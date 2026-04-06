@@ -19,22 +19,28 @@ export const Form: React.FC = () => {
 
   useEffect(() => {
     if (phoneInputRef.current) {
-      itiRef.current = intlTelInput(phoneInputRef.current, {
-        initialCountry: "auto",
-        geoIpLookup: (callback: (countryCode: string) => void) => {
-          fetch("https://ipapi.co/json")
-            .then((res) => res.json())
-            .then((data) => {
-              console.log("GeoIP Data Found:", data);
-              callback(data.country_code);
-            })
-            .catch(() => callback("UA"));
-        },
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-        separateDialCode: true,
-        preferredCountries: ["ua", "pl", "gb", "us"],
-        autoPlaceholder: "aggressive",
-      } as any);
+      try {
+        itiRef.current = intlTelInput(phoneInputRef.current, {
+          initialCountry: "auto",
+          geoIpLookup: (callback: (countryCode: string) => void) => {
+            fetch("https://ipapi.co/json")
+              .then((res) => res.json())
+              .then((data) => {
+                console.log("GeoIP Data Found:", data);
+                callback(data.country_code);
+              })
+              .catch(() => callback("UA"));
+          },
+          // Use localized or absolute URL for utils to avoid some blocks
+          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+          separateDialCode: true,
+          preferredCountries: ["ua", "pl", "gb", "us"],
+          autoPlaceholder: "aggressive",
+        } as any);
+        console.log("ITI Initialized");
+      } catch (err) {
+        console.error("ITI Init Error:", err);
+      }
     }
 
     return () => {
@@ -64,17 +70,27 @@ export const Form: React.FC = () => {
       const countryData = itiRef.current.getSelectedCountryData();
       const error = itiRef.current.getValidationError();
 
-      console.log("Phone Validation Debug:", {
-        isValid: isPhoneValid,
-        formattedNumber: number,
-        rawInput: formData.phone,
-        country: countryData.name,
-        iso2: countryData.iso2,
-        errorCode: error
+      console.log("Validation Call:", {
+        val: isPhoneValid,
+        num: number,
+        code: error,
+        country: countryData.iso2
       });
 
-      if (!isPhoneValid) {
+      // FALLBACK: If iti results are blocked or unreliable, 
+      // do a basic digit check (min 9 digits)
+      const digitsOnly = formData.phone.replace(/\D/g, "");
+      const looksLikePhone = digitsOnly.length >= 9;
+
+      if (!isPhoneValid && !looksLikePhone) {
         newErrors.phone = "Некоректний номер телефону";
+        valid = false;
+      }
+    } else {
+      // IF ITI FAILED TO INITIALIZE AT ALL
+      const digitsOnly = formData.phone.replace(/\D/g, "");
+      if (digitsOnly.length < 9) {
+        newErrors.phone = "Введіть номер телефону";
         valid = false;
       }
     }
