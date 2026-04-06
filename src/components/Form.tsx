@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import styles from "./Form.module.css";
 import { Input } from "./Input";
 import { Button } from "./Button";
 import { trackFBEvent } from "./FacebookPixel";
-import intlTelInput from "intl-tel-input";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TELEGRAM_LINK = "https://t.me/+qNxPhx3CUpw1ODZi";
@@ -14,41 +13,6 @@ export const Form: React.FC = () => {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [errors, setErrors] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
-  const phoneInputRef = useRef<HTMLInputElement>(null);
-  const itiRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (phoneInputRef.current) {
-      try {
-        itiRef.current = intlTelInput(phoneInputRef.current, {
-          initialCountry: "auto",
-          geoIpLookup: (callback: (countryCode: string) => void) => {
-            fetch("https://ipapi.co/json")
-              .then((res) => res.json())
-              .then((data) => {
-                console.log("GeoIP Data Found:", data);
-                callback(data.country_code);
-              })
-              .catch(() => callback("UA"));
-          },
-          // Use localized or absolute URL for utils to avoid some blocks
-          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-          separateDialCode: true,
-          preferredCountries: ["ua", "pl", "gb", "us"],
-          autoPlaceholder: "aggressive",
-        } as any);
-        console.log("ITI Initialized");
-      } catch (err) {
-        console.error("ITI Init Error:", err);
-      }
-    }
-
-    return () => {
-      if (itiRef.current) {
-        itiRef.current.destroy();
-      }
-    };
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,35 +28,11 @@ export const Form: React.FC = () => {
       valid = false;
     }
 
-    if (itiRef.current) {
-      const isPhoneValid = itiRef.current.isValidNumber();
-      const number = itiRef.current.getNumber();
-      const countryData = itiRef.current.getSelectedCountryData();
-      const error = itiRef.current.getValidationError();
-
-      console.log("Validation Call:", {
-        val: isPhoneValid,
-        num: number,
-        code: error,
-        country: countryData.iso2
-      });
-
-      // FALLBACK: If iti results are blocked or unreliable, 
-      // do a basic digit check (min 9 digits)
-      const digitsOnly = formData.phone.replace(/\D/g, "");
-      const looksLikePhone = digitsOnly.length >= 9;
-
-      if (!isPhoneValid && !looksLikePhone) {
-        newErrors.phone = "Некоректний номер телефону";
-        valid = false;
-      }
-    } else {
-      // IF ITI FAILED TO INITIALIZE AT ALL
-      const digitsOnly = formData.phone.replace(/\D/g, "");
-      if (digitsOnly.length < 9) {
-        newErrors.phone = "Введіть номер телефону";
-        valid = false;
-      }
+    // Simple digit count validation (min 9 digits)
+    const digitsOnly = formData.phone.replace(/\D/g, "");
+    if (digitsOnly.length < 9) {
+      newErrors.phone = "Некоректний номер телефону (мін. 9 цифр)";
+      valid = false;
     }
 
     setErrors(newErrors);
@@ -104,20 +44,19 @@ export const Form: React.FC = () => {
     if (!validate()) return;
 
     setStatus("loading");
-    const fullPhone = itiRef.current?.getNumber() || formData.phone;
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
     const utmData = {
-      utm_source: searchParams.get("utm_source") || "",
-      utm_medium: searchParams.get("utm_medium") || "",
-      utm_campaign: searchParams.get("utm_campaign") || "",
-      utm_content: searchParams.get("utm_content") || "",
-      utm_term: searchParams.get("utm_term") || "",
+      utm_source: searchParams.get("utm_source") || "direct",
+      utm_medium: searchParams.get("utm_medium") || "none",
+      utm_campaign: searchParams.get("utm_campaign") || "none",
+      utm_content: searchParams.get("utm_content") || "none",
+      utm_term: searchParams.get("utm_term") || "none",
       full_url: window.location.href
     };
 
-    // Track Lead before sending
+    // Track Lead
     trackFBEvent("Lead", { 
       content_name: "Masterclass Registration",
       value: 0,
@@ -134,8 +73,7 @@ export const Form: React.FC = () => {
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
-            ...formData, 
-            phone: fullPhone,
+            ...formData,
             ...utmData
           }),
         });
@@ -166,10 +104,10 @@ export const Form: React.FC = () => {
           disabled={status !== "idle"}
         />
         <Input 
-          ref={phoneInputRef}
           label="Номер телефону" 
           name="phone" 
           type="tel" 
+          placeholder="+380..." 
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
