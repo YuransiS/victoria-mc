@@ -70,3 +70,38 @@
 .expertPoint:last-child {
   border-bottom: none;
 }
+
+.expertSocial {
+  margin-top: 1rem;
+}
+
+.instagramButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background-color: var(--on-surface);
+  color: var(--surface);
+  border-radius: 100px;
+  text-decoration: none;
+  font-family: var(--font-manrope);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.instagramButton:hover {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.instagramButton svg {
+  transition: transform 0.3s ease;
+}
+
+.instagramButton:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
