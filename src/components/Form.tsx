@@ -20,16 +20,23 @@ export const Form: React.FC = () => {
   useEffect(() => {
     if (phoneInputRef.current) {
       try {
+        console.log("Starting ITI initialization...");
         itiRef.current = intlTelInput(phoneInputRef.current, {
           initialCountry: "auto",
           geoIpLookup: (callback: (countryCode: string) => void) => {
             fetch("https://ipapi.co/json")
-              .then((res) => res.json())
+              .then((res) => {
+                if (!res.ok) throw new Error("Status " + res.status);
+                return res.json();
+              })
               .then((data) => {
                 console.log("GeoIP Detected:", data.country_code);
                 callback(data.country_code);
               })
-              .catch(() => callback("ua"));
+              .catch((err) => {
+                console.warn("GeoIP Fetch failed, defaulting to UA:", err.message);
+                callback("ua");
+              });
           },
           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
           separateDialCode: true,
@@ -39,7 +46,11 @@ export const Form: React.FC = () => {
 
         const handlePhoneInput = () => {
           if (itiRef.current) {
-            setFormData(prev => ({ ...prev, phone: itiRef.current.getNumber() }));
+            const num = itiRef.current.getNumber();
+            setFormData(prev => {
+              if (prev.phone === num) return prev;
+              return { ...prev, phone: num };
+            });
           }
         };
 
@@ -168,6 +179,7 @@ export const Form: React.FC = () => {
           label="Номер телефону" 
           name="phone" 
           type="tel" 
+          placeholder="+380..."
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
