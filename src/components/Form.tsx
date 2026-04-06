@@ -36,16 +36,29 @@ export const Form: React.FC = () => {
           preferredCountries: ["ua", "pl", "gb", "us"],
           autoPlaceholder: "aggressive",
         } as any);
+
+        const handlePhoneInput = () => {
+          if (itiRef.current) {
+            setFormData(prev => ({ ...prev, phone: itiRef.current.getNumber() }));
+          }
+        };
+
+        phoneInputRef.current.addEventListener("input", handlePhoneInput);
+        phoneInputRef.current.addEventListener("countrychange", handlePhoneInput);
+
+        return () => {
+          if (phoneInputRef.current) {
+            phoneInputRef.current.removeEventListener("input", handlePhoneInput);
+            phoneInputRef.current.removeEventListener("countrychange", handlePhoneInput);
+          }
+          if (itiRef.current) {
+            itiRef.current.destroy();
+          }
+        };
       } catch (err) {
         console.error("intl-tel-input init error:", err);
       }
     }
-
-    return () => {
-      if (itiRef.current) {
-        itiRef.current.destroy();
-      }
-    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,16 +78,18 @@ export const Form: React.FC = () => {
     if (itiRef.current) {
       const isValid = itiRef.current.isValidNumber();
       const num = itiRef.current.getNumber();
+      const digitsOnly = formData.phone.replace(/\D/g, "");
       
-      console.log("Phone Validation:", { isValid, num });
+      console.log("Validation State:", { isValid, num, digits: digitsOnly.length });
 
-      if (!isValid && formData.phone.replace(/\D/g, "").length < 9) {
+      if (!isValid && digitsOnly.length < 9) {
         newErrors.phone = "Некоректний номер телефону";
         valid = false;
       }
     } else {
-      if (formData.phone.replace(/\D/g, "").length < 9) {
-        newErrors.phone = "Введіть номер телефону";
+      const digitsOnly = formData.phone.replace(/\D/g, "");
+      if (digitsOnly.length < 9) {
+        newErrors.phone = "Введіть номер телефону (мін. 9 цифр)";
         valid = false;
       }
     }
