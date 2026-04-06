@@ -20,11 +20,14 @@ export const Form: React.FC = () => {
   useEffect(() => {
     if (phoneInputRef.current) {
       itiRef.current = intlTelInput(phoneInputRef.current, {
-        initialCountry: "ua",
+        initialCountry: "auto",
         geoIpLookup: (callback: (countryCode: string) => void) => {
           fetch("https://ipapi.co/json")
             .then((res) => res.json())
-            .then((data) => callback(data.country_code))
+            .then((data) => {
+              console.log("GeoIP Data Found:", data);
+              callback(data.country_code);
+            })
             .catch(() => callback("UA"));
         },
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
@@ -57,6 +60,19 @@ export const Form: React.FC = () => {
 
     if (itiRef.current) {
       const isPhoneValid = itiRef.current.isValidNumber();
+      const number = itiRef.current.getNumber();
+      const countryData = itiRef.current.getSelectedCountryData();
+      const error = itiRef.current.getValidationError();
+
+      console.log("Phone Validation Debug:", {
+        isValid: isPhoneValid,
+        formattedNumber: number,
+        rawInput: formData.phone,
+        country: countryData.name,
+        iso2: countryData.iso2,
+        errorCode: error
+      });
+
       if (!isPhoneValid) {
         newErrors.phone = "Некоректний номер телефону";
         valid = false;
