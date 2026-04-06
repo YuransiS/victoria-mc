@@ -1,0 +1,37 @@
+.formContainer {
+  background-color: var(--surface-container-low);
+  padding: 3rem 2rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.title {
+  font-family: var(--font-newsreader);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message {
+  font-family: var(--font-manrope);
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.success {
+  color: var(--primary);
+}
+
+.error {
+  color: var(--error);
+}
+
+.submitBtn {
+  margin-top: 1rem;
+}

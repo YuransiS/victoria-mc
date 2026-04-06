@@ -1,0 +1,43 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-manrope);
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  border-bottom: 2px solid var(--primary);
+  outline: none;
+}
+
+.inputError {
+  border-bottom: 2px solid var(--error);
+  color: var(--error);
+}
+
+.errorMessage {
+  font-family: var(--font-manrope);
+  color: var(--error);
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}

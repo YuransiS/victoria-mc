@@ -1,0 +1,44 @@
+.section {
+  padding: 8rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  background-color: var(--surface-container-low);
+}
+
+.statementBlock {
+  max-width: 1000px;
+  width: 100%;
+  border-left: 4px solid var(--accent);
+  padding-left: 2rem;
+}
+
+@media (min-width: 768px) {
+  .statementBlock {
+    padding-left: 4rem;
+  }
+}
+
+.statementTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2rem, 5vw, 4rem);
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.statementText {
+  font-family: var(--font-manrope);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.caption {
+  margin-top: 3rem;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  font-family: var(--font-manrope);
+}
