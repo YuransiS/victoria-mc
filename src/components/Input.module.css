@@ -52,6 +52,15 @@
   display: block;
 }
 
+.hintMessage {
+  font-family: var(--font-manrope);
+  color: rgba(217, 184, 151, 0.7);
+  font-size: 0.65rem;
+  margin-top: 0.2rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
 :global(.iti) {
   width: 100%;
 }

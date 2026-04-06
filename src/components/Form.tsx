@@ -28,11 +28,19 @@ export const Form: React.FC = () => {
       valid = false;
     }
 
-    // Extremely lenient: just check for minimal digits
-    const digitsOnly = formData.phone.replace(/\D/g, "");
-    if (digitsOnly.length < 7) {
-      newErrors.phone = "Введіть номер телефону";
-      valid = false;
+    // Lenient: allow Telegram nick (@username) or phone number
+    const contact = formData.phone.trim();
+    if (contact.startsWith("@")) {
+      if (contact.length < 4) {
+        newErrors.phone = "Введіть коректний Telegram нік";
+        valid = false;
+      }
+    } else {
+      const digitsOnly = contact.replace(/\D/g, "");
+      if (digitsOnly.length < 7) {
+        newErrors.phone = "Введіть Telegram нік або номер телефону";
+        valid = false;
+      }
     }
 
     setErrors(newErrors);
@@ -103,13 +111,14 @@ export const Form: React.FC = () => {
           disabled={status !== "idle"}
         />
         <Input 
-          label="НОМЕР ТЕЛЕФОНУ" 
+          label="ТЕЛЕГРАМ @НІК АБО НОМЕР ТЕЛЕФОНУ" 
           name="phone" 
-          type="tel" 
-          placeholder="+380..." 
+          type="text" 
+          placeholder="@nickname або +380..." 
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
+          hint="Краще вкажіть Telegram @нік для швидкого зв'язку"
           disabled={status !== "idle"}
         />
 

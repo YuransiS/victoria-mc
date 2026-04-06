@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 import { FacebookPixel } from "@/components/FacebookPixel";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 export default function RootLayout({
   children,
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body className={`${manrope.variable} ${newsreader.variable} ${manrope.className}`}>
+        <SmoothScroll />
         <FacebookPixel />
         {children}
       </body>

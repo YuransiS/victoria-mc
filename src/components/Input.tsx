@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  hint?: string;
   wrapperClassName?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, wrapperClassName, ...props }, ref) => {
+  ({ label, error, hint, wrapperClassName, ...props }, ref) => {
     return (
       <div className={`${styles.wrapper} ${wrapperClassName || ""}`}>
         <label className={styles.label}>{label}</label>
@@ -19,14 +20,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props} 
         />
         <AnimatePresence>
-          {error && (
+          {error ? (
             <motion.span 
+              key="error"
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
               className={styles.errorMessage}
             >
               {error}
+            </motion.span>
+          ) : hint && (
+            <motion.span 
+              key="hint"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className={styles.hintMessage}
+            >
+              {hint}
             </motion.span>
           )}
         </AnimatePresence>

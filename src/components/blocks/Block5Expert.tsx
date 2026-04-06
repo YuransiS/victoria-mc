@@ -1,44 +1,92 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import styles from "./Block5Expert.module.css";
 import { Button } from "@/components/Button";
+import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+const imageVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9, filter: "blur(5px)" },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: "easeOut" }
+  }
+};
 
 export function Block5Expert() {
   return (
     <section className={styles.section}>
-      <div className={styles.sectionHeader}>
+      <motion.div 
+        className={styles.sectionHeader}
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2 className={styles.sectionTitle}>Хто проводить Майстер-клас?</h2>
-      </div>
+      </motion.div>
       <div className={styles.expertLayout}>
-        <div className={styles.imageWrapper}>
+        <motion.div 
+          className={styles.imageWrapper}
+          variants={imageVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           <Image
             src="https://i.ibb.co/N2J39PrH/IMG-0911.jpg"
             alt="Вікторія Мещерякова"
             fill
             className={styles.imageCover}
           />
-        </div>
-        <div className={styles.expertInfo}>
-          <h3 className={styles.expertTitle}>Я - Вікторія Мещерякова</h3>
-          <div className={styles.expertPoint}>
+        </motion.div>
+        <motion.div 
+          className={styles.expertInfo}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          <motion.h3 className={styles.expertTitle} variants={itemVariants}>Я - Вікторія Мещерякова</motion.h3>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             Працюю з контентом з 2015 року. Бачила Instagram від самого початку і всі його трансформації до сьогодні.
-          </div>
-          <div className={styles.expertPoint}>
+          </motion.div>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             Починала з авторських ляльок які створювала руками - вручну будувала для них контент і продажі ще до того як це почали робити нейромережі.
-          </div>
-          <div className={styles.expertPoint}>
+          </motion.div>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             Розробляла стратегії для міжнародних брендів, зокрема Fisher. Працювала з аудиторіями трьох країн: Британія, США, Польща.
-          </div>
-          <div className={styles.expertPoint}>
+          </motion.div>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             5 років викладання. За цей час виробила мову пояснення яка працює для будь-якого рівня і будь-якої ніші.
-          </div>
-          <div className={styles.expertPoint}>
+          </motion.div>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             Мама двох дітей. Система "контент за 30 хвилин" - це не маркетинговий слоган. Це єдиний спосіб яким я сама веду блог між дитиною, роботою і реальним життям.
-          </div>
-          <div className={styles.expertPoint}>
+          </motion.div>
+          <motion.div className={styles.expertPoint} variants={itemVariants}>
             Я сама пройшла шлях від хаосу та емоційного постингу до чіткої системи. Саме тому знаю де саме ти зараз застрягла - і що з цим робити.
-          </div>
-          <div className={styles.expertSocial}>
+          </motion.div>
+          <motion.div className={styles.expertSocial} variants={itemVariants}>
             <a 
               href="https://www.instagram.com/victoria_meshcheriakova?igsh=dW55YTltMTZ0Mmw1" 
               target="_blank" 
@@ -55,13 +103,16 @@ export function Block5Expert() {
               </svg>
               <span>Подивитись мій Instagram</span>
             </a>
-          </div>
-          <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-start", width: "100%" }}>
+          </motion.div>
+          <motion.div 
+            style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-start", width: "100%" }}
+            variants={itemVariants}
+          >
             <a href="#register" style={{ width: "100%" }}>
               <Button variant="primary" style={{ width: "100%" }}>ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
