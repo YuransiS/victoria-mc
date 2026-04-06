@@ -21,24 +21,39 @@ export function Block1Hero() {
       <div className={styles.container}>
         {/* MAIN STACKED CONTENT */}
         <div className={styles.content}>
-          
+
           <div className={styles.textContent}>
+            <div className={styles.topRow}>
+              <span>09.04</span>
+              <span>18:00 за Києвом</span>
+            </div>
+
             <h1 className={styles.title}>
-              ВІД ХАОСУ<br/>ДО СИСТЕМИ
+              ВІД ХАОСУ<br />ДО СИСТЕМИ
             </h1>
-            
+
             <p className={styles.description}>
-              Як побудувати блог, який працює на вас — зробити вашу експертність видимою та залучати клієнтів.
+              як побудувати блог, який працює на вас - відображає ваші цінності, викликає довіру та приводить клієнтів
             </p>
           </div>
 
           {/* REGISTRATION FORM COMPACT */}
           <div className={styles.formWrapper}>
             <div className={styles.priceTag}>
-               <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
+              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
             </div>
-            
+
             <Form />
+
+            <div className={styles.socialProof}>
+              <div className={styles.avatars}>
+                <img src="https://i.pravatar.cc/100?img=32" alt="Participant" />
+                <img src="https://i.pravatar.cc/100?img=47" alt="Participant" />
+                <img src="https://i.pravatar.cc/100?img=12" alt="Participant" />
+                <img src="https://i.pravatar.cc/100?img=26" alt="Participant" />
+              </div>
+              <span>🔥 <b>712</b> людей вже зареєструвалися</span>
+            </div>
           </div>
 
         </div>

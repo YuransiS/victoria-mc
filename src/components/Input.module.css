@@ -1,35 +1,35 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.5rem; /* Variant is tighter */
+  margin-bottom: 0.35rem; /* Compressed from 0.5rem */
   width: 100%;
 }
 
 .label {
   font-family: var(--font-manrope);
-  font-size: 0.65rem;
-  color: #7a7a7a; /* Subtle grayish label for the variant look */
-  margin-bottom: 0.25rem;
+  font-size: 0.6rem; /* Smaller labels */
+  color: #7a7a7a;
+  margin-bottom: 0.15rem; /* Tighter spacing */
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
-  margin-left: 0.75rem; /* Spacing from left edge like variant */
+  margin-left: 0.5rem;
 }
 
 .input {
-  background: rgba(0, 0, 0, 0.3) !important; /* Darker inputs task */
+  background: rgba(0, 0, 0, 0.3) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 0.75rem !important;
+  border-radius: 0.5rem !important; /* Slightly sharper corners for compact look */
   color: #ffffff !important;
   font-family: var(--font-manrope);
-  font-size: 0.95rem !important;
-  padding: 1.15rem 1.25rem !important;
+  font-size: 0.875rem !important; /* Smaller text task */
+  padding: 0.75rem 1rem !important; /* Major reduction from 1.15rem */
   transition: all 0.25s ease;
   width: 100%;
 }
 
 .input:focus {
-  border: 1px solid rgba(217, 184, 151, 0.5) !important; /* Goldish glow */
+  border: 1px solid rgba(217, 184, 151, 0.5) !important;
   background: rgba(0, 0, 0, 0.4) !important;
   box-shadow: 0 0 0 4px rgba(217, 184, 151, 0.1) !important;
   outline: none;
@@ -42,9 +42,9 @@
 .errorMessage {
   font-family: var(--font-manrope);
   color: #ff4d4d;
-  font-size: 0.7rem;
-  margin-top: 0.25rem;
-  margin-left: 0.75rem;
+  font-size: 0.65rem;
+  margin-top: 0.15rem;
+  margin-left: 0.5rem;
 }
 
 ::placeholder {

@@ -5,27 +5,29 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Tighter layout like in variant */
+  gap: 0.15rem; /* Major compression task */
 }
 
 /* SUBMIT BUTTON WITH GRADIENT */
 .submitBtn {
-  margin-top: 1.5rem;
+  margin-top: 0.75rem; /* Compressed from 1.5rem */
   background: linear-gradient(135deg, #a8947a 0%, #d1b897 50%, #a8947a 100%) !important;
   color: #1a1a1a !important;
   font-family: var(--font-manrope);
   font-weight: 800 !important;
-  font-size: 1.25rem !important;
-  padding: 1.25rem !important;
-  border-radius: 1rem !important;
+  font-size: 1.1rem !important; /* Slightly smaller button text */
+  padding: 1rem !important; /* Compressed padding */
+  border-radius: 0.75rem !important;
   text-transform: uppercase;
   border: none;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: clip;
   width: 100%;
   position: relative;
-  overflow: hidden;
 }
 
 .submitBtn::after {
@@ -51,8 +53,8 @@
 
 .message {
   font-family: var(--font-manrope);
-  margin-top: 1rem;
-  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
   text-align: center;
   color: #fff;
 }
