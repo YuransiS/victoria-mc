@@ -20,24 +20,8 @@ export const Form: React.FC = () => {
   useEffect(() => {
     if (phoneInputRef.current) {
       try {
-        console.log("Starting ITI initialization...");
         itiRef.current = intlTelInput(phoneInputRef.current, {
-          initialCountry: "auto",
-          geoIpLookup: (callback: (countryCode: string) => void) => {
-            fetch("https://ipapi.co/json")
-              .then((res) => {
-                if (!res.ok) throw new Error("Status " + res.status);
-                return res.json();
-              })
-              .then((data) => {
-                console.log("GeoIP Detected:", data.country_code);
-                callback(data.country_code);
-              })
-              .catch((err) => {
-                console.warn("GeoIP Fetch failed, defaulting to UA:", err.message);
-                callback("ua");
-              });
-          },
+          initialCountry: "ua",
           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
           separateDialCode: true,
           preferredCountries: ["ua", "pl", "gb", "us"],
