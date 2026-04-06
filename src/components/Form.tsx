@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./Form.module.css";
 import { Input } from "./Input";
 import { Button } from "./Button";
 import { trackFBEvent } from "./FacebookPixel";
+import intlTelInput from "intl-tel-input";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TELEGRAM_LINK = "https://t.me/+qNxPhx3CUpw1ODZi";
@@ -13,6 +14,39 @@ export const Form: React.FC = () => {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [errors, setErrors] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const itiRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (phoneInputRef.current) {
+      try {
+        itiRef.current = intlTelInput(phoneInputRef.current, {
+          initialCountry: "auto",
+          geoIpLookup: (callback: (countryCode: string) => void) => {
+            fetch("https://ipapi.co/json")
+              .then((res) => res.json())
+              .then((data) => {
+                console.log("GeoIP Detected:", data.country_code);
+                callback(data.country_code);
+              })
+              .catch(() => callback("ua"));
+          },
+          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+          separateDialCode: true,
+          preferredCountries: ["ua", "pl", "gb", "us"],
+          autoPlaceholder: "aggressive",
+        } as any);
+      } catch (err) {
+        console.error("intl-tel-input init error:", err);
+      }
+    }
+
+    return () => {
+      if (itiRef.current) {
+        itiRef.current.destroy();
+      }
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,11 +62,21 @@ export const Form: React.FC = () => {
       valid = false;
     }
 
-    // Simple digit count validation (min 9 digits)
-    const digitsOnly = formData.phone.replace(/\D/g, "");
-    if (digitsOnly.length < 9) {
-      newErrors.phone = "Некоректний номер телефону (мін. 9 цифр)";
-      valid = false;
+    if (itiRef.current) {
+      const isValid = itiRef.current.isValidNumber();
+      const num = itiRef.current.getNumber();
+      
+      console.log("Phone Validation:", { isValid, num });
+
+      if (!isValid && formData.phone.replace(/\D/g, "").length < 9) {
+        newErrors.phone = "Некоректний номер телефону";
+        valid = false;
+      }
+    } else {
+      if (formData.phone.replace(/\D/g, "").length < 9) {
+        newErrors.phone = "Введіть номер телефону";
+        valid = false;
+      }
     }
 
     setErrors(newErrors);
@@ -44,6 +88,8 @@ export const Form: React.FC = () => {
     if (!validate()) return;
 
     setStatus("loading");
+    
+    const fullPhone = itiRef.current ? itiRef.current.getNumber() : formData.phone;
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
@@ -56,7 +102,6 @@ export const Form: React.FC = () => {
       full_url: window.location.href
     };
 
-    // Track Lead
     trackFBEvent("Lead", { 
       content_name: "Masterclass Registration",
       value: 0,
@@ -74,6 +119,7 @@ export const Form: React.FC = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             ...formData,
+            phone: fullPhone,
             ...utmData
           }),
         });
@@ -82,7 +128,6 @@ export const Form: React.FC = () => {
       console.error("Submission error:", error);
     }
 
-    // Always redirect anyway as per instructions
     setStatus("redirecting");
     
     setTimeout(() => {
@@ -104,10 +149,10 @@ export const Form: React.FC = () => {
           disabled={status !== "idle"}
         />
         <Input 
+          ref={phoneInputRef}
           label="Номер телефону" 
           name="phone" 
           type="tel" 
-          placeholder="+380..." 
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
