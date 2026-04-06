@@ -27,7 +27,7 @@ export function Block3Audience() {
       </div>
       <div style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }}>
         <a href="#register">
-          <Button variant="secondary">приєднатися на майстер-клас (бонус)</Button>
+          <Button variant="primary">ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
         </a>
       </div>
     </section>

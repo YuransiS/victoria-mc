@@ -1,8 +1,7 @@
-/* ROOT HERO */
 .hero {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   background-color: #121212;
   overflow: hidden;
@@ -172,4 +171,12 @@
 .socialProof b {
   color: #d1b897; /* warm gold accent */
   font-weight: 800;
+}
+
+@media (max-width: 480px) {
+  .formWrapper {
+    transform: scale(0.85);
+    transform-origin: bottom center;
+    margin-bottom: env(safe-area-inset-bottom, 1rem);
+  }
 }

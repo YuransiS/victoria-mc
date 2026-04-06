@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./SharedBlocks.module.css";
+import { Button } from "@/components/Button";
 
 export function Block2Learning() {
   return (
@@ -28,6 +29,11 @@ export function Block2Learning() {
           <span className={styles.listItemNum}>5</span>
           <p className={styles.listItemText}>Дізнаєшся алгоритм «30 хвилин», за яким зможеш знімати якісний контент вдома біля вікна без допомоги студій та фотографів.</p>
         </div>
+      </div>
+      <div style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }}>
+        <a href="#register">
+          <Button variant="primary">ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
+        </a>
       </div>
     </section>
   );

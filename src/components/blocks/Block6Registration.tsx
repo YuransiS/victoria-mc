@@ -4,15 +4,29 @@ import { Form } from "@/components/Form";
 
 export function Block6Registration() {
   return (
-    <section id="register" className={`${styles.section} ${styles.sectionAlt}`}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "2rem", width: "100%", maxWidth: "600px", margin: "0 auto" }}>
+    <section id="register" className={`${styles.section}`}>
+      <div style={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: "2rem", 
+        width: "100%", 
+        maxWidth: "600px", 
+        margin: "0 auto",
+        background: "rgba(30, 30, 28, 0.9)",
+        backdropFilter: "blur(25px)",
+        WebkitBackdropFilter: "blur(25px)",
+        borderRadius: "1.5rem",
+        padding: "2.5rem 1.5rem",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        boxShadow: "0 40px 100px rgba(0, 0, 0, 0.6)"
+      }}>
         <div>
-          <h2 className={styles.sectionTitle} style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", textAlign: "center" }}>
+          <h2 className={styles.sectionTitle} style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", textAlign: "center", color: "#d1b897", margin: "0 0 1rem 0" }}>
             Реєструйся на практичний майстер-клас
           </h2>
-          <p style={{ textAlign: "center", color: "var(--on-surface-variant)", lineHeight: 1.6 }}>
+          <p style={{ textAlign: "center", color: "rgba(255, 255, 255, 0.8)", lineHeight: 1.6, margin: 0 }}>
             та отримуй готову структуру блогу під будь яку нішу на 6 місяців вперед.<br />
-            <strong style={{ color: "var(--accent)" }}>Кількість безкоштовних місць на майстер-класі - обмежена.</strong>
+            <strong style={{ color: "#d1b897" }}>Кількість безкоштовних місць на майстер-класі - обмежена.</strong>
           </p>
         </div>
         <Form />

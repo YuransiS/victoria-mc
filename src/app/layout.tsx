@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
+import "intl-tel-input/build/css/intlTelInput.css";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
   description: "Дізнайтеся, як доносити цінність послуг через естетичний візуал та отримувати клієнтів з Instagram без цілодобового постингу.",
 };
 
+import { FacebookPixel } from "@/components/FacebookPixel";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body className={`${manrope.variable} ${newsreader.variable} ${manrope.className}`}>
+        <FacebookPixel />
         {children}
       </body>
     </html>
