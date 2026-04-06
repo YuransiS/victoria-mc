@@ -28,6 +28,10 @@
   width: 100%;
 }
 
+:global(.iti) .input {
+  padding-left: 85px !important; /* Adjust based on dial code size */
+}
+
 .input:focus {
   border: 1px solid rgba(217, 184, 151, 0.5) !important;
   background: rgba(0, 0, 0, 0.4) !important;
