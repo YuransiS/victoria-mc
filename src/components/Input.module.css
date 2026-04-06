@@ -1,43 +1,51 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem; /* Compact form task */
   width: 100%;
 }
 
 .label {
   font-family: var(--font-manrope);
-  font-size: 0.75rem;
-  color: var(--on-surface-variant);
-  margin-bottom: 0.5rem;
+  font-size: 0.75rem; /* External label task visibility */
+  color: #fff; /* High contrast task */
+  margin-bottom: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600; /* External label boldness for prominence */
 }
 
 .input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--outline-variant);
-  color: var(--on-surface);
+  background: rgba(255, 255, 255, 0.02); /* Very subtle fill for modern feel */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #ffffff;
   font-family: var(--font-manrope);
   font-size: 1rem;
-  padding: 0.5rem 0;
-  transition: all 0.3s ease;
+  padding: 0.825rem 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .input:focus {
-  border-bottom: 2px solid var(--primary);
+  border: 1px solid var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px rgba(217, 99, 91, 0.1); /* Subtle primary glow */
   outline: none;
 }
 
 .inputError {
-  border-bottom: 2px solid var(--error);
-  color: var(--error);
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
 }
 
 .errorMessage {
   font-family: var(--font-manrope);
-  color: var(--error);
-  font-size: 0.75rem;
-  margin-top: 0.5rem;
+  color: #ff6b6b;
+  font-size: 0.7rem;
+  margin-top: 0.35rem;
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.3); /* Low priority placeholders task */
 }

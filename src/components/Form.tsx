@@ -6,7 +6,7 @@ import { Input } from "./Input";
 import { Button } from "./Button";
 
 export const Form: React.FC = () => {
-  const [formData, setFormData] = useState({ name: "", phone: "", telegram: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -45,7 +45,7 @@ export const Form: React.FC = () => {
 
       setStatus("success");
       setMessage("Дякуємо! Ваша заявка прийнята.");
-      setFormData({ name: "", phone: "", telegram: "" });
+      setFormData({ name: "", phone: "" });
     } catch (error) {
       setStatus("error");
       setMessage("Не вдалося відправити. Перевірте з'єднання.");
@@ -73,14 +73,7 @@ export const Form: React.FC = () => {
           onChange={handleChange}
           required
         />
-        <Input 
-          label="Telegram (за бажанням)" 
-          name="telegram" 
-          type="text" 
-          placeholder="@username" 
-          value={formData.telegram}
-          onChange={handleChange}
-        />
+
         <Button 
           type="submit" 
           variant="primary" 

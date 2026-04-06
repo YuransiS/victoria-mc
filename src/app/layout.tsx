@@ -16,8 +16,8 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Digital Curator - Editorial Visualism",
-  description: "A moody, high-end editorial aesthetic landing page.",
+  title: "ВІКТОРІЯ МЕЩЕРЯКОВА — Майстер-клас: Візуал та Сенси",
+  description: "Дізнайтеся, як доносити цінність послуг через естетичний візуал та отримувати клієнтів з Instagram без цілодобового постингу.",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="uk">
       <body className={`${manrope.variable} ${newsreader.variable} ${manrope.className}`}>
         {children}
       </body>
