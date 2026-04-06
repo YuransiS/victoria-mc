@@ -1,51 +1,52 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.75rem; /* Compact form task */
+  margin-bottom: 0.5rem; /* Variant is tighter */
   width: 100%;
 }
 
 .label {
   font-family: var(--font-manrope);
-  font-size: 0.75rem; /* External label task visibility */
-  color: #fff; /* High contrast task */
-  margin-bottom: 0.4rem;
+  font-size: 0.65rem;
+  color: #7a7a7a; /* Subtle grayish label for the variant look */
+  margin-bottom: 0.25rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600; /* External label boldness for prominence */
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  margin-left: 0.75rem; /* Spacing from left edge like variant */
 }
 
 .input {
-  background: rgba(255, 255, 255, 0.02); /* Very subtle fill for modern feel */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3) !important; /* Darker inputs task */
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.75rem !important;
+  color: #ffffff !important;
   font-family: var(--font-manrope);
-  font-size: 1rem;
-  padding: 0.825rem 1rem;
-  transition: all 0.2s ease;
+  font-size: 0.95rem !important;
+  padding: 1.15rem 1.25rem !important;
+  transition: all 0.25s ease;
   width: 100%;
 }
 
 .input:focus {
-  border: 1px solid var(--primary);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 4px rgba(217, 99, 91, 0.1); /* Subtle primary glow */
+  border: 1px solid rgba(217, 184, 151, 0.5) !important; /* Goldish glow */
+  background: rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 0 0 4px rgba(217, 184, 151, 0.1) !important;
   outline: none;
 }
 
 .inputError {
-  border: 1px solid #ff6b6b;
-  color: #ff6b6b;
+  border: 1px solid #ff4d4d !important;
 }
 
 .errorMessage {
   font-family: var(--font-manrope);
-  color: #ff6b6b;
+  color: #ff4d4d;
   font-size: 0.7rem;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
+  margin-left: 0.75rem;
 }
 
 ::placeholder {
-  color: rgba(255, 255, 255, 0.3); /* Low priority placeholders task */
+  color: rgba(255, 255, 255, 0.2);
 }

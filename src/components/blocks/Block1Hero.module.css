@@ -1,185 +1,122 @@
+/* ROOT HERO */
 .hero {
   position: relative;
   min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height for mobiles */
+  min-height: 100dvh;
   display: flex;
-  background-color: #0d0d0c; /* Deep black background */
+  background-color: #121212;
   overflow: hidden;
+  color: #fff;
 }
 
 .background {
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: flex;
-  justify-content: flex-end; /* Rule of Thirds: Image to the right */
 }
 
 .bgImage {
   object-fit: cover;
-  object-position: bottom; /* Pin photo to bottom so it starts from form */
+  object-position: center 40%;
+  /* Focus on speaker's face slightly higher */
   width: 100%;
   height: 100%;
-}
-
-@media (min-width: 1024px) {
-  .bgImage {
-    width: 60%; /* Image takes only a portion on the right */
-    mask-image: linear-gradient(to left, black 60%, transparent 100%);
-  }
+  opacity: 1;
+  /* Moody mix */
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%);
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%);
+  opacity: 0.6;
 }
 
-@media (max-width: 1023px) {
-  .overlay {
-     background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.95) 100%);
-  }
-}
-
+/* CONTAINER & LAYOUT */
 .container {
   position: relative;
-  z-index: 1;
+  z-index: 10;
   width: 100%;
-  max-width: 1300px;
+  max-width: 800px;
+  /* More centered text block width */
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 4rem 1.5rem 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* PIN TO BOTTOM */
-}
-
-.header {
-  position: absolute; /* Header can float above, pushed up */
-  top: 2rem;
-  left: 1.5rem;
-  right: 1.5rem;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-family: var(--font-manrope);
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-align: center;
 }
 
 .content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem; /* Tight spacing between text and form */
-  padding-bottom: 2rem; /* Give a little breathing room from the absolute edge */
-}
-
-@media (min-width: 1024px) {
-  .content {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 4rem;
-    padding-bottom: 4rem;
-  }
+  justify-content: flex-start;
+  /* Title stays top-isch */
+  gap: 2rem;
+  width: 100%;
+  padding-bottom: 2rem;
 }
 
 .textContent {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  max-width: 650px;
-  text-align: left;
+  gap: 1.5rem;
 }
 
 .title {
   font-family: var(--font-newsreader);
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  font-weight: 700;
-  color: #fff;
+  font-size: clamp(2.5rem, 8vw, 4.2rem);
+  line-height: 1;
+  font-weight: 500;
+  color: #d1b897;
+  /* Warm gold/white color */
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .description {
-  font-family: var(--font-manrope);
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-}
-
-.expertBlock {
-  margin-top: 0.5rem;
-}
-
-.author {
   font-family: var(--font-newsreader);
-  font-size: 1.3rem;
-  font-style: italic;
-  font-weight: 500;
-  color: #ffffff;
+  /* Serif in variant */
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* FORM STYLING */
-
+/* FORM WRAPPER - GLASSMORPHYSIM */
 .formWrapper {
-  background-color: rgba(20, 20, 18, 0.95);
-  backdrop-filter: blur(24px);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
+  margin-top: auto;
+  /* Push to bottom */
+  background: rgba(30, 30, 28, 0.7);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-radius: 2rem;
+  padding: 1.5rem 1.5rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 450px;
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-  width: 100%;
 }
 
-@media (min-width: 1024px) {
-  .formWrapper {
-    width: 360px;
-    flex-shrink: 0;
-  }
-}
-
-.priceHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.35rem;
-}
-
-.priceTitle {
+.priceTag {
+  align-self: flex-end;
+  background-color: rgba(255, 255, 255, 0.85);
+  color: #1a1a1a;
+  padding: 0.4rem 1.25rem;
+  border-radius: 100px;
   font-family: var(--font-manrope);
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  margin-bottom: 0.5rem;
 }
 
-.priceValue {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.priceStrike {
-  text-decoration: line-through;
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
-  font-size: 1rem;
-}
-
-.priceFree {
-  background-color: #ffffff;
-  color: #000;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+.priceTag b {
   font-weight: 800;
-  font-size: 0.75rem;
-  text-transform: uppercase;
 }

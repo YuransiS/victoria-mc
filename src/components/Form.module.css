@@ -2,55 +2,57 @@
   width: 100%;
 }
 
-.title {
-  display: none; /* Hide internal title if any */
-}
-
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem; /* Tighter layout like in variant */
 }
 
-.message {
-  font-family: var(--font-manrope);
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  text-align: center;
-}
-
-.success {
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.error {
-  color: #ff6b6b;
-}
-
+/* SUBMIT BUTTON WITH GRADIENT */
 .submitBtn {
-  margin-top: 0.25rem; /* Near-zero space to button */
-  /* CTA Button Overrides */
-  background-color: #ffffff !important; /* Pure white task */
-  color: #000000 !important;
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #a8947a 0%, #d1b897 50%, #a8947a 100%) !important;
+  color: #1a1a1a !important;
   font-family: var(--font-manrope);
-  font-weight: 800 !important; /* Bold task */
-  font-size: 1.125rem !important; /* Larger font task */
-  padding: 1.125rem !important;
-  border-radius: 0.75rem !important;
+  font-weight: 800 !important;
+  font-size: 1.25rem !important;
+  padding: 1.25rem !important;
+  border-radius: 1rem !important;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
   border: none;
-  width: 100%;
   cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.submitBtn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/dark-matter.png"); /* Grain effect */
+  opacity: 0.15;
+  pointer-events: none;
 }
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+  opacity: 0.95;
 }
 
 .submitBtn:active {
   transform: translateY(0);
+}
+
+.message {
+  font-family: var(--font-manrope);
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #fff;
 }
