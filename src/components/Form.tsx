@@ -133,6 +133,10 @@ export const Form: React.FC = () => {
            status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : 
            "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ"}
         </Button>
+
+        <p className={styles.bonusText}>
+          <strong>Бонус:</strong> готова структура блогу під будь яку нішу на 6 місяців вперед (отримай відразу після реєстрації).
+        </p>
       </form>
 
       <AnimatePresence>
