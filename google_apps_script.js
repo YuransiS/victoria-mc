@@ -6,61 +6,64 @@ function doPost(e) {
 
   try {
     const data = JSON.parse(e.postData.contents);
-    
-    if (data.api_key !== API_KEY) {
-      return createErrorResponse("Unauthorized access");
-    }
+    if (data.api_key !== API_KEY) return createErrorResponse("Unauthorized");
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet;
-    
     if (data.target_sheet_id) {
       const sheets = ss.getSheets();
       sheet = sheets.find(s => s.getSheetId().toString() === data.target_sheet_id.toString());
     }
     if (!sheet) sheet = ss.getSheetByName(DEFAULT_SHEET_NAME) || ss.getSheets()[0];
 
-    const now = new Date();
-    const timestamp = Utilities.formatDate(now, TIMEZONE, TIMESTAMP_FORMAT);
-    const order_id = data.order_id || "";
+    // Ensure we have OrderID as string
+    const order_id = (data.order_id || "").toString().trim();
+    if (!order_id) return createErrorResponse("No OrderID");
 
-    // 1. Search for existing order
+    const dataRange = sheet.getDataRange().getValues();
     let rowToUpdate = -1;
-    if (order_id) {
-      const dataRange = sheet.getDataRange().getValues();
-      for (let i = 1; i < dataRange.length; i++) {
-        // OrderID is in Col 12 (Index 11)
-        if (dataRange[i][11] === order_id) {
-          rowToUpdate = i + 1;
-          break;
-        }
+
+    // Smart Match: checking column 12 (Index 11)
+    for (let i = 1; i < dataRange.length; i++) {
+      let cellValue = (dataRange[i][11] || "").toString().trim();
+      if (cellValue === order_id) {
+        rowToUpdate = i + 1;
+        break;
       }
     }
 
     if (rowToUpdate !== -1) {
-      // 2. UPDATE existing row (Col 13 for Status)
+      // UPDATE: Found existing lead
       if (data.status) {
         sheet.getRange(rowToUpdate, 13).setValue(data.status);
       }
       return createSuccessResponse("Status updated for " + order_id);
     } else {
-      // 3. APPEND new lead
-      sheet.appendRow([
-        timestamp,
-        data.name || "",
-        data.phone || "",
-        data.utm_source || "",
-        data.utm_medium || "",
-        data.utm_campaign || "",
-        data.utm_content || "",
-        data.utm_term || "",
-        data.full_url || "",
-        data.tariff || "",
-        data.amount || "",
-        order_id,
-        data.status || "Pending" // Col 13
-      ]);
-      return createSuccessResponse("New lead added");
+      // ONLY APPEND IF IT'S A NEW LEAD (containing name/phone)
+      if (data.name || data.phone) {
+        const now = new Date();
+        const timestamp = Utilities.formatDate(now, TIMEZONE, TIMESTAMP_FORMAT);
+        sheet.appendRow([
+          timestamp,
+          data.name || "",
+          data.phone || "",
+          data.utm_source || "",
+          data.utm_medium || "",
+          data.utm_campaign || "",
+          data.utm_content || "",
+          data.utm_term || "",
+          data.full_url || "",
+          data.tariff || "",
+          data.amount || "",
+          order_id,
+          data.status || "Pending"
+        ]);
+        return createSuccessResponse("New lead logged");
+      } else {
+        // It was a callback, but we couldn't find the lead. 
+        // We log error but don't add garbage row.
+        return createSuccessResponse("OrderID not found, skipping ghost row");
+      }
     }
 
   } catch (error) {
