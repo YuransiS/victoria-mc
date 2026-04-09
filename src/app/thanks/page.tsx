@@ -48,7 +48,7 @@ export default function ThanksPage() {
 
           <div className="space-y-4">
             <Link 
-              href="https://t.me/victoria_mesheriakova" 
+              href="https://t.me/vika_cooperation" 
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               НАПИСАТИ В TELEGRAM
