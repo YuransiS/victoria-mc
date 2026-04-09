@@ -13,31 +13,29 @@ export const PricingSection = () => {
     setIsModalOpen(true);
   };
 
-  // Timer logic
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 3,
-    minutes: 58,
-    seconds: 35,
-  });
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0); // Next midnight (00:00)
+      const diff = midnight.getTime() - now.getTime();
+      
+      if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 };
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      
+      return { hours, minutes, seconds };
+    };
+
+    // Initial set
+    setTimeLeft(calculateTimeLeft());
+
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) {
-          seconds = 59;
-          minutes--;
-        }
-        if (minutes < 0) {
-          minutes = 59;
-          hours--;
-        }
-        if (hours < 0) {
-          return { hours: 0, minutes: 0, seconds: 0 };
-        }
-        return { hours, minutes, seconds };
-      });
+      setTimeLeft(calculateTimeLeft());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -104,13 +102,13 @@ export const PricingSection = () => {
             </button>
           </motion.div>
 
-          {/* Plan 2: ГРУПОВИЙ */}
+          {/* Plan 2: ГРУПОВИЙ - Visually Larger */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="postage-stamp flex flex-col items-center text-center !p-12 relative z-10"
+            className="postage-stamp flex flex-col items-center text-center !p-12 relative z-10 md:scale-110 md:mx-4 bg-white shadow-2xl"
           >
             {/* Best Choice Badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1 text-[10px] uppercase tracking-[0.2em] font-bold z-20">
