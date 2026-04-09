@@ -5,10 +5,11 @@ import { useEffect } from "react";
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  amount: string;
+  tariffName: string;
+  amount: number;
 }
 
-export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => {
+export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingModalProps) => {
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -20,6 +21,64 @@ export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => 
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      customerName: formData.get("name") as string,
+      customerEmail: formData.get("email") as string,
+      customerPhone: formData.get("phone") as string,
+      amount: amount,
+      tariffName: tariffName
+    };
+
+    try {
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const paymentData = await response.json();
+
+      if (paymentData.error) {
+        alert("Помилка при створенні платежу. Спробуйте пізніше.");
+        return;
+      }
+
+      // Create and submit a hidden form to WayForPay
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://secure.wayforpay.com/pay';
+      form.acceptCharset = 'utf-8';
+
+      Object.entries(paymentData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          (value as any[]).forEach((val) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = `${key}[]`;
+            input.value = val.toString();
+            form.appendChild(input);
+          });
+        } else {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value ? value.toString() : '';
+          form.appendChild(input);
+        }
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -49,16 +108,17 @@ export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => 
           Оформлення броні
         </h3>
         <p className="font-inter text-[#9e9e9e] text-sm mb-10">
-          Зафіксуйте місце за спеціальною ціною. Сума: ${amount}
+          Зафіксуйте місце за спеціальною ціною. Сума: {amount} грн
         </p>
 
-        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-8" onSubmit={handleSubmit}>
           {/* Input: Name */}
           <div className="relative flex flex-col">
             <label htmlFor="name" className="font-inter text-xs text-[#9e9e9e] mb-2 uppercase tracking-wider">
               Ім{`'`}я
             </label>
             <input 
+              name="name"
               type="text" 
               id="name"
               className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
@@ -73,6 +133,7 @@ export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => 
               Email
             </label>
             <input 
+              name="email"
               type="email" 
               id="email"
               className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
@@ -87,6 +148,7 @@ export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => 
               Телефон
             </label>
             <input 
+              name="phone"
               type="tel" 
               id="phone"
               className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
@@ -99,7 +161,7 @@ export const BookingModal = ({ isOpen, onClose, amount }: BookingModalProps) => 
             type="submit"
             className="w-full bg-[#c6c6c7] text-black font-inter font-semibold py-4 mt-4 uppercase tracking-wide hover:bg-white transition-colors duration-300 shadow-[0_40px_60px_rgba(198,198,199,0.08)]"
           >
-            Сплатити бронь ${amount}
+            Сплатити бронь {amount} грн
           </button>
         </form>
       </div>

@@ -27,7 +27,7 @@ export const BenefitsSection = () => {
               <li className="flex gap-6 items-start">
                 <span className="font-manrope text-3xl font-black text-outline-variant-custom">03</span>
                 <p className="font-space text-lg font-medium leading-snug">
-                  Доступ до уроку «Як знайти свої сенси?»
+                  Доступ до уроку з чого складається власний стиль в блозі?
                 </p>
               </li>
             </ul>

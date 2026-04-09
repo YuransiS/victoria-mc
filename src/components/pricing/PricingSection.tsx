@@ -1,44 +1,105 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { motion } from "framer-motion";
+import { usePersistentTimer } from "@/hooks/usePersistentTimer";
+
+interface Feature {
+  text: string;
+  included: boolean;
+  bold?: boolean;
+}
+
+interface PriceSet {
+  badge: string;
+  secondary: string;
+  full: string;
+}
+
+interface Tariff {
+  id: string;
+  name: string;
+  isBestChoice?: boolean;
+  features: Feature[];
+  prices: {
+    special: PriceSet;
+    regular: PriceSet;
+  };
+}
+
+const TARIFFS: Tariff[] = [
+  {
+    id: "self",
+    name: "САМОСТІЙНИЙ",
+    features: [
+      { text: "ДОСТУП ДО ВСІХ МОДУЛІВ", included: true },
+      { text: "ДОСТУП ДО УРОКІВ НА 3 МІСЯЦІ", included: true },
+      { text: "ПРИСУТНІСТЬ НА ЗУСТРІЧАХ ЯК ГЛЯДАЧ", included: true },
+      { text: "УЧАСТЬ В ЧЕЛЕНДЖАХ", included: false },
+      { text: "РОБОТА ЗІ СПІКЕРАМИ", included: false },
+      { text: "ЧАТ З УЧАСНИКАМИ", included: false },
+      { text: "ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ", included: false },
+      { text: "ГРУПОВІ ЗУМ-ЗУСТРІЧ", included: false },
+      { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: true },
+    ],
+    prices: {
+      special: { badge: "$390", secondary: "$450", full: "$550" },
+      regular: { badge: "$450", secondary: "$550", full: "$650" }
+    }
+  },
+  {
+    id: "group",
+    name: "ГРУПОВИЙ",
+    isBestChoice: true,
+    features: [
+      { text: "ДОСТУП ДО ВСІХ МОДУЛІВ", included: true },
+      { text: "УЧАСТЬ В ЧЕЛЕНДЖАХ", included: true },
+      { text: "РОБОТА ЗІ СПІКЕРАМИ", included: true },
+      { text: "ДОСТУП ДО УРОКІВ НА ПІВ РОКУ", included: true },
+      { text: "ЧАТ З УЧАСНИКАМИ", included: true },
+      { text: "ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ", included: true },
+      { text: "ГРУПОВІ ЗУМ-ЗУСТРІЧІ ТА РОЗБОРИ ЗІ МНОЮ", included: true },
+      { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: true },
+    ],
+    prices: {
+      special: { badge: "$490", secondary: "$590", full: "$790" },
+      regular: { badge: "$590", secondary: "$790", full: "$990" }
+    }
+  },
+  {
+    id: "individual",
+    name: "ІНДИВІДУАЛЬНИЙ",
+    features: [
+      { text: "ДОСТУП ДО ВСІХ МОДУЛІВ", included: true },
+      { text: "УЧАСТЬ В ЧЕЛЕНДЖАХ", included: true },
+      { text: "РОБОТА ЗІ СПІКЕРАМИ", included: true },
+      { text: "ДОСТУП ДО УРОКІВ НА ПІВ РОКУ", included: true },
+      { text: "ЧАТ З УЧАСНИКАМИ", included: true },
+      { text: "ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ", included: true },
+      { text: "ГРУПОВІ ЗУМ-ЗУСТРІЧІ ТА РОЗБОРИ ЗІ МНОЮ", included: true },
+      { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: true },
+      { text: "ІНДИВІДУАЛЬНА РОБОТА НАД ВАШИМ КОНТЕНТОМ", included: true, bold: true },
+      { text: "2 ІНДИВІДУАЛЬНІ ЗУСТРІЧІ ЗІ МНОЮ", included: true, bold: true },
+      { text: "МІСЯЦЬ ПІСЛЯ КУРСУ Я НА ЗВ'ЯЗКУ", included: true, bold: true },
+    ],
+    prices: {
+      special: { badge: "$890", secondary: "$1090", full: "$1290" },
+      regular: { badge: "$1090", secondary: "$1290", full: "$1590" }
+    }
+  }
+];
 
 export const PricingSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBookingAmount, setSelectedBookingAmount] = useState<string>("");
+  const [selectedTariff, setSelectedTariff] = useState<{name: string, amount: number}>({name: "", amount: 1000});
+  
+  const { isExpired, timeParts } = usePersistentTimer(24);
 
-  const handleBook = (amount: string) => {
-    setSelectedBookingAmount(amount);
+  const handleBook = (tariffName: string) => {
+    setSelectedTariff({ name: tariffName, amount: 1000 });
     setIsModalOpen(true);
   };
-
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0); // Next midnight (00:00)
-      const diff = midnight.getTime() - now.getTime();
-      
-      if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 };
-      
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      
-      return { hours, minutes, seconds };
-    };
-
-    // Initial set
-    setTimeLeft(calculateTimeLeft());
-
-    const interval = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section 
@@ -49,181 +110,122 @@ export const PricingSection = () => {
         backgroundPosition: 'center',
       }}
     >
-      {/* Overlay to ensure readability - adjusted for the new background */}
       <div className="absolute inset-0 bg-white/40 z-0" />
 
       <div className="max-w-screen-2xl mx-auto relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-stretch pt-20">
-          
-          {/* Plan 1: САМОСТІЙНИЙ */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="postage-stamp flex flex-col items-center text-center !p-12"
-          >
-            <h3 className="font-headline text-3xl md:text-4xl font-extrabold uppercase tracking-tight mb-12">
-              САМОСТІЙНИЙ
-            </h3>
-            <ul className="text-left w-full space-y-3 mb-16 flex-grow px-4">
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО ВСІХ МОДУЛІВ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО УРОКІВ НА 3 МІСЯЦІ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ПРИСУТНІСТЬ НА ЗУСТРІЧАХ ЯК ГЛЯДАЧ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-30 leading-tight line-through">• УЧАСТЬ В ЧЕЛЕНДЖАХ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-30 leading-tight line-through">• РОБОТА ЗІ СПІКЕРАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-30 leading-tight line-through">• ЧАТ З УЧАСНИКАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-30 leading-tight line-through">• ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-30 leading-tight line-through">• ГРУПОВІ ЗУМ-ЗУСТРІЧ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ</li>
-            </ul>
+          {TARIFFS.map((tariff, index) => {
+            const currentPrices = isExpired ? tariff.prices.regular : tariff.prices.special;
             
-            <div className="w-full space-y-2 mb-8 px-4">
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Повна ціна</span>
-                <div className="font-headline text-3xl text-gray-400 line-through opacity-50">$550</div>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Ціна вебінару</span>
-                <div className="font-headline text-4xl text-black font-bold opacity-70">$450</div>
-              </div>
-              <div className="mt-4 price-badge text-white py-4 px-8 rounded-xl w-full">
-                <div className="flex flex-col items-center">
-                  <span className="font-label text-[10px] uppercase tracking-widest text-white/70 mb-1">При броні під час дзвінку</span>
-                  <span className="font-headline text-5xl font-black tracking-tighter">$390</span>
+            return (
+              <motion.div 
+                key={tariff.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className={`postage-stamp flex flex-col items-center text-center !p-12 relative ${
+                  tariff.isBestChoice ? "z-10 md:scale-110 md:mx-4 bg-white shadow-2xl" : ""
+                }`}
+              >
+                {tariff.isBestChoice && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1 text-[10px] uppercase tracking-[0.2em] font-bold z-20">
+                    BEST CHOICE
+                  </div>
+                )}
+                
+                <h3 className="font-headline text-3xl md:text-4xl font-extrabold uppercase tracking-tight mb-12">
+                  {tariff.name}
+                </h3>
+
+                <ul className="text-left w-full space-y-3 mb-16 flex-grow px-4">
+                  {tariff.features.map((feature, fIndex) => (
+                    <li 
+                      key={fIndex}
+                      className={`font-headline text-[11px] md:text-xs uppercase tracking-tighter leading-tight ${
+                        feature.included ? "opacity-80 font-bold" : "opacity-30 line-through"
+                      } ${feature.bold ? "font-black pt-2" : ""}`}
+                    >
+                      • {feature.text}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="w-full space-y-2 mb-8 px-4">
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Повна ціна</span>
+                    <div className="font-headline text-3xl text-gray-400 line-through opacity-50">{currentPrices.full}</div>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Ціна вебінару</span>
+                    <div className="font-headline text-4xl text-black font-bold opacity-70">{currentPrices.secondary}</div>
+                  </div>
+                  <div className={`mt-4 price-badge text-white py-4 px-8 rounded-xl w-full ${tariff.isBestChoice ? "border-2 border-primary/20" : ""}`}>
+                    <div className="flex flex-col items-center">
+                      <span className="font-label text-[10px] uppercase tracking-widest text-white/70 mb-1">
+                        {isExpired ? "Спеціальна ціна" : "При броні зараз"}
+                      </span>
+                      <span className="font-headline text-5xl font-black tracking-tighter">{currentPrices.badge}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => handleBook("20")}
-              className="w-full bg-primary text-white py-5 px-4 font-headline font-extrabold text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all"
-            >
-              ЗАБРОНЮВАТИ ЗА $20
-            </button>
-          </motion.div>
 
-          {/* Plan 2: ГРУПОВИЙ - Visually Larger */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="postage-stamp flex flex-col items-center text-center !p-12 relative z-10 md:scale-110 md:mx-4 bg-white shadow-2xl"
-          >
-            {/* Best Choice Badge */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1 text-[10px] uppercase tracking-[0.2em] font-bold z-20">
-              BEST CHOICE
-            </div>
-            <h3 className="font-headline text-3xl md:text-4xl font-extrabold uppercase tracking-tight mb-12">
-              ГРУПОВИЙ
-            </h3>
-            <ul className="text-left w-full space-y-3 mb-16 flex-grow px-4">
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО ВСІХ МОДУЛІВ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• УЧАСТЬ В ЧЕЛЕНДЖАХ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• РОБОТА ЗІ СПІКЕРАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО УРОКІВ НА ПІВ РОКУ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ЧАТ З УЧАСНИКАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ГРУПОВІ ЗУМ-ЗУСТРІЧІ ТА РОЗБОРИ ЗІ МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ</li>
-            </ul>
-
-            <div className="w-full space-y-2 mb-8 px-4">
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Повна ціна</span>
-                <div className="font-headline text-3xl text-gray-400 line-through opacity-50">$790</div>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Ціна вебінару</span>
-                <div className="font-headline text-4xl text-black font-bold opacity-70">$590</div>
-              </div>
-              <div className="mt-4 price-badge text-white py-4 px-8 rounded-xl w-full border-2 border-primary/20">
-                <div className="flex flex-col items-center">
-                  <span className="font-label text-[10px] uppercase tracking-widest text-white/70 mb-1">При броні під час дзвінку</span>
-                  <span className="font-headline text-5xl font-black tracking-tighter">$490</span>
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => handleBook("30")}
-              className="w-full bg-primary text-white py-5 px-4 font-headline font-extrabold text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all"
-            >
-              ЗАБРОНЮВАТИ ЗА $30
-            </button>
-          </motion.div>
-
-          {/* Plan 3: ІНДИВІДУАЛЬНИЙ */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="postage-stamp flex flex-col items-center text-center !p-12"
-          >
-            <h3 className="font-headline text-3xl md:text-4xl font-extrabold uppercase tracking-tight mb-12">
-              ІНДИВІДУАЛЬНИЙ
-            </h3>
-            <ul className="text-left w-full space-y-3 mb-16 flex-grow px-4">
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО ВСІХ МОДУЛІВ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• УЧАСТЬ В ЧЕЛЕНДЖАХ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• РОБОТА ЗІ СПІКЕРАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ДОСТУП ДО УРОКІВ НА ПІВ РОКУ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ЧАТ З УЧАСНИКАМИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ГРУПОВІ ЗУМ-ЗУСТРІЧІ ТА РОЗБОРИ ЗІ МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-bold uppercase tracking-tighter opacity-80 leading-tight">• ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ</li>
-              <li className="font-headline text-[11px] md:text-xs font-black uppercase tracking-tighter pt-2">+ ІНДИВІДУАЛЬНА РОБОТА НАД ВАШИМ КОНТЕНТОМ</li>
-              <li className="font-headline text-[11px] md:text-xs font-black uppercase tracking-tighter">+ 2 ІНДИВІДУАЛЬНІ ЗУСТРІЧІ ЗІ МНОЮ</li>
-              <li className="font-headline text-[11px] md:text-xs font-black uppercase tracking-tighter">+ МІСЯЦЬ ПІСЛЯ КУРСУ Я НА ЗВ&apos;ЯЗКУ</li>
-            </ul>
-
-            <div className="w-full space-y-2 mb-8 px-4">
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Повна ціна</span>
-                <div className="font-headline text-3xl text-gray-400 line-through opacity-50">$1290</div>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-label text-[10px] uppercase tracking-widest text-secondary">Ціна вебінару</span>
-                <div className="font-headline text-4xl text-black font-bold opacity-70">$1090</div>
-              </div>
-              <div className="mt-4 price-badge text-white py-4 px-8 rounded-xl w-full">
-                <div className="flex flex-col items-center">
-                  <span className="font-label text-[10px] uppercase tracking-widest text-white/70 mb-1">При броні під час дзвінку</span>
-                  <span className="font-headline text-5xl font-black tracking-tighter">$890</span>
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => handleBook("50")}
-              className="w-full bg-primary text-white py-5 px-4 font-headline font-extrabold text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all"
-            >
-              ЗАБРОНЮВАТИ ЗА $50
-            </button>
-          </motion.div>
+                <button 
+                  onClick={() => handleBook(tariff.name)}
+                  className="w-full bg-primary text-white py-5 px-4 font-headline font-extrabold text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all"
+                >
+                  ЗАБРОНЮВАТИ ЗА 1000 ГРН
+                </button>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Timer Section */}
-        <div className="mt-20 text-center flex flex-col items-center gap-6">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-            <p className="font-headline text-sm md:text-lg font-extrabold uppercase tracking-widest">
-              ЦІНА ДІЄ ДО 00:00 ДЛЯ УЧАСНИКІВ ВЕБІНАРУ
-            </p>
-            <div className="flex gap-4 font-headline text-4xl font-black bg-black text-white px-6 py-2 rounded-lg">
-              <span>{String(timeLeft.hours).padStart(2, '0')}</span>:
-              <span>{String(timeLeft.minutes).padStart(2, '0')}</span>:
-              <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
+        {!isExpired && (
+          <div className="mt-20 text-center flex flex-col items-center gap-6">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+              <p className="font-headline text-sm md:text-lg font-extrabold uppercase tracking-widest">
+                СПЕЦІАЛЬНА ЦІНА ДІЄ ЩЕ:
+              </p>
+              <div 
+                className="flex gap-4 font-headline text-4xl font-black bg-black text-white px-6 py-2 rounded-lg cursor-pointer"
+                onClick={(e) => {
+                  if (e.detail === 3) {
+                    localStorage.removeItem('visitStartTime');
+                    window.location.reload();
+                  }
+                }}
+                title="Triple click to reset (Dev)"
+              >
+                <span>{String(timeParts.hours).padStart(2, '0')}</span>:
+                <span>{String(timeParts.minutes).padStart(2, '0')}</span>:
+                <span>{String(timeParts.seconds).padStart(2, '0')}</span>
+              </div>
             </div>
+            <p className="font-label text-[10px] uppercase tracking-widest text-secondary italic">
+              зафіксуйте вартість поки таймер не вичерпався
+            </p>
           </div>
-          <p className="font-label text-[10px] uppercase tracking-widest text-secondary italic">
-            при броні/оплаті під час дзвінку
-          </p>
-        </div>
+        )}
+
+        {isExpired && (
+          <div className="mt-20 text-center flex flex-col items-center gap-6">
+            <p className="font-headline text-sm md:text-lg font-extrabold uppercase tracking-widest text-red-600">
+              ЧАС ДІЇ СПЕЦІАЛЬНОЇ ПРОПОЗИЦІЇ МИНУВ
+            </p>
+            <p className="font-label text-xs uppercase tracking-widest text-secondary">
+              тепер доступні стандартні ціни
+            </p>
+          </div>
+        )}
       </div>
 
       <BookingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        amount={selectedBookingAmount}
+        tariffName={selectedTariff.name}
+        amount={selectedTariff.amount}
       />
     </section>
   );
