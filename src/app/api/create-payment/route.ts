@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       clientEmail: customerEmail,
       clientPhone: customerPhone,
       serviceUrl: `${currentDomain}/api/payment-callback`,
-      returnUrl: `${currentDomain}/thanks`,
+      returnUrl: `${currentDomain}/api/thanks-redirect`,
     };
 
     return NextResponse.json(paymentData);
