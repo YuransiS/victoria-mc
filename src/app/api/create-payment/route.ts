@@ -9,10 +9,10 @@ export async function POST(request: Request) {
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const currentDomain = `${protocol}://${host}`;
 
-    // ДАНІ ТЕПЕР ЖОРСТКО В ПАЙПЛАЙНІ ДЛЯ УНИКНЕННЯ ПОМИЛОК
+    // Hardcoded credentials for absolute certainty during debugging
     const merchantAccount = "freelance_user_665d96f1b94f6";
     const merchantSecretKey = "02b6627f80439146d019fb6e8c865e67"; 
-    const merchantDomainName = "victoria-mc.com.ua"; 
+    const merchantDomainName = "victoria-mc.vercel.app"; 
 
     const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
