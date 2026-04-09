@@ -9,11 +9,13 @@ export async function POST(request: Request) {
     const merchantSecretKey = process.env.WFP_SECRET_KEY;
     const merchantDomainName = process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.com.ua';
     const orderReference = `ORDER_${Date.now()}`;
-    const orderDate = Math.floor(Date.now() / 1000);
+    const orderDate = Math.floor(Date.now() / 1000).toString(); // Ensure string
     const currency = 'UAH';
-    const productName = [`Бронювання тарифу: ${tariffName}`];
-    const productCount = [1];
-    const productPrice = [amount];
+    
+    // Simplified product info for signature reliability
+    const productName = [`Бронювання: ${tariffName}`];
+    const productCount = ["1"];
+    const productPrice = [amount.toString()];
 
     // Signature data string:
     // merchantAccount;merchantDomainName;orderReference;orderDate;amount;currency;productName[0];productCount[0];productPrice[0]
@@ -22,16 +24,16 @@ export async function POST(request: Request) {
       merchantDomainName,
       orderReference,
       orderDate,
-      amount,
+      amount.toString(),
       currency,
-      ...productName,
-      ...productCount,
-      ...productPrice
+      productName[0],
+      productCount[0],
+      productPrice[0]
     ].join(';');
 
     const merchantSignature = crypto
       .createHmac('md5', merchantSecretKey!)
-      .update(signatureData)
+      .update(signatureData, 'utf8')
       .digest('hex');
 
     const paymentData = {
