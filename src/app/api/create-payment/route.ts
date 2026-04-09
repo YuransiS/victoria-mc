@@ -50,7 +50,6 @@ export async function POST(request: Request) {
       clientPhone: customerPhone,
       serviceUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/payment-callback`,
       returnUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/thanks`,
-      orderReference: orderReference, // Expose for lead tracking
     };
 
     return NextResponse.json(paymentData);

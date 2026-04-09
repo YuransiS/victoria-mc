@@ -161,7 +161,7 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
             input.value = val.toString();
             form.appendChild(input);
           });
-        } else if (value !== undefined) {
+        } else if (value !== undefined && value !== null) {
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = key;
