@@ -137,8 +137,9 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
         }),
       }).catch(e => console.error("Lead log error:", e));
 
-      // Set flag for Thanks page
+      // Set flags for Thanks page logic
       sessionStorage.setItem('paymentAttempted', 'true');
+      sessionStorage.setItem('lastOrderId', paymentData.orderReference);
 
       // 3. Prepare WayForPay Form
       const form = document.createElement('form');

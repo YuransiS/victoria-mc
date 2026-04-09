@@ -9,12 +9,29 @@ export default function ThanksPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Basic protection: check if user reached this page through common flow
     const attempt = sessionStorage.getItem('paymentAttempted');
+    const orderId = sessionStorage.getItem('lastOrderId');
+
     if (!attempt) {
       router.push('/');
+      return;
     }
-    // Optional: Clear after some time or on unmount
+
+    // Trigger status update to Google Sheets (Client-side confirmation)
+    if (orderId) {
+      fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          order_id: orderId,
+          status: "APPROVED (Redirect)", // Verified by reaching thanks page
+          target_sheet_id: "1127634999"
+        }),
+      }).then(() => {
+        // Clear orderId after successful update to prevent loops
+        sessionStorage.removeItem('lastOrderId');
+      }).catch(e => console.error("Redirect status update failed:", e));
+    }
   }, [router]);
 
   return (
