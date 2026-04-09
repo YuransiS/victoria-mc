@@ -3,47 +3,54 @@ import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
-    console.log('WayForPay Callback:', data);
+    // WayForPay sends data as form-urlencoded, not JSON
+    const formData = await request.formData();
+    const data: Record<string, any> = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    console.log('WayForPay Callback Received:', data.orderReference, data.transactionStatus);
 
     const { 
       orderReference, 
       transactionStatus, 
       amount, 
-      reason, 
-      merchantSignature 
+      reason
     } = data;
 
-    // Security check: Validate signature from WFP
-    // signature = orderReference;amount;currency;transactionStatus;reason;settlementDate
-    // But WFP signature for response is complex. For now, let's focus on logic.
-    
-    // 1. Notify Google Sheets about payment status
-    const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
+    // 1. Log to Google Sheets (using our lead proxy logic)
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
+    const apiKey = process.env.SHEETS_API_KEY;
+
     if (scriptUrl) {
-      // We send this as a "Log" entry
+      // Create a descriptive log entry
+      const logData = {
+        name: `PAYMENT: ${transactionStatus}`,
+        phone: `Ref: ${orderReference}`,
+        tariff: reason || "WFP Callback",
+        amount: amount,
+        order_id: orderReference,
+        target_sheet_id: "1127634999",
+        api_key: apiKey,
+        utm_source: "wayforpay_callback"
+      };
+
       await fetch(scriptUrl, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: `PAYMENT CALLBACK: ${transactionStatus}`,
-          phone: `Order: ${orderReference}`,
-          tariff: reason || "Payment status update",
-          amount: amount,
-          order_id: orderReference,
-          target_sheet_id: "1127634999",
-          api_key: process.env.NEXT_PUBLIC_SHEETS_API_KEY
-        }),
-      });
+        body: JSON.stringify(logData),
+      }).catch(err => console.error('Sheet log error:', err));
     }
 
-    // WayForPay requires an 'accept' response
-    const merchantAccount = process.env.WFP_MERCHANT_LOGIN;
+    // 2. Respond to WayForPay with 'accept'
+    // Response signature: md5(orderReference + ';' + 'accept' + ';' + time)
     const time = Math.floor(Date.now() / 1000);
     const responseSignatureData = [orderReference, 'accept', time].join(';');
+    const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim() || "";
+    
     const signature = crypto
-      .createHmac('md5', process.env.WFP_SECRET_KEY!)
+      .createHmac('md5', merchantSecretKey)
       .update(responseSignatureData)
       .digest('hex');
 
@@ -55,7 +62,7 @@ export async function POST(request: Request) {
     });
 
   } catch (error) {
-    console.error('Callback error:', error);
-    return NextResponse.json({ error: 'Callback failed' }, { status: 500 });
+    console.error('Callback critical error:', error);
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
