@@ -9,28 +9,31 @@ export async function POST(request: Request) {
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const currentDomain = `${protocol}://${host}`;
 
+    // ДАНІ ТЕПЕР ЖОРСТКО В ПАЙПЛАЙНІ ДЛЯ УНИКНЕННЯ ПОМИЛОК
     const merchantAccount = "freelance_user_665d96f1b94f6";
     const merchantSecretKey = "02b6627f80439146d019fb6e8c865e67"; 
     const merchantDomainName = "victoria-mc.com.ua"; 
-    
-    const orderReference = `ORDER_${Date.now()}`;
+
+    const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
     const currency = 'UAH';
-    const amountStr = amount.toString();
     
-    const productNameStr = `Booking: ${tariffName}`; 
+    // Спрощуємо все до рядків
+    const productPriceStr = amount.toString();
+    const productNameStr = `Booking Victoria MC ${tariffName}`;
     const productCountStr = "1";
 
+    // Sequence: merchantAccount;merchantDomainName;orderReference;orderDate;amount;currency;productName;productCount;productPrice
     const signatureData = [
       merchantAccount,
       merchantDomainName,
       orderReference,
       orderDate,
-      amountStr,
+      productPriceStr,
       currency,
       productNameStr,
       productCountStr,
-      amountStr
+      productPriceStr
     ].join(';');
 
     const merchantSignature = crypto
@@ -44,15 +47,14 @@ export async function POST(request: Request) {
       merchantSignature,
       orderReference,
       orderDate,
-      amount: amountStr,
+      amount: parseInt(amount),
       currency,
       productName: [productNameStr],
-      productCount: [productCountStr],
-      productPrice: [amountStr],
+      productCount: [1],
+      productPrice: [parseInt(amount)],
       clientFirstName: customerName,
       clientEmail: customerEmail,
       clientPhone: customerPhone,
-      language: 'UA',
       serviceUrl: `${currentDomain}/api/payment-callback`,
       returnUrl: `${currentDomain}/thanks`,
     };
@@ -60,6 +62,6 @@ export async function POST(request: Request) {
     return NextResponse.json(paymentData);
   } catch (error) {
     console.error('Payment creation error:', error);
-    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
