@@ -226,10 +226,10 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
 
         <button 
           onClick={onClose}
-          className="absolute top-8 right-8 text-[#666] hover:text-white transition-colors"
+          className="absolute top-4 right-4 sm:top-8 sm:right-8 text-[#666] hover:text-white transition-colors p-4 z-[110]"
           aria-label="Close modal"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
