@@ -1,48 +1,75 @@
+"use client";
+
+import React from "react";
+import { motion } from "framer-motion";
+
 export const HeroSection = () => {
   return (
-    <section className="relative w-full min-h-screen bg-[#0e0e0e] flex items-center overflow-hidden">
-      {/* Background image placeholder / overlay */}
-      <div className="absolute inset-0 w-full h-full">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
-        {/* Placeholder for the cinematic image */}
-        <div className="absolute inset-0 bg-[#0e0e0e] opacity-50" />
+    <section className="relative min-h-screen flex flex-col items-center justify-center text-white overflow-hidden">
+      {/* Background Images */}
+      <div className="absolute inset-0 z-0">
+        <picture>
+          <source media="(max-width: 768px)" srcSet="/hero_mobile_muted.png" />
+          <img 
+            src="/hero_pc_muted.png" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover grayscale-[0.3]"
+          />
+        </picture>
+        {/* Subtle overlay for text contrast */}
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      <div className="relative z-20 container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row justify-between items-start lg:items-center w-full">
-        {/* Left side: Typography */}
-        <div className="flex-1 w-full flex flex-col justify-center mt-24 lg:mt-0">
-          <p className="font-inter text-sm text-[#9e9e9e] mb-6 tracking-widest uppercase">
-            01 / КОНЦЕПТ
+      <div className="max-w-screen-2xl mx-auto w-full relative z-10 px-8 py-20 flex flex-col items-center text-center">
+        {/* Top Info */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-12 space-y-2"
+        >
+          <p className="font-headline text-xl md:text-2xl font-bold uppercase tracking-widest text-[#e2e2e2]">старт: травень</p>
+          <p className="font-headline text-lg md:text-xl uppercase tracking-widest opacity-60">7 тижнів</p>
+        </motion.div>
+
+        {/* Main Title */}
+        <motion.h1 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="font-headline font-black text-[18vw] md:text-[14vw] leading-none tracking-tighter uppercase mb-12 text-white"
+        >
+          СТВОРЮЙ
+        </motion.h1>
+
+        {/* Bottom Blocks */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="max-w-3xl space-y-8"
+        >
+          <p className="font-headline text-lg md:text-2xl font-bold uppercase tracking-wide text-[#e2e2e2]">
+            забудь про хаос в блозі
           </p>
-          <h1 className="font-manrope text-5xl md:text-7xl lg:text-[5rem] text-[#c6c6c7] leading-[1.1] font-bold uppercase tracking-tight">
-            Створюй
-            <span className="block text-3xl md:text-5xl lg:text-[3rem] mt-4 opacity-80">
-              Візуал. Сенси. Контент.
-            </span>
-          </h1>
-        </div>
+          
+          <p className="font-headline text-sm md:text-lg uppercase tracking-wider leading-relaxed opacity-80">
+            побудуй для себе зручну систему роботи з контентом та візуалом вже з першого тижня навчання
+          </p>
 
-        {/* Right side: Editorial Copy */}
-        <div className="flex-1 w-full lg:w-1/2 flex justify-end mt-16 lg:mt-0">
-          <div className="max-w-md text-right">
-            <p className="font-inter text-base md:text-lg text-[#e0e0e0] leading-[1.6]">
-              Забудь про хаос в блозі.
-              <br />
-              <br />
-              Побудуй для себе зручну систему роботи з контентом та візуалом вже з першого тижня навчання.
-              <br />
-              <br />
-              Без фотостудій, складних зйомок і дорогого обладнання.
-            </p>
-          </div>
-        </div>
-      </div>
+          <p className="font-label text-xs md:text-sm italic tracking-widest opacity-50">
+            без фотостудій, складних зйомок і дорогого обладнання
+          </p>
+        </motion.div>
 
-      {/* Bottom left detail */}
-      <div className="absolute bottom-8 left-6 lg:left-12 z-20">
-        <p className="font-inter text-sm text-[#9e9e9e]">
-          Тривалість: 7 тижнів / Формат: Online
-        </p>
+        {/* Side captions */}
+        <div className="absolute left-8 bottom-24 hidden lg:flex flex-col gap-4 text-left">
+          <span className="font-headline text-2xl font-bold uppercase tracking-tighter text-white/80">ВІЗУАЛ</span>
+          <span className="font-headline text-2xl font-bold uppercase tracking-tighter text-white/80">КОНТЕНТ</span>
+        </div>
+        <div className="absolute right-8 bottom-24 hidden lg:flex text-right">
+          <span className="font-headline text-2xl font-bold uppercase tracking-tighter text-white/80">СЕНСИ</span>
+        </div>
       </div>
     </section>
   );

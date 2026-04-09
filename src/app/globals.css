@@ -1,28 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #faf8f5;
-  --surface: #faf8f5;
-  --surface-container-low: #f4efe9;
-  --surface-container-high: #e8e2d9;
-  --surface-container-highest: #ddd6cc;
-  --surface-bright: #ffffff;
-  --surface-variant: rgba(250, 248, 245, 0.6);
-  --surface-dim: rgba(250, 248, 245, 0.85);
-  
-  --primary: #2c2b29;
-  --primary-container: #55534f;
-  --on-surface: #1a1918;
-  --on-surface-variant: #6b6863;
-  --accent: #d9635b;
-  --error: #d9635b;
-  --outline-variant: rgba(0, 0, 0, 0.12);
-  
-  --radius: 0px;
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
 }
 
+@font-face {
+  font-family: 'Manrope';
+  src: url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+}
+
+:root {
+  --primary: #5d5f2c;
+  --primary-fixed: #e5e7a6;
+  --surface: #f9f9f9;
+  --on-surface: #1a1c1c;
+  --surface-variant: #e2e2e2;
+  --secondary: #5e5e5e;
+  --outline-variant: #c9c7b7;
+  --surface-container: #eeeeee;
+  --on-surface-variant: #48473c;
+  --error: #ba1a1a;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-secondary: var(--secondary);
+  --color-outline-variant: var(--outline-variant);
+  --color-surface-container: var(--surface-container);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-error: var(--error);
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+}
+
+/* Base styles */
 html, body {
-  background-color: var(--background);
+  background-color: var(--surface);
   color: var(--on-surface);
   margin: 0;
   padding: 0;
@@ -34,31 +54,49 @@ html, body {
   box-sizing: inherit;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  font-weight: normal;
+.text-justified-editorial {
+  text-align-last: left;
+  text-align: justify;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.chat-bubble {
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 85%;
 }
 
-ul, ol {
-  padding: 0;
-  margin: 0;
-  list-style: none;
+.chat-bubble-received {
+  background-color: #f3f3f4;
+  border-bottom-left-radius: 4px;
 }
 
-button, input {
-  font-family: inherit;
-  outline: none;
+.chat-bubble-sent {
+  background-color: #e5e7a6;
+  border-bottom-right-radius: 4px;
+  margin-left: auto;
 }
 
-::-webkit-input-placeholder {
-  color: var(--on-surface-variant);
+.price-badge {
+  background-color: #5d5f2c;
 }
 
-::placeholder {
-  color: var(--on-surface-variant);
+/* STAMP EFFECT: Clean, scalloped edges with solid center */
+.postage-stamp {
+  background: white !important;
+  position: relative;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.05));
+  padding: 40px;
+  
+  --mask-grid: radial-gradient(10px at 10px 10px, #0000 98%, #000) -10px -10px / 20px 20px;
+  --mask-solid: linear-gradient(#000 0 0) 10px 10px / calc(100% - 20px) calc(100% - 20px) no-repeat;
+  
+  -webkit-mask: var(--mask-grid), var(--mask-solid);
+  -webkit-mask-composite: source-over;
+  
+  mask: var(--mask-grid), var(--mask-solid);
+  mask-composite: add;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
 }
