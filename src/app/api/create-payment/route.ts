@@ -9,10 +9,10 @@ export async function POST(request: Request) {
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const currentDomain = `${protocol}://${host}`;
 
-    // Hardcoded credentials for absolute certainty during debugging
-    const merchantAccount = "freelance_user_665d96f1b94f6";
-    const merchantSecretKey = "02b6627f80439146d019fb6e8c865e67"; 
-    const merchantDomainName = "victoria-mc.vercel.app"; 
+    // Moving back to secure environment variables as requested
+    const merchantAccount = process.env.WFP_MERCHANT_LOGIN?.replace(/['"]/g, '').trim();
+    const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim();
+    const merchantDomainName = (process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.vercel.app').replace(/['"]/g, '').trim();
 
     const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
