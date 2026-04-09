@@ -147,7 +147,6 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
       form.acceptCharset = 'utf-8';
 
       Object.entries(paymentData).forEach(([key, value]) => {
-        if (key === 'orderReference') return; // Handled below or already in data
         if (Array.isArray(value)) {
           (value as any[]).forEach((val) => {
             const input = document.createElement('input');

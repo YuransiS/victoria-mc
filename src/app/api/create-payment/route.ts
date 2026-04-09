@@ -9,21 +9,20 @@ export async function POST(request: Request) {
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const currentDomain = `${protocol}://${host}`;
 
-    // Moving back to secure environment variables as requested
+    // Moving back to secure environment variables with the long Secret Key
     const merchantAccount = process.env.WFP_MERCHANT_LOGIN?.replace(/['"]/g, '').trim();
     const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim();
     const merchantDomainName = (process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.vercel.app').replace(/['"]/g, '').trim();
-
+    
+    // Critical: orderReference!
     const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
     const currency = 'UAH';
     
-    // Спрощуємо все до рядків
     const productPriceStr = amount.toString();
-    const productNameStr = `Booking Victoria MC ${tariffName}`;
+    const productNameStr = `Booking: ${tariffName}`;
     const productCountStr = "1";
 
-    // Sequence: merchantAccount;merchantDomainName;orderReference;orderDate;amount;currency;productName;productCount;productPrice
     const signatureData = [
       merchantAccount,
       merchantDomainName,
@@ -35,8 +34,9 @@ export async function POST(request: Request) {
       productCountStr,
       productPriceStr
     ].join(';');
+
     if (!merchantAccount || !merchantSecretKey) {
-      return NextResponse.json({ error: 'Merchant credentials not configured' }, { status: 500 });
+      return NextResponse.json({ error: 'Config missing' }, { status: 500 });
     }
 
     const merchantSignature = crypto
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(paymentData);
   } catch (error) {
-    console.error('Payment creation error:', error);
+    console.error('WFP Error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
