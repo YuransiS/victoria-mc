@@ -34,6 +34,7 @@ export default function ThanksPage() {
         }),
       }).then(() => {
         if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
+        sessionStorage.removeItem('savedFormData'); // Clear form on success
       }).catch(e => console.error("Update failed:", e));
     }
   }, [router]);

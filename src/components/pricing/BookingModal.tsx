@@ -27,13 +27,36 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
 
   const [isTestMode, setIsTestMode] = useState(false);
 
+  // Restore data from session storage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('savedFormData');
+    if (saved) {
+      try {
+        setFormData(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse saved form data");
+      }
+    }
+
+    // Auto-open if coming from a retry
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('retry') === 'payment' && !isOpen) {
+      // Note: This logic depends on how the parent opens the modal
+      // For now, we just ensure data is there.
+    }
+  }, []);
+
+  // Sync data to session storage
+  useEffect(() => {
+    if (formData.name || formData.phone || formData.telegram) {
+      sessionStorage.setItem('savedFormData', JSON.stringify(formData));
+    }
+  }, [formData]);
+
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      // Reset form when opening
-      setFormData({ name: "", phone: "", telegram: "" });
-      setErrors({});
       setIsTestMode(false);
     } else {
       document.body.style.overflow = "unset";
