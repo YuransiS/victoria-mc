@@ -10,27 +10,31 @@ export default function ThanksPage() {
 
   useEffect(() => {
     const attempt = sessionStorage.getItem('paymentAttempted');
-    const orderId = sessionStorage.getItem('lastOrderId');
+    const sessionOrderId = sessionStorage.getItem('lastOrderId');
+    
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    
+    const activeOrderId = urlOrderId || sessionOrderId;
 
-    if (!attempt) {
+    if (!attempt && !urlOrderId) {
       router.push('/');
       return;
     }
 
     // Trigger status update to Google Sheets (Client-side confirmation)
-    if (orderId) {
+    if (activeOrderId) {
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          order_id: orderId,
-          status: "APPROVED (Redirect)", // Verified by reaching thanks page
+          order_id: activeOrderId,
+          status: "APPROVED (Redirect)",
           target_sheet_id: "1127634999"
         }),
       }).then(() => {
-        // Clear orderId after successful update to prevent loops
-        sessionStorage.removeItem('lastOrderId');
-      }).catch(e => console.error("Redirect status update failed:", e));
+        if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
+      }).catch(e => console.error("Update failed:", e));
     }
   }, [router]);
 

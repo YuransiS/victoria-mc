@@ -16,6 +16,8 @@ export async function POST(request: Request) {
       amount
     } = data;
 
+    console.log('WayForPay Callback Received:', orderReference, transactionStatus);
+
     // 1. Log payment status to Google Sheets
     const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
     const apiKey = process.env.SHEETS_API_KEY;
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           order_id: orderReference,
-          status: transactionStatus, // This will go to the 13th column
+          status: transactionStatus,
           api_key: apiKey,
           target_sheet_id: "1127634999"
         }),
@@ -40,15 +42,17 @@ export async function POST(request: Request) {
     
     const signature = crypto
       .createHmac('md5', merchantSecretKey)
-      .update(responseSignatureData)
+      .update(responseSignatureData, 'utf8')
       .digest('hex');
 
-    return NextResponse.json({
+    const responseBody = {
       orderReference,
       status: 'accept',
       time,
       signature
-    });
+    };
+
+    return NextResponse.json(responseBody);
 
   } catch (error) {
     console.error('Callback error:', error);
