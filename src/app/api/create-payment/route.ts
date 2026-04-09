@@ -5,30 +5,37 @@ export async function POST(request: Request) {
   try {
     const { amount, tariffName, customerEmail, customerName, customerPhone } = await request.json();
 
-    const merchantAccount = process.env.WFP_MERCHANT_LOGIN;
-    const merchantSecretKey = process.env.WFP_SECRET_KEY;
-    const merchantDomainName = process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.com.ua';
+    // Dynamically detect host for return/service URLs
+    const host = request.headers.get('host');
+    const protocol = host?.includes('localhost') ? 'http' : 'https';
+    const currentDomain = `${protocol}://${host}`;
+
+    // Clean keys from possible quotes or whitespace
+    const merchantAccount = process.env.WFP_MERCHANT_LOGIN?.replace(/['"]/g, '').trim();
+    const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim();
+    const merchantDomainName = (process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.com.ua').replace(/['"]/g, '').trim();
+    
     const orderReference = `ORDER_${Date.now()}`;
-    const orderDate = Math.floor(Date.now() / 1000).toString(); // Ensure string
+    const orderDate = Math.floor(Date.now() / 1000).toString();
     const currency = 'UAH';
     
-    // Simplified product info for signature reliability
-    const productName = [`Бронювання: ${tariffName}`];
-    const productCount = ["1"];
-    const productPrice = [amount.toString()];
+    // Normalized values for signature
+    const productPriceStr = amount.toString();
+    const productNameStr = `Бронювання: ${tariffName}`;
+    const productCountStr = "1";
 
-    // Signature data string:
+    // Signature data string strictly following WFP docs:
     // merchantAccount;merchantDomainName;orderReference;orderDate;amount;currency;productName[0];productCount[0];productPrice[0]
     const signatureData = [
       merchantAccount,
       merchantDomainName,
       orderReference,
       orderDate,
-      amount.toString(),
+      productPriceStr,
       currency,
-      productName[0],
-      productCount[0],
-      productPrice[0]
+      productNameStr,
+      productCountStr,
+      productPriceStr
     ].join(';');
 
     const merchantSignature = crypto
@@ -42,16 +49,16 @@ export async function POST(request: Request) {
       merchantSignature,
       orderReference,
       orderDate,
-      amount,
+      amount: amount,
       currency,
-      productName,
-      productCount,
-      productPrice,
+      productName: [productNameStr],
+      productCount: [1],
+      productPrice: [amount],
       clientFirstName: customerName,
       clientEmail: customerEmail,
       clientPhone: customerPhone,
-      serviceUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/payment-callback`,
-      returnUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/thanks`,
+      serviceUrl: `${currentDomain}/api/payment-callback`,
+      returnUrl: `${currentDomain}/thanks`,
     };
 
     return NextResponse.json(paymentData);
