@@ -35,6 +35,9 @@ export async function POST(request: Request) {
       productCountStr,
       productPriceStr
     ].join(';');
+    if (!merchantAccount || !merchantSecretKey) {
+      return NextResponse.json({ error: 'Merchant credentials not configured' }, { status: 500 });
+    }
 
     const merchantSignature = crypto
       .createHmac('md5', merchantSecretKey)
