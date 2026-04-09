@@ -51,7 +51,12 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
     if (formData.name || formData.phone || formData.telegram) {
       sessionStorage.setItem('savedFormData', JSON.stringify(formData));
     }
-  }, [formData]);
+    // Also save context
+    if (tariffName) {
+      sessionStorage.setItem('lastTariffName', tariffName);
+      sessionStorage.setItem('lastAmount', amount.toString());
+    }
+  }, [formData, tariffName, amount]);
 
   // Prevent scrolling when modal is open
   useEffect(() => {

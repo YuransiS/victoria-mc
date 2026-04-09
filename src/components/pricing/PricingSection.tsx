@@ -101,6 +101,26 @@ export const PricingSection = () => {
     setIsModalOpen(true);
   };
 
+  // Handle retry auto-open
+  useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('retry') === 'payment') {
+        const savedTariff = sessionStorage.getItem('lastTariffName');
+        const savedAmount = sessionStorage.getItem('lastAmount');
+        if (savedTariff) {
+          setTimeout(() => {
+            setSelectedTariff({ 
+              name: savedTariff, 
+              amount: savedAmount ? parseInt(savedAmount) : 1000 
+            });
+            setIsModalOpen(true);
+          }, 500); // Small delay to ensure everything is rendered
+        }
+      }
+    }
+  });
+
   return (
     <section 
       className="relative pb-32 px-4 md:px-8 bg-surface overflow-hidden"
