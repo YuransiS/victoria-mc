@@ -5,41 +5,36 @@ export async function POST(request: Request) {
   try {
     const { amount, tariffName, customerEmail, customerName, customerPhone } = await request.json();
 
-    // Dynamically detect host for return/service URLs
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const currentDomain = `${protocol}://${host}`;
 
-    // Clean keys from possible quotes or whitespace
-    const merchantAccount = process.env.WFP_MERCHANT_LOGIN?.replace(/['"]/g, '').trim();
-    const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim();
-    const merchantDomainName = (process.env.WFP_MERCHANT_DOMAIN || 'victoria-mc.com.ua').replace(/['"]/g, '').trim();
+    const merchantAccount = "freelance_user_665d96f1b94f6";
+    const merchantSecretKey = "02b6627f80439146d019fb6e8c865e67"; 
+    const merchantDomainName = "victoria-mc.com.ua"; 
     
     const orderReference = `ORDER_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
     const currency = 'UAH';
+    const amountStr = amount.toString();
     
-    // Normalized values for signature
-    const productPriceStr = amount.toString();
-    const productNameStr = `Бронювання: ${tariffName}`;
+    const productNameStr = `Booking: ${tariffName}`; 
     const productCountStr = "1";
 
-    // Signature data string strictly following WFP docs:
-    // merchantAccount;merchantDomainName;orderReference;orderDate;amount;currency;productName[0];productCount[0];productPrice[0]
     const signatureData = [
       merchantAccount,
       merchantDomainName,
       orderReference,
       orderDate,
-      productPriceStr,
+      amountStr,
       currency,
       productNameStr,
       productCountStr,
-      productPriceStr
+      amountStr
     ].join(';');
 
     const merchantSignature = crypto
-      .createHmac('md5', merchantSecretKey!)
+      .createHmac('md5', merchantSecretKey)
       .update(signatureData, 'utf8')
       .digest('hex');
 
@@ -49,14 +44,15 @@ export async function POST(request: Request) {
       merchantSignature,
       orderReference,
       orderDate,
-      amount: amount,
+      amount: amountStr,
       currency,
       productName: [productNameStr],
-      productCount: [1],
-      productPrice: [amount],
+      productCount: [productCountStr],
+      productPrice: [amountStr],
       clientFirstName: customerName,
       clientEmail: customerEmail,
       clientPhone: customerPhone,
+      language: 'UA',
       serviceUrl: `${currentDomain}/api/payment-callback`,
       returnUrl: `${currentDomain}/thanks`,
     };
