@@ -82,6 +82,7 @@ export const Form: React.FC = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             ...formData,
+            api_key: process.env.NEXT_PUBLIC_SHEETS_API_KEY,
             ...utmData
           }),
         });

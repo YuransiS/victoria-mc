@@ -1,24 +1,46 @@
 function doPost(e) {
   // Config
-  const MAIN_SHEET_NAME = "Лиды"; // or use the first sheet by default
+  const DEFAULT_SHEET_NAME = "Лиды";
   const TIMEZONE = "Europe/Kiev";
   const TIMESTAMP_FORMAT = "dd.MM.yyyy HH:mm:ss";
+  
+  // Basic security: Check for API Key if you want to restrict access
+  // Define this in your script properties or hardcode here
+  const API_KEY = "secret_booking_token_2026"; 
 
   try {
-    // Open active spreadsheet
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(MAIN_SHEET_NAME);
-    if (!sheet) {
-      // Fallback to first sheet or create new
-      sheet = ss.getSheets()[0];
+    const data = JSON.parse(e.postData.contents);
+    
+    // Security check
+    if (data.api_key !== API_KEY) {
+      return createErrorResponse("Unauthorized access");
     }
 
-    // Parse incoming data
-    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet;
+
+    // Support targeting by sheetId (gid)
+    if (data.target_sheet_id) {
+      const sheets = ss.getSheets();
+      sheet = sheets.find(s => s.getSheetId().toString() === data.target_sheet_id.toString());
+    }
+    
+    // Fallback to sheet name
+    if (!sheet && data.target_sheet_name) {
+      sheet = ss.getSheetByName(data.target_sheet_name);
+    }
+
+    // Ultimate fallback
+    if (!sheet) {
+      sheet = ss.getSheetByName(DEFAULT_SHEET_NAME) || ss.getSheets()[0];
+    }
+
+    // Prepare data
     const name = data.name || "";
     const phone = data.phone || "";
-
-    // UTM parameters
+    const tariff = data.tariff || "";
+    const amount = data.amount || "";
+    const order_id = data.order_id || ""; // To link with payments
     const utm_source = data.utm_source || "";
     const utm_medium = data.utm_medium || "";
     const utm_campaign = data.utm_campaign || "";
@@ -26,11 +48,11 @@ function doPost(e) {
     const utm_term = data.utm_term || "";
     const full_url = data.full_url || "";
 
-    // Create timestamp
     const now = new Date();
     const timestamp = Utilities.formatDate(now, TIMEZONE, TIMESTAMP_FORMAT);
 
-    // Append row: Date, Name, Phone, Source, Medium, Campaign, Content, Term, URL
+    // Dynamic columns to avoid shifting: 
+    // Date, Name, Phone, Source, Medium, Campaign, Content, Term, URL, Tariff, Amount, OrderID
     sheet.appendRow([
       timestamp,
       name,
@@ -40,23 +62,34 @@ function doPost(e) {
       utm_campaign,
       utm_content,
       utm_term,
-      full_url
+      full_url,
+      tariff,
+      amount,
+      order_id
     ]);
 
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "success",
-      message: "Data successfully written to sheet"
-    })).setMimeType(ContentService.MimeType.JSON);
+    return createSuccessResponse("Data successfully written to sheet: " + sheet.getName());
 
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "error",
-      message: error.message
-    })).setMimeType(ContentService.MimeType.JSON);
+    return createErrorResponse(error.message);
   }
 }
 
-// In order to configure CORS preflight (OPTIONS)
+function createSuccessResponse(message) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    message: message
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function createErrorResponse(message) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "error",
+    message: message
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+// CORS preflight (OPTIONS)
 function doOptions(e) {
   return ContentService.createTextOutput(JSON.stringify({ "status": "ok" }))
     .setMimeType(ContentService.MimeType.JSON);
