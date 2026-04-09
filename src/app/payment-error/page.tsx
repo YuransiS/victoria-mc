@@ -56,7 +56,7 @@ export default function PaymentErrorPage() {
 
           <div className="space-y-4">
             <button 
-              onClick={() => router.push('/?retry=payment')}
+              onClick={() => router.push('/price?retry=payment')}
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               СПРОБУВАТИ ЩЕ РАЗ
