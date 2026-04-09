@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -9,11 +10,28 @@ interface BookingModalProps {
   amount: number;
 }
 
+interface FormErrors {
+  name?: string;
+  phone?: string;
+  telegram?: string;
+}
+
 export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingModalProps) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    telegram: ""
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      // Reset form when opening
+      setFormData({ name: "", phone: "", telegram: "" });
+      setErrors({});
     } else {
       document.body.style.overflow = "unset";
     }
@@ -22,14 +40,50 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
     };
   }, [isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const validateForm = () => {
+    const newErrors: FormErrors = {};
+    
+    // Name validation: No digits
+    if (!formData.name) {
+      newErrors.name = "Будь ласка, введіть ім'я";
+    } else if (/\d/.test(formData.name)) {
+      newErrors.name = "Ім'я не може містити цифри";
+    }
+
+    // Phone validation: Basic format
+    const phoneRegex = /^\+?3?8?(0\d{9})$/;
+    if (!formData.phone) {
+      newErrors.phone = "Будь ласка, введіть номер телефону";
+    } else if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ""))) {
+      newErrors.phone = "Невірний формат номера (+380...)";
+    }
+
+    // Telegram validation: Min 3 chars
+    if (!formData.telegram) {
+      newErrors.telegram = "Будь ласка, введіть нік у Telegram";
+    } else {
+      const tgNick = formData.telegram.replace("@", "");
+      if (tgNick.length < 3) {
+        newErrors.telegram = "Нік у Telegram має бути не менше 3 символів";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const formData = new FormData(e.currentTarget);
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+
     const data = {
-      customerName: formData.get("name") as string,
-      customerEmail: formData.get("email") as string,
-      customerPhone: formData.get("phone") as string,
+      customerName: formData.name,
+      customerEmail: `${formData.telegram.replace("@", "")}@telegram.com`, // Fallback for API
+      customerPhone: formData.phone,
+      telegram: formData.telegram,
       amount: amount,
       tariffName: tariffName
     };
@@ -45,10 +99,10 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
 
       if (paymentData.error) {
         alert("Помилка при створенні платежу. Спробуйте пізніше.");
+        setIsSubmitting(false);
         return;
       }
 
-      // Create and submit a hidden form to WayForPay
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = 'https://secure.wayforpay.com/pay';
@@ -77,23 +131,29 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
     } catch (error) {
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
+      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
+  const shakeAnimation = {
+    x: [0, -10, 10, -10, 10, 0],
+    transition: { duration: 0.4 }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      {/* Blurred Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-md"
         onClick={onClose}
       />
 
-      {/* Modal Content - Glassmorphism */}
-      <div className="relative w-full max-w-md bg-[#121212]/80 backdrop-blur-xl p-8 sm:p-12 shadow-[0_40px_80px_rgba(0,0,0,0.8)] border-none">
-        
-        {/* Close Button */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="relative w-full max-w-md bg-[#121212]/80 backdrop-blur-xl p-8 sm:p-12 shadow-[0_40px_80px_rgba(0,0,0,0.8)] border-none border border-white/5"
+      >
         <button 
           onClick={onClose}
           className="absolute top-6 right-6 text-[#9e9e9e] hover:text-white transition-colors"
@@ -113,58 +173,104 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
 
         <form className="space-y-8" onSubmit={handleSubmit}>
           {/* Input: Name */}
-          <div className="relative flex flex-col">
+          <motion.div 
+            animate={errors.name ? shakeAnimation : {}}
+            className="relative flex flex-col"
+          >
             <label htmlFor="name" className="font-inter text-xs text-[#9e9e9e] mb-2 uppercase tracking-wider">
               Ім{`'`}я
             </label>
             <input 
-              name="name"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
               type="text" 
               id="name"
-              className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
+              className={`w-full bg-transparent border-0 border-b ${errors.name ? 'border-red-500' : 'border-[#333333]'} py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0`}
               placeholder="Ваше ім'я"
-              required
             />
-          </div>
+            <AnimatePresence>
+              {errors.name && (
+                <motion.span 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-red-500 text-[10px] uppercase mt-1 font-bold tracking-tighter"
+                >
+                  {errors.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-          {/* Input: Email */}
-          <div className="relative flex flex-col">
-            <label htmlFor="email" className="font-inter text-xs text-[#9e9e9e] mb-2 uppercase tracking-wider">
-              Email
+          {/* Input: Telegram */}
+          <motion.div 
+            animate={errors.telegram ? shakeAnimation : {}}
+            className="relative flex flex-col"
+          >
+            <label htmlFor="telegram" className="font-inter text-xs text-[#9e9e9e] mb-2 uppercase tracking-wider">
+              Нік у Telegram
             </label>
             <input 
-              name="email"
-              type="email" 
-              id="email"
-              className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
-              placeholder="your@email.com"
-              required
+              value={formData.telegram}
+              onChange={(e) => setFormData({...formData, telegram: e.target.value})}
+              type="text" 
+              id="telegram"
+              className={`w-full bg-transparent border-0 border-b ${errors.telegram ? 'border-red-500' : 'border-[#333333]'} py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0`}
+              placeholder="@username"
             />
-          </div>
+            <AnimatePresence>
+              {errors.telegram && (
+                <motion.span 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-red-500 text-[10px] uppercase mt-1 font-bold tracking-tighter"
+                >
+                  {errors.telegram}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Input: Phone */}
-          <div className="relative flex flex-col">
+          <motion.div 
+            animate={errors.phone ? shakeAnimation : {}}
+            className="relative flex flex-col"
+          >
             <label htmlFor="phone" className="font-inter text-xs text-[#9e9e9e] mb-2 uppercase tracking-wider">
               Телефон
             </label>
             <input 
-              name="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
               type="tel" 
               id="phone"
-              className="w-full bg-transparent border-0 border-b border-[#333333] py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0"
+              className={`w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-[#333333]'} py-2 text-white font-inter text-base focus:ring-0 focus:border-[#c6c6c7] focus:outline-none transition-colors rounded-none px-0`}
               placeholder="+380"
-              required
             />
-          </div>
+            <AnimatePresence>
+              {errors.phone && (
+                <motion.span 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-red-500 text-[10px] uppercase mt-1 font-bold tracking-tighter"
+                >
+                  {errors.phone}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           <button
+            disabled={isSubmitting}
             type="submit"
-            className="w-full bg-[#c6c6c7] text-black font-inter font-semibold py-4 mt-4 uppercase tracking-wide hover:bg-white transition-colors duration-300 shadow-[0_40px_60px_rgba(198,198,199,0.08)]"
+            className="w-full bg-[#c6c6c7] text-black font-inter font-semibold py-4 mt-4 uppercase tracking-wide hover:bg-white transition-colors duration-300 shadow-[0_40px_60px_rgba(198,198,199,0.08)] disabled:opacity-50"
           >
-            Сплатити бронь {amount} грн
+            {isSubmitting ? "Створюємо платіж..." : `Сплатити бронь ${amount} грн`}
           </button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

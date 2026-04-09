@@ -60,6 +60,33 @@ export const HeroSection = () => {
           <p className="font-label text-xs md:text-sm italic tracking-widest opacity-50">
             без фотостудій, складних зйомок і дорогого обладнання
           </p>
+
+          <motion.button
+            onClick={() => {
+              const element = document.getElementById('group-tariff');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            animate={{ 
+              scale: [1, 1.05, 1],
+              boxShadow: [
+                "0 0 0 0px rgba(255, 255, 255, 0)",
+                "0 0 0 20px rgba(255, 255, 255, 0)",
+                "0 0 0 0px rgba(255, 255, 255, 0)"
+              ]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 2,
+              ease: "easeInOut"
+            }}
+            className="mt-12 bg-white text-black px-12 py-5 font-headline font-black text-xl uppercase tracking-widest hover:bg-black hover:text-white transition-colors duration-300"
+          >
+            ЗАБРОНЮВАТИ МІСЦЕ
+          </motion.button>
         </motion.div>
 
         {/* Side captions */}

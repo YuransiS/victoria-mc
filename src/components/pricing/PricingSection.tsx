@@ -120,6 +120,7 @@ export const PricingSection = () => {
             return (
               <motion.div 
                 key={tariff.id}
+                id={tariff.id === 'group' ? 'group-tariff' : undefined}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
