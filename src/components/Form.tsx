@@ -71,22 +71,15 @@ export const Form: React.FC = () => {
       currency: "UAH",
       ...utmData
     });
-
-    const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
-
     try {
-      if (scriptUrl) {
-        await fetch(scriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            ...formData,
-            api_key: process.env.NEXT_PUBLIC_SHEETS_API_KEY,
-            ...utmData
-          }),
-        });
-      }
+      await fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          ...formData,
+          ...utmData
+        }),
+      });
     } catch (error) {
       console.error("Submission error:", error);
     }

@@ -122,25 +122,20 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
         return;
       }
 
-      // 2. Track Lead to Google Sheets (non-blocking)
-      const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
-      if (scriptUrl) {
-        fetch(scriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            name: formData.name + (isTestMode ? " (TEST)" : ""),
-            phone: sanitizedPhone,
-            tariff: tariffName,
-            amount: actualAmount,
-            order_id: paymentData.orderReference, // Linked ID
-            target_sheet_id: "1127634999", 
-            api_key: process.env.NEXT_PUBLIC_SHEETS_API_KEY,
-            ...utmData
-          }),
-        }).catch(e => console.error("Lead log error:", e));
-      }
+      // 2. Track Lead to Google Sheets (via secure proxy)
+      fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: formData.name + (isTestMode ? " (TEST)" : ""),
+          phone: sanitizedPhone,
+          tariff: tariffName,
+          amount: actualAmount,
+          order_id: paymentData.orderReference, // Linked ID
+          target_sheet_id: "1127634999", 
+          ...utmData
+        }),
+      }).catch(e => console.error("Lead log error:", e));
 
       // Set flag for Thanks page
       sessionStorage.setItem('paymentAttempted', 'true');
