@@ -108,11 +108,11 @@ export const Form: React.FC = () => {
           label="ТЕЛЕГРАМ @НІК АБО НОМЕР ТЕЛЕФОНУ" 
           name="phone" 
           type="text" 
-          placeholder="@nickname або +380..." 
+          placeholder="@nickname або номер телефону" 
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
-          hint="Краще вкажіть Telegram @нік для швидкого зв'язку"
+          hint="Будь ласка, перевірте правильність номера або ніка, щоб ми могли з вами зв'язатися"
           disabled={status !== "idle"}
         />
 

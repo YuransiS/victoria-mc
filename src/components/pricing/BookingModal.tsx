@@ -81,12 +81,12 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
       newErrors.name = "Ім'я не може містити цифри";
     }
 
-    // Phone validation: Basic format
-    const phoneRegex = /^\+?3?8?(0\d{9})$/;
+    // Phone validation: Relaxed for international numbers
+    const phoneRegex = /^\+?\d{7,15}$/;
     if (!formData.phone) {
       newErrors.phone = "Будь ласка, введіть номер телефону";
     } else if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ""))) {
-      newErrors.phone = "Невірний формат номера (+380...)";
+      newErrors.phone = "Введіть коректний номер телефону";
     }
 
     // Telegram validation: Min 3 chars
@@ -322,9 +322,12 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
               animate={errors.phone ? shakeAnimation : {}}
               className="relative flex flex-col group"
             >
-              <label htmlFor="phone" className="font-inter text-[10px] text-[#666] mb-2 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
+              <label htmlFor="phone" className="font-inter text-[10px] text-[#666] mb-1 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
                 Номер телефону
               </label>
+              <p className="text-[9px] text-[#444] uppercase tracking-wider mb-2 leading-relaxed">
+                Перепроверьте номер. Якщо він буде невірним, ми не зможемо з вами зв{`'`}язатися
+              </p>
               <input 
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -332,7 +335,7 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
                 id="phone"
                 disabled={isSubmitting}
                 className={`w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
-                placeholder="+380"
+                placeholder="+"
               />
               <AnimatePresence>
                 {errors.phone && (
