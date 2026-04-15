@@ -24,8 +24,9 @@ export function ExitIntentModal() {
       const currentScrollY = window.scrollY;
       const scrollSpeed = lastScrollY - currentScrollY;
       
-      // If user scrolls up very fast (e.g. > 70px per frame) it indicates exit intent on mobile
-      if (scrollSpeed > 70 && currentScrollY > 100) {
+      // Increased threshold to 150px/frame and require being at least 500px down 
+      // This detects a very aggressive "flick" upwards which usually means trying to leave/refresh
+      if (scrollSpeed > 150 && currentScrollY > 500) {
         setIsVisible(true);
         setHasShown(true);
       }
@@ -33,12 +34,23 @@ export function ExitIntentModal() {
       lastScrollY = currentScrollY;
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && !hasShown) {
+        // Triggers when user switches tabs or goes to home screen
+        // Although they won't see it immediately, it will be there when they return
+        setIsVisible(true);
+        setHasShown(true);
+      }
+    };
+
     document.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [hasShown]);
 
