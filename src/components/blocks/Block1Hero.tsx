@@ -27,7 +27,7 @@ export function Block1Hero() {
         transition={{ duration: 1.5, ease: "easeOut" }}
       >
         <Image
-          src="https://i.ibb.co/8nKsyCB9/IMG-0418.jpg"
+          src="https://i.ibb.co/rgvJrKg/IMG-0901.jpg"
           alt="Expert Image"
           fill
           className={styles.bgImage}
