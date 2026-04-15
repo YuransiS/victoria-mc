@@ -1,16 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./Block1Hero.module.css";
 import { Form } from "@/components/Form";
 import { motion } from "framer-motion";
 
 export function Block1Hero() {
+  const [regCount, setRegCount] = useState(976);
+
+  useEffect(() => {
+    const handleNewRegistration = () => {
+      setRegCount(prev => prev + 1);
+    };
+    window.addEventListener('new_registration', handleNewRegistration);
+    return () => window.removeEventListener('new_registration', handleNewRegistration);
+  }, []);
+
   return (
     <section className={styles.hero}>
       {/* BACKGROUND LAYER */}
-      <motion.div 
+      <motion.div
         className={styles.background}
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -31,7 +41,7 @@ export function Block1Hero() {
         <div className={styles.content}>
 
           <div className={styles.textContent}>
-            <motion.div 
+            <motion.div
               className={styles.topRow}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 0.8, y: 0 }}
@@ -41,7 +51,7 @@ export function Block1Hero() {
               <span>18:00 ЗА КИЄВОМ</span>
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               className={styles.title}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -56,37 +66,14 @@ export function Block1Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
             >
-              <p className={styles.subtitle}>Як упакувати свою експертність у візуал, що відповідає високому чеку.</p>
+              <p className={styles.subtitle}>Від хаосу до системи: як побудувати блог, який працює на вас - відображає ваші цінності, викликає довіру та приводить клієнтів</p>
             </motion.div>
 
-            {/* FEATURES LIST - Desktop only in Hero */}
-            <motion.div 
-              className={`${styles.features} ${styles.desktopOnly}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
-            >
-              <div className={styles.featureItem}>
-                <span className={styles.featureLabel}>30 хвилин</span>
-                <span className={styles.featureDesc}>час на створення якісного контенту за моїм алгоритмом</span>
-              </div>
-              <div className={styles.featureItem}>
-                <span className={styles.featureLabel}>9 кадрів</span>
-                <span className={styles.featureDesc}>готова візуальна система та теми на 2 тижні вперед</span>
-              </div>
-              <div className={styles.featureItem}>
-                <span className={styles.featureLabel}>0 грн</span>
-                <span className={styles.featureDesc}>бюджет на студію: вчимося «бачити кадр» у звичайній квартирі</span>
-              </div>
-              <div className={styles.featureItem}>
-                <span className={styles.featureLabel}>Нативні продажі</span>
-                <span className={styles.featureDesc}>донесення цінності через сенси, а не через нудні тексти</span>
-              </div>
-            </motion.div>
           </div>
 
           {/* REGISTRATION FORM COMPACT */}
-          <motion.div 
+          <motion.div
+            id="registration-form"
             className={styles.formWrapper}
             initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -106,11 +93,12 @@ export function Block1Hero() {
                 <img src="https://i.pravatar.cc/100?img=26" alt="Participant" />
               </div>
               <div className={styles.proofText}>
-                <span>🔥 <b>989</b> людей вже зареєструвалися</span>
+                <span>🔥 <b>{regCount}</b> людей вже зареєструвалися</span>
                 <span className={styles.limited}>Кількість місць обмежена</span>
               </div>
             </div>
           </motion.div>
+
 
         </div>
       </div>

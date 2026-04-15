@@ -40,7 +40,7 @@ export const usePersistentTimer = (durationHours: number = 24) => {
 
   const getTimeParts = () => {
     if (timeLeft === null) return { hours: 0, minutes: 0, seconds: 0 };
-    
+
     const h = Math.floor(timeLeft / (1000 * 60 * 60));
     const m = Math.floor((timeLeft / (1000 * 60)) % 60);
     const s = Math.floor((timeLeft / 1000) % 60);

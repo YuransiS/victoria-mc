@@ -1,0 +1,88 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal {
+  background: #1a1a1c;
+  border: 1px solid rgba(209, 184, 151, 0.3);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem 2rem;
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+.title {
+  font-family: var(--font-newsreader);
+  font-size: 2rem;
+  color: #d1b897;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.mainText {
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.mainText b {
+  color: #d1b897;
+}
+
+.ctaButton {
+  background: #d1b897;
+  color: #121212;
+  font-family: var(--font-manrope);
+  font-weight: 800;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 1.2rem;
+  width: 100%;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}

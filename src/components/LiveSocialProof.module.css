@@ -1,0 +1,61 @@
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 100;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(209, 184, 151, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  pointer-events: none; /* So it doesn't block clicks */
+}
+
+@media (max-width: 600px) {
+  .toast {
+    left: 1rem;
+    right: 1rem;
+    bottom: 5.5rem; /* Lifted to avoid sticky mobile CTA */
+    max-width: calc(100vw - 2rem);
+    justify-content: center;
+  }
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #d1b897;
+  color: #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-newsreader);
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-family: var(--font-manrope);
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-manrope);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
