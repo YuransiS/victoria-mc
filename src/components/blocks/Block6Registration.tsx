@@ -31,11 +31,11 @@ export function Block6Registration() {
       >
         <div>
           <h2 className={styles.sectionTitle} style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", textAlign: "center", color: "#d1b897", margin: "0 0 1rem 0" }}>
-            Реєструйся на практичний майстер-клас
+            РЕЄСТРУЙСЯ НА МАЙСТЕР-КЛАС ТА ВИХОДЬ ІЗ ХАОСУ
           </h2>
           <p style={{ textAlign: "center", color: "rgba(255, 255, 255, 0.8)", lineHeight: 1.6, margin: 0 }}>
-            та отримуй готову структуру блогу під будь яку нішу на 6 місяців вперед.<br />
-            <strong style={{ color: "#d1b897" }}>Кількість безкоштовних місць на майстер-класі - обмежена.</strong>
+            Отримуй готову структуру блогу на 6 місяців відразу після реєстрації.<br />
+            <strong style={{ color: "#d1b897" }}>Кількість безкоштовних місць обмежена.</strong>
           </p>
         </div>
         <Form />

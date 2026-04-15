@@ -28,17 +28,35 @@
   letter-spacing: -0.02em;
 }
 
-.statementText {
-  font-family: var(--font-manrope);
-  font-size: clamp(1.125rem, 2vw, 1.5rem);
-  color: var(--on-surface-variant);
-  line-height: 1.6;
-  margin-bottom: 2rem;
+.pointsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 3rem;
 }
 
-.caption {
-  margin-top: 3rem;
-  color: var(--on-surface-variant);
-  font-size: 0.875rem;
+@media (min-width: 768px) {
+  .pointsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.point {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pointText {
   font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  color: var(--on-surface);
+  line-height: 1.6;
+}
+
+.pointText strong {
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
 }

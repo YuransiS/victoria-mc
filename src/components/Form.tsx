@@ -9,7 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const TELEGRAM_LINK = "https://t.me/+qNxPhx3CUpw1ODZi";
 
-export const Form: React.FC = () => {
+interface FormProps {
+  buttonText?: string;
+}
+
+export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ" }) => {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [errors, setErrors] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
@@ -125,11 +129,11 @@ export const Form: React.FC = () => {
         >
           {status === "loading" ? "ВІДПРАВКА..." : 
            status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : 
-           "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ"}
+           buttonText}
         </Button>
 
         <p className={styles.bonusText}>
-          <strong>Бонус:</strong> готова структура блогу під будь яку нішу на 6 місяців вперед (отримай відразу після реєстрації).
+          <strong>Бонус:</strong> Готова структура блогу на 6 місяців (отримаєш відразу після реєстрації).
         </p>
       </form>
 

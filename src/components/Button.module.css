@@ -2,16 +2,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
   font-family: var(--font-manrope);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
   border-radius: var(--radius);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .button:disabled {

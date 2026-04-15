@@ -37,8 +37,8 @@ export function Block1Hero() {
               animate={{ opacity: 0.8, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              <span>09.04</span>
-              <span>18:00 за Києвом</span>
+              <span>21.04</span>
+              <span>18:00 ЗА КИЄВОМ</span>
             </motion.div>
 
             <motion.h1 
@@ -50,14 +50,40 @@ export function Block1Hero() {
               ВІД ХАОСУ<br />ДО СИСТЕМИ
             </motion.h1>
 
-            <motion.p 
-              className={styles.description}
+            <motion.div
+              className={styles.subDescription}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
             >
-              як побудувати блог, який працює на вас - відображає ваші цінності, викликає довіру та приводить клієнтів
-            </motion.p>
+              <p className={styles.subtitle}>Як упакувати свою експертність у візуал, що відповідає високому чеку.</p>
+              <p className={styles.mainText}>Створи систему нативних продажів через особистий стиль та сенси за 30 хвилин на день - без оренди студій, складних програм та 4-годинних зйомок.</p>
+            </motion.div>
+
+            {/* FEATURES LIST - Desktop only in Hero */}
+            <motion.div 
+              className={`${styles.features} ${styles.desktopOnly}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
+            >
+              <div className={styles.featureItem}>
+                <span className={styles.featureLabel}>30 хвилин</span>
+                <span className={styles.featureDesc}>час на створення якісного контенту за моїм алгоритмом</span>
+              </div>
+              <div className={styles.featureItem}>
+                <span className={styles.featureLabel}>9 кадрів</span>
+                <span className={styles.featureDesc}>готова візуальна система та теми на 2 тижні вперед</span>
+              </div>
+              <div className={styles.featureItem}>
+                <span className={styles.featureLabel}>0 грн</span>
+                <span className={styles.featureDesc}>бюджет на студію: вчимося «бачити кадр» у звичайній квартирі</span>
+              </div>
+              <div className={styles.featureItem}>
+                <span className={styles.featureLabel}>Нативні продажі</span>
+                <span className={styles.featureDesc}>донесення цінності через сенси, а не через нудні тексти</span>
+              </div>
+            </motion.div>
           </div>
 
           {/* REGISTRATION FORM COMPACT */}
@@ -71,7 +97,7 @@ export function Block1Hero() {
               <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
             </div>
 
-            <Form />
+            <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" />
 
             <div className={styles.socialProof}>
               <div className={styles.avatars}>
@@ -80,7 +106,10 @@ export function Block1Hero() {
                 <img src="https://i.pravatar.cc/100?img=12" alt="Participant" />
                 <img src="https://i.pravatar.cc/100?img=26" alt="Participant" />
               </div>
-              <span>🔥 <b>712</b> людей вже зареєструвалися</span>
+              <div className={styles.proofText}>
+                <span>🔥 <b>989</b> людей вже зареєструвалися</span>
+                <span className={styles.limited}>Кількість місць обмежена</span>
+              </div>
             </div>
           </motion.div>
 

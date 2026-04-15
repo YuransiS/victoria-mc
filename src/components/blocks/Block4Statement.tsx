@@ -5,16 +5,27 @@ export function Block4Statement() {
   return (
     <section className={styles.section}>
       <div className={styles.statementBlock}>
-        <h2 className={styles.statementTitle}>ДОВІРА- ГОЛОВНА ВАЛЮТА 2026 РОКУ.</h2>
-        <p className={styles.statementText}>
-          У світі, переповненому ШІ-генераціями, люди шукають справжніх людей. Конверсія у запит у профілях із закладеними сенсами з візуалом у 5 разів вища, ніж у звичайних каталогів послуг.
-        </p>
-        <p className={styles.statementText} style={{ color: "var(--on-surface)" }}>
-          Це твій шанс навчитися створювати візуал зі сенсами поки інші продовжують копіювати чужі шаблони.
-        </p>
-        <p className={styles.caption}>
-          * Графік: Зростання довіри до блогів з власним стилем та сенсами vs падіння залученості у АІ сторінок.
-        </p>
+        <h2 className={styles.statementTitle}>ЧОМУ ЦЕ ВАЖЛИВО САМЕ ЗАРАЗ?</h2>
+        
+        <div className={styles.pointsGrid}>
+          <div className={styles.point}>
+            <p className={styles.pointText}>
+              <strong>Алгоритми не люблять хаос.</strong> Коли контент зрозумілий - Instagram сам просуває тебе на потрібну аудиторію.
+            </p>
+          </div>
+          
+          <div className={styles.point}>
+            <p className={styles.pointText}>
+              <strong>Ринок перенасичений.</strong> Люди втомилися від «успішного успіху» та офіційності. Зараз купують у живих, автентичних людей, чий контент має структуру.
+            </p>
+          </div>
+          
+          <div className={styles.point}>
+            <p className={styles.pointText}>
+              <strong>Instagram - це твій актив.</strong> Він має приносити прибуток, а не забирати енергію. Система звільняє час для життя.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,0 +1,38 @@
+@media (max-width: 480px) {
+  .hero {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+    height: 100dvh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  .container {
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0;
+  }
+  .formWrapper {
+    transform: scale(0.92);
+    transform-origin: center bottom;
+    padding: 1rem;
+    margin-top: auto;
+    max-width: 100%;
+  }
+  .formWrapper button {
+    font-size: clamp(0.7rem, 3.8vw, 0.82rem) !important;
+    padding: 0.8rem 0.4rem !important;
+  }
+  .title {
+    font-size: 2.2rem;
+  }
+}

@@ -34,7 +34,7 @@ export function Block2Learning() {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className={styles.sectionTitle}>На майстер-класі:</h2>
+        <h2 className={styles.sectionTitle}>Програма МК:</h2>
       </motion.div>
       <motion.div 
         className={styles.listGrid}
@@ -45,23 +45,84 @@ export function Block2Learning() {
       >
         <motion.div className={styles.listItem} variants={itemVariants}>
           <span className={styles.listItemNum}>1</span>
-          <p className={styles.listItemText}>Дізнаєшся про свої ключові помилки, через які твій блог прямо зараз не приносить замовлень та заявок. Та отримаєш готові рішення, як їх виправити і що для цього потрібно.</p>
+          <div className={styles.listItemText}>
+            <strong>Аудит: Чому блог є, а результату немає?</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>Діагностика профілю: чому твій контент не перетворюється на замовлення від клієнтів (на реальних прикладах).</li>
+            </ul>
+          </div>
         </motion.div>
+
         <motion.div className={styles.listItem} variants={itemVariants}>
           <span className={styles.listItemNum}>2</span>
-          <p className={styles.listItemText}>Складеш план на 9 фото зі змістом саме під свою нішу, щоб закрити питання контенту на 2 тижні наперед.</p>
+          <div className={styles.listItemText}>
+            <strong>Фундамент: ДНК твого блогу</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>Як знайти глибинну мотивацію ведення контенту - не "хочу клієнтів" а що насправді стоїть за цим</li>
+              <li>Як розібратись у своїх сенсах - що ти хочеш транслювати світу і чому це важливо саме тобі</li>
+              <li>Як упакувати це в просту формулу: хто ти + кому це потрібно + що людина отримує</li>
+            </ul>
+          </div>
         </motion.div>
+
         <motion.div className={styles.listItem} variants={itemVariants}>
           <span className={styles.listItemNum}>3</span>
-          <p className={styles.listItemText}>Отримаєш покроковий план, як об’єднати мету твого блогу, теми постів та візуал у єдину робочу систему.</p>
+          <div className={styles.listItemText}>
+            <strong>УНІКАЛЬНІСТЬ: як знайти себе, а не копіювати інших</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>Що таке автентичність у контенті - і чому вона продає краще за тренди</li>
+              <li>Як знайти свою унікальність через те що ти вже маєш: спосіб мислення, деталі побуту, погляд на свою нішу</li>
+              <li>Як розвинути надивленість - бачити кадри і сенси там де інші не помічають</li>
+              <li>Як перетворити свої ідеї в контент-план який відображає тебе а не чужі тренди</li>
+            </ul>
+          </div>
         </motion.div>
+
         <motion.div className={styles.listItem} variants={itemVariants}>
           <span className={styles.listItemNum}>4</span>
-          <p className={styles.listItemText}>Навчишся вкладати сенси у шрифти та деталі кадру, щоб продавати свою експертність, не пишучи полотна тексту.</p>
+          <div className={styles.listItemText}>
+            <strong>Як показувати себе без душного експертного контенту</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>Як поєднувати особисте і експертне щоб одне підсилювало інше</li>
+              <li>Як продавати нативно - через цінності і деталі а не через "купи"</li>
+              <li>Як впоратись з перфекціонізмом який заває публікувати</li>
+              <li>Як вести блог стабільно коли немає часу і натхнення — конкретний інструмент а не порада "просто почни"</li>
+            </ul>
+          </div>
         </motion.div>
+
         <motion.div className={styles.listItem} variants={itemVariants}>
           <span className={styles.listItemNum}>5</span>
-          <p className={styles.listItemText}>Дізнаєшся алгоритм «30 хвилин», за яким зможеш знімати якісний контент вдома біля вікна без допомоги студій та фотографів.</p>
+          <div className={styles.listItemText}>
+            <strong>ВІЗУАЛ: стиль стрічка кадр</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>Як знайти свій стиль</li>
+              <li>Як планувати фото для загального візуалу</li>
+              <li>Практика в прямому ефірі: різноманітна стрічка зі сенсами з одної локації</li>
+              <li>Розбір технічних навичок, програм, в яких потрібно розібратися</li>
+            </ul>
+          </div>
+        </motion.div>
+
+        <motion.div className={styles.listItem} variants={itemVariants}>
+          <span className={styles.listItemNum}>6</span>
+          <div className={styles.listItemText}>
+            <strong>РОЗБОРИ АКАУНТІВ З РІЗНИХ НІШ</strong>
+            <p style={{ fontSize: '0.85rem', marginTop: '0.4rem', fontStyle: 'italic' }}>бухгалтер юрист майстер фотограф дизайнер художниця психолог коуч педагог</p>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>що конкретно не працює і чому яке рішення - показуємо як би виглядало після</li>
+            </ul>
+          </div>
+        </motion.div>
+
+        <motion.div className={styles.listItem} variants={itemVariants}>
+          <span className={styles.listItemNum}>7</span>
+          <div className={styles.listItemText}>
+            <strong>Презентація на навчальний продукт СТВОРЮЙ</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <li>спец умови та бонуси тільки для учасників майстер-класу</li>
+            </ul>
+          </div>
         </motion.div>
       </motion.div>
       <motion.div 

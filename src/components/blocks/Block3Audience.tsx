@@ -48,16 +48,16 @@ export function Block3Audience() {
           <p className={styles.listItemText}>Витрачаєш 4 години на Instagram, а результат - 0. Втомилася від хаотичних думок «що постити сьогодні» і хочеш мати готовий покроковий протокол дій.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Твій блог виглядає «дешевше», ніж твоя експертність. Хочеш обґрунтовано підняти чек на свої послуги через професійну візуальну упаковку.</p>
+          <p className={styles.listItemText}>Твій блог виглядає «дешевше», ніж твоя експертність. Хочеш обґрунтовано підняти чек на послуги через професійну візуальну упаковку.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Боїшся камери або видаляєш пости через 2 дні. Потребуєш впевненості, яка з’являється лише тоді, коли контент побудований на твердому фундаменті, а не на натхненні.</p>
+          <p className={styles.listItemText}>Боїшся бути «душним експертом». Твій блог схожий на Вікіпедію: багато користі, але не видно людини. Не знаєш, як показувати справжню себе і мати продажі.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
           <p className={styles.listItemText}>Ти в обмежених ресурсах (мама, емігрант, найм). Маєш лише 30 хвилин вільного часу і хочеш, щоб контент став простою звичкою, як пити вітаміни.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Ти - SMM-ник, який взуває клієнтів, але «босий» сам. Хочеш нарешті вийти із тіні та побудувати власний сильний бренд, який приносить замовлення на твій чек.</p>
+          <p className={styles.listItemText}>Ти - SMM-ник, який взуває клієнтів, але «босий» сам. Хочеш нарешті вийти з тіні та побудувати власний сильний бренд, що приносить замовлення.</p>
         </motion.div>
       </motion.div>
       <motion.div 
