@@ -57,7 +57,6 @@ export function Block1Hero() {
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
             >
               <p className={styles.subtitle}>Як упакувати свою експертність у візуал, що відповідає високому чеку.</p>
-              <p className={styles.mainText}>Створи систему нативних продажів через особистий стиль та сенси за 30 хвилин на день - без оренди студій, складних програм та 4-годинних зйомок.</p>
             </motion.div>
 
             {/* FEATURES LIST - Desktop only in Hero */}

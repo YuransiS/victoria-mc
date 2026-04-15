@@ -14,6 +14,10 @@ export function Block1Features() {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
+        <p className={styles.featuresIntro}>
+          Створи систему нативних продажів через особистий стиль та сенси за 30 хвилин на день - без оренди студій, складних програм та 4-годинних зйомок.
+        </p>
+
         <div className={styles.featuresGrid}>
           <div className={styles.featureItemMobile}>
             <span className={styles.featureLabel}>30 хвилин</span>
