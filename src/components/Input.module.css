@@ -98,3 +98,22 @@
 ::placeholder {
   color: rgba(255, 255, 255, 0.2);
 }
+@media (max-width: 480px) {
+  .input {
+    padding: 0.65rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+  .label {
+    font-size: 0.55rem;
+    margin-left: 0.4rem;
+    margin-bottom: 0.1rem;
+  }
+  .wrapper {
+    margin-bottom: 0.25rem;
+  }
+  .hintMessage, .errorMessage {
+    font-size: 0.6rem;
+    margin-top: 0.1rem;
+    margin-left: 0.4rem;
+  }
+}

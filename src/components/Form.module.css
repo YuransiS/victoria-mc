@@ -139,3 +139,14 @@
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@media (max-width: 480px) {
+  .submitBtn {
+    padding: 0.85rem !important;
+    font-size: 0.95rem !important;
+    margin-top: 0.5rem;
+  }
+  .bonusText {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+  }
+}
