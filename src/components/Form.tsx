@@ -81,7 +81,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           ...formData,
-          ...utmData
+          ...utmData,
+          target_sheet_id: "70777205"
         }),
       });
     } catch (error) {

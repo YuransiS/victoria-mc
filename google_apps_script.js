@@ -18,17 +18,18 @@ function doPost(e) {
 
     // Ensure we have OrderID as string
     const order_id = (data.order_id || "").toString().trim();
-    if (!order_id) return createErrorResponse("No OrderID");
 
     const dataRange = sheet.getDataRange().getValues();
     let rowToUpdate = -1;
 
-    // Smart Match: checking column 12 (Index 11)
-    for (let i = 1; i < dataRange.length; i++) {
-      let cellValue = (dataRange[i][11] || "").toString().trim();
-      if (cellValue === order_id) {
-        rowToUpdate = i + 1;
-        break;
+    // Smart Match: checking column 12 (Index 11) - Only if order_id is provided
+    if (order_id) {
+      for (let i = 1; i < dataRange.length; i++) {
+        let cellValue = (dataRange[i][11] || "").toString().trim();
+        if (cellValue === order_id) {
+          rowToUpdate = i + 1;
+          break;
+        }
       }
     }
 
