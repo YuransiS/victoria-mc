@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Form.module.css";
 import { Input } from "./Input";
 import { Button } from "./Button";
@@ -17,6 +17,19 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [errors, setErrors] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
+  const [activeUsers, setActiveUsers] = useState(4);
+
+  useEffect(() => {
+    // Randomly fluctuate active users count to look "live"
+    const interval = setInterval(() => {
+      setActiveUsers(prev => {
+        const change = Math.random() > 0.5 ? 1 : -1;
+        const newValue = prev + change;
+        return newValue < 3 ? 3 : newValue > 7 ? 7 : newValue;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -99,6 +112,10 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   return (
     <div className={styles.formContainer}>
       <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.liveCounter}>
+          <span className={styles.liveDot}></span>
+          <span>зараз заповнюють анкету: {activeUsers} людини</span>
+        </div>
         <Input 
           label="ІМ'Я ТА ПРІЗВИЩЕ" 
           name="name" 
