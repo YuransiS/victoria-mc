@@ -57,7 +57,7 @@ function doPost(e) {
           data.tariff || "",
           data.amount || "",
           order_id,
-          data.status || "Pending"
+          data.status || (order_id ? "Pending" : "")
         ]);
         return createSuccessResponse("New lead logged");
       } else {

@@ -34,15 +34,15 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
 
     // Lenient: allow Telegram nick (@username) or phone number
     const contact = formData.phone.trim();
-    if (contact.startsWith("@")) {
-      if (contact.length < 4) {
-        newErrors.phone = "Введіть коректний Telegram нік";
-        valid = false;
-      }
-    } else {
+    if (contact.length < 3) {
+      newErrors.phone = "Введіть Telegram нік або номер телефону";
+      valid = false;
+    } else if (!contact.startsWith("@")) {
+      // If it doesn't start with @, it could be a phone or a nick
       const digitsOnly = contact.replace(/\D/g, "");
-      if (digitsOnly.length < 7) {
-        newErrors.phone = "Введіть Telegram нік або номер телефону";
+      // If it's mostly digits but too short, it's a bad phone number
+      if (digitsOnly.length > 0 && digitsOnly.length < 7) {
+        newErrors.phone = "Введіть коректний номер телефону або нік";
         valid = false;
       }
     }
