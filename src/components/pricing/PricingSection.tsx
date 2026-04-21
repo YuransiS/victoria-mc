@@ -44,7 +44,7 @@ const TARIFFS: Tariff[] = [
       { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: false },
     ],
     prices: {
-      special: { badge: "$390", secondary: "$450", full: "$550" },
+      special: { badge: "$399", secondary: "$450", full: "$550" },
       regular: { badge: "$450", secondary: "$550", full: "$650" }
     }
   },
@@ -63,7 +63,7 @@ const TARIFFS: Tariff[] = [
       { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: true },
     ],
     prices: {
-      special: { badge: "$490", secondary: "$590", full: "$790" },
+      special: { badge: "$505", secondary: "$590", full: "$790" },
       regular: { badge: "$590", secondary: "$790", full: "$990" }
     }
   },
@@ -84,7 +84,7 @@ const TARIFFS: Tariff[] = [
       { text: "МІСЯЦЬ ПІСЛЯ КУРСУ Я НА ЗВ'ЯЗКУ", included: true, bold: true },
     ],
     prices: {
-      special: { badge: "$890", secondary: "$1090", full: "$1290" },
+      special: { badge: "$911", secondary: "$1090", full: "$1290" },
       regular: { badge: "$1090", secondary: "$1290", full: "$1590" }
     }
   }
