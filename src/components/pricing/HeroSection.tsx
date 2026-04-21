@@ -9,7 +9,7 @@ export const HeroSection = () => {
       {/* Background Images */}
       <div className="absolute inset-0 z-0">
         <picture>
-          <source media="(max-width: 768px)" srcSet="/hero_mobile_muted.png" />
+          <source media="(max-width: 768px)" srcSet="https://i.ibb.co/jkNS82vw/IMG-4550.jpg" />
           <img 
             src="/hero_pc_muted.png" 
             alt="Hero Background" 

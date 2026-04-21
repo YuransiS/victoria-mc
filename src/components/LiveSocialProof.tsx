@@ -23,7 +23,7 @@ const bookingActions = [
 
 export function LiveSocialProof({ variant = "registration" }: { variant?: "registration" | "booking" }) {
   const [notification, setNotification] = useState<{name: string, action: string} | null>(null);
-  const [bookingCount, setBookingCount] = useState(12);
+  const [bookingCount, setBookingCount] = useState(1);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -38,7 +38,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
         const action = actions[Math.floor(Math.random() * actions.length)];
         setNotification({ name, action });
         if (variant === "booking") {
-          setBookingCount(prev => prev + 1);
+          setBookingCount(prev => Math.max(1, prev - 1));
         }
         
         // Update the global count on the hero screen
@@ -61,7 +61,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
       const action = actions[Math.floor(Math.random() * actions.length)];
       setNotification({ name, action });
       if (variant === "booking") {
-        setBookingCount(prev => prev + 1);
+        setBookingCount(prev => Math.max(1, prev - 1));
       }
       
       // Update global count
@@ -77,7 +77,18 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
     return () => {
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [variant]);
+
+  useEffect(() => {
+    if (variant !== 'booking') return;
+
+    const intervalId = setInterval(() => {
+      // Randomly increase the count to simulate people starting to book
+      setBookingCount(prev => (prev < 2 ? prev + 1 : prev));
+    }, Math.floor(Math.random() * 15000) + 15000); // Every 15-30s
+
+    return () => clearInterval(intervalId);
+  }, [variant]);
 
   return (
     <AnimatePresence>
