@@ -1,13 +1,20 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 export const BenefitsSection = () => {
   return (
     <section className="bg-white py-32 px-8 border-y border-black/5">
       <div className="max-w-screen-xl mx-auto">
-        <div className="border-l-4 border-primary-brand pl-8">
-          <h2 className="font-manrope font-extrabold text-4xl md:text-5xl uppercase tracking-tight mb-12">
+        <motion.div 
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8 }}
+          className="border-l-4 border-primary pl-8"
+        >
+          <h2 className="font-headline font-extrabold text-4xl md:text-5xl uppercase tracking-tight mb-12">
             Що ви отримуєте за бронювання:
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -31,13 +38,19 @@ export const BenefitsSection = () => {
                 </p>
               </li>
             </ul>
-            <div className="bg-surface-variant-custom p-10 flex flex-col justify-center">
-              <p className="font-space text-lg italic text-on-surface-custom leading-relaxed">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="bg-surface-variant p-10 flex flex-col justify-center"
+            >
+              <p className="font-label text-lg italic text-on-surface leading-relaxed">
                 "Ви отримуєте один із уроків основної програми курсу СТВОРЮЙ. Зможете протестувати мою методологію на практиці."
               </p>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -8,17 +8,17 @@ export const usePersistentTimer = (durationHours: number = 24) => {
     // Check if we are in search of a reset trigger
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('dev_reset') === 'secret_token_123') {
-      localStorage.removeItem('visitStartTime');
+      localStorage.removeItem('visitStartTimeV2');
       // Remove the param from URL without refreshing
       window.history.replaceState({}, '', window.location.pathname);
     }
 
     const durationMs = durationHours * 60 * 60 * 1000;
-    let startTime = localStorage.getItem('visitStartTime');
+    let startTime = localStorage.getItem('visitStartTimeV2');
 
     if (!startTime) {
       startTime = Date.now().toString();
-      localStorage.setItem('visitStartTime', startTime);
+      localStorage.setItem('visitStartTimeV2', startTime);
     }
 
     const startTimestamp = parseInt(startTime);
@@ -52,7 +52,7 @@ export const usePersistentTimer = (durationHours: number = 24) => {
     isExpired,
     timeParts: getTimeParts(),
     reset: () => {
-      localStorage.removeItem('visitStartTime');
+      localStorage.removeItem('visitStartTimeV2');
       window.location.reload();
     }
   };

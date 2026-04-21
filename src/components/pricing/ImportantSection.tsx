@@ -1,15 +1,28 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 export const ImportantSection = () => {
   return (
     <section className="bg-black text-white py-32 px-8">
       <div className="max-w-screen-xl mx-auto text-center">
-        <h2 className="font-manrope font-extrabold text-6xl md:text-8xl mb-24 uppercase tracking-tighter">
+        <motion.h2 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="font-headline font-extrabold text-6xl md:text-8xl mb-24 uppercase tracking-tighter"
+        >
           ВАЖЛИВО:
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16 text-left max-w-5xl mx-auto">
+        </motion.h2>
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16 text-left max-w-5xl mx-auto"
+        >
           <p className="font-space text-lg opacity-80 border-b border-white/10 pb-4">
             Уроки без води з чіткою покроковою інформацією
           </p>
@@ -31,7 +44,7 @@ export const ImportantSection = () => {
           <p className="font-space text-lg opacity-80 border-b border-white/10 pb-4 md:col-span-2">
             Максимум практики: дивишся урок → повторюєш → бачиш результат
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

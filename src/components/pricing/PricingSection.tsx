@@ -41,7 +41,7 @@ const TARIFFS: Tariff[] = [
       { text: "ЧАТ З УЧАСНИКАМИ", included: false },
       { text: "ПЕРЕВІРКА ДЗ ОСОБИСТО МНОЮ", included: false },
       { text: "ГРУПОВІ ЗУМ-ЗУСТРІЧ", included: false },
-      { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: true },
+      { text: "ГОТОВІ ШАБЛОНИ ТА ДОДАТКОВІ МАТЕРІАЛИ", included: false },
     ],
     prices: {
       special: { badge: "$390", secondary: "$450", full: "$550" },

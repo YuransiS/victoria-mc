@@ -12,7 +12,7 @@ export const Footer = () => {
         </div>
 
         <div className="flex gap-8">
-          <a href="#" className="font-label text-xs uppercase tracking-widest hover:text-primary transition-colors">Instagram</a>
+          <a href="https://www.instagram.com/victoria_meshcheriakova?igsh=dW55YTltMTZ0Mmw1" target="_blank" rel="noopener noreferrer" className="font-label text-xs uppercase tracking-widest hover:text-primary transition-colors">Instagram</a>
           <a href="#" className="font-label text-xs uppercase tracking-widest hover:text-primary transition-colors">Telegram</a>
         </div>
 
