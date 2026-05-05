@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./PracticumProgram.module.css";
-import { motion } from "framer-motion";
+import { animate, stagger } from "animejs";
 
 export function PracticumProgram() {
+  const sectionRef = useRef<HTMLElement>(null);
+  
   const days = [
     {
       day: "1 день",
@@ -45,27 +47,56 @@ export function PracticumProgram() {
     },
   ];
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Anime.js V4 Staggered Reveal
+            animate(`.${styles.dayRow}`, {
+              opacity: [0, 1],
+              translateX: (el: any) => {
+                return el.classList.contains(styles.left) ? [-50, 0] : [50, 0];
+              },
+              translateY: [30, 0],
+              delay: stagger(150),
+              duration: 1000,
+              easing: "easeOutExpo",
+            });
+
+            animate(`.${styles.progressLine}`, {
+              scaleY: [0, 1],
+              duration: 2000,
+              easing: "easeInOutQuad",
+            });
+
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className={styles.section} id="program">
+    <section className={styles.section} id="program" ref={sectionRef}>
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>ПРОГРАМА ПРАКТИКУМУ</h2>
         
         <div className={styles.timeline}>
-          <motion.div 
-            className={styles.progressLine}
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: false, margin: "-100px" }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-          />
+          <div className={styles.progressLine} style={{ transformOrigin: "top" }} />
           
           {days.map((d, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
               className={`${styles.dayRow} ${i % 2 === 0 ? styles.left : styles.right}`}
+              style={{ opacity: 0 }}
             >
               <div className={styles.dayContent}>
                 <div className={styles.dayNum}>{d.day}</div>
@@ -76,30 +107,26 @@ export function PracticumProgram() {
                 {d.live && <div className={styles.liveTag}>{d.live}</div>}
               </div>
               <div className={styles.dot} />
-            </motion.div>
+            </div>
           ))}
 
           {/* Separate Bonus Block */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
             className={`${styles.dayRow} ${days.length % 2 === 0 ? styles.left : styles.right} ${styles.specialBonusRow}`}
+            style={{ opacity: 0 }}
           >
             <div className={`${styles.dayContent} ${styles.bonusContent}`}>
-              <div className={styles.specialBonusBox}>
-                <h4 className={styles.bonusBadge}>ОСОБЛИВИЙ БОНУС</h4>
-                <h3 className={styles.bonusTitle}>🔥 АНАТОМІЯ КАРУСЕЛЬКИ</h3>
-                <p className={styles.bonusSubtitle}>(ТІЛЬКИ ДЛЯ ТИХ, ХТО ДІЙШОВ ДО КІНЦЯ)</p>
-                <ul className={styles.bonusList}>
-                  <li>Структура карусельки яку зберігають</li>
-                  <li>Помилки та мінімалістичний дизайн</li>
-                  <li>Практика: твоя перша карусель</li>
-                </ul>
-              </div>
+              <h4 className={styles.bonusBadge}>БОНУС</h4>
+              <h3 className={styles.bonusTitle}>🔥 АНАТОМІЯ КАРУСЕЛЬКИ</h3>
+              <p className={styles.bonusSubtitle}>(ДЛЯ ТИХ, ХТО ДІЙШОВ ДО КІНЦЯ)</p>
+              <ul className={styles.bonusList}>
+                <li>Структура карусельки яку зберігають</li>
+                <li>Помилки та мінімалістичний дизайн</li>
+                <li>Практика: твоя перша карусель</li>
+              </ul>
             </div>
             <div className={styles.dot} />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
