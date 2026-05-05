@@ -156,10 +156,9 @@ export function PracticumHero() {
           </div>
         </div>
 
-        {/* Vika's Photo - Optimized with next/image */}
         <div className={styles.vikaPhotoContainer} ref={photoRef}>
           <Image 
-            src="https://i.ibb.co/rRz99L0Q/IMG-0901.png" 
+            src="/vika_practicum.png" 
             alt="Вікторія" 
             className={styles.vikaPhoto}
             fill
