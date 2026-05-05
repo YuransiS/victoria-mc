@@ -19,8 +19,23 @@ export default function PaymentErrorPage() {
 
     // Try to get some context about what failed
     const lastOrderId = sessionStorage.getItem('lastOrderId');
-    if (lastOrderId) {
-      setOrderDetails({ id: lastOrderId });
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    const activeOrderId = urlOrderId || lastOrderId;
+
+    if (activeOrderId) {
+      setOrderDetails({ id: activeOrderId });
+      
+      // Update status in sheets
+      fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          order_id: activeOrderId,
+          status: "DECLINED (Redirect)",
+          target_sheet_id: "1127634999"
+        }),
+      }).catch(e => console.error("Update failed:", e));
     }
   }, [router]);
 

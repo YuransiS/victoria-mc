@@ -1,10 +1,32 @@
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function PracticumFailPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const sessionOrderId = sessionStorage.getItem('lastOrderId');
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    const activeOrderId = urlOrderId || sessionOrderId;
+
+    if (activeOrderId) {
+      fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          order_id: activeOrderId,
+          status: "DECLINED (Redirect)",
+          target_sheet_name: "Практикум"
+        }),
+      }).catch(e => console.error("Update failed:", e));
+    }
+  }, []);
+
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center p-8 overflow-hidden relative">
       <div className="absolute inset-0 z-0">

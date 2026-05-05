@@ -438,3 +438,31 @@
     margin-top: 0.5rem;
   }
 }
+
+.testPaymentBtn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-manrope);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: 100%;
+}
+
+.testPaymentBtn:hover {
+  border-color: rgba(209, 184, 151, 0.4);
+  color: #d1b897;
+  background: rgba(209, 184, 151, 0.05);
+}
+
+@media (max-width: 480px) {
+  .testPaymentBtn {
+    margin-top: -0.5rem;
+  }
+}

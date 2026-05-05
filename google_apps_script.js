@@ -45,6 +45,26 @@ function doPost(e) {
           break;
         }
       }
+
+      // GLOBAL SEARCH FALLBACK: if not found in target sheet, look in ALL sheets
+      if (rowToUpdate === -1) {
+        const allSheets = ss.getSheets();
+        for (let s = 0; s < allSheets.length; s++) {
+          const currentSheet = allSheets[s];
+          if (currentSheet.getName() === sheet.getName()) continue;
+          
+          const currentRange = currentSheet.getDataRange().getValues();
+          for (let i = 1; i < currentRange.length; i++) {
+            let cellValue = (currentRange[i][11] || "").toString().trim();
+            if (cellValue === order_id) {
+              sheet = currentSheet; // Important: update sheet reference for the actual update call
+              rowToUpdate = i + 1;
+              break;
+            }
+          }
+          if (rowToUpdate !== -1) break;
+        }
+      }
     }
 
     if (rowToUpdate !== -1) {

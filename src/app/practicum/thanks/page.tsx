@@ -30,7 +30,7 @@ export default function PracticumThanksPage() {
         body: JSON.stringify({ 
           order_id: activeOrderId,
           status: "APPROVED (Redirect)",
-          target_sheet_id: "practicum_sheet" // Special ID for practicum
+          target_sheet_name: "Практикум"
         }),
       }).then(() => {
         if (sessionOrderId) sessionStorage.removeItem('lastOrderId');

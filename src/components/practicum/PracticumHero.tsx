@@ -7,6 +7,8 @@ import { BookingModal } from "@/components/pricing/BookingModal";
 
 export function PracticumHero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(490);
+  const [showTestMode, setShowTestMode] = useState(false);
   const [spotsLeft, setSpotsLeft] = useState(63);
   const [activeUsers, setActiveUsers] = useState(7);
   const [blurAmount, setBlurAmount] = useState(0);
@@ -19,6 +21,12 @@ export function PracticumHero() {
   const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // CHECK FOR TEST MODE
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('test') === '1') {
+      setShowTestMode(true);
+    }
+
     // SCROLL LISTENER FOR BLUR EFFECT
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -164,7 +172,10 @@ export function PracticumHero() {
 
           <button 
             className={styles.mainActionBtn}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setPaymentAmount(490);
+              setIsModalOpen(true);
+            }}
           >
             <div className={styles.btnContent}>
               <span>ВЗЯТИ УЧАСТЬ — 490 ГРН</span>
@@ -172,15 +183,40 @@ export function PracticumHero() {
             </div>
           </button>
 
-          <a 
-            href="#program"
+          {showTestMode && (
+            <button 
+              className={styles.testPaymentBtn}
+              onClick={() => {
+                setPaymentAmount(1);
+                setIsModalOpen(true);
+              }}
+            >
+              ТЕСТОВА ОПЛАТА — 1 ГРН
+            </button>
+          )}
+
+          <button 
             className={styles.secondaryBtn}
+            onClick={(e) => {
+              e.preventDefault();
+              const target = document.querySelector("#program");
+              if (target) {
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+                const scrollObj = { y: window.pageYOffset };
+                animate(scrollObj, {
+                  y: targetPosition,
+                  duration: 1200,
+                  easing: "easeOutExpo",
+                  onRender: () => window.scrollTo(0, scrollObj.y)
+                });
+              }
+            }}
           >
             ДЕТАЛІ ПРОГРАМИ
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M7 13l5 5 5-5M7 6l5 5 5-5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-          </a>
+          </button>
 
           <div className={styles.socialProof}>
             <div className={styles.avatars}>
@@ -199,8 +235,8 @@ export function PracticumHero() {
       <BookingModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        tariffName="Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ" 
-        amount={490} 
+        tariffName={paymentAmount === 1 ? "ТЕСТОВА ОПЛАТА (1 ГРН)" : "Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ"} 
+        amount={paymentAmount} 
         targetSheetName="Практикум"
         successUrl="/practicum/thanks"
         failUrl="/practicum/fail"
