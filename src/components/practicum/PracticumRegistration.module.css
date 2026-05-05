@@ -1,0 +1,129 @@
+.section {
+  padding: 120px 20px;
+  background-color: #000;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ctaBox {
+  position: relative;
+  background: #111;
+  border-radius: 50px;
+  padding: 80px 40px;
+  text-align: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(209, 184, 151, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.spots {
+  font-family: var(--font-manrope);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #d1b897;
+  letter-spacing: 0.2em;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-family: var(--font-newsreader);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: #fff;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.desc {
+  font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 600px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.priceBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.oldPrice {
+  font-family: var(--font-manrope);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-family: var(--font-manrope);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.registerBtn {
+  background: #fff;
+  color: #000;
+  font-family: var(--font-manrope);
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 24px 48px;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+}
+
+.registerBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+}
+
+.guarantee {
+  margin-top: 24px;
+  font-family: var(--font-manrope);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 768px) {
+  .ctaBox {
+    padding: 60px 24px;
+    border-radius: 30px;
+  }
+  .priceBlock {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .registerBtn {
+    width: 100%;
+    padding: 20px;
+    font-size: 0.9rem;
+  }
+}

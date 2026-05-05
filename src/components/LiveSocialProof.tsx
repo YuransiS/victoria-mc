@@ -22,7 +22,7 @@ const bookingActions = [
 ];
 
 export function LiveSocialProof({ variant = "registration" }: { variant?: "registration" | "booking" }) {
-  const [notification, setNotification] = useState<{name: string, action: string} | null>(null);
+  const [notification, setNotification] = useState<{name: string, action: string, id: number} | null>(null);
   const [bookingCount, setBookingCount] = useState(1);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
         const actions = variant === "booking" ? bookingActions : registrationActions;
         const name = names[Math.floor(Math.random() * names.length)];
         const action = actions[Math.floor(Math.random() * actions.length)];
-        setNotification({ name, action });
+        setNotification({ name, action, id: Date.now() });
         if (variant === "booking") {
           setBookingCount(prev => Math.max(1, prev - 1));
         }
@@ -59,7 +59,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
       const actions = variant === "booking" ? bookingActions : registrationActions;
       const name = names[Math.floor(Math.random() * names.length)];
       const action = actions[Math.floor(Math.random() * actions.length)];
-      setNotification({ name, action });
+      setNotification({ name, action, id: Date.now() });
       if (variant === "booking") {
         setBookingCount(prev => Math.max(1, prev - 1));
       }
@@ -94,6 +94,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
     <AnimatePresence>
       {notification && (
         <motion.div 
+          key={notification.id}
           className={styles.toast}
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -108,26 +109,6 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
             <p className={styles.subtitle}>{notification.action}</p>
           </div>
         </motion.div>
-      )}
-      
-      {variant === 'booking' && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-4 px-4 z-[90] flex justify-center items-center shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-2 font-headline text-xs md:text-sm uppercase tracking-widest text-black">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-            </span>
-            Зараз бронюють місця: 
-            <motion.span 
-              key={bookingCount}
-              initial={{ scale: 1.5, color: '#5d5f2c' }}
-              animate={{ scale: 1, color: '#000000' }}
-              className="font-extrabold text-primary ml-1"
-            >
-              {bookingCount} осіб
-            </motion.span>
-          </div>
-        </div>
       )}
     </AnimatePresence>
   );

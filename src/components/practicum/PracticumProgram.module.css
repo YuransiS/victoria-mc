@@ -1,0 +1,202 @@
+.section {
+  padding: 100px 20px;
+  background-color: #000;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: #d1b897;
+  text-align: center;
+  margin-bottom: 80px;
+  text-transform: uppercase;
+}
+
+.timeline {
+  position: relative;
+  padding: 40px 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.progressLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #d1b897, #e5ccae, #d1b897);
+  transform-origin: top;
+  z-index: 1;
+  box-shadow: 0 0 15px rgba(209, 184, 151, 0.3);
+}
+
+.dayRow {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 50%;
+  position: relative;
+  margin-bottom: 60px;
+}
+
+.right {
+  justify-content: flex-start;
+  padding-right: 0;
+  padding-left: 50%;
+}
+
+.dot {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  width: 12px;
+  height: 12px;
+  background-color: #d1b897;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 15px #d1b897;
+  z-index: 2;
+}
+
+.dayContent {
+  width: 90%;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 40px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.left .dayContent {
+  margin-right: 40px;
+  text-align: right;
+}
+
+.right .dayContent {
+  margin-left: 40px;
+  text-align: left;
+}
+
+.dayContent:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-5px);
+}
+
+.dayNum {
+  font-family: var(--font-manrope);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #d1b897;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 12px;
+}
+
+.dayContent h3 {
+  font-family: var(--font-newsreader);
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.dayContent p {
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bonusTag, .liveTag {
+  display: inline-block;
+  padding: 6px 14px;
+  font-family: var(--font-manrope);
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 4px;
+  margin-top: 20px;
+  letter-spacing: 0.05em;
+}
+
+.bonusTag {
+  background: #d1b897;
+  color: #000;
+}
+
+.liveTag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.specialBonusBox {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.specialBonusBox h4 {
+  font-family: var(--font-manrope);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #d1b897;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.specialBonusBox ul {
+  list-style: none;
+  padding: 0;
+}
+
+.specialBonusBox li {
+  font-family: var(--font-manrope);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+  position: relative;
+  padding-left: 15px;
+}
+
+.specialBonusBox li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #d1b897;
+}
+
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 20px;
+  }
+  .progressLine {
+    left: 20px;
+  }
+  .dot {
+    left: 20px;
+  }
+  .dayRow {
+    justify-content: flex-start;
+    padding-left: 50px;
+    padding-right: 0;
+  }
+  .left .dayContent, .right .dayContent {
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+    width: 100%;
+  }
+}

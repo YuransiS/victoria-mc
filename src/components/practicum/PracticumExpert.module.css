@@ -1,0 +1,183 @@
+.section {
+  padding: 6rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sectionHeader {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  letter-spacing: -0.02em;
+  color: #d1b897; /* Themed for practicum */
+}
+
+.expertLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .expertLayout {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 5rem;
+  }
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 3/4;
+  position: relative;
+  background-color: #1e1e1c;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.imageCover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  filter: grayscale(20%) contrast(105%);
+}
+
+.expertInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.expertTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  color: #d1b897;
+  margin-bottom: 0.5rem;
+}
+
+.expertPoint {
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.expertPoint:last-child {
+  border-bottom: none;
+}
+
+.expertSocial {
+  margin-top: 1rem;
+}
+
+.instagramButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  background-color: #d1b897;
+  color: #000;
+  border-radius: 100px;
+  text-decoration: none;
+  font-family: var(--font-manrope);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.instagramButton::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shine 4s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-150%) rotate(45deg); }
+  100% { transform: translateX(150%) rotate(45deg); }
+}
+
+.instagramButton:hover {
+  background-color: #e5ccae;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(209, 184, 151, 0.3);
+}
+
+.instagramButton svg {
+  transition: transform 0.3s ease;
+}
+
+.instagramButton:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.ctaWrapper {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  background: #d1b897;
+  color: #000;
+  text-decoration: none;
+  font-family: var(--font-manrope);
+  font-weight: 800;
+  font-size: 1rem;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(209, 184, 151, 0.3);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+}
+
+.ctaButton::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+.ctaButton:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(209, 184, 151, 0.5);
+}
+
