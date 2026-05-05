@@ -13,7 +13,7 @@
   font-family: var(--font-newsreader);
   font-size: clamp(2rem, 4vw, 2.75rem);
   letter-spacing: -0.02em;
-  color: #d1b897; /* Themed for practicum */
+  color: #d1b897;
 }
 
 .expertLayout {
@@ -101,19 +101,22 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transform: rotate(45deg);
   animation: shine 4s infinite;
 }
 
 @keyframes shine {
-  0% { transform: translateX(-150%) rotate(45deg); }
-  100% { transform: translateX(150%) rotate(45deg); }
+  0% {
+    transform: translateX(-150%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(150%) rotate(45deg);
+  }
 }
 
 .instagramButton:hover {
@@ -166,12 +169,10 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transform: rotate(45deg);
   animation: shine 3s infinite;
 }
@@ -180,4 +181,3 @@
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 10px 30px rgba(209, 184, 151, 0.5);
 }
-
