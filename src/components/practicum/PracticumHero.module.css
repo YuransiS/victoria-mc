@@ -86,8 +86,13 @@
   letter-spacing: 0.25em;
   text-transform: uppercase;
   color: #d1b897;
-  width: 100%;
-  margin-bottom: 2rem;
+  width: fit-content;
+  margin: 0 auto 3rem auto;
+  padding: 0.75rem 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(209, 184, 151, 0.2);
+  border-radius: 100px;
 }
 
 .dot {
@@ -128,6 +133,32 @@
   font-weight: 400;
   border-left: 2px solid rgba(209, 184, 151, 0.3);
   padding-left: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.secondaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: fit-content;
+  color: #d1b897;
+  font-family: var(--font-manrope);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(209, 184, 151, 0.3);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.secondaryBtn:hover {
+  background: rgba(209, 184, 151, 0.1);
+  border-color: #d1b897;
+  transform: translateX(5px);
 }
 
 /* CTA CARD */
@@ -349,10 +380,11 @@
     padding: 1.5rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
     background: rgba(18, 18, 18, 0.98);
     backdrop-filter: blur(40px);
-    z-index: 100;
+    z-index: 999;
     gap: 0.75rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
+    transform: none !important;
   }
 
   .socialProof {

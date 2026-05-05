@@ -97,7 +97,11 @@ export function PracticumHeroForm({
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          successUrl: "/practicum/thanks",
+          failUrl: "/practicum/fail"
+        })
       });
 
       const paymentData = await response.json();
@@ -119,6 +123,7 @@ export function PracticumHeroForm({
           amount: amount,
           order_id: paymentData.orderReference,
           target_sheet_id: "1127634999", 
+          target_sheet_name: "Практикум",
           ...utmData
         }),
       }).catch(e => console.error("Lead log error:", e));
@@ -164,7 +169,7 @@ export function PracticumHeroForm({
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.liveCounter}>
           <span className={styles.liveDot}></span>
-          <span>зараз бронюють: {activeUsers} людей</span>
+          <span>зараз дивляться: {activeUsers} людей</span>
         </div>
         
         <div className={styles.inputGrid}>

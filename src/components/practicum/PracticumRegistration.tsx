@@ -7,7 +7,9 @@ import { BookingModal } from "@/components/pricing/BookingModal";
 
 export function PracticumRegistration() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [spotsLeft, setSpotsLeft] = useState(37);
+  const [spotsLeft, setSpotsLeft] = useState(63);
+  const [tariff, setTariff] = useState("Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ");
+  const [amount, setAmount] = useState(490);
 
   useEffect(() => {
     // Dynamic imitation of spots decreasing
@@ -36,7 +38,7 @@ export function PracticumRegistration() {
             <div className={styles.spots}>ЗАЛИШИЛОСЬ {spotsLeft} МІСЦЬ З 100</div>
             <h2 className={styles.title}>ГОТОВА ПОЧАТИ РОБИТИ СТОРІЗ, ЯКІ ПРОДАЮТЬ?</h2>
             <p className={styles.desc}>
-              Забронюй своє місце на 7-денний практикум вже зараз. Почни створювати контент, який відображає тебе та приносить результат.
+              Взяти участь у 7-денному практикумі вже зараз. Почни створювати контент, який відображає тебе та приносить результат.
             </p>
             
             <div className={styles.priceBlock}>
@@ -44,14 +46,38 @@ export function PracticumRegistration() {
               <div className={styles.newPrice}>490 ГРН</div>
             </div>
 
+            <p className={styles.priceTrigger}>🔥 ПІСЛЯ НАБОРУ 100 ЛЮДЕЙ ЦІНА БУДЕ ПІДВИЩЕНА</p>
+
             <button 
               className={styles.registerBtn}
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setTariff("Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ");
+                setAmount(490);
+                setIsModalOpen(true);
+              }}
             >
-              ЗАРЕЄСТРУВАТИСЯ НА ПРАКТИКУМ
+              ВЗЯТИ УЧАСТЬ У ПРАКТИКУМІ
             </button>
             
             <p className={styles.guarantee}>Безпечна оплата через WayForPay</p>
+
+            <div className={styles.consultationBox}>
+              <div className={styles.consultationContent}>
+                <h3>Особиста консультація від Віки</h3>
+                <p>Розбір твого блогу та стратегії 1 на 1 (30-40 хв)</p>
+                <div className={styles.consultationPrice}>1990 ГРН</div>
+              </div>
+              <button 
+                className={styles.consultationBtn}
+                onClick={() => {
+                  setTariff("Особиста консультація (Практикум)");
+                  setAmount(1990);
+                  setIsModalOpen(true);
+                }}
+              >
+                ПРИДБАТИ КОНСУЛЬТАЦІЮ
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -59,8 +85,11 @@ export function PracticumRegistration() {
       <BookingModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        tariffName="Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ" 
-        amount={490} 
+        tariffName={tariff} 
+        amount={amount} 
+        targetSheetName="Практикум"
+        successUrl="/practicum/thanks"
+        failUrl="/practicum/fail"
       />
     </section>
   );

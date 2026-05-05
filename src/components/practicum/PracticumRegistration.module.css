@@ -112,6 +112,75 @@
   letter-spacing: 0.1em;
 }
 
+.priceTrigger {
+  font-family: var(--font-manrope);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #d1b897;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+  background: rgba(209, 184, 151, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.consultationBox {
+  margin-top: 60px;
+  padding-top: 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.consultationContent {
+  text-align: center;
+}
+
+.consultationContent h3 {
+  font-family: var(--font-newsreader);
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.consultationContent p {
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 16px;
+}
+
+.consultationPrice {
+  font-family: var(--font-manrope);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #d1b897;
+}
+
+.consultationBtn {
+  background: transparent;
+  color: #fff;
+  font-family: var(--font-manrope);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 18px 36px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+}
+
+.consultationBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #fff;
+  transform: translateY(-3px);
+}
+
 @media (max-width: 768px) {
   .ctaBox {
     padding: 60px 24px;

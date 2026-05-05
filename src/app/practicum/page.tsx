@@ -7,6 +7,7 @@ import { PracticumProgram } from "@/components/practicum/PracticumProgram";
 import { PracticumResults } from "@/components/practicum/PracticumResults";
 import { PracticumRegistration } from "@/components/practicum/PracticumRegistration";
 import { PracticumExpert } from "@/components/practicum/PracticumExpert";
+import { PracticumFAQ } from "@/components/practicum/PracticumFAQ";
 import { Footer } from "@/components/Footer";
 import { CinematicEffects } from "@/components/CinematicEffects";
 import { LiveSocialProof } from "@/components/LiveSocialProof";
@@ -23,12 +24,13 @@ export default function PracticumPage() {
       <LiveSocialProof variant="booking" />
       
       <PracticumHero />
-      <PracticumIdea />
       <PracticumFormat />
-      <PracticumExpert />
       <PracticumProgram />
+      <PracticumIdea />
+      <PracticumExpert />
       <PracticumResults />
       <PracticumRegistration />
+      <PracticumFAQ />
       
       <Footer />
     </main>

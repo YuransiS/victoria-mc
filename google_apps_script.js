@@ -10,10 +10,24 @@ function doPost(e) {
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet;
-    if (data.target_sheet_id) {
+
+    // Support target_sheet_name for auto-creation
+    if (data.target_sheet_name) {
+      sheet = ss.getSheetByName(data.target_sheet_name);
+      if (!sheet) {
+        sheet = ss.insertSheet(data.target_sheet_name);
+        // Add headers for new sheet
+        sheet.appendRow([
+          "Дата", "Ім'я", "Телефон", "Source", "Medium", "Campaign", 
+          "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус"
+        ]);
+        sheet.setFrozenRows(1);
+      }
+    } else if (data.target_sheet_id) {
       const sheets = ss.getSheets();
       sheet = sheets.find(s => s.getSheetId().toString() === data.target_sheet_id.toString());
     }
+    
     if (!sheet) sheet = ss.getSheetByName(DEFAULT_SHEET_NAME) || ss.getSheets()[0];
 
     // Ensure we have OrderID as string

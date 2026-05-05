@@ -60,6 +60,30 @@
   border-color: rgba(209, 184, 151, 0.2);
 }
 
+.bonusCard {
+  background: rgba(209, 184, 151, 0.05);
+  border: 1px solid rgba(209, 184, 151, 0.3);
+  position: relative;
+}
+
+.bonusCard::before {
+  content: "БОНУС";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #d1b897;
+  letter-spacing: 0.1em;
+  background: rgba(209, 184, 151, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.bonusCard h3 {
+  color: #d1b897;
+}
+
 .icon {
   font-size: 32px;
   margin-bottom: 20px;

@@ -8,6 +8,9 @@ interface BookingModalProps {
   onClose: () => void;
   tariffName: string;
   amount: number;
+  targetSheetName?: string;
+  successUrl?: string;
+  failUrl?: string;
 }
 
 interface FormErrors {
@@ -16,7 +19,15 @@ interface FormErrors {
   telegram?: string;
 }
 
-export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingModalProps) => {
+export const BookingModal = ({ 
+  isOpen, 
+  onClose, 
+  tariffName, 
+  amount,
+  targetSheetName,
+  successUrl,
+  failUrl
+}: BookingModalProps) => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -139,7 +150,11 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          successUrl,
+          failUrl
+        })
       });
 
       const paymentData = await response.json();
@@ -161,6 +176,7 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
           amount: actualAmount,
           order_id: paymentData.orderReference, // Linked ID
           target_sheet_id: "1127634999", 
+          target_sheet_name: targetSheetName,
           ...utmData
         }),
       }).catch(e => console.error("Lead log error:", e));
@@ -243,14 +259,14 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
             }}
             className="font-manrope text-3xl text-white font-black mb-2 uppercase tracking-tight italic cursor-default select-none"
           >
-            ОФОРМЛЕННЯ БРОНІ {isTestMode && <span className="text-red-500 text-xs">(TEST)</span>}
+            ОПЛАТИТИ УЧАСТЬ {isTestMode && <span className="text-red-500 text-xs">(TEST)</span>}
           </h3>
           <div className="flex flex-col gap-1 mb-10">
             <p className="font-inter text-[#888] text-[10px] uppercase tracking-widest font-bold">
               ТАРИФ: <span className="text-white">{tariffName}</span>
             </p>
             <p className="font-inter text-[#888] text-[10px] uppercase tracking-widest font-bold">
-              СУМА БРОНІ: <span className={isTestMode ? "text-red-500 animate-pulse" : "text-white"}>{actualAmount} ГРН</span>
+              СУМА УЧАСТІ: <span className={isTestMode ? "text-red-500 animate-pulse" : "text-white"}>{actualAmount} ГРН</span>
             </p>
           </div>
 
@@ -358,7 +374,7 @@ export const BookingModal = ({ isOpen, onClose, tariffName, amount }: BookingMod
                 className="group relative w-full bg-white text-black font-manrope font-black py-6 mt-4 uppercase tracking-[0.15em] hover:bg-white/90 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-center"
               >
                 <span className={isSubmitting ? "opacity-0" : "opacity-100"}>
-                  Оплатити бронь {actualAmount} грн
+                  Оплатити участь {actualAmount} грн
                 </span>
                 
                 {isSubmitting && (

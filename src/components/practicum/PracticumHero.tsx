@@ -74,6 +74,18 @@ export function PracticumHero() {
             <p className={styles.subtitle}>
               Навчись знімати контент, який відображає твою особистість та перетворює підписників на клієнтів — без стресу та щоденної втоми.
             </p>
+            <motion.a 
+              href="#program"
+              className={styles.secondaryBtn}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              ДЕТАЛІ ПРОГРАМИ
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </motion.a>
           </motion.div>
         </div>
 
@@ -92,7 +104,7 @@ export function PracticumHero() {
             className={styles.mainActionBtn}
             onClick={() => setIsModalOpen(true)}
           >
-            <span>ЗАБРОНЮВАТИ МІСЦЕ</span>
+            <span>ВЗЯТИ УЧАСТЬ</span>
             <div className={styles.btnPrice}>
               <span className={styles.newPrice}>490 ГРН</span>
               <span className={styles.oldPrice}>1500 ГРН</span>
@@ -118,6 +130,9 @@ export function PracticumHero() {
         onClose={() => setIsModalOpen(false)} 
         tariffName="Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ" 
         amount={490} 
+        targetSheetName="Практикум"
+        successUrl="/practicum/thanks"
+        failUrl="/practicum/fail"
       />
     </section>
   );

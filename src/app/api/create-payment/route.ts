@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const { amount, tariffName, customerEmail, customerName, customerPhone } = await request.json();
+    const { amount, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl } = await request.json();
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -44,6 +44,15 @@ export async function POST(request: Request) {
       .update(signatureData, 'utf8')
       .digest('hex');
 
+    // Build return URL with optional target redirects
+    let returnUrl = `${currentDomain}/api/thanks-redirect`;
+    if (successUrl || failUrl) {
+      const params = new URLSearchParams();
+      if (successUrl) params.set('successUrl', successUrl);
+      if (failUrl) params.set('failUrl', failUrl);
+      returnUrl += `?${params.toString()}`;
+    }
+
     const paymentData = {
       merchantAccount,
       merchantDomainName,
@@ -59,7 +68,7 @@ export async function POST(request: Request) {
       clientEmail: customerEmail,
       clientPhone: customerPhone,
       serviceUrl: `${currentDomain}/api/payment-callback`,
-      returnUrl: `${currentDomain}/api/thanks-redirect`,
+      returnUrl: returnUrl,
     };
 
     return NextResponse.json(paymentData);

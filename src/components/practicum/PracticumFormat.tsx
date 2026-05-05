@@ -17,14 +17,15 @@ export function PracticumFormat() {
       icon: "💬",
     },
     {
-      title: "Бонусний ефір",
-      desc: "Ефір з розборами блогів учасників практикуму для глибокого розуміння помилок.",
-      icon: "✨",
-    },
-    {
       title: "Спільнота",
       desc: "100 людей з однією ціллю. Мотивація, підтримка та соціальний тиск у позитивному сенсі.",
       icon: "🤝",
+    },
+    {
+      title: "Бонусний ефір",
+      desc: "Ефір з розборами блогів учасників практикуму для глибокого розуміння помилок.",
+      icon: "✨",
+      isBonus: true,
     },
   ];
 
@@ -48,7 +49,7 @@ export function PracticumFormat() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={styles.card}
+                className={`${styles.card} ${f.isBonus ? styles.bonusCard : ""}`}
               >
                 <div className={styles.icon}>{f.icon}</div>
                 <h3>{f.title}</h3>
