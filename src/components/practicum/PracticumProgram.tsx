@@ -61,13 +61,13 @@ export function PracticumProgram() {
               translateY: [30, 0],
               delay: stagger(150),
               duration: 1000,
-              easing: "easeOutExpo",
+              ease: "easeOutExpo",
             });
 
             animate(`.${styles.progressLine}`, {
               scaleY: [0, 1],
               duration: 2000,
-              easing: "easeInOutQuad",
+              ease: "easeInOutQuad",
             });
 
             observer.unobserve(entry.target);

@@ -49,7 +49,7 @@ export function PracticumHero() {
     const isMobile = window.innerWidth <= 480;
     const timeline = createTimeline({
       defaults: {
-        easing: "easeOutExpo",
+        ease: "easeOutExpo",
         duration: 1200,
       }
     });
@@ -85,13 +85,13 @@ export function PracticumHero() {
         },
         translateY: [100, 0],
         duration: 2000,
-        easing: "spring(1, 80, 12, 0)",
+        ease: "spring(1, 80, 12, 0)",
       }, "-=1000")
       .add(`.${styles.ctaCard}`, {
         opacity: [0, 1],
         translateY: [150, 0],
         duration: 1500,
-        easing: "easeOutElastic(1, .8)",
+        ease: "easeOutElastic(1, .8)",
       }, "-=1500");
 
     // SPOT REGISTRATION HANDLER
@@ -206,7 +206,7 @@ export function PracticumHero() {
                 animate(scrollObj, {
                   y: targetPosition,
                   duration: 1200,
-                  easing: "easeOutExpo",
+                  ease: "easeOutExpo",
                   onRender: () => window.scrollTo(0, scrollObj.y)
                 });
               }
