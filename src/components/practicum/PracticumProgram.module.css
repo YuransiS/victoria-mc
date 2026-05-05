@@ -178,6 +178,66 @@
   color: #d1b897;
 }
 
+.specialBonusRow {
+  margin-top: 40px;
+}
+
+.bonusContent {
+  background: linear-gradient(135deg, rgba(209, 184, 151, 0.05) 0%, rgba(209, 184, 151, 0.02) 100%);
+  border: 1px solid rgba(209, 184, 151, 0.2) !important;
+}
+
+.bonusBadge {
+  font-family: var(--font-manrope);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #000;
+  background: #d1b897;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 15px;
+  letter-spacing: 0.1em;
+}
+
+.bonusTitle {
+  font-family: var(--font-newsreader);
+  font-size: 2rem !important;
+  color: #d1b897 !important;
+  margin-bottom: 5px !important;
+}
+
+.bonusSubtitle {
+  font-family: var(--font-manrope);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bonusList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.bonusList li {
+  font-family: var(--font-manrope);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.bonusList li::before {
+  content: "🔥";
+  position: absolute;
+  left: 0;
+  font-size: 0.8rem;
+}
+
 @media (max-width: 768px) {
   .timeline::before {
     left: 20px;

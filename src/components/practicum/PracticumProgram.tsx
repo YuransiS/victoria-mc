@@ -42,7 +42,6 @@ export function PracticumProgram() {
       day: "7 день",
       title: "Продаючий сторітелнг",
       desc: "Будуємо цілісну історію, яка веде до запису на послугу чи купівлі продукту.",
-      specialBonus: "🔥 БОНУС: АНАТОМІЯ КАРУСЕЛЬКИ (ТІЛЬКИ ДЛЯ ТИХ, ХТО ДІЙШОВ ДО КІНЦЯ)",
     },
   ];
 
@@ -59,6 +58,7 @@ export function PracticumProgram() {
             viewport={{ once: false, margin: "-100px" }}
             transition={{ duration: 1.5, ease: "easeOut" }}
           />
+          
           {days.map((d, i) => (
             <motion.div
               key={i}
@@ -74,20 +74,32 @@ export function PracticumProgram() {
                 
                 {d.bonus && <div className={styles.bonusTag}>{d.bonus}</div>}
                 {d.live && <div className={styles.liveTag}>{d.live}</div>}
-                {d.specialBonus && (
-                  <div className={styles.specialBonusBox}>
-                    <h4>{d.specialBonus}</h4>
-                    <ul>
-                      <li>Структура карусельки яку зберігають</li>
-                      <li>Помилки та мінімалістичний дизайн</li>
-                      <li>Практика: твоя перша карусель</li>
-                    </ul>
-                  </div>
-                )}
               </div>
               <div className={styles.dot} />
             </motion.div>
           ))}
+
+          {/* Separate Bonus Block */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={`${styles.dayRow} ${days.length % 2 === 0 ? styles.left : styles.right} ${styles.specialBonusRow}`}
+          >
+            <div className={`${styles.dayContent} ${styles.bonusContent}`}>
+              <div className={styles.specialBonusBox}>
+                <h4 className={styles.bonusBadge}>ОСОБЛИВИЙ БОНУС</h4>
+                <h3 className={styles.bonusTitle}>🔥 АНАТОМІЯ КАРУСЕЛЬКИ</h3>
+                <p className={styles.bonusSubtitle}>(ТІЛЬКИ ДЛЯ ТИХ, ХТО ДІЙШОВ ДО КІНЦЯ)</p>
+                <ul className={styles.bonusList}>
+                  <li>Структура карусельки яку зберігають</li>
+                  <li>Помилки та мінімалістичний дизайн</li>
+                  <li>Практика: твоя перша карусель</li>
+                </ul>
+              </div>
+            </div>
+            <div className={styles.dot} />
+          </motion.div>
         </div>
       </div>
     </section>
