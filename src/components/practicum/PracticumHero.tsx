@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./PracticumHero.module.css";
 import { animate, createTimeline, stagger } from "animejs";
 import { BookingModal } from "@/components/pricing/BookingModal";
+import Image from "next/image";
 
 export function PracticumHero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -155,12 +156,16 @@ export function PracticumHero() {
           </div>
         </div>
 
-        {/* Vika's Photo */}
+        {/* Vika's Photo - Optimized with next/image */}
         <div className={styles.vikaPhotoContainer} ref={photoRef}>
-          <img 
+          <Image 
             src="https://i.ibb.co/rRz99L0Q/IMG-0901.png" 
             alt="Вікторія" 
             className={styles.vikaPhoto}
+            fill
+            priority
+            quality={90}
+            sizes="(max-width: 480px) 100vw, 50vw"
           />
         </div>
 

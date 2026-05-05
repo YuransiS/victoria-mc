@@ -313,15 +313,15 @@
   right: 2%;
   bottom: 0;
   height: 95vh;
+  width: 60vh; /* Adjust width to maintain portrait aspect ratio */
   z-index: 5;
   pointer-events: none;
   opacity: 0; 
 }
 
 .vikaPhoto {
-  height: 100%;
-  width: auto;
   object-fit: contain;
+  object-position: center bottom;
   filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.8));
 }
 
