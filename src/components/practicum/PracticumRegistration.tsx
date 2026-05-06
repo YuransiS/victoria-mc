@@ -45,7 +45,7 @@ export function PracticumRegistration() {
         </motion.p>
 
         <div className={styles.tariffsGrid}>
-          {/* LIGHT TARIFF */}
+          {/* LIGHT TARIFF - КОРОЛЕВА КОНТЕНТУ */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -54,34 +54,34 @@ export function PracticumRegistration() {
           >
             <div className={styles.glow} />
             <div className={styles.cardContent}>
-              <h3 className={styles.tariffTitle}>LIGHT</h3>
-              <p className={styles.tariffDesc}>Для тих, хто хоче отримати базу та почати діяти самостійно</p>
+              <h3 className={styles.tariffTitle}>КОРОЛЕВА КОНТЕНТУ</h3>
+              <p className={styles.tariffDesc}>Для тих, кому потрібна підтримка, покрокові інструкції, спільнота та структрра</p>
               
               <ul className={styles.featuresList}>
-                <li>7 днів практикуму зі сторіз</li>
-                <li>Всі домашні завдання</li>
-                <li>Бонус: Структура карусельки</li>
-                <li>Доступ до загального чату</li>
+                <li>участь в практикумі</li>
+                <li>зворотній зв'язок в групі</li>
+                <li>бонусний ефір по системі створення каруселей в інстаграмі</li>
+                <li>доступ до загального чату</li>
               </ul>
 
               <div className={styles.priceWrapper}>
-                <div className={styles.oldPrice}>1500 ГРН</div>
-                <div className={styles.newPrice}>490 ГРН</div>
+                <div className={styles.oldPrice}>45$</div>
+                <div className={styles.newPrice}>9$</div>
                 <button 
                   className={styles.registerBtn}
                   onClick={() => {
-                    setTariff("Практикум: LIGHT");
-                    setAmount(490);
+                    setTariff("КОРОЛЕВА КОНТЕНТУ");
+                    setAmount(9);
                     setIsModalOpen(true);
                   }}
                 >
-                  ОБРАТИ LIGHT
+                  ОБРАТИ ТАРИФ
                 </button>
               </div>
             </div>
           </motion.div>
 
-          {/* PRO TARIFF */}
+          {/* PRO TARIFF - ОСОБИСТА РОБОТА */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -91,29 +91,30 @@ export function PracticumRegistration() {
             <div className={styles.proBadge}>ПОПУЛЯРНИЙ</div>
             <div className={styles.glow} />
             <div className={styles.cardContent}>
-              <h3 className={styles.tariffTitle}>PRO</h3>
-              <p className={styles.tariffDesc}>Максимальний результат з моїм особистим супроводом</p>
+              <h3 className={styles.tariffTitle}>ОСОБИСТА РОБОТА</h3>
+              <p className={styles.tariffDesc}>Для тих, кому важливий особистий зворотній зв'язок та робота на практикумі</p>
               
               <ul className={styles.featuresList}>
-                <li>Участь в челенджі</li>
-                <li>Участь в практикумі</li>
-                <li><strong>Особистий розбір від Вікторії</strong></li>
-                <li>Рекомендації щодо покращення візуалу та контенту</li>
-                <li>Бонус: Структура карусельки</li>
+                <li>участь в практикумі</li>
+                <li>зворотній зв'язок в групі</li>
+                <li>бонусний ефір по системі створення каруселей в інстаграмі</li>
+                <li>доступ до загального чату</li>
+                <li><strong>+ особиста перевірка виконання завдань</strong></li>
+                <li><strong>+ особиста консультація по контенту та візуалу від Віки</strong></li>
               </ul>
 
               <div className={styles.priceWrapper}>
-                <div className={styles.oldPrice}>3890 ГРН</div>
-                <div className={styles.newPrice}>1990 ГРН</div>
+                <div className={styles.oldPrice}>190$</div>
+                <div className={styles.newPrice}>89$</div>
                 <button 
                   className={styles.registerBtn}
                   onClick={() => {
-                    setTariff("Практикум: PRO");
-                    setAmount(1990);
+                    setTariff("ОСОБИСТА РОБОТА");
+                    setAmount(89);
                     setIsModalOpen(true);
                   }}
                 >
-                  ОБРАТИ PRO
+                  ОБРАТИ ТАРИФ
                 </button>
               </div>
             </div>
@@ -128,6 +129,8 @@ export function PracticumRegistration() {
         onClose={() => setIsModalOpen(false)} 
         tariffName={tariff} 
         amount={amount} 
+        currency="USD"
+        currencySymbol="$"
         targetSheetName="Практикум"
         successUrl="/practicum/thanks"
         failUrl="/practicum/fail"

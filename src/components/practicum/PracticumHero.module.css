@@ -38,11 +38,9 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle at 50% 30%, 
-    rgba(8, 8, 8, 0) 0%, 
-    rgba(8, 8, 8, 0.95) 100%
-  );
+  background: radial-gradient(circle at 50% 30%,
+      rgba(8, 8, 8, 0) 0%,
+      rgba(8, 8, 8, 0.95) 100%);
   z-index: 1;
 }
 
@@ -55,11 +53,13 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-top: 1.5rem; /* Visual offset while container starts from top */
+  padding-top: 1.5rem;
+  /* Visual offset while container starts from top */
   padding-bottom: 1rem;
   z-index: 1000;
   pointer-events: none;
-  opacity: 0; /* Managed by Anime.js entrance */
+  opacity: 0;
+  /* Managed by Anime.js entrance */
   transition: background 0.4s ease;
 }
 
@@ -116,7 +116,8 @@
   max-width: 750px;
   width: 100%;
   text-align: left;
-  opacity: 0; /* Managed by Anime.js */
+  opacity: 0;
+  /* Managed by Anime.js */
 }
 
 .title {
@@ -130,7 +131,8 @@
 }
 
 .title :global(.line) {
-  opacity: 0; /* Managed by Anime.js */
+  opacity: 0;
+  /* Managed by Anime.js */
 }
 
 .title span {
@@ -150,7 +152,7 @@
   border-left: 2px solid rgba(209, 184, 151, 0.3);
   padding-left: 1.5rem;
   margin-bottom: 3rem;
-  opacity: 0; 
+  opacity: 0;
 }
 
 /* CTA CARD */
@@ -168,7 +170,8 @@
   width: 100%;
   max-width: 440px;
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-  opacity: 0; /* Managed by Anime.js */
+  opacity: 0;
+  /* Managed by Anime.js */
 }
 
 .liveUsers {
@@ -201,8 +204,15 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 .mainActionBtn {
@@ -293,7 +303,9 @@
   z-index: 10;
 }
 
-.avatars img:first-child { margin-left: 0; }
+.avatars img:first-child {
+  margin-left: 0;
+}
 
 .proofText {
   display: flex;
@@ -313,10 +325,11 @@
   right: 2%;
   bottom: 0;
   height: 95vh;
-  width: 60vh; /* Adjust width to maintain portrait aspect ratio */
+  width: 60vh;
+  /* Adjust width to maintain portrait aspect ratio */
   z-index: 5;
   pointer-events: none;
-  opacity: 0; 
+  opacity: 0;
 }
 
 .vikaPhoto {

@@ -8,6 +8,8 @@ interface BookingModalProps {
   onClose: () => void;
   tariffName: string;
   amount: number;
+  currency?: string;
+  currencySymbol?: string;
   targetSheetName?: string;
   successUrl?: string;
   failUrl?: string;
@@ -24,6 +26,8 @@ export const BookingModal = ({
   onClose, 
   tariffName, 
   amount,
+  currency = "UAH",
+  currencySymbol = "ГРН",
   targetSheetName,
   successUrl,
   failUrl
@@ -152,6 +156,7 @@ export const BookingModal = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          currency,
           successUrl,
           failUrl
         })
@@ -174,6 +179,7 @@ export const BookingModal = ({
           phone: sanitizedPhone,
           tariff: tariffName,
           amount: actualAmount,
+          currency: currency,
           order_id: paymentData.orderReference, // Linked ID
           target_sheet_id: "1127634999", 
           target_sheet_name: targetSheetName,
@@ -266,7 +272,7 @@ export const BookingModal = ({
               ТАРИФ: <span className="text-white">{tariffName}</span>
             </p>
             <p className="font-inter text-[#888] text-[10px] uppercase tracking-widest font-bold">
-              СУМА УЧАСТІ: <span className={isTestMode ? "text-red-500 animate-pulse" : "text-white"}>{actualAmount} ГРН</span>
+              СУМА УЧАСТІ: <span className={isTestMode ? "text-red-500 animate-pulse" : "text-white"}>{actualAmount} {currencySymbol}</span>
             </p>
           </div>
 
@@ -374,7 +380,7 @@ export const BookingModal = ({
                 className="group relative w-full bg-white text-black font-manrope font-black py-6 mt-4 uppercase tracking-[0.15em] hover:bg-white/90 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-center"
               >
                 <span className={isSubmitting ? "opacity-0" : "opacity-100"}>
-                  Оплатити участь {actualAmount} грн
+                  Оплатити участь {actualAmount} {currencySymbol.toLowerCase()}
                 </span>
                 
                 {isSubmitting && (

@@ -8,9 +8,9 @@ import Image from "next/image";
 
 export function PracticumHero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [paymentAmount, setPaymentAmount] = useState(490);
+  const [paymentAmount, setPaymentAmount] = useState(9);
   const [showTestMode, setShowTestMode] = useState(false);
-  const [spotsLeft, setSpotsLeft] = useState(63);
+  const [joined, setJoined] = useState(37);
   const [activeUsers, setActiveUsers] = useState(7);
   const [blurAmount, setBlurAmount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -97,7 +97,7 @@ export function PracticumHero() {
 
     // SPOT REGISTRATION HANDLER
     const handleNewRegistration = () => {
-      setSpotsLeft(prev => (prev > 5 ? prev - 1 : prev));
+      setJoined(prev => (prev < 95 ? prev + 1 : prev));
     };
     window.addEventListener('new_registration', handleNewRegistration);
 
@@ -131,7 +131,7 @@ export function PracticumHero() {
       >
         <div className={styles.topRow}>
           <span className={styles.dot}></span>
-          <span>11.05 — 17.05</span>
+          <span>15.05 — 21.05</span>
           <span className={styles.separator}>|</span>
           <span>7-ДЕННИЙ ПРАКТИКУМ</span>
         </div>
@@ -177,13 +177,13 @@ export function PracticumHero() {
           <button 
             className={styles.mainActionBtn}
             onClick={() => {
-              setPaymentAmount(490);
+              setPaymentAmount(9);
               setIsModalOpen(true);
             }}
           >
             <div className={styles.btnContent}>
-              <span>ВЗЯТИ УЧАСТЬ — 490 ГРН</span>
-              <span className={styles.oldPriceInline}>1500 ГРН</span>
+              <span>ВЗЯТИ УЧАСТЬ — 9$</span>
+              <span className={styles.oldPriceInline}>45$</span>
             </div>
           </button>
 
@@ -195,7 +195,7 @@ export function PracticumHero() {
                 setIsModalOpen(true);
               }}
             >
-              ТЕСТОВА ОПЛАТА — 1 ГРН
+              ТЕСТОВА ОПЛАТА — 1$
             </button>
           )}
 
@@ -229,8 +229,8 @@ export function PracticumHero() {
               <img src="https://i.pravatar.cc/100?img=12" alt="Participant" />
             </div>
             <div className={styles.proofText}>
-              <span>🔥 <b>37</b> вже з нами</span>
-              <span>Залишилось <b>{spotsLeft}</b> місць</span>
+              <span>🔥 <b>{joined}</b> вже з нами</span>
+              <span>Залишилось <b>{100 - joined}</b> місць</span>
             </div>
           </div>
         </div>
@@ -239,8 +239,10 @@ export function PracticumHero() {
       <BookingModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        tariffName={paymentAmount === 1 ? "ТЕСТОВА ОПЛАТА (1 ГРН)" : "Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ"} 
+        tariffName={paymentAmount === 1 ? "ТЕСТОВА ОПЛАТА (1$)" : "КОРОЛЕВА КОНТЕНТУ"} 
         amount={paymentAmount} 
+        currency="USD"
+        currencySymbol="$"
         targetSheetName="Практикум"
         successUrl="/practicum/thanks"
         failUrl="/practicum/fail"

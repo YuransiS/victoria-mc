@@ -66,11 +66,14 @@ export function PracticumIdea() {
         >
           <h2 className={styles.title}>КОНЦЕПЦІЯ ЧЕЛЕНДЖУ</h2>
           <p className={styles.conceptText}>
-            Моя методологія — це завжди про дію і практику. Не суха теорія, яку треба "потім впровадити". А результат, який ти бачиш вже під час навчання. Саме так побудований мій основний курс <i>СТВОРЮЙ</i>. Саме так побудований цей <b>ПРАКТИКУМ</b>.
+            Моя методологія — це завжди про дію і практику. Не суха теорія, яку треба "потім впровадити". А результат, який ти бачиш вже під час навчання.
+          </p>
+          <p className={styles.conceptTextHighlight}>
+            Саме так побудований цей <b>ПРАКТИКУМ</b>.
           </p>
 
           <div className={styles.formula}>
-            <span>ОТРИМАЙ</span>
+            <span>ОТРИМАЙ ЗАВДАННЯ</span>
             <span className={styles.arrow}>→</span>
             <span>ЗРОБИ</span>
             <span className={styles.arrow}>→</span>
@@ -90,15 +93,6 @@ export function PracticumIdea() {
               <div className={styles.dailyDot} />
               <p><b>Щодня</b> — живий фідбек у спільноті.</p>
             </motion.div>
-          </div>
-
-          <div className={styles.communityEffect}>
-            <p>
-              Коли поруч 100 людей, які роблять те саме, що і ти — ти робиш. Навіть коли немає настрою. Навіть коли здається, що не виходить.
-            </p>
-            <p className={styles.communityHighlight}>
-              Це і є ефект закритої спільноти — соціальний тиск у позитивному сенсі. Ти бачиш, що інші публікують. Ти бачиш їхні результати. <b>Ти хочеш свій.</b>
-            </p>
           </div>
         </motion.div>
 

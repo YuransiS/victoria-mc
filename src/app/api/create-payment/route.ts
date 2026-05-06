@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const { amount, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl } = await request.json();
+    const { amount, currency: reqCurrency, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl } = await request.json();
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     // Critical: orderReference!
     const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
-    const currency = 'UAH';
+    const currency = reqCurrency || 'UAH';
     
     const productPriceStr = amount.toString();
     const productNameStr = `Booking: ${tariffName}`;
