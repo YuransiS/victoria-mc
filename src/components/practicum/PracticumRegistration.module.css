@@ -4,18 +4,33 @@
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-.ctaBox {
+.tariffsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.tariffCard {
   position: relative;
   background: #111;
-  border-radius: 50px;
-  padding: 80px 40px;
+  border-radius: 40px;
+  padding: 60px 40px;
   text-align: center;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tariffCard.pro {
+  border-color: #d1b897;
+  background: linear-gradient(180deg, #111 0%, #1a1510 100%);
 }
 
 .glow {
@@ -29,50 +44,62 @@
   pointer-events: none;
 }
 
-.content {
+.cardContent {
   position: relative;
   z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.spots {
-  font-family: var(--font-manrope);
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #d1b897;
-  letter-spacing: 0.2em;
-  margin-bottom: 24px;
-}
-
-.title {
+.tariffTitle {
   font-family: var(--font-newsreader);
-  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-size: 2.2rem;
   color: #fff;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   text-transform: uppercase;
 }
 
-.desc {
+.tariffDesc {
   font-family: var(--font-manrope);
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.6);
-  max-width: 600px;
-  margin: 0 auto 48px;
-  line-height: 1.6;
+  margin-bottom: 30px;
+  line-height: 1.5;
 }
 
-.priceBlock {
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px;
+  text-align: left;
+}
+
+.featuresList li {
+  font-family: var(--font-manrope);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  margin-bottom: 40px;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.featuresList li::before {
+  content: "—";
+  color: #d1b897;
+}
+
+.priceWrapper {
+  margin-top: auto;
 }
 
 .oldPrice {
   font-family: var(--font-manrope);
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.3);
   text-decoration: line-through;
+  margin-bottom: 4px;
 }
 
 .newPrice {
@@ -80,6 +107,40 @@
   font-size: 2.5rem;
   font-weight: 800;
   color: #fff;
+  margin-bottom: 24px;
+}
+
+.proBadge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #d1b897;
+  color: #000;
+  font-family: var(--font-manrope);
+  font-weight: 800;
+  font-size: 0.7rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.1em;
+}
+
+.sectionTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.sectionDesc {
+  font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 60px;
+  line-height: 1.6;
 }
 
 .registerBtn {
@@ -87,8 +148,8 @@
   color: #000;
   font-family: var(--font-manrope);
   font-weight: 800;
-  font-size: 1.1rem;
-  padding: 24px 48px;
+  font-size: 1rem;
+  padding: 20px 32px;
   border: none;
   border-radius: 100px;
   cursor: pointer;
@@ -96,10 +157,15 @@
   letter-spacing: 0.05em;
   transition: all 0.3s ease;
   box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.tariffCard.pro .registerBtn {
+  background: #d1b897;
 }
 
 .registerBtn:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
   box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
 }
 
@@ -110,89 +176,12 @@
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-}
-
-.priceTrigger {
-  font-family: var(--font-manrope);
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #d1b897;
-  letter-spacing: 0.1em;
-  margin-bottom: 24px;
-  background: rgba(209, 184, 151, 0.1);
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: inline-block;
-}
-
-.consultationBox {
-  margin-top: 60px;
-  padding-top: 60px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-}
-
-.consultationContent {
   text-align: center;
 }
 
-.consultationContent h3 {
-  font-family: var(--font-newsreader);
-  font-size: 1.8rem;
-  color: #fff;
-  margin-bottom: 12px;
-}
-
-.consultationContent p {
-  font-family: var(--font-manrope);
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 16px;
-}
-
-.consultationPrice {
-  font-family: var(--font-manrope);
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #d1b897;
-}
-
-.consultationBtn {
-  background: transparent;
-  color: #fff;
-  font-family: var(--font-manrope);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 18px 36px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 100px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: all 0.3s ease;
-}
-
-.consultationBtn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: #fff;
-  transform: translateY(-3px);
-}
-
 @media (max-width: 768px) {
-  .ctaBox {
-    padding: 60px 24px;
-    border-radius: 30px;
-  }
-  .priceBlock {
-    flex-direction: column;
-    gap: 8px;
-  }
   .registerBtn {
-    width: 100%;
-    padding: 20px;
+    padding: 18px;
     font-size: 0.9rem;
   }
 }

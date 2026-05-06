@@ -16,7 +16,7 @@ export function PracticumFAQ() {
         >
           <h2 className={styles.title}>Є ЯКІСЬ ПИТАННЯ?</h2>
           <p className={styles.desc}>
-            Якщо у тебе виникли труднощі з оплатою або залишились питання по програмі — пиши нашому менеджеру в Telegram.
+            Якщо у тебе виникли труднощі з оплатою або залишились питання по програмі — пиши мені особисто в Telegram.
           </p>
           
           <a 
@@ -25,8 +25,8 @@ export function PracticumFAQ() {
             rel="noopener noreferrer"
             className={styles.contactBtn}
           >
-            <span>ЗВ'ЯЗАТИСЯ З ПІДТРИМКОЮ</span>
-            <span className={styles.tag}>(по питанням)</span>
+            <span>ЗВ'ЯЗАТИСЯ ЗІ МНОЮ</span>
+            <span className={styles.tag}>(особистий контакт)</span>
           </a>
         </motion.div>
       </div>
