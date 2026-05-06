@@ -7,7 +7,15 @@ import { animate, stagger } from "animejs";
 export function PracticumProgram() {
   const sectionRef = useRef<HTMLElement>(null);
   
-  const days = [
+  interface DayItem {
+    day: string;
+    title: string;
+    desc: string;
+    live?: string;
+    bonus?: string;
+  }
+
+  const days: DayItem[] = [
     {
       day: "1 ДЕНЬ - 15.05",
       title: "Прогрів до стилю життя",
