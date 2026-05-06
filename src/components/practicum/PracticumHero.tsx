@@ -14,6 +14,7 @@ export function PracticumHero() {
   const [activeUsers, setActiveUsers] = useState(7);
   const [blurAmount, setBlurAmount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
   
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -93,6 +94,15 @@ export function PracticumHero() {
         translateY: [150, 0],
         duration: 1500,
         ease: "easeOutElastic(1, .8)",
+        // iPhone/Safari stability fixes
+        begin: (anim) => {
+          const el = document.querySelector(`.${styles.ctaCard}`) as HTMLElement;
+          if (el) {
+            el.style.transform = "translateZ(0)";
+            el.style.webkitTransform = "translateZ(0)";
+            el.style.webkitOverflowScrolling = "touch";
+          }
+        }
       }, "-=1500");
 
     // SPOT REGISTRATION HANDLER
@@ -203,15 +213,19 @@ export function PracticumHero() {
             className={styles.secondaryBtn}
             onClick={(e) => {
               e.preventDefault();
+              if (isScrolling) return;
+              
               const target = document.querySelector("#program");
               if (target) {
+                setIsScrolling(true);
                 const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
                 const scrollObj = { y: window.pageYOffset };
                 animate(scrollObj, {
                   y: targetPosition,
                   duration: 1200,
                   ease: "easeOutExpo",
-                  onRender: () => window.scrollTo(0, scrollObj.y)
+                  onRender: () => window.scrollTo(0, scrollObj.y),
+                  onComplete: () => setIsScrolling(false)
                 });
               }
             }}
