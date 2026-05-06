@@ -91,18 +91,9 @@ export function PracticumHero() {
       }, "-=1000")
       .add(`.${styles.ctaCard}`, {
         opacity: [0, 1],
-        translateY: [150, 0],
-        duration: 1500,
-        ease: "easeOutElastic(1, .8)",
-        // iPhone/Safari stability fixes
-        begin: (anim) => {
-          const el = document.querySelector(`.${styles.ctaCard}`) as HTMLElement;
-          if (el) {
-            el.style.transform = "translateZ(0)";
-            el.style.webkitTransform = "translateZ(0)";
-            el.style.webkitOverflowScrolling = "touch";
-          }
-        }
+        translateY: isMobile ? [20, 0] : [150, 0], // Much smaller movement for mobile
+        duration: 1000,
+        ease: "easeOutQuart",
       }, "-=1500");
 
     // SPOT REGISTRATION HANDLER
