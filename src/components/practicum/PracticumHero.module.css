@@ -170,8 +170,8 @@
   width: 100%;
   max-width: 440px;
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  /* Managed by Anime.js */
+  opacity: 1;
+  /* Entrance managed by Anime.js [0, 1] */
 }
 
 .liveUsers {
