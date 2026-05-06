@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { trackFBEvent } from "@/components/FacebookPixel";
 
 export default function PracticumThanksPage() {
   const router = useRouter();
@@ -11,6 +12,8 @@ export default function PracticumThanksPage() {
   useEffect(() => {
     const attempt = sessionStorage.getItem('paymentAttempted');
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
+    const lastAmount = sessionStorage.getItem('lastAmount') || "9";
+    const lastTariff = sessionStorage.getItem('lastTariffName') || "Практикум";
     
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
@@ -20,6 +23,18 @@ export default function PracticumThanksPage() {
     if (!attempt && !urlOrderId) {
       router.push('/practicum');
       return;
+    }
+
+    // Track Purchase to Facebook (only once)
+    const tracked = sessionStorage.getItem('pixelPurchaseTracked');
+    if (!tracked) {
+      trackFBEvent("Purchase", {
+        value: parseFloat(lastAmount),
+        currency: "USD",
+        content_name: lastTariff,
+        order_id: activeOrderId
+      });
+      sessionStorage.setItem('pixelPurchaseTracked', 'true');
     }
 
     // Trigger status update

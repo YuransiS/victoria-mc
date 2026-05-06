@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackFBEvent } from "@/components/FacebookPixel";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -79,6 +80,11 @@ export const BookingModal = ({
       document.body.style.overflow = "hidden";
       document.body.setAttribute("data-modal-open", "true");
       setIsTestMode(false);
+      trackFBEvent("InitiateCheckout", { 
+        content_name: tariffName, 
+        value: amount, 
+        currency: currency 
+      });
     } else {
       document.body.style.overflow = "unset";
       document.body.removeAttribute("data-modal-open");
@@ -189,6 +195,14 @@ export const BookingModal = ({
           ...utmData
         }),
       }).catch(e => console.error("Lead log error:", e));
+      
+      // 2.5 Track Lead to Facebook
+      trackFBEvent("Lead", { 
+        content_name: tariffName, 
+        value: actualAmount, 
+        currency: currency,
+        ...utmData
+      });
 
       // Set flags for Thanks page logic
       sessionStorage.setItem('paymentAttempted', 'true');

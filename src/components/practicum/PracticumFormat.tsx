@@ -18,7 +18,7 @@ export function PracticumFormat() {
     },
     {
       title: "Бонусний ефір: система створення каруселей",
-      desc: "Ефір з розборами блогів учасників практикуму для глибокого розуміння помилок.",
+      desc: "",
       icon: "✨",
       isBonus: true,
     },
@@ -49,7 +49,7 @@ export function PracticumFormat() {
               >
                 <div className={styles.icon}>{f.icon}</div>
                 <h3>{f.title}</h3>
-                <p>{f.desc}</p>
+                {f.desc && <p>{f.desc}</p>}
               </motion.div>
             ))}
           </div>

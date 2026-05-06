@@ -3,12 +3,14 @@
 import React, { useEffect, useRef } from "react";
 import Script from "next/script";
 
-const FB_PIXEL_ID = "1230047148487254";
+const FB_PIXEL_IDS = ["1230047148487254"];
 
 export const FacebookPixel = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).fbq) {
-      (window as any).fbq("track", "PageView");
+      FB_PIXEL_IDS.forEach(id => {
+        (window as any).fbq("track", "PageView", {}, { pixelId: id });
+      });
     }
   }, []);
 
@@ -27,18 +29,21 @@ export const FacebookPixel = () => {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${FB_PIXEL_ID}');
+            ${FB_PIXEL_IDS.map(id => `fbq('init', '${id}');`).join('\n')}
             fbq('track', 'PageView');
           `,
         }}
       />
       <noscript>
-        <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
-        />
+        {FB_PIXEL_IDS.map(id => (
+          <img
+            key={id}
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`}
+          />
+        ))}
       </noscript>
     </>
   );
@@ -46,6 +51,15 @@ export const FacebookPixel = () => {
 
 export const trackFBEvent = (eventName: string, params?: any) => {
   if (typeof window !== "undefined" && (window as any).fbq) {
-    (window as any).fbq("track", eventName, params);
+    const standardEvents = ["AddPaymentInfo", "AddToCart", "AddToWishlist", "CompleteRegistration", "Contact", "CustomizeProduct", "Donate", "FindLocation", "InitiateCheckout", "Lead", "Purchase", "Schedule", "Search", "StartTrial", "SubmitApplication", "Subscribe", "ViewContent"];
+    const isStandard = standardEvents.includes(eventName);
+    
+    FB_PIXEL_IDS.forEach(id => {
+      if (isStandard) {
+        (window as any).fbq("track", eventName, params, { pixelId: id });
+      } else {
+        (window as any).fbq("trackCustom", eventName, params, { pixelId: id });
+      }
+    });
   }
 };

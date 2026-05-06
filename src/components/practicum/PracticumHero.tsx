@@ -138,6 +138,7 @@ export function PracticumHero() {
         onClick={() => {
           setPaymentAmount(9);
           setIsModalOpen(true);
+          import("@/components/FacebookPixel").then(m => m.trackFBEvent("Click_Buy", { amount: 9 }));
         }}
       >
         <div className={styles.btnContent}>
