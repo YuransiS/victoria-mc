@@ -179,7 +179,31 @@
   text-align: center;
 }
 
+@media (max-width: 900px) {
+  .tariffsGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .tariffCard {
+    padding: 40px 24px;
+    border-radius: 30px;
+  }
+
+  .tariffTitle {
+    font-size: 1.8rem;
+  }
+
+  .newPrice {
+    font-size: 2rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .section {
+    padding: 80px 20px;
+  }
+
   .registerBtn {
     padding: 18px;
     font-size: 0.9rem;
