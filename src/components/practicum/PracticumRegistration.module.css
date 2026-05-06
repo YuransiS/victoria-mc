@@ -9,13 +9,14 @@
 }
 
 .tariffsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  display: flex;
+  justify-content: center;
   margin-top: 40px;
 }
 
 .tariffCard {
+  max-width: 550px;
+  width: 100%;
   position: relative;
   background: #111;
   border-radius: 40px;
@@ -25,12 +26,6 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-.tariffCard.pro {
-  border-color: #d1b897;
-  background: linear-gradient(180deg, #111 0%, #1a1510 100%);
 }
 
 .glow {

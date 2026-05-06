@@ -9,13 +9,13 @@ export function PracticumIdea() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.2 },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
   return (
@@ -25,10 +25,10 @@ export function PracticumIdea() {
         {/* ГОЛОВНА ІДЕЯ */}
         <motion.div 
           className={styles.headerBlock}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
         >
           <h2 className={styles.title}>ГОЛОВНА ІДЕЯ</h2>
           <motion.div 
@@ -59,10 +59,10 @@ export function PracticumIdea() {
         {/* КОНЦЕПЦІЯ ЧЕЛЕНДЖУ */}
         <motion.div 
           className={styles.conceptBlock}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
         >
           <h2 className={styles.title}>КОНЦЕПЦІЯ ЧЕЛЕНДЖУ</h2>
           <p className={styles.conceptText}>

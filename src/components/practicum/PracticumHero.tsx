@@ -51,8 +51,8 @@ export function PracticumHero() {
     const isMobile = window.innerWidth <= 480;
     const timeline = createTimeline({
       defaults: {
-        ease: "easeOutExpo",
-        duration: 1200,
+        ease: "easeOutQuart",
+        duration: 600,
       }
     });
 
@@ -60,41 +60,40 @@ export function PracticumHero() {
       .add(`.${styles.topRowWrapper}`, {
         opacity: [0, 1],
         translateY: [-20, 0],
-        duration: 800,
-        delay: 200,
+        duration: 400,
+        delay: 50,
       })
       .add(`.${styles.content}`, {
         opacity: [0, 1],
-        translateY: [40, 0],
-        duration: 1500,
-      }, "-=400")
+        translateY: [30, 0],
+        duration: 600,
+      }, "-=200")
       .add(`.${styles.title} .line`, {
         opacity: [0, 1],
-        translateX: [-30, 0],
-        delay: stagger(150),
-      }, "-=1200")
+        translateX: [-20, 0],
+        delay: stagger(60),
+      }, "-=600")
       .add(`.${styles.subtitle}`, {
         opacity: [0, 1],
-        translateY: [20, 0],
-        duration: 800,
-      }, "-=800")
+        translateY: [15, 0],
+        duration: 500,
+      }, "-=400")
       .add(`.${styles.vikaPhotoContainer}`, {
         opacity: [0, 1],
-        scale: [0.9, 1],
-        // Use a function for responsive translateX to avoid conflicts
+        scale: [0.95, 1],
         translateX: (el: HTMLElement) => {
-          return isMobile ? ["-50%", "-50%"] : [50, 0];
+          return isMobile ? ["-50%", "-50%"] : [30, 0];
         },
-        translateY: [100, 0],
-        duration: 2000,
-        ease: "spring(1, 80, 12, 0)",
-      }, "-=1000")
+        translateY: [60, 0],
+        duration: 1000,
+        ease: "spring(1, 85, 15, 0)",
+      }, "-=500")
       .add(`.${styles.ctaCard}`, {
         opacity: [0, 1],
-        translateY: isMobile ? [20, 0] : [150, 0], // Much smaller movement for mobile
-        duration: 1000,
+        translateY: isMobile ? [15, 0] : [100, 0],
+        duration: 600,
         ease: "easeOutQuart",
-      }, "-=1500");
+      }, "-=800");
 
     // SPOT REGISTRATION HANDLER
     const handleNewRegistration = () => {

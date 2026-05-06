@@ -62,17 +62,17 @@ export function PracticumProgram() {
             animate(`.${styles.dayRow}`, {
               opacity: [0, 1],
               translateX: (el: any) => {
-                return el.classList.contains(styles.left) ? [-50, 0] : [50, 0];
+                return el.classList.contains(styles.left) ? [-30, 0] : [30, 0];
               },
-              translateY: [30, 0],
-              delay: stagger(150),
-              duration: 1000,
-              ease: "easeOutExpo",
+              translateY: [20, 0],
+              delay: stagger(80),
+              duration: 600,
+              ease: "easeOutQuart",
             });
 
             animate(`.${styles.progressLine}`, {
               scaleY: [0, 1],
-              duration: 2000,
+              duration: 1200,
               ease: "easeInOutQuad",
             });
 

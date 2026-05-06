@@ -28,9 +28,10 @@ export function PracticumFormat() {
     <section className={styles.section}>
       <div className={styles.container}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className={styles.formatBox}
         >
           <div className={styles.label}>ФОРМАТ ПРАКТИКУМУ</div>
@@ -40,10 +41,10 @@ export function PracticumFormat() {
             {formats.map((f, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.05, duration: 0.4 }}
                 className={`${styles.card} ${f.isBonus ? styles.bonusCard : ""}`}
               >
                 <div className={styles.icon}>{f.icon}</div>

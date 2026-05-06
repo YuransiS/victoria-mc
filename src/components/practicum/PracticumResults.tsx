@@ -41,7 +41,7 @@ export function PracticumResults() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.05, duration: 0.4 }}
                 className={styles.item}
               >
                 <div className={styles.check}>✓</div>
@@ -56,10 +56,10 @@ export function PracticumResults() {
 
         <motion.div 
           className={styles.ctaWrapper}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
         >
           <a href="#register" className={styles.ctaButton}>
             <span>ГОТОВА ОТРИМАТИ ТАКІ РЕЗУЛЬТАТИ</span>

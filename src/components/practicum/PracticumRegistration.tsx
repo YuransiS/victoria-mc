@@ -36,10 +36,10 @@ export function PracticumRegistration() {
         </motion.h2>
         <motion.p 
           className={styles.sectionDesc}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
+          transition={{ duration: 0.4 }}
         >
           7 днів, які змінять твоє бачення контенту та допоможуть побудувати чергу з клієнтів
         </motion.p>
@@ -47,15 +47,16 @@ export function PracticumRegistration() {
         <div className={styles.tariffsGrid}>
           {/* LIGHT TARIFF - КОРОЛЕВА КОНТЕНТУ */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className={styles.tariffCard}
           >
             <div className={styles.glow} />
             <div className={styles.cardContent}>
               <h3 className={styles.tariffTitle}>КОРОЛЕВА КОНТЕНТУ</h3>
-              <p className={styles.tariffDesc}>Для тих, кому потрібна підтримка, покрокові інструкції, спільнота та структрра</p>
+              <p className={styles.tariffDesc}>Для тих, кому потрібна підтримка, покрокові інструкції, спільнота та структура</p>
               
               <ul className={styles.featuresList}>
                 <li>участь в практикумі</li>
@@ -72,45 +73,6 @@ export function PracticumRegistration() {
                   onClick={() => {
                     setTariff("КОРОЛЕВА КОНТЕНТУ");
                     setAmount(9);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  ОБРАТИ ТАРИФ
-                </button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* PRO TARIFF - ОСОБИСТА РОБОТА */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className={`${styles.tariffCard} ${styles.pro}`}
-          >
-            <div className={styles.proBadge}>ПОПУЛЯРНИЙ</div>
-            <div className={styles.glow} />
-            <div className={styles.cardContent}>
-              <h3 className={styles.tariffTitle}>ОСОБИСТА РОБОТА</h3>
-              <p className={styles.tariffDesc}>Для тих, кому важливий особистий зворотній зв'язок та робота на практикумі</p>
-              
-              <ul className={styles.featuresList}>
-                <li>участь в практикумі</li>
-                <li>зворотній зв'язок в групі</li>
-                <li>бонусний ефір по системі створення каруселей в інстаграмі</li>
-                <li>доступ до загального чату</li>
-                <li><strong>+ особиста перевірка виконання завдань</strong></li>
-                <li><strong>+ особиста консультація по контенту та візуалу від Віки</strong></li>
-              </ul>
-
-              <div className={styles.priceWrapper}>
-                <div className={styles.oldPrice}>190$</div>
-                <div className={styles.newPrice}>89$</div>
-                <button 
-                  className={styles.registerBtn}
-                  onClick={() => {
-                    setTariff("ОСОБИСТА РОБОТА");
-                    setAmount(89);
                     setIsModalOpen(true);
                   }}
                 >
