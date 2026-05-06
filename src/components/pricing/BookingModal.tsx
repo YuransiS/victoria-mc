@@ -77,12 +77,15 @@ export const BookingModal = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.body.setAttribute("data-modal-open", "true");
       setIsTestMode(false);
     } else {
       document.body.style.overflow = "unset";
+      document.body.removeAttribute("data-modal-open");
     }
     return () => {
       document.body.style.overflow = "unset";
+      document.body.removeAttribute("data-modal-open");
     };
   }, [isOpen]);
 
@@ -97,7 +100,7 @@ export const BookingModal = ({
     }
 
     // Phone validation: Relaxed for international numbers
-    const phoneRegex = /^\+?\d{7,15}$/;
+    const phoneRegex = /^\+?\d{5,20}$/;
     if (!formData.phone) {
       newErrors.phone = "Будь ласка, введіть номер телефону";
     } else if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ""))) {
@@ -224,7 +227,14 @@ export const BookingModal = ({
     }
   };
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [isOpen]);
 
   const shakeAnimation = {
     x: [0, -10, 10, -10, 10, 0],
@@ -232,17 +242,22 @@ export const BookingModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <AnimatePresence mode="wait">
+      {isOpen && (
+        <div className="fixed inset-0 z-[10001] overflow-y-auto">
       <div 
         className="fixed inset-0 bg-black/80 backdrop-blur-xl"
         onClick={onClose}
       />
-
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 40 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-md bg-[#181818] p-8 sm:p-14 shadow-[0_60px_100px_rgba(0,0,0,0.9)] border border-white/5 overflow-hidden"
-      >
+      
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+        <motion.div 
+          key="booking-modal-content"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="pointer-events-auto relative w-full max-w-md bg-[#181818] p-8 sm:p-14 shadow-[0_60px_100px_rgba(0,0,0,0.9)] border border-white/5"
+        >
         {/* Decorative background element */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
 
@@ -291,6 +306,7 @@ export const BookingModal = ({
                 type="text" 
                 id="name"
                 disabled={isSubmitting}
+                autoComplete="name"
                 className={`w-full bg-transparent border-0 border-b ${errors.name ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
                 placeholder="Введіть ім'я"
               />
@@ -322,6 +338,8 @@ export const BookingModal = ({
                 type="text" 
                 id="telegram"
                 disabled={isSubmitting}
+                autoComplete="off"
+                autoCapitalize="none"
                 className={`w-full bg-transparent border-0 border-b ${errors.telegram ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
                 placeholder="@username"
               />
@@ -356,6 +374,8 @@ export const BookingModal = ({
                 type="tel" 
                 id="phone"
                 disabled={isSubmitting}
+                autoComplete="tel"
+                inputMode="tel"
                 className={`w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
                 placeholder="+"
               />
@@ -410,6 +430,9 @@ export const BookingModal = ({
           )}
         </AnimatePresence>
       </motion.div>
+      </div>
     </div>
+      )}
+    </AnimatePresence>
   );
 };

@@ -24,8 +24,26 @@ const bookingActions = [
 export function LiveSocialProof({ variant = "registration" }: { variant?: "registration" | "booking" }) {
   const [notification, setNotification] = useState<{name: string, action: string, id: number} | null>(null);
   const [bookingCount, setBookingCount] = useState(1);
+  const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
 
   useEffect(() => {
+    const checkModal = () => {
+      setIsAnyModalOpen(document.body.classList.contains('modal-open'));
+    };
+    
+    checkModal();
+    const observer = new MutationObserver(checkModal);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      setNotification(null);
+      return;
+    }
+
     let timeoutId: NodeJS.Timeout;
 
     const scheduleNextNotification = () => {
@@ -77,7 +95,7 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [variant]);
+  }, [variant, isAnyModalOpen]);
 
   useEffect(() => {
     if (variant !== 'booking') return;
@@ -92,14 +110,24 @@ export function LiveSocialProof({ variant = "registration" }: { variant?: "regis
 
   return (
     <AnimatePresence>
-      {notification && (
+      {notification && !isAnyModalOpen && (
         <motion.div 
           key={notification.id}
           className={styles.toast}
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ duration: 0.4 }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 200 }}
+          dragElastic={0.1}
+          onDragEnd={(_, info) => {
+            if (info.offset.x > 80) {
+              setNotification(null);
+            }
+          }}
+          initial={{ opacity: 0, x: -50, scale: 0.9 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9, x: 100 }}
+          transition={{ duration: 0.3 }}
+          style={{ cursor: 'grab' }}
+          whileDrag={{ cursor: 'grabbing', scale: 1.02 }}
         >
           <div className={styles.avatar}>
             {notification.name.charAt(0)}
