@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Manrope, Newsreader, Inter } from "next/font/google";
+import { Manrope, Newsreader, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import "intl-tel-input/build/css/intlTelInput.css";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
   variable: "--font-manrope",
+  weight: ["400", "500", "600", "700"],
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-playfair",
+  style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
 });
 
@@ -39,7 +46,7 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${manrope.variable} ${newsreader.variable} ${inter.variable} ${manrope.className}`}>
+      <body className={`${manrope.variable} ${newsreader.variable} ${inter.variable} ${playfair.variable} ${manrope.className}`}>
         <SmoothScroll />
         <FacebookPixel />
         {children}

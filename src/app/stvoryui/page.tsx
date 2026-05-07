@@ -1,0 +1,427 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import intlTelInput from 'intl-tel-input';
+import 'intl-tel-input/build/css/intlTelInput.css';
+import './globals.css';
+
+// Types for form data
+interface FormData {
+  name: string;
+  phone_raw: string;
+  social: string;
+  niche: string;
+  target_sheet: string;
+}
+
+const names = ["Олена", "Марія", "Ірина", "Анастасія", "Тетяна", "Юлія", "Наталія", "Світлана", "Оксана", "Вікторія", "Дарина", "Анна", "Христина"];
+const actions = ["заповнила анкету", "забронювала місце", "щойно переглянула відео-урок", "хоче на курс"];
+
+export default function StvoryuiPage() {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [liveCount, setLiveCount] = useState(6);
+  const [toast, setToast] = useState<{ name: string; action: string; show: boolean }>({
+    name: '',
+    action: '',
+    show: false
+  });
+
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const itiRef = useRef<any>(null);
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+
+  // Initialize intl-tel-input
+  useEffect(() => {
+    if (phoneInputRef.current) {
+      itiRef.current = intlTelInput(phoneInputRef.current, {
+        initialCountry: "auto",
+        geoIpLookup: (callback: any) => {
+          fetch("https://ipapi.co/json")
+            .then(res => res.json())
+            .then(data => callback(data.country_code))
+            .catch(() => callback("ua"));
+        },
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/utils.js",
+      } as any);
+    }
+
+    return () => {
+      if (itiRef.current) {
+        itiRef.current.destroy();
+      }
+    };
+  }, []);
+
+  // Live Counter Logic
+  useEffect(() => {
+    const updateCounter = () => {
+      setLiveCount(prev => {
+        const change = Math.random() > 0.5 ? 1 : -1;
+        let next = prev + change;
+        if (next < 4) next = 4;
+        if (next > 12) next = 10;
+        return next;
+      });
+      const nextUpdate = Math.floor(Math.random() * (15000 - 5000) + 5000);
+      setTimeout(updateCounter, nextUpdate);
+    };
+    const timer = setTimeout(updateCounter, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Notification Logic
+  useEffect(() => {
+    const showNotification = () => {
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const randomAction = actions[Math.floor(Math.random() * actions.length)];
+      
+      setToast({ name: randomName, action: randomAction, show: true });
+      
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 4000);
+
+      const nextTime = Math.floor(Math.random() * (25000 - 10000) + 10000);
+      setTimeout(showNotification, nextTime);
+    };
+    const timer = setTimeout(showNotification, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    
+    // Get full phone number (E.164) or fallback to raw input value
+    let fullPhone = '';
+    if (itiRef.current) {
+      fullPhone = itiRef.current.getNumber();
+    }
+    if (!fullPhone && phoneInputRef.current) {
+      fullPhone = phoneInputRef.current.value.trim();
+    }
+    
+    // Get UTMs
+    const params = new URLSearchParams(window.location.search);
+    const utms = {
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || ''
+    };
+
+    try {
+      const response = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          phone: fullPhone,
+          ...utms
+        }),
+      });
+
+      if (response.ok) {
+        setSuccess(true);
+        reset();
+        document.body.classList.add('modal-open');
+      } else {
+        alert('Щось пішло не так. Спробуйте ще раз.');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Помилка мережі.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeSuccessModal = () => {
+    setSuccess(false);
+    document.body.classList.remove('modal-open');
+  };
+
+  return (
+    <div className="antialiased text-sm md:text-base pb-24 bg-[#F9F9F9] min-h-screen">
+      {/* HERO */}
+      <section className="pt-12 pb-10 px-6 md:px-24 max-w-5xl mx-auto text-center animate-fade-in">
+        <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.25em] text-gray-400 mb-6">Відео-урок</p>
+        <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] mb-4 text-black font-medium">
+          Як у 2026 році <br /><span className="italic text-gray-500">побудувати систему</span> <br />роботи з контентом та візуалом
+        </h1>
+        <p className="font-sans text-xs md:text-sm font-medium text-gray-800 uppercase tracking-wide max-w-xl mx-auto border-t border-black/10 pt-4 mt-6">без хаосу та стресу і зробити це всього за один день</p>
+      </section>
+
+      {/* VIDEO */}
+      <section className="px-4 md:px-12 max-w-5xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <div className="video-container">
+          <iframe 
+            src="https://www.youtube.com/embed/XEON6uOBRv8?si=X8BC3prkh22PEh27?autoplay=1&rel=0&modestbranding=1" 
+            title="YouTube video player" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowFullScreen
+          ></iframe>
+        </div>
+      </section>
+
+      {/* OFFER */}
+      <section className="px-6 md:px-24 max-w-3xl mx-auto text-center mb-16">
+        <div className="text-left md:text-center space-y-8">
+          <div className="space-y-4">
+            <p className="font-serif text-xl md:text-2xl leading-relaxed text-black">Якщо тобі цікавий візуал та контент, і ти готова зробити його кращим та ефективнішим:</p>
+            <p className="text-sm md:text-base text-gray-600 leading-relaxed font-light">Заповнюй цю анкету і почни створювати контент та візуал краще, ніж в улюблених інфлюєнсерів вже з першого тижня навчання. Анкета не зобовʼязує до покупки, це можливість для мене краще познайомитись з вами, підказати по вашому запиту та розказати вам про найвигідніші умови особисто.</p>
+          </div>
+
+          <p className="font-medium text-black text-base md:text-lg border-y border-black/5 py-6">Твій блог має приносити клієнтів на товари, послуги, інфопродукти, а не забирати час.</p>
+
+          <div className="flex flex-col items-center gap-8 pt-4">
+            <a href="#anketa" className="inline-block bg-black text-white px-10 py-5 text-xs md:text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all shadow-xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-8 h-8 text-gray-300 animate-bounce">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* FORM */}
+      <section id="anketa" className="px-6 pb-24 bg-white border-t border-gray-100 pt-16">
+        <div className="max-w-xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-3xl md:text-4xl font-medium mb-4">Анкета курсу СТВОРЮЙ</h2>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="pulse-dot"></span>
+              <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-medium live-counter-anim">Зараз заповнюють: {liveCount} людей</p>
+            </div>
+            <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em]">Заповнюй форму нижче</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10" noValidate>
+            <input type="hidden" value="Ленд2" {...register('target_sheet')} />
+            
+            {/* Name */}
+            <div className="relative group">
+              <input 
+                type="text" 
+                {...register('name', { required: true, minLength: 2 })}
+                placeholder=" " 
+                className={`peer w-full bg-transparent border-b ${errors.name ? 'border-red-500' : 'border-gray-200'} py-4 text-base focus:border-black focus:outline-none transition-colors`}
+              />
+              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Твоє ім'я</label>
+              {errors.name && <div className="error-msg block">Мінімум 2 літери.</div>}
+            </div>
+
+            {/* Phone */}
+            <div className="relative group">
+              <label className="text-gray-400 text-[10px] uppercase tracking-wider mb-2 block font-bold">Твій номер телефону</label>
+              <input 
+                type="tel" 
+                {...register('phone_raw', { required: true })}
+                ref={(e) => {
+                  register('phone_raw').ref(e);
+                  phoneInputRef.current = e;
+                }}
+                className="w-full"
+              />
+              {errors.phone_raw && <div className="error-msg block">Введіть номер телефону.</div>}
+              {/* Note: phone validation is handled via itiRef in onSubmit */}
+            </div>
+
+            {/* Social */}
+            <div className="relative group">
+              <input 
+                type="text" 
+                {...register('social', { required: true, minLength: 3 })}
+                placeholder=" " 
+                className={`peer w-full bg-transparent border-b ${errors.social ? 'border-red-500' : 'border-gray-200'} py-4 text-base focus:border-black focus:outline-none transition-colors`}
+              />
+              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Instagram або Telegram (@нікнейм)</label>
+              {errors.social && <div className="error-msg block">Мінімум 3 символи.</div>}
+            </div>
+
+            {/* Niche */}
+            <div className="relative group">
+              <input 
+                type="text" 
+                {...register('niche', { required: true })}
+                placeholder=" " 
+                className={`peer w-full bg-transparent border-b ${errors.niche ? 'border-red-500' : 'border-gray-200'} py-4 text-base focus:border-black focus:outline-none transition-colors`}
+              />
+              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Твоя ніша</label>
+              {errors.niche && <div className="error-msg block">Обов'язкове поле.</div>}
+            </div>
+            
+            <p className="text-center text-[10px] text-gray-400 uppercase tracking-widest pt-4">Заповнюй, і я зв'яжусь з тобою щодо участі</p>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-black text-white py-5 text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex justify-center items-center gap-3 disabled:bg-gray-400"
+            >
+              <span>{loading ? 'Відправка...' : 'Відправити анкету'}</span>
+              {loading && <div className="loader block"></div>}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* WHY IMPORTANT */}
+      <section className="py-24 px-6 md:px-24 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-serif text-3xl md:text-4xl text-center mb-16 leading-tight">Чому важливо заповнити анкету прямо зараз:</h2>
+          
+          <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 mb-2">
+                <span className="w-10 h-10 rounded-full border border-black flex items-center justify-center font-serif text-xl italic">01</span>
+                <div className="h-[1px] flex-grow bg-black/10"></div>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                На основі твоєї анкети я або моя команда проведемо аудит твого профілю. 
+                <span className="block mt-4 font-bold text-black border-l-2 border-black pl-4">Ти отримаєш конкретний перелік помилок у візуалі та сенсах, які прямо зараз зливають твоїх клієнтів.</span>
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 mb-2">
+                <span className="w-10 h-10 rounded-full border border-black flex items-center justify-center font-serif text-xl italic">02</span>
+                <div className="h-[1px] flex-grow bg-black/10"></div>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                Ми розповімо, як адаптувати <strong>СИСТЕМУ</strong> під твій графік, щоб знімати контент на тиждень вперед, використовуючи лише смартфон та світло з вікна.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 mb-2">
+                <span className="w-10 h-10 rounded-full border border-black flex items-center justify-center font-serif text-xl italic">03</span>
+                <div className="h-[1px] flex-grow bg-black/10"></div>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                Це останній потік, де на навчанні немає кураторів - <strong>я веду кожного студента особисто</strong>. Кількість місць обмежена моїм часом, тому пріоритет у черзі отримують ті, хто заповнив анкету.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 mb-2">
+                <span className="w-10 h-10 rounded-full border border-black flex items-center justify-center font-serif text-xl italic">04</span>
+                <div className="h-[1px] flex-grow bg-black/10"></div>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                Тільки для учасників анкети відкриються закриті умови покупки, яких не буде у загальному доступі.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-20 text-center">
+            <a href="#anketa" className="inline-block bg-black text-white px-12 py-6 text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all shadow-2xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
+          </div>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      <section className="py-32 px-6 md:px-24 bg-white overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-24 animate-fade-in">
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-gray-400 mb-6">Результати</p>
+            <h2 className="font-serif text-4xl md:text-6xl text-black font-medium leading-tight mb-4">
+              Трансформація <br /><span className="italic text-gray-400 font-normal">візуальних сенсів</span>
+            </h2>
+            <div className="w-16 h-[1px] bg-black/10 mx-auto mt-8"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-32">
+            {[
+              { name: 'Мар’яна', niche: 'Вчителька танців', id: '01', before: 'https://i.ibb.co/350Z2MCW/IMG-5900.jpg', after: 'https://i.ibb.co/dhn0HQx/IMG-5901.jpg' },
+              { name: 'Бізнес', niche: 'Будівництво басейнів', id: '02', before: 'https://i.ibb.co/F4JG4p7D/IMG-5896.jpg', after: 'https://i.ibb.co/2Y7pmktn/IMG-5897.jpg' },
+              { name: 'Аня', niche: 'Дизайнер одягу', id: '03', before: 'https://i.ibb.co/ycV62Bsy/IMG-5898.jpg', after: 'https://i.ibb.co/kgCgSsyz/IMG-5899.jpg' },
+              { name: 'Аня', niche: 'Вчителька української', id: '04', before: 'https://i.ibb.co/1YRsL7f5/IMG-5894.jpg', after: 'https://i.ibb.co/xqb4G38y/IMG-5895.jpg' },
+              { name: 'Катя', niche: 'Лайфстайл блог', id: '05', before: 'https://i.ibb.co/fdF1Y1b2/IMG-5892.jpg', after: 'https://i.ibb.co/fVgSyWQJ/IMG-5893.jpg' },
+              { name: 'Аліса', niche: 'Стилістка', id: '06', before: 'https://i.ibb.co/nMDKNkY4/IMG-5890.jpg', after: 'https://i.ibb.co/xqdWH5NY/IMG-5891.jpg' },
+            ].map((client, idx) => (
+              <div key={idx} className="space-y-8 animate-fade-in" style={{ animationDelay: `${(idx % 2 + 1) * 0.1}s` }}>
+                <div className="flex items-end justify-between border-b border-gray-100 pb-4">
+                  <div className="space-y-1">
+                    <h3 className="font-serif text-2xl md:text-3xl font-medium text-black">{client.name}</h3>
+                    <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-[0.25em] font-bold">{client.niche}</p>
+                  </div>
+                  <span className="font-serif italic text-gray-300 text-3xl">{client.id}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative overflow-hidden group shadow-sm">
+                    <img src={client.before} alt={`До трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm">
+                      <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-black">До</p>
+                    </div>
+                  </div>
+                  <div className="relative overflow-hidden group shadow-md shadow-gray-200">
+                    <img src={client.after} alt={`Після трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-1000" />
+                    <div className="absolute top-4 left-4 bg-black px-3 py-1.5 shadow-xl">
+                      <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-white">Після</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-32 text-center animate-fade-in">
+            <p className="text-xs md:text-sm text-gray-400 italic font-light">Кожен з цих кейсів — це результат поєднання правильних сенсів та естетичного візуалу.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* SUCCESS MODAL */}
+      {success && (
+        <div className="fixed inset-0 z-[60]" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={closeSuccessModal}></div>
+          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+              <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-sm">
+                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 text-center">
+                  <div className="mx-auto flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-green-50 mb-5">
+                    <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
+                  <div className="mt-2">
+                    <h3 className="font-serif text-2xl font-semibold leading-6 text-gray-900 mb-2">Анкету надіслано!</h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500 leading-relaxed">Дякую за твій інтерес до курсу СТВОРЮЙ. <br />Я отримала твою анкету і зв'яжусь з тобою в Instagram або Telegram найближчим часом.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
+                  <button type="button" onClick={closeSuccessModal} className="inline-flex w-full justify-center rounded-sm bg-black px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 transition-colors uppercase tracking-wider sm:w-auto">
+                    Зрозуміло
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STICKY BUTTONS */}
+      <div className="fixed bottom-0 left-0 w-full p-4 z-40 bg-gradient-to-t from-white via-white to-transparent pt-8 md:hidden">
+        <a href="#anketa" className="block w-full bg-black text-white text-center py-4 text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl">Заповнити анкету</a>
+      </div>
+      <a href="#anketa" className="hidden md:flex fixed bottom-8 right-8 z-40 bg-black text-white w-auto px-8 py-4 items-center gap-3 shadow-2xl hover:bg-gray-800 transition-all rounded-sm group">
+        <span className="text-xs font-bold uppercase tracking-[0.15em]">Заповнити анкету</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 group-hover:translate-x-1 transition-transform">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+
+      {/* TOAST NOTIFICATION */}
+      <div id="notification-toast" className={toast.show ? 'show' : ''}>
+        <div className="pulse-dot"></div>
+        <div className="text-[12px] text-gray-800 font-medium">
+          <span className="font-bold">{toast.name}</span> <span>{toast.action}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
