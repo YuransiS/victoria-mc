@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import './globals.css';
+import { trackFBEvent } from '@/components/FacebookPixel';
 
 // Types for form data
 interface FormData {
@@ -33,24 +34,34 @@ export default function StvoryuiPage() {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
 
+  useEffect(() => {
+    trackFBEvent('ViewContent', {
+      content_name: 'Анкета СТВОРЮЙ',
+      content_category: 'Landing Page'
+    });
+  }, []);
+
   // Initialize intl-tel-input
   useEffect(() => {
-    if (phoneInputRef.current) {
+    if (phoneInputRef.current && !itiRef.current) {
       itiRef.current = intlTelInput(phoneInputRef.current, {
         initialCountry: "auto",
-        geoIpLookup: (callback: any) => {
+        geoIpLookup: (callback: (countryCode: string) => void) => {
           fetch("https://ipapi.co/json")
-            .then(res => res.json())
-            .then(data => callback(data.country_code))
+            .then((res) => res.json())
+            .then((data) => callback(data.country_code?.toLowerCase() || "ua"))
             .catch(() => callback("ua"));
         },
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/utils.js",
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/26.9.2/js/utils.js",
+        separateDialCode: true,
+        strictMode: true,
       } as any);
     }
 
     return () => {
       if (itiRef.current) {
         itiRef.current.destroy();
+        itiRef.current = null;
       }
     };
   }, []);
@@ -123,6 +134,12 @@ export default function StvoryuiPage() {
       });
 
       if (response.ok) {
+        // Track Facebook Lead event
+        trackFBEvent('Lead', {
+          content_name: 'Анкета СТВОРЮЙ',
+          content_category: 'Pre-order'
+        });
+        
         setSuccess(true);
         reset();
         document.body.classList.add('modal-open');

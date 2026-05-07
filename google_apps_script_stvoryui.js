@@ -18,15 +18,29 @@ function doPost(e) {
       if (rawData) {
         data = JSON.parse(rawData);
       }
-    } catch (parseError) {}
+    } catch (parseError) { }
+
+    if (!data) {
+       return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': 'No data provided' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Security check - Unified and backward compatible
+    var API_KEY = "secret_booking_token_2026";
+    var providedKey = data.api_key || data.apiKey;
+    
+    if (providedKey && providedKey !== API_KEY) {
+      return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': 'Unauthorized' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
     // Check if it's a WayForPay callback
-    if (data && data.orderReference && data.transactionStatus) {
+    if (data.orderReference && data.transactionStatus) {
       return handleWayForPayCallback(data);
     } 
     // Otherwise it's a form submit
     else {
-      return handleFormSubmit(data || {});
+      return handleFormSubmit(data);
     }
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': String(error) }))
@@ -40,6 +54,7 @@ function handleFormSubmit(data) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = null;
   
+  // 1. Identify Target Sheet
   var targetGid = data.gid || data.sheet_id;
   if (!targetGid) {
     var rawSheetName = data.sheetName || data.target_sheet;
@@ -64,36 +79,22 @@ function handleFormSubmit(data) {
   }
   
   if (!sheet) {
-      var targetSheetName = data.sheetName || data.target_sheet || 'Ленд 3';
-      sheet = ss.insertSheet(targetSheetName);
+      sheet = ss.insertSheet(data.sheetName || 'Ленд 3');
   }
 
-  var defaultHeaders = ['Date', 'Order ID', 'Status'];
+  // 2. Prepare Data Mapping with EXACT Column Order
   var timestamp = Utilities.formatDate(new Date(), "GMT+2", "dd.MM.yyyy HH:mm:ss");
   
-  var lastCol = sheet.getLastColumn();
-  if (lastCol === 0) {
-      sheet.appendRow(defaultHeaders);
-      lastCol = defaultHeaders.length;
-  }
-  
-  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var initialHeaderCount = headers.length;
-  
-  var ensureHeader = function(name) {
-      var idx = headers.indexOf(name);
-      if (idx === -1) {
-          headers.push(name);
-          return headers.length - 1;
-      }
-      return idx;
-  };
-
-  var excludeKeys = ['gid', 'sheet_id', 'target_sheet', 'sheetName'];
+  // The exact order requested by user
+  var orderedHeaders = [
+    'Date', 'Name', 'Phone', 'Social', 'UTM Source', 'UTM Medium', 'UTM Campaign',
+    'Difficulties', 'Request', 'Readiness', 'Goal', 'Order ID', 'Niche', 'Price', 'Status', 'UTM Content'
+  ];
   
   var processedData = {
     'Date': timestamp,
-    'Status': data.status || 'Новий лід (Не оплачено)'
+    'Status': data.status || 'Новий лід (Не оплачено)',
+    'Price': data.amount || data.price || ''
   };
   
   if (data.orderId || data['Order ID']) {
@@ -101,50 +102,46 @@ function handleFormSubmit(data) {
   }
 
   for (var key in data) {
-    if (excludeKeys.indexOf(key) !== -1) continue;
-    if (key === 'status' || key === 'orderId' || key === 'Order ID' || key === 'Date') continue;
-    
-    var displayKey = key;
-    if (key === 'name' || key === 'imya') displayKey = 'Name';
-    else if (key === 'phone' || key === 'phone_raw') displayKey = 'Phone';
-    else if (key === 'social') displayKey = 'Social';
-    else if (key === 'niche') displayKey = 'Niche';
-    else if (key === 'amount') displayKey = 'Price';
-    else if (key === 'difficulties') displayKey = 'Difficulties';
-    else if (key === 'goal') displayKey = 'Goal';
-    else if (key === 'instagram') displayKey = 'Instagram';
-    else if (key === 'tg_nick') displayKey = 'TG Nick';
-    else if (key === 'participation_type') displayKey = 'Participation Type';
-    else if (key === 'country') displayKey = 'Country';
-    else if (key === 'utm_source') displayKey = 'UTM Source';
-    else if (key === 'utm_medium') displayKey = 'UTM Medium';
-    else if (key === 'utm_campaign') displayKey = 'UTM Campaign';
-    else if (key === 'utm_content') displayKey = 'UTM Content';
-
+    var lowKey = key.toLowerCase();
     var val = data[key];
-    if (displayKey === 'Phone' && val && String(val).indexOf('+') !== -1) {
-        val = "'" + val; 
-    }
-    processedData[displayKey] = val;
-  }
-  
-  for (var key in processedData) {
-      ensureHeader(key);
-  }
-  
-  if (headers.length > initialHeaderCount) {
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  }
-
-  var rowData = new Array(headers.length).fill('');
-  for (var key in processedData) {
-      var colIdx = headers.indexOf(key);
-      if (colIdx !== -1) {
-          rowData[colIdx] = processedData[key];
+    
+    var targetKey = '';
+    if (lowKey === 'name' || lowKey === 'imya') targetKey = "Name";
+    else if (lowKey === 'phone' || lowKey === 'phone_raw') targetKey = 'Phone';
+    else if (lowKey === 'social' || lowKey === 'instagram') targetKey = 'Social';
+    else if (lowKey === 'niche') targetKey = 'Niche';
+    else if (lowKey === 'difficulties') targetKey = 'Difficulties';
+    else if (lowKey === 'request') targetKey = 'Request';
+    else if (lowKey === 'readiness') targetKey = 'Readiness';
+    else if (lowKey === 'goal') targetKey = 'Goal';
+    else if (lowKey === 'utm_source') targetKey = 'UTM Source';
+    else if (lowKey === 'utm_medium') targetKey = 'UTM Medium';
+    else if (lowKey === 'utm_campaign') targetKey = 'UTM Campaign';
+    else if (lowKey === 'utm_content') targetKey = 'UTM Content';
+    
+    if (targetKey) {
+      if (targetKey === 'Phone' && val && String(val).indexOf('+') !== -1) {
+          val = "'" + val; 
       }
+      processedData[targetKey] = val;
+    }
   }
 
-  sheet.appendRow(rowData);
+  // 3. Ensure Headers exist in the requested order
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) {
+      sheet.appendRow(orderedHeaders);
+      lastCol = orderedHeaders.length;
+  }
+  
+  var currentHeaders = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  
+  // Create final row array matching current sheet headers
+  var finalRow = currentHeaders.map(function(h) {
+      return processedData[h] !== undefined ? processedData[h] : '';
+  });
+
+  sheet.appendRow(finalRow);
   
   return ContentService.createTextOutput(JSON.stringify({ 'result': 'success' }))
     .setMimeType(ContentService.MimeType.JSON);
@@ -171,17 +168,9 @@ function handleWayForPayCallback(data) {
     var statusColIdx = headers.indexOf('Status');
     
     if (orderIdColIdx === -1) continue;
-    
     if (statusColIdx === -1) {
-      headers.push('Status');
-      statusColIdx = headers.length - 1;
-      sheet.getRange(1, statusColIdx + 1).setValue('Status');
-    }
-    var priceColIdx = headers.indexOf('Price');
-    if (priceColIdx === -1) {
-      headers.push('Price');
-      priceColIdx = headers.length - 1;
-      sheet.getRange(1, priceColIdx + 1).setValue('Price');
+      sheet.getRange(1, lastCol + 1).setValue('Status');
+      statusColIdx = lastCol;
     }
 
     var orderIdValues = sheet.getRange(2, orderIdColIdx + 1, lastRow - 1, 1).getValues();
@@ -189,12 +178,9 @@ function handleWayForPayCallback(data) {
     for (var r = 0; r < orderIdValues.length; r++) {
       if (orderIdValues[r][0] === orderId || String(orderIdValues[r][0]) === String(orderId)) { 
         if (status === 'Approved') {
-          sheet.getRange(r + 2, statusColIdx + 1).setValue('Оплачено');
-          if (amount) {
-            sheet.getRange(r + 2, priceColIdx + 1).setValue(amount);
-          }
+          sheet.getRange(r + 2, statusColIdx + 1).setValue('Approved');
         } else {
-          sheet.getRange(r + 2, statusColIdx + 1).setValue('Помилка оплати (' + status + ')');
+          sheet.getRange(r + 2, statusColIdx + 1).setValue('Failed (' + status + ')');
         }
         found = true;
         break;
@@ -206,18 +192,14 @@ function handleWayForPayCallback(data) {
   var time = Math.round(new Date().getTime() / 1000);
   var signatureBody = data.orderReference + ';accept;' + time;
   var signatureBytes = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_MD5, signatureBody, SECRET_KEY);
-  
   var signatureHex = signatureBytes.map(function(byte) {
       return ('0' + (byte & 0xFF).toString(16)).slice(-2);
   }).join('');
   
-  var responsePayload = {
+  return ContentService.createTextOutput(JSON.stringify({
     orderReference: data.orderReference,
     status: 'accept',
     time: time,
     signature: signatureHex
-  };
-
-  return ContentService.createTextOutput(JSON.stringify(responsePayload))
-    .setMimeType(ContentService.MimeType.JSON);
+  })).setMimeType(ContentService.MimeType.JSON);
 }

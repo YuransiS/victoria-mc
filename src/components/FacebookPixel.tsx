@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Script from "next/script";
 
-const FB_PIXEL_IDS = ["1230047148487254"];
+const FB_PIXEL_IDS = ["1230047148487254", "1497146881743265"];
 
 export const FacebookPixel = () => {
   useEffect(() => {

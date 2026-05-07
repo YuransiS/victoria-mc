@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwSaSkvHXzOlz-7N1eQQWW8Rt7k-dWSNoZrTmcZ0TMOUg7n6VGPDTyK66ed2eD1Uk6f/exec';
+const GOOGLE_SCRIPT_URL_MAIN = process.env.GOOGLE_SCRIPT_URL;
+const GOOGLE_SCRIPT_URL_STVORYUI = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
 
 export async function POST(req: Request) {
   try {
@@ -39,24 +40,37 @@ export async function POST(req: Request) {
       );
     }
 
+    const utms = {
+      utm_source: data.utm_source || 'direct',
+      utm_medium: data.utm_medium || '-',
+      utm_campaign: data.utm_campaign || '-',
+      utm_content: data.utm_content || '-',
+      utm_term: data.utm_term || '-',
+    };
+
+    // Determine which script to send to
+    let scriptUrl = GOOGLE_SCRIPT_URL_MAIN;
+    if (data.target_sheet === 'Ленд2') {
+      scriptUrl = GOOGLE_SCRIPT_URL_STVORYUI;
+    }
+
+    if (!scriptUrl) {
+      console.error('No Google Script URL configured for this lead source');
+    }
+
     // 2. Google Sheets Task
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
     tasks.push(
-      fetch(GOOGLE_SCRIPT_URL, {
+      fetch(scriptUrl || '', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
-          utm_source: utm_source || 'direct',
-          utm_medium: utm_medium || '-',
-          utm_campaign: utm_campaign || '-',
-          target_sheet: 'Ленд2'
+          ...utms,
+          phone: phone,
+          api_key: process.env.SHEETS_API_KEY || 'secret_booking_token_2026',
         }),
-        signal: controller.signal
+        signal: AbortSignal.timeout(15000)
       })
-      .then(() => clearTimeout(timeoutId))
       .catch(err => console.error('Sheets failed or timed out:', err))
     );
 
