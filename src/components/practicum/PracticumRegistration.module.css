@@ -8,6 +8,25 @@
   margin: 0 auto;
 }
 
+.sectionTitle {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.sectionDesc {
+  font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 60px;
+  line-height: 1.6;
+}
+
 .tariffsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -20,20 +39,33 @@
 
 .tariffCard {
   position: relative;
-  background: #080808;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 30px;
   padding: 50px 30px;
   text-align: left;
   overflow: visible;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.tariffCard:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .tariffCard.pro {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: #0c0202; /* Slight reddish tint like in screenshot */
+  background: rgba(209, 184, 151, 0.03);
+  border-color: rgba(209, 184, 151, 0.2);
+}
+
+.tariffCard.pro:hover {
+  background: rgba(209, 184, 151, 0.06);
+  border-color: rgba(209, 184, 151, 0.4);
 }
 
 .bestChoiceBadge {
@@ -41,7 +73,7 @@
   top: -15px;
   left: 50%;
   transform: translateX(-50%);
-  background: #73d1c1; /* Mint color from screenshot */
+  background: #d1b897;
   color: #000;
   font-family: var(--font-manrope);
   font-weight: 800;
@@ -50,7 +82,7 @@
   border-radius: 20px;
   letter-spacing: 0.1em;
   white-space: nowrap;
-  box-shadow: 0 0 20px rgba(115, 209, 193, 0.4);
+  box-shadow: 0 0 20px rgba(209, 184, 151, 0.4);
   z-index: 10;
 }
 
@@ -63,13 +95,17 @@
 }
 
 .tariffTitle {
-  font-family: var(--font-manrope);
-  font-weight: 900;
-  font-size: 1.8rem;
+  font-family: var(--font-newsreader);
+  font-weight: 400;
+  font-size: 2rem;
   color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
+}
+
+.pro .tariffTitle {
+  color: #d1b897;
 }
 
 .tariffDesc {
@@ -100,7 +136,7 @@
 
 .featuresList li::before {
   content: "✓";
-  color: #fff;
+  color: #d1b897;
   font-weight: bold;
 }
 
@@ -114,10 +150,6 @@
   color: rgba(255, 255, 255, 0.2);
   text-decoration: none;
   display: inline-block;
-}
-
-.featuresList li.included {
-  color: #fff;
 }
 
 .priceWrapper {
@@ -144,34 +176,102 @@
   display: inline-block;
 }
 
-.newPrice::before {
-  content: "";
-  display: block;
-}
-
 .registerBtn {
-  background: #73d1c1;
+  background: #d1b897;
   color: #000;
   font-family: var(--font-manrope);
   font-weight: 800;
   font-size: 0.9rem;
   padding: 22px 32px;
   border: none;
-  border-radius: 15px;
+  border-radius: 100px;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   transition: all 0.3s ease;
   width: 100%;
+  box-shadow: 0 10px 20px rgba(209, 184, 151, 0.2);
 }
 
 .registerBtn:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.1);
-  box-shadow: 0 10px 25px rgba(115, 209, 193, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  background: #e5ccae;
+  box-shadow: 0 15px 30px rgba(209, 184, 151, 0.4);
 }
 
-.guarantee {
+.guaranteeBlock {
+  margin-top: 80px;
+  background: rgba(209, 184, 151, 0.03);
+  border: 1px solid rgba(209, 184, 151, 0.15);
+  border-radius: 40px;
+  padding: 60px;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.shieldContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shieldGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(209, 184, 151, 0.2) 0%, transparent 70%);
+  animation: shieldPulse 4s infinite ease-in-out;
+}
+
+@keyframes shieldPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.shieldSvg {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 15px rgba(209, 184, 151, 0.3));
+}
+
+.guaranteeInfo {
+  flex: 1;
+}
+
+.guaranteeTitle {
+  font-family: var(--font-newsreader);
+  font-size: 2.2rem;
+  color: #d1b897;
+  margin-bottom: 24px;
+}
+
+.guaranteeText {
+  font-family: var(--font-manrope);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.riskFree {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.paymentSecurity {
   margin-top: 40px;
   font-family: var(--font-manrope);
   font-size: 0.75rem;
@@ -195,5 +295,22 @@
   .newPrice {
     font-size: 3rem;
   }
+
+  .guaranteeBlock {
+    flex-direction: column;
+    padding: 40px 30px;
+    gap: 30px;
+    text-align: center;
+    margin-top: 60px;
+  }
+
+  .guaranteeTitle {
+    font-size: 1.8rem;
+  }
+
+  .guaranteeText {
+    font-size: 1rem;
+  }
 }
+
 
