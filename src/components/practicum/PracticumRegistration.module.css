@@ -39,56 +39,23 @@
 
 .tariffCard {
   position: relative;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 30px;
-  padding: 50px 30px;
-  text-align: left;
-  overflow: visible;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #111;
+  border-radius: 40px;
+  padding: 60px 40px;
+  text-align: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .tariffCard:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.tariffCard.pro {
-  background: rgba(209, 184, 151, 0.03);
-  border-color: rgba(209, 184, 151, 0.2);
-}
-
-.tariffCard.pro:hover {
-  background: rgba(209, 184, 151, 0.06);
-  border-color: rgba(209, 184, 151, 0.4);
-}
-
-.bestChoiceBadge {
-  position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #d1b897;
-  color: #000;
-  font-family: var(--font-manrope);
-  font-weight: 800;
-  font-size: 0.7rem;
-  padding: 8px 24px;
-  border-radius: 20px;
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-  box-shadow: 0 0 20px rgba(209, 184, 151, 0.4);
-  z-index: 10;
+  border-color: rgba(209, 184, 151, 0.3);
 }
 
 .cardContent {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -97,20 +64,15 @@
 .tariffTitle {
   font-family: var(--font-newsreader);
   font-weight: 400;
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: #fff;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: center;
-  letter-spacing: 0.02em;
-}
-
-.pro .tariffTitle {
-  color: #d1b897;
 }
 
 .tariffDesc {
   font-family: var(--font-manrope);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.5);
   margin-bottom: 40px;
   line-height: 1.5;
@@ -120,24 +82,24 @@
 .featuresList {
   list-style: none;
   padding: 0;
-  margin: 0 0 50px;
+  margin: 0 0 40px;
+  text-align: left;
 }
 
 .featuresList li {
   font-family: var(--font-manrope);
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 18px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 15px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  line-height: 1.4;
+  gap: 10px;
 }
 
 .featuresList li::before {
-  content: "✓";
+  content: "—";
   color: #d1b897;
-  font-weight: bold;
+  opacity: 0.5;
 }
 
 .featuresList li.crossedOut {
@@ -146,34 +108,27 @@
 }
 
 .featuresList li.crossedOut::before {
-  content: "✕";
   color: rgba(255, 255, 255, 0.2);
-  text-decoration: none;
-  display: inline-block;
 }
 
 .priceWrapper {
   margin-top: auto;
-  text-align: center;
 }
 
 .oldPrice {
   font-family: var(--font-manrope);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.3);
   text-decoration: line-through;
-  margin-bottom: 0;
-  display: inline-block;
-  margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 .newPrice {
   font-family: var(--font-manrope);
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 800;
   color: #fff;
   margin-bottom: 30px;
-  display: inline-block;
 }
 
 .registerBtn {
@@ -181,8 +136,8 @@
   color: #000;
   font-family: var(--font-manrope);
   font-weight: 800;
-  font-size: 0.9rem;
-  padding: 22px 32px;
+  font-size: 1rem;
+  padding: 24px 32px;
   border: none;
   border-radius: 100px;
   cursor: pointer;
@@ -190,14 +145,13 @@
   letter-spacing: 0.1em;
   transition: all 0.3s ease;
   width: 100%;
-  box-shadow: 0 10px 20px rgba(209, 184, 151, 0.2);
 }
 
 .registerBtn:hover {
-  transform: translateY(-3px) scale(1.02);
-  background: #e5ccae;
-  box-shadow: 0 15px 30px rgba(209, 184, 151, 0.4);
+  transform: translateY(-5px);
+  background: #fff;
 }
+
 
 .guaranteeBlock {
   margin-top: 80px;

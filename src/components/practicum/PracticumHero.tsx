@@ -137,18 +137,12 @@ export function PracticumHero() {
         className={styles.mainActionBtn}
         onClick={(e) => {
           e.preventDefault();
-          const target = document.querySelector("#register");
-          if (target) {
-            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
-            window.scrollTo({
-              top: targetPosition,
-              behavior: "smooth"
-            });
-          }
+          setPaymentAmount(9);
+          setIsModalOpen(true);
         }}
       >
         <div className={styles.btnContent}>
-          <span>ОБРАТИ ТАРИФ</span>
+          <span>ЗАЙНЯТИ МІСЦЕ — 9$</span>
         </div>
       </button>
 

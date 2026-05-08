@@ -76,9 +76,8 @@ export function PracticumRegistration() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className={`${styles.tariffCard} ${styles.pro}`}
+            className={styles.tariffCard}
           >
-            <div className={styles.bestChoiceBadge}>КРАЩИЙ ВИБІР</div>
             <div className={styles.cardContent}>
               <h3 className={styles.tariffTitle}>ОСОБИСТА РОБОТА</h3>
               <p className={styles.tariffDesc}>Індивідуальна робота над вашим результатом та особистий супровід від Вікторії</p>
@@ -91,6 +90,7 @@ export function PracticumRegistration() {
                 <li>особиста перевірка виконання завдань</li>
                 <li>особиста консультація по контенту та візуалу від Віки</li>
               </ul>
+
 
               <div className={styles.priceWrapper}>
                 <div className={styles.oldPrice}>69$</div>
