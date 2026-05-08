@@ -7,21 +7,8 @@ import { BookingModal } from "@/components/pricing/BookingModal";
 
 export function PracticumRegistration() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [spotsLeft, setSpotsLeft] = useState(63);
-  const [tariff, setTariff] = useState("Практикум СТОРІЗ ЯКІ ПРОДАЮТЬ");
-  const [amount, setAmount] = useState(490);
-
-  useEffect(() => {
-    // Dynamic imitation of spots decreasing
-    const interval = setInterval(() => {
-      setSpotsLeft(prev => {
-        if (prev <= 7) return prev;
-        const decrease = Math.random() > 0.8 ? 1 : 0;
-        return prev - decrease;
-      });
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const [tariff, setTariff] = useState("КОРОЛЕВА КОНТЕНТУ");
+  const [amount, setAmount] = useState(9);
 
   return (
     <section className={styles.section} id="register">
@@ -56,13 +43,15 @@ export function PracticumRegistration() {
             <div className={styles.glow} />
             <div className={styles.cardContent}>
               <h3 className={styles.tariffTitle}>КОРОЛЕВА КОНТЕНТУ</h3>
-              <p className={styles.tariffDesc}>Для тих, кому потрібна підтримка, покрокові інструкції, спільнота та структура</p>
+              <p className={styles.tariffDesc}>Для тих, кому потрібна підтримка, покрокові інструкції та структура</p>
               
               <ul className={styles.featuresList}>
                 <li>участь в практикумі</li>
                 <li>зворотній зв'язок в групі</li>
-                <li>бонусний ефір по системі створення каруселей в інстаграмі</li>
+                <li>бонусний ефір по системі створення каруселей</li>
                 <li>доступ до загального чату</li>
+                <li className={styles.crossedOut}>особиста перевірка виконання завдань</li>
+                <li className={styles.crossedOut}>особиста консультація по контенту та візуалу від Віки</li>
               </ul>
 
               <div className={styles.priceWrapper}>
@@ -81,6 +70,46 @@ export function PracticumRegistration() {
               </div>
             </div>
           </motion.div>
+
+          {/* VIP TARIFF - ОСОБИСТА РОБОТА */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className={`${styles.tariffCard} ${styles.pro}`}
+          >
+            <div className={styles.glow} />
+            <div className={styles.cardContent}>
+              <h3 className={styles.tariffTitle}>ОСОБИСТА РОБОТА</h3>
+              <p className={styles.tariffDesc}>Індивідуальна робота над вашим результатом та особистий супровід від Вікторії</p>
+              
+              <ul className={styles.featuresList}>
+                <li>участь в практикумі</li>
+                <li>зворотній зв'язок в групі</li>
+                <li>бонусний ефір по системі створення каруселей</li>
+                <li>доступ до загального чату</li>
+                <li>особиста перевірка виконання завдань</li>
+                <li>особиста консультація по контенту та візуалу від Віки</li>
+              </ul>
+
+              <div className={styles.priceWrapper}>
+                <div className={styles.oldPrice}>69$</div>
+                <div className={styles.newPrice}>39$</div>
+                <button 
+                  className={styles.registerBtn}
+                  onClick={() => {
+                    setTariff("ОСОБИСТА РОБОТА");
+                    setAmount(39);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  ОБРАТИ ТАРИФ
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
         </div>
 
         <p className={styles.guarantee}>Безпечна оплата через WayForPay</p>
@@ -100,3 +129,4 @@ export function PracticumRegistration() {
     </section>
   );
 }
+

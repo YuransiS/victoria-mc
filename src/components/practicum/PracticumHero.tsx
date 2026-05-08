@@ -135,15 +135,20 @@ export function PracticumHero() {
 
       <button 
         className={styles.mainActionBtn}
-        onClick={() => {
-          setPaymentAmount(9);
-          setIsModalOpen(true);
-          import("@/components/FacebookPixel").then(m => m.trackFBEvent("Click_Buy", { amount: 9 }));
+        onClick={(e) => {
+          e.preventDefault();
+          const target = document.querySelector("#register");
+          if (target) {
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: "smooth"
+            });
+          }
         }}
       >
         <div className={styles.btnContent}>
-          <span>ВЗЯТИ УЧАСТЬ — 9$</span>
-          <span className={styles.oldPriceInline}>45$</span>
+          <span>ОБРАТИ ТАРИФ</span>
         </div>
       </button>
 
