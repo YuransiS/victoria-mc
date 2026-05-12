@@ -1,0 +1,69 @@
+* Основной сайт - https://victoria-mc.vercel.app/
+
+   * Главная страница (`/`) — Запись на мастер класс (под автовеб)
+   * Брони на курс (`/price`) — страница с тарифными планами
+   * Практикум (`/practicum`) — основная страница практикума
+   * VSL лендинг на трафик (/free-lection)— страница регистрации на бесплатную лекцию
+   * Форма VSL (из бота) (`/free-lection/vsl-form`) — страница с видео и формой
+   * Платный трипвайер (/rozbir) - Страница Розбир с платным трипвайером
+
+
+
+
+Система Единой таблицы (листы):
+
+Ліди МК (устарело) - не актуальная таблица с данными которые необходимы для аналитики
+
+Характеристики: 
+   * gid=0
+   * Столбики: Дата        Ім'я        Телефон        Source        Medium        Campaign        Content        Term        URL
+Приметки: В колонке Телефон многие пытались вписать свой телеграм, необходима валидация
+
+Пример: 09.04.2026 17:43:28        Альона        380973117073        instagram        social        profile_bio        link_in_bio        none        https://victoria-mc.vercel.app/?utm_source=instagram&utm_medium=social&utm_campaign=profile_bio&utm_content=link_in_bio&fbclid=PAdGRleAREjZRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAacNi7OZH28qeieYVwHScnbKSzAnKRtDOszOU-W3yEkBdi78w0FjUnylW18tdg_aem_CKfhLldF25XuVIXwRVqDeA
+
+МК 2.0 (актуально) - актуальная таблица с лидами которые пришли на мастер класс после внесения существенных изменений
+
+Характеристики:
+   * gid=70777205
+   * Столбики: Дата        Ім'я        Телефон        Source        Medium        Campaign        Content        Term        URL
+Приметки: В колонке Телефон многие пытались вписать свой телеграм, необходима валидация
+
+Пример: 19.04.2026 18:53:59        Вікторія Бойко        48794197217        ig        social        none        link_in_bio        none        https://victoria-mc.vercel.app/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPMTI0MDI0NTc0Mjg3NDE0AAGn9A_XkwUeiM8iS3C2pxVEcUTZyCu1wmf1kMzZRtzTb39h8YKOTt5LoO4rpws_aem_1fVkYT7X-xSU9cRfyftLnQ
+
+
+Практикум - Актуальная таблица с данными тех кто купил доступ на практикум
+
+Характеристики:
+   * gid=337144317
+   * Столбики: Дата        Ім'я        Телефон        Source        Medium        Campaign        Content        Term        URL        Тариф        Сума        OrderID        Статус
+Приметки: Цена в долларах США. Телеграм никто не вписывал. Номера телефона бывают в формате без нуля (965810796 ) или в почти полном формате (380979789000)
+Телеграма нет. необходима валидация только по номеру телефона
+
+Пример: 12.05.2026 11:50:54        Надія         994272180        social        bio        practicum_promo        link_in_bio        none        https://victoria-mc.vercel.app/practicum?utm_source=social&utm_medium=bio&utm_campaign=practicum_promo&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPMTI0MDI0NTc0Mjg3NDE0AAGnGydIybbtDPR8bU-vqWxIAUgrzosiIkbgIFx0SHHN37dyfmSB4rF-blj_5Vo_aem_psFyfyyKJWQwHU4aqyQiIQ        КОРОЛЕВА КОНТЕНТУ        9        VMC_1778575852033        APPROVED (Redirect)        
+
+
+Бронювання- После мастер класса на вебинаре им предлагают сделать брони на основной курс.
+
+Характеристики:
+   * gid=1127634999
+   * Столбики: Дата        Ім'я        Телефон        Source        Medium        Campaign        Content        Term        URL        Тариф        Ціна        Номер заказу        Статус оплати
+Приметки: Цены в грн, Телеграм никто не вписывал. Номера телефона бывают в формате без нуля (965810796 ) или в почти полном формате (380979789000)
+Телеграма нет. необходима валидация только по номеру телефона
+
+Пример: 22.04.2026 17:18:43        Наталія Капітон        380639289999        direct        none        none        none        none        https://victoria-mc.vercel.app/price        ГРУПОВИЙ        1000        VMC_1776867521749        APPROVED (Redirect)
+
+
+Розбір (Old)- Архивная таблица платного трипвайеа Розбір
+
+Характеристики:
+   * gid=365397965
+   * Столбики: Date        Name        Phone        Social        Niche        source        medium        campaign        content        term        Order ID        Price        Status        UTM Content        date        variant_name        Коментар
+Приметки:. Social это ник в телеграме. Номера телефона все в формате +380662519999. Дата оплаты дублируеться, “вариант нейм” рудимент, бесполезен, в формате Price Test: 290 UAH 
+Пример: 01.04.2026 09:15:09        Вікторія         +380679977474        Viktoriibrun                traff        MINIK | UA | 01.04        21_35_WIDE_590        2        6989392364857        ORDER_1775027708000_4318        590        Оплачено                01.04.2026, 10:15:08        Price Test: 590 UAH        14.04 зустріч
+
+Розбір- Новая таблица которая будет служить для нового места где будут падать лиды с платного трипвайера
+
+Характеристики:
+   * gid=893672808
+   * Столбики: нету
+Приметки: Цена в грн

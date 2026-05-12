@@ -1,0 +1,839 @@
+﻿'use client';
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Users, 
+  MousePointer2, 
+  CreditCard, 
+  TrendingUp, 
+  Search, 
+  Calendar,
+  Clock,
+  ChevronRight,
+  User,
+  Phone,
+  ArrowRight,
+  Activity,
+  History,
+  Tag,
+  BarChart3,
+  PieChart as PieChartIcon,
+  Filter,
+  DollarSign,
+  Copy,
+  Check,
+  ExternalLink,
+  Send,
+  LogOut
+} from 'lucide-react';
+
+interface Lead {
+  date?: string;
+  name?: string;
+  phone?: string;
+  telegram?: string;
+  tariff?: string;
+  orderId?: string;
+  status?: string;
+  visitorId?: string;
+  "Р”Р°С‚Р° С‚Р° С‡Р°СЃ": string;
+  "Р†Рј'СЏ": string;
+  "РўРµР»РµС„РѕРЅ": string;
+  "Telegram": string;
+  "РўР°СЂРёС„": string;
+  "РќРѕРјРµСЂ Р·Р°РјРѕРІР»РµРЅРЅСЏ": string;
+  "РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё": string;
+  "Visitor ID": string;
+  "Customer Journey": string;
+  "First UTM Source": string;
+  "Last UTM Source": string;
+  "РљРѕРјРµРЅС‚Р°СЂ": string;
+  comment?: string;
+  _sheet: string;
+  _originalData?: any;
+  [key: string]: any;
+}
+
+interface Traffic {
+  date?: string;
+  visitorId?: string;
+  "Р”Р°С‚Р° С‚Р° С‡Р°СЃ": string;
+  "Visitor ID": string;
+  "РЁР»СЏС…": string;
+  "IP": string;
+  "User Agent": string;
+  "UTM Source": string;
+  [key: string]: any;
+}
+
+export default function AdminDashboard() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [traffic, setTraffic] = useState<Traffic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(null);
+  const [localComment, setLocalComment] = useState('');
+  const [savingComment, setSavingComment] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch('/api/admin/data');
+      const data = await res.json();
+      setLeads(data.leads || []);
+      setTraffic(data.traffic || []);
+    } catch (err) {
+      c  const [filterDate, setFilterDate] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterSource, setFilterSource] = useState('all');
+  const [filterPlan, setFilterPlan] = useState('all');
+  const [filterNiche, setFilterNiche] = useState('all');
+  const [filterComment, setFilterComment] = useState('all');
+  const [filterPayment, setFilterPayment] = useState('all');
+
+  // Normalization
+  const normalizePhone = (p: any) => p?.toString().replace(/\D/g, '') || '';
+  const normalizeTg = (t: any) => t?.toString().toLowerCase().replace('@', '').trim() || '';
+
+  const filteredLeadsAdvanced = leads
+    .filter(l => {
+      // Search
+      const searchLower = search.toLowerCase();
+      const name = (l.name || l["Р†Рј'СЏ"] || '').toString().toLowerCase();
+      const phone = (l.phone || l["РўРµР»РµС„РѕРЅ"] || '').toString();
+      const tg = (l.telegram || l["Telegram"] || '').toString().toLowerCase();
+      const vId = (l.visitorId || l["Visitor ID"] || '').toString();
+      if (search && !name.includes(searchLower) && !phone.includes(search) && !vId.includes(search) && !tg.includes(searchLower)) return false;
+
+      // Date
+      const dateObj = new Date(l.date || l["Р”Р°С‚Р°"] || l["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0);
+      const now = new Date();
+      if (filterDate === 'today' && now.toDateString() !== dateObj.toDateString()) return false;
+      if (filterDate === 'week' && (now.getTime() - dateObj.getTime()) > 7 * 24 * 60 * 60 * 1000) return false;
+      if (filterDate === 'month' && (now.getTime() - dateObj.getTime()) > 30 * 24 * 60 * 60 * 1000) return false;
+
+      // Status
+      const status = (l.status || l["РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё"] || l["РЎС‚Р°С‚СѓСЃ"])?.toString().toLowerCase() || '';
+      if (filterStatus === 'paid' && !status.includes('РѕРїР»Р°С‡РµРЅРѕ')) return false;
+      if (filterStatus === 'booking' && !status.includes('Р±СЂРѕРЅСЊ')) return false;
+      if (filterStatus === 'unpaid') {
+        if (status.includes('РѕРїР»Р°С‡РµРЅРѕ') || status.includes('Р±СЂРѕРЅСЊ')) return false;
+      }
+
+      // Comment filter
+      const hasComment = (l.comment || l["РљРѕРјРµРЅС‚Р°СЂ"] || '').toString().trim().length > 0;
+      if (filterComment === 'yes' && !hasComment) return false;
+      if (filterComment === 'no' && hasComment) return false;
+
+      // Niche filter
+      if (filterNiche !== 'all') {
+        const niche = (l.niche || l["Niche"] || l["РќС–С€Р°"] || '').toString().toLowerCase();
+        if (!niche.includes(filterNiche.toLowerCase())) return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.date || a["Р”Р°С‚Р°"] || a["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime();
+      const dateB = new Date(b.date || b["Р”Р°С‚Р°"] || b["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime();
+      return dateB - dateA;
+    });”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime();
+      const dateB = new Date(b.date || b["Р”Р°С‚Р°"] || b["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime();
+      return dateB - dateA;
+    });
+
+  // Unique leads grouping
+  const uniqueLeads: (Lead & { _allSheets: string[], _selectionId: string })[] = [];
+  const seenIdentifiers = new Map<string, any>();
+  
+  filteredLeadsAdvanced.forEach(l => {
+    const phone = normalizePhone(l.phone || l["РўРµР»РµС„РѕРЅ"]);
+    const tg = normalizeTg(l.telegram || l["Telegram"] || l["РўРµР»РµРіСЂР°Рј"] || l["РўРµР»РµРіР°"]);
+    const identifier = phone || tg || l.visitorId || l["Visitor ID"];
+    
+    if (identifier) {
+      if (!seenIdentifiers.has(identifier)) {
+        const leadWithSheets = { ...l, _allSheets: [l._sheet], _selectionId: identifier };
+        seenIdentifiers.set(identifier, leadWithSheets);
+        uniqueLeads.push(leadWithSheets);
+      } else {
+        const existing = seenIdentifiers.get(identifier);
+        if (existing && !existing._allSheets.includes(l._sheet)) {
+          existing._allSheets.push(l._sheet);
+        }
+      }
+    } else {
+      const fallbackId = `temp-${Math.random()}`;
+      uniqueLeads.push({ ...l, _allSheets: [l._sheet], _selectionId: fallbackId });
+    }
+  });
+
+  const finalFilteredLeads = uniqueLeads.filter(l => {
+    if (filterSource !== 'all' && !l._allSheets.includes(filterSource)) return false;
+    if (filterPlan !== 'all') {
+      const plan = (l.tariff || l["РўР°СЂРёС„"] || l["РџР°РєРµС‚"] || '').toUpperCase();
+      if (!plan.includes(filterPlan.toUpperCase())) return false;
+    }
+    return true;
+  });
+
+  const leadsToday = uniqueLeads.filter(l => {
+    const d = new Date(l.date || l["Р”Р°С‚Р°"] || l["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"]);
+    return d.toDateString() === new Date().toDateString();
+  }).length;
+
+  const getStatusColor = (status: any) => {
+    const s = (status || '').toString().toLowerCase().trim();
+    if (s.includes('РЅРµ РѕРїР»Р°С‡РµРЅРѕ')) return 'text-white/20';
+    if (s.includes('РѕРїР»Р°С‡РµРЅРѕ')) return 'text-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.2)] font-bold';
+    if (s.includes('РІС–РґС…РёР»РµРЅРѕ') || s.includes('СЃРєР°СЃРѕРІР°РЅРѕ')) return 'text-rose-500 font-medium';
+    if (s.includes('Р±СЂРѕРЅСЊ') || s.includes('РѕС‡С–РєСѓС”')) return 'text-sky-400 font-bold';
+    return 'text-white/40';
+  };
+
+  const getLeadRevenue = (lead: Lead) => {
+    const status = (lead.status || lead["РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё"] || lead["РЎС‚Р°С‚СѓСЃ"])?.toString().toLowerCase() || '';
+    
+    // Р‘СЂРѕРЅСЊ РІСЃРµРіРґР° 1000 РіСЂРЅ
+    if (status.includes('Р±СЂРѕРЅСЊ')) return { uah: 1000, usd: 0 };
+    
+    // РўРѕР»СЊРєРѕ РµСЃР»Рё РїРѕР»РЅРѕСЃС‚СЊСЋ РѕРїР»Р°С‡РµРЅРѕ - СЃС‡РёС‚Р°РµРј С‚Р°СЂРёС„
+    if (!status.includes('РѕРїР»Р°С‡РµРЅРѕ')) return { uah: 0, usd: 0 };
+    
+    const tariff = (lead.tariff || lead["РўР°СЂРёС„"] || lead["РџР°РєРµС‚"])?.toString().toUpperCase() || '';
+    
+    if (tariff.includes('Р†РќР”РР’Р†Р”РЈРђР›Р¬РќРР™')) return { uah: 0, usd: 911 };
+    if (tariff.includes('Р“Р РЈРџРћР’РР™')) return { uah: 0, usd: 505 };
+    if (tariff.includes('РЎРђРњРћРЎРўР†Р™РќРР™')) return { uah: 0, usd: 399 };
+    
+    return { uah: 0, usd: 0 }; 
+  };
+
+  const revenueStats = uniqueLeads.reduce((acc, lead) => {
+    const { uah, usd } = getLeadRevenue(lead);
+    acc.uah += uah;
+    acc.usd += usd;
+    return acc;
+  }, { uah: 0, usd: 0 });
+
+  const getUtmStats = (field: string) => {
+    const stats = filteredLeadsAdvanced.reduce((acc, lead) => {
+      const val = lead[field] || lead[field.toLowerCase()] || 'Direct / Unknown';
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(stats)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  };
+
+  const [activeUtmTab, setActiveUtmTab] = useState('utm_source');
+
+  const updateLeadStatus = async (newStatus: string) => {
+    if (!selectedLead) return;
+    setUpdating(true);
+    try {
+      const res = await fetch('/api/admin/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_status',
+          targetSheet: selectedLead._sheet,
+          orderId: selectedLead.orderId || selectedLead["РќРѕРјРµСЂ Р·Р°РјРѕРІР»РµРЅРЅСЏ"] || selectedLead.visitorId,
+          status: newStatus
+        })
+      });
+      const result = await res.json();
+      if (result.result === 'success') {
+        setLeads(prev => prev.map(l => 
+          (l.orderId === selectedLead.orderId && l.orderId) || (l.visitorId === selectedLead.visitorId)
+            ? { ...l, status: newStatus, "РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё": newStatus } 
+            : l
+        ));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const saveComment = async () => {
+    if (!selectedLead) return;
+    setSavingComment(true);
+    try {
+      const res = await fetch('/api/admin/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_comment',
+          targetSheet: selectedLead._sheet,
+          orderId: selectedLead.orderId || selectedLead["РќРѕРјРµСЂ Р·Р°РјРѕРІР»РµРЅРЅСЏ"] || selectedLead.visitorId,
+          comment: localComment
+        })
+      });
+      const result = await res.json();
+      if (result.result === 'success') {
+        setLeads(prev => prev.map(l => 
+          (l.orderId === selectedLead.orderId && l.orderId) || (l.visitorId === selectedLead.visitorId)
+            ? { ...l, comment: localComment, "РљРѕРјРµРЅС‚Р°СЂ": localComment } 
+            : l
+        ));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingComment(false);
+    }
+  };
+
+  const selectedLead = uniqueLeads.find(l => l._selectionId === selectedVisitorId);
+  
+  useEffect(() => {
+    if (selectedLead) {
+      setLocalComment(selectedLead.comment || selectedLead["РљРѕРјРµРЅС‚Р°СЂ"] || '');
+    }
+  }, [selectedVisitorId]);
+
+  const visitorTraffic = traffic.filter(t => {
+    const vId = t.visitorId || t["Visitor ID"];
+    return vId === selectedVisitorId || vId === selectedLead?.visitorId || vId === selectedLead?.["Visitor ID"];
+  });
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString('uk-UA');
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#050505]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-16 w-16 animate-spin rounded-full border-t-2 border-[#D4AF37]" />
+          <p className="text-[#D4AF37] font-bold tracking-widest animate-pulse uppercase text-[10px]">Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ Р°РЅР°Р»С–С‚РёРєРё...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8 font-sans">
+      {/* Header & Advanced Filters */}
+      <div className="mb-12 flex flex-col xl:flex-row xl:items-end justify-between gap-8">
+        <div>
+          <div className="inline-block border-l-2 border-[#D4AF37] pl-4 mb-2">
+            <h1 className="text-4xl font-black uppercase tracking-tighter text-white font-headline">
+              Victoria MC
+            </h1>
+          </div>
+          <p className="text-white/30 text-xs uppercase tracking-[0.3em] font-bold">Control Panel & Lead Management</p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:flex-wrap items-end gap-3">
+          {/* Search */}
+          <div className="col-span-2 md:col-span-2 lg:w-64 relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-[#D4AF37] transition-colors" />
+            <input 
+              type="text" 
+              placeholder="РџРѕС€СѓРє (Р†Рј'СЏ, РўРµР», TG, ID)..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all placeholder:text-white/10 text-xs font-bold"
+            />
+          </div>
+
+          <FilterSelect 
+            label="РџРµСЂС–РѕРґ"
+            value={filterDate}
+            onChange={setFilterDate}
+            options={[
+              { v: 'all', l: 'Р’РµСЃСЊ С‡Р°СЃ' },
+              { v: 'today', l: 'РЎСЊРѕРіРѕРґРЅС–' },
+              { v: 'week', l: 'РўРёР¶РґРµРЅСЊ' },
+              { v: 'month', l: 'РњС–СЃСЏС†СЊ' }
+            ]}
+          />
+
+          <FilterSelect 
+            label="РЎС‚Р°С‚СѓСЃ РћРїР»Р°С‚Рё"
+            value={filterStatus}
+            onChange={setFilterStatus}
+            options={[
+              { v: 'all', l: 'Р’СЃС– СЃС‚Р°С‚СѓСЃРё' },
+              { v: 'paid', l: 'РћРїР»Р°С‡РµРЅРѕ' },
+              { v: 'booking', l: 'Р‘СЂРѕРЅСЊ' },
+              { v: 'unpaid', l: 'РћС‡С–РєСѓС”' }
+            ]}
+          />
+
+          <FilterSelect 
+            label="Р”Р¶РµСЂРµР»Рѕ"
+            value={filterSource}
+            onChange={setFilterSource}
+            options={[
+              { v: 'all', l: 'Р’СЃС– Р»РµРЅРґРё' },
+              ...[...new Set(uniqueLeads.flatMap(l => l._allSheets))].map(s => ({ v: s, l: s }))
+            ]}
+          />
+
+          <FilterSelect 
+            label="РќС–С€Р°"
+            value={filterNiche}
+            onChange={setFilterNiche}
+            options={[
+              { v: 'all', l: 'Р’СЃС– РЅС–С€С–' },
+              ...[...new Set(uniqueLeads.map(l => l.niche || l["РќС–С€Р°"] || l["Niche"]).filter(Boolean))].map(s => ({ v: s, l: s }))
+            ]}
+          />
+
+          <FilterSelect 
+            label="РљРѕРјРµРЅС‚Р°СЂС–"
+            value={filterComment}
+            onChange={setFilterComment}
+            options={[
+              { v: 'all', l: 'Р’СЃС–' },
+              { v: 'yes', l: 'Р— РєРѕРјРµРЅС‚Р°СЂРµРј' },
+              { v: 'no', l: 'Р‘РµР· РєРѕРјРµРЅС‚Р°СЂСЏ' }
+            ]}
+          />
+
+          <button 
+            onClick={handleLogout}
+            className="h-[46px] w-[46px] flex items-center justify-center bg-white/[0.03] hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 rounded-xl text-white/20 hover:text-red-500 transition-all active:scale-95"
+            title="Р’РёР№С‚Рё"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <StatCard 
+          icon={<Users className="text-[#D4AF37]" />}
+          label="РЈРЅС–РєР°Р»СЊРЅРёС… Р»С–РґС–РІ"
+          value={uniqueLeads.length}
+          sub={`Р’СЃСЊРѕРіРѕ ${filteredLeadsAdvanced.length} Р·Р°СЏРІРѕРє`}
+        />
+        <StatCard 
+          icon={<DollarSign className="text-emerald-500" />}
+          label="Р”РѕС…С–Рґ (USD)"
+          value={`$${revenueStats.usd.toLocaleString()}`}
+          sub="РўС–Р»СЊРєРё РїРѕРІРЅС– РѕРїР»Р°С‚Рё"
+        />
+        <StatCard 
+          icon={<CreditCard className="text-sky-400" />}
+          label="Р‘СЂРѕРЅСЋРІР°РЅРЅСЏ (UAH)"
+          value={`${revenueStats.uah.toLocaleString()} в‚ґ`}
+          sub="РЎСѓРјР° РїРѕ 1000 РіСЂРЅ Р·Р° Р±СЂРѕРЅСЊ"
+        />
+      </div>
+
+      {/* Analytics Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        <div className="lg:col-span-2 bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
+                <BarChart3 size={20} />
+              </div>
+              <h3 className="text-lg font-black uppercase tracking-widest font-headline">UTM Metrics</h3>
+            </div>
+            <div className="flex bg-black/60 rounded-xl p-1 border border-white/5">
+              {[
+                { id: 'utm_source', label: 'Source' },
+                { id: 'utm_campaign', label: 'Campaign' },
+                { id: 'utm_medium', label: 'Medium' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveUtmTab(tab.id)}
+                  className={`px-4 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${activeUtmTab === tab.id ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/20' : 'text-white/30 hover:text-white'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {getUtmStats(activeUtmTab).map(([name, count]) => (
+              <div key={name} className="space-y-3">
+                <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest">
+                  <span className="text-white/40 truncate max-w-[400px]">{name}</span>
+                  <span className="text-[#D4AF37] tabular-nums">{count} leads</span>
+                </div>
+                <div className="h-1.5 w-full bg-white/[0.03] rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(count / Math.max(1, filteredLeadsAdvanced.length)) * 100}%` }}
+                    className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F9E49B] rounded-full"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 backdrop-blur-xl">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                <PieChartIcon size={20} />
+            </div>
+            <h3 className="text-lg font-black uppercase tracking-widest font-headline">Lending Distribution</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {[...new Set(filteredLeadsAdvanced.map(l => l._sheet))].map(sheet => {
+              const count = filteredLeadsAdvanced.filter(l => l._sheet === sheet).length;
+              return (
+                <div key={sheet} className="flex items-center justify-between p-5 bg-white/[0.02] rounded-2xl border border-white/5 hover:border-[#D4AF37]/30 transition-all">
+                  <div>
+                    <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1">{sheet}</p>
+                    <p className="font-black text-xl tabular-nums">{count}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-full bg-white/[0.05] flex items-center justify-center text-[#D4AF37] font-bold text-[10px] tabular-nums">
+                    {((count / Math.max(1, filteredLeadsAdvanced.length)) * 100).toFixed(0)}%
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Table */}
+      <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-xl">
+        <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+          <h2 className="font-black uppercase tracking-widest text-[10px] text-white/20">Unified Lead Database</h2>
+          <button onClick={fetchData} className="text-[10px] text-[#D4AF37] hover:text-white font-bold uppercase tracking-widest transition-colors">Refresh Board</button>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="text-white/10 text-[9px] uppercase font-black tracking-[0.2em] bg-white/[0.01]">
+                <th className="px-8 py-5">Lead / Identity</th>
+                <th className="px-8 py-5">Contacts</th>
+                <th className="px-8 py-5">Offer / Status</th>
+                <th className="px-8 py-5">Niche</th>
+                <th className="px-8 py-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {finalFilteredLeads.map((lead, i) => (
+                <tr 
+                  key={i} 
+                  className="hover:bg-white/[0.03] transition-all cursor-pointer group border-l-2 border-transparent hover:border-[#D4AF37]"
+                  onClick={() => setSelectedVisitorId(lead._selectionId)}
+                >
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#000] border border-white/10 flex items-center justify-center text-white font-black uppercase text-sm shadow-lg shadow-[#D4AF37]/5">
+                        {(lead.name || lead["Р†Рј'СЏ"])?.[0] || <User size={18} />}
+                      </div>
+                      <div>
+                        <p className="font-black text-sm tracking-tight">{lead.name || lead["Р†Рј'СЏ"] || 'Anonymous'}</p>
+                        <p className="text-[9px] text-white/10 font-mono tracking-widest mt-1 uppercase">{lead._selectionId.slice(0, 12)}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-xs font-bold text-white/60 tabular-nums">{lead.phone || lead["РўРµР»РµС„РѕРЅ"] || 'вЂ”'}</p>
+                      <p className="text-[10px] text-[#D4AF37] font-bold lowercase tracking-tight">{lead.telegram || lead["Telegram"] || 'вЂ”'}</p>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="space-y-2">
+                      <div className="inline-block px-2.5 py-1 rounded-lg bg-white/[0.03] text-[8px] font-black uppercase tracking-[0.1em] text-white/30 border border-white/5">
+                        {lead.tariff || lead["РўР°СЂРёС„"] || 'FREE'}
+                      </div>
+                      <p className={`text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 ${getStatusColor(lead.status || lead["РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё"])}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current shadow-[0_0_8px_currentColor]" />
+                        {lead.status || lead["РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё"] || 'Pending'}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest italic">{lead.niche || lead["Niche"] || lead["РќС–С€Р°"] || 'вЂ”'}</p>
+                  </td>
+                  <td className="px-8 py-6 text-right">
+                    <div className="flex items-center justify-end gap-5">
+                      {(lead.comment || lead["РљРѕРјРµРЅС‚Р°СЂ"]) && (
+                        <div className="h-6 w-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
+                            <Activity size={10} className="animate-pulse" />
+                        </div>
+                      )}
+                      <div className="h-10 w-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:text-black group-hover:scale-110 transition-all shadow-xl shadow-black/40">
+                        <ChevronRight size={18} />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* User Card Modal */}
+      <AnimatePresence>
+        {selectedVisitorId && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedVisitorId(null)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm" 
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="relative w-full max-w-5xl bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] flex flex-col md:flex-row max-h-[90vh]"
+            >
+              {/* Left Column */}
+              <div className="w-full md:w-[380px] bg-white/[0.02] p-10 flex flex-col border-b md:border-b-0 md:border-r border-white/10 overflow-y-auto">
+                <div className="flex items-center justify-between mb-10">
+                  <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-[#D4AF37] to-[#000] border border-white/20 flex items-center justify-center text-3xl font-black uppercase shadow-2xl shadow-[#D4AF37]/10">
+                    {selectedLead?.["Р†Рј'СЏ"]?.[0] || 'U'}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[8px] uppercase font-black text-white/20 tracking-[0.3em] mb-2">Lead Status</p>
+                    <div className="relative">
+                      <select 
+                        value={selectedLead?.status || selectedLead?.["РЎС‚Р°С‚СѓСЃ РѕРїР»Р°С‚Рё"] || ''} 
+                        disabled={updating}
+                        onChange={(e) => updateLeadStatus(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer focus:outline-none focus:border-[#D4AF37] text-[#D4AF37] w-full text-center"
+                      >
+                        <option value="РћРїР»Р°С‡РµРЅРѕ" className="bg-[#1a1c1c]">Paid Full</option>
+                        <option value="Р‘СЂРѕРЅСЊ" className="bg-[#1a1c1c]">Booked (1000в‚ґ)</option>
+                        <option value="РќРµ РѕРїР»Р°С‡РµРЅРѕ" className="bg-[#1a1c1c]">Unpaid</option>
+                        <option value="Р’С–РґС…РёР»РµРЅРѕ" className="bg-[#1a1c1c]">Rejected</option>
+                        <option value="" className="bg-[#1a1c1c]">Pending</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="text-3xl font-black uppercase leading-none tracking-tighter font-headline mb-3">{selectedLead?.name || selectedLead?.["Р†Рј'СЏ"] || 'Anonymous'}</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {selectedLead?._allSheets.map(s => (
+                            <span key={s} className="px-2 py-0.5 rounded bg-white/5 text-[7px] font-black uppercase tracking-widest text-white/20 border border-white/5">{s}</span>
+                        ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    <InfoRow icon={<Phone size={14} />} label="Phone Number" value={selectedLead?.phone || selectedLead?.["РўРµР»РµС„РѕРЅ"] || 'вЂ”'} isCopyable color="text-white/80" />
+                    <InfoRow icon={<Send size={14} />} label="Telegram Handle" value={selectedLead?.telegram || selectedLead?.["Telegram"] || 'вЂ”'} isTelegram color="text-[#D4AF37]" />
+                    <InfoRow icon={<Tag size={14} />} label="Active Offer" value={selectedLead?.tariff || selectedLead?.["РўР°СЂРёС„"] || 'вЂ”'} />
+                    <InfoRow icon={<Activity size={14} />} label="Niche / Expertise" value={selectedLead?.niche || selectedLead?.["РќС–С€Р°"] || 'вЂ”'} italic />
+                  </div>
+
+                  <div className="pt-10 border-t border-white/5">
+                    <p className="text-[9px] uppercase font-black text-white/20 mb-4 tracking-[0.3em]">Management Notes</p>
+                    <div className="relative group">
+                      <textarea 
+                        value={localComment}
+                        onChange={(e) => setLocalComment(e.target.value)}
+                        placeholder="Add private lead notes..."
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-5 text-xs text-white/80 focus:outline-none focus:border-[#D4AF37] min-h-[160px] resize-none transition-all placeholder:text-white/5 font-medium"
+                      />
+                      <button 
+                        onClick={saveComment}
+                        disabled={savingComment || localComment === (selectedLead?.comment || selectedLead?.["РљРѕРјРµРЅС‚Р°СЂ"] || '')}
+                        className="absolute bottom-4 right-4 px-5 py-2.5 bg-[#D4AF37] text-black text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 group-focus-within:opacity-100 disabled:opacity-0 transition-all shadow-xl shadow-[#D4AF37]/20"
+                      >
+                        {savingComment ? 'Saving...' : 'Save Notes'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: History */}
+              <div className="flex-1 p-10 overflow-y-auto bg-black/40">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20">
+                    <History size={20} />
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-widest font-headline">Activity Stream</h3>
+                </div>
+
+                <div className="space-y-8 relative">
+                  <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/5" />
+
+                  {([...visitorTraffic, ...leads.filter(l => {
+                    const phone = normalizePhone(l.phone || l["РўРµР»РµС„РѕРЅ"]);
+                    const tg = normalizeTg(l.telegram || l["Telegram"]);
+                    const identifier = phone || tg || l.visitorId || l["Visitor ID"];
+                    return identifier === selectedVisitorId;
+                  })] as any[])
+                    .sort((a, b) => new Date(b.date || b["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime() - new Date(a.date || a["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"] || 0).getTime())
+                    .map((event, i) => {
+                      const isLead = event._sheet;
+                      return (
+                        <div key={i} className="relative pl-12 group/event">
+                          <div className={`absolute left-0 top-1 h-10 w-10 rounded-2xl border border-white/5 flex items-center justify-center z-10 transition-all ${isLead ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/20' : 'bg-[#111] text-white/10 group-hover/event:text-white/30'}`}>
+                            {isLead ? <CreditCard size={14} /> : <MousePointer2 size={14} />}
+                          </div>
+                          <div>
+                            <p className="text-[8px] text-white/10 font-black mb-2 uppercase tracking-[0.2em]">{formatDate(event.date || event["Р”Р°С‚Р° С‚Р° С‡Р°СЃ"])}</p>
+                            {isLead ? (
+                              <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 hover:border-[#D4AF37]/20 transition-all">
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="font-black text-[10px] uppercase tracking-widest">Lead Created: {event._sheet}</p>
+                                    <span className="text-[10px] font-black text-[#D4AF37] tabular-nums">{event.amount || event["РЎСѓРјР°"] || 'вЂ”'}</span>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                  <div className="flex items-center gap-2 text-[9px] font-black text-white/40 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-md">
+                                    <Tag size={10} /> {event.tariff || event["РўР°СЂРёС„"] || 'вЂ”'}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-[9px] font-black text-white/40 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-md">
+                                    <Activity size={10} /> {event.niche || event["РќС–С€Р°"] || 'вЂ”'}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-between group py-2">
+                                <div>
+                                  <p className="font-bold text-xs text-white/30">Viewed Page: <span className="text-white/60">{event.path || event["РЁР»СЏС…"]}</span></p>
+                                  <p className="text-[8px] text-white/5 font-mono mt-1.5 uppercase tracking-tighter">Source: {event.utm_source || 'Direct'} / IP: {event.ip || 'Hidden'}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                  {(visitorTraffic.length === 0 && !selectedLead) && (
+                    <div className="flex flex-col items-center justify-center py-24 text-white/5">
+                      <History size={60} className="mb-6 opacity-5" />
+                      <p className="font-black uppercase tracking-[0.4em] text-[10px]">No Data Stream</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, sub }: { icon: React.ReactNode, label: string, value: string | number, sub: string }) {
+  return (
+    <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] relative overflow-hidden group hover:bg-white/[0.07] transition-all">
+      <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
+        {icon}
+      </div>
+      <div className="mb-4 flex items-center gap-3">
+        <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center">
+          {icon}
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">{label}</span>
+      </div>
+      <div className="flex items-baseline gap-2">
+        <p className="text-3xl font-black font-headline tracking-tighter">{value}</p>
+        <p className="text-[9px] font-bold text-white/10 uppercase tracking-widest">{sub}</p>
+      </div>
+    </div>
+  );
+}
+
+function InfoRow({ 
+  icon, 
+  label, 
+  value, 
+  color = "text-white/50", 
+  isCopyable = false,
+  isTelegram = false,
+  italic = false
+}: { 
+  icon: React.ReactNode, 
+  label: string, 
+  value: string | number, 
+  color?: string,
+  isCopyable?: boolean,
+  isTelegram?: boolean,
+  italic?: boolean
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (value && value !== 'вЂ”') {
+      navigator.clipboard.writeText(value.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const tgLink = isTelegram && value && value !== 'вЂ”' 
+    ? `https://t.me/${value.toString().replace('@', '').trim()}` 
+    : null;
+
+  return (
+    <div className="flex items-start gap-4 group/info">
+      <div className="text-white/10 mt-1">{icon}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[7px] uppercase font-black text-white/10 tracking-[0.2em] mb-1">{label}</p>
+        <div className="flex items-center gap-2">
+          {tgLink ? (
+            <a href={tgLink} target="_blank" rel="noopener noreferrer" className={`text-[11px] font-bold ${color} hover:text-[#D4AF37] transition-colors truncate`}>
+              {value}
+            </a>
+          ) : (
+            <p className={`text-[11px] font-bold ${color} truncate ${italic ? 'italic font-medium' : ''}`}>{value}</p>
+          )}
+
+          {isCopyable && value && value !== 'вЂ”' && (
+            <button onClick={handleCopy} className="opacity-0 group-hover/info:opacity-100 transition-opacity">
+              {copied ? <Check size={10} className="text-[#D4AF37]" /> : <Copy size={10} className="text-white/10" />}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterSelect({ label, value, onChange, options }: { label: string, value: string, onChange: (v: string) => void, options: { v: string, l: string }[] }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="text-[8px] uppercase font-black text-white/20 tracking-widest ml-1">{label}</p>
+      <select 
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="bg-white/[0.03] border border-white/10 rounded-xl py-2.5 px-4 focus:outline-none focus:border-[#D4AF37] text-[10px] font-black uppercase tracking-widest text-white/60 appearance-none cursor-pointer hover:bg-white/[0.05] transition-all min-w-[120px]"
+      >
+        {options.map(o => (
+          <option key={o.v} value={o.v} className="bg-[#0a0a0a]">{o.l}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
