@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency: reqCurrency, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl } = await request.json();
+    const { amount, currency: reqCurrency, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl, targetSheet } = await request.json();
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -71,6 +71,33 @@ export async function POST(request: Request) {
       returnUrl: returnUrl,
     };
 
+    // CRM Logging & UUID Generation
+    let uuid = null;
+    const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
+    if (GOOGLE_SCRIPT_CRM) {
+      try {
+        const res = await fetch(GOOGLE_SCRIPT_CRM, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'log_lead',
+            target_sheet: targetSheet || "Бронювання",
+            orderId: orderReference,
+            name: customerName,
+            phone: customerPhone,
+            amount: amount,
+            tariff: tariffName,
+            status: "⏳ Очікується оплата",
+            api_key: process.env.SHEETS_API_KEY
+          })
+        });
+        const resData = await res.json();
+        if (resData.uuid) uuid = resData.uuid;
+      } catch (err) {
+        console.error('CRM logging failed:', err);
+      }
+    }
+
     // Telegram Notification
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -96,7 +123,7 @@ export async function POST(request: Request) {
       }).catch(err => console.error('Telegram notification failed:', err));
     }
 
-    return NextResponse.json(paymentData);
+    return NextResponse.json({ ...paymentData, uuid });
   } catch (error) {
     console.error('WFP Error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

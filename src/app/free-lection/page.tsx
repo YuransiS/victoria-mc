@@ -153,11 +153,15 @@ export default function FreeLectionPage() {
     localStorage.setItem('lead_social', data.social || '');
 
     try {
-      await fetch('/api/lead', {
+      const response = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+      const resData = await response.json();
+      if (resData.uuid) {
+        localStorage.setItem('lead_uuid', resData.uuid);
+      }
       window.location.href = BOT_REDIRECT_URL;
     } catch (err) {
       console.error(err);

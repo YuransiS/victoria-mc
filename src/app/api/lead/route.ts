@@ -104,22 +104,31 @@ export async function POST(req: Request) {
     }
 
     // 2. Google Sheets Tasks
-    submissions.forEach(sub => {
-      tasks.push(
-        fetch(sub.url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sub.body),
-          signal: AbortSignal.timeout(30000)
-        })
-        .catch(err => console.error(`Sheets submission failed for ${sub.url}:`, err))
-      );
+    const results = await Promise.allSettled(
+      submissions.map(async (sub) => {
+        try {
+          const res = await fetch(sub.url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sub.body),
+            signal: AbortSignal.timeout(30000)
+          });
+          return await res.json();
+        } catch (err) {
+          console.error(`Sheets submission failed for ${sub.url}:`, err);
+          throw err;
+        }
+      })
+    );
+
+    let uuid = null;
+    results.forEach(res => {
+      if (res.status === 'fulfilled' && res.value?.uuid) {
+        uuid = res.value.uuid;
+      }
     });
 
-    // Run both in parallel
-    await Promise.allSettled(tasks);
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, uuid });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });

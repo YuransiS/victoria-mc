@@ -20,6 +20,12 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   const [activeUsers, setActiveUsers] = useState(4);
 
   useEffect(() => {
+    // Load saved data from localStorage
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
+    if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
+
     // Randomly fluctuate active users count to look "live"
     const interval = setInterval(() => {
       setActiveUsers(prev => {
@@ -32,8 +38,11 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: "" }));
+    // Persist on the fly
+    localStorage.setItem(`lead_${name}`, value);
   };
 
   const validate = () => {
@@ -88,16 +97,24 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       currency: "UAH",
       ...utmData
     });
+
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/lead', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           ...formData,
           ...utmData,
-          target_sheet_id: "70777205"
+          target_sheet: "Masterclass_Leads" // Set a descriptive sheet name
         }),
       });
+      const resData = await res.json();
+      if (resData.uuid) {
+        localStorage.setItem('lead_uuid', resData.uuid);
+      }
+      // Also ensure fields are saved
+      localStorage.setItem('lead_name', formData.name);
+      localStorage.setItem('lead_phone', formData.phone);
     } catch (error) {
       console.error("Submission error:", error);
     }

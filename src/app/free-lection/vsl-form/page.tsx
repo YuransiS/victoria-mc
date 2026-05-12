@@ -178,7 +178,16 @@ export default function StvoryuiPage() {
         }),
       });
 
+      const resData = await response.json();
+
       if (response.ok) {
+        // Save to localStorage for cross-page persistence
+        localStorage.setItem('lead_name', data.name);
+        localStorage.setItem('lead_phone', fullPhone);
+        localStorage.setItem('lead_social', data.social || '');
+        if (resData.uuid) {
+          localStorage.setItem('lead_uuid', resData.uuid);
+        }
         // Track Facebook Lead event
         trackFBEvent('Lead', {
           content_name: 'Анкета СТВОРЮЙ',

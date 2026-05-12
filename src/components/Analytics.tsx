@@ -67,13 +67,23 @@ const AnalyticsInner = () => {
     
     localStorage.setItem('journey', JSON.stringify(journey));
 
-    // 4. Log to Backend (Anonymous & Real-time)
+    // 4. User Identity for Cross-Page Tracking
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
+    const uuid = localStorage.getItem('lead_uuid');
+
+    // 5. Log to Backend (Identified if data exists)
     fetch('/api/analytics/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         visitorId,
+        uuid,
         path: pathname,
+        name: savedName,
+        phone: savedPhone,
+        social: savedSocial,
         utms: hasUtms ? utms : JSON.parse(localStorage.getItem('last_utms') || '{}')
       })
     }).catch(() => {});

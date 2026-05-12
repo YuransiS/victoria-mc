@@ -31,6 +31,7 @@ function doPost(e) {
     if (action === 'update_status') return updateLeadField(data, "status");
     if (action === 'update_comment') return updateLeadField(data, "comment");
     if (action === 'update_global_user') return updateGlobalUser(data);
+    if (action === 'update_payment_status') return updatePaymentStatus(data);
 
     return handleLegacyLeadLogging(data);
 
@@ -252,7 +253,7 @@ function handleLegacyLeadLogging(data) {
       sheet.getRange(rowToUpdate, statusIdx + 1).setValue(data.status || data.transactionStatus);
       logGlobalAction(uuid, "Status Update", rawSheetName, {status: data.status || data.transactionStatus});
     }
-    return createSuccessResponse("Updated legacy lead");
+    return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Updated legacy lead", uuid: uuid})).setMimeType(ContentService.MimeType.JSON);
   } 
   
   const timestamp = Utilities.formatDate(new Date(), "Europe/Kiev", "dd.MM.yyyy HH:mm:ss");
@@ -287,7 +288,7 @@ function handleLegacyLeadLogging(data) {
   }
   
   sheet.appendRow(newRow);
-  return createSuccessResponse("New legacy lead logged");
+  return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "New legacy lead logged", uuid: uuid})).setMimeType(ContentService.MimeType.JSON);
 }
 
 function updateLeadField(data, fieldType) {
@@ -483,6 +484,53 @@ function getAdminData() {
   });
   
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function updatePaymentStatus(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const orderId = (data.orderId || "").toString().trim();
+  if (!orderId) return createErrorResponse("No OrderID provided");
+
+  const sheets = ss.getSheets();
+  let found = false;
+  let uuid = "";
+  
+  for (let s = 0; s < sheets.length; s++) {
+    const currentSheet = sheets[s];
+    const name = currentSheet.getName();
+    if (name === "System_Logs" || name === "Errors" || name === "Global_Users" || name === "Global_Actions" || name === "Traffic") continue;
+    
+    const dataRange = currentSheet.getDataRange().getValues();
+    const headers = dataRange[0];
+    
+    let orderIdIdx = -1, statusIdx = -1, uuidIdx = -1;
+    headers.forEach((h, i) => {
+      const lowH = h.toString().toLowerCase();
+      if (lowH.includes("orderid") || lowH.includes("номер замовлення") || lowH.includes("visitor id")) orderIdIdx = i;
+      if (lowH.includes("статус")) statusIdx = i;
+      if (lowH === "uuid") uuidIdx = i;
+    });
+    
+    if (orderIdIdx === -1) continue;
+    
+    for (let i = 1; i < dataRange.length; i++) {
+      if ((dataRange[i][orderIdIdx] || "").toString().trim() === orderId) {
+        if (statusIdx !== -1) {
+          currentSheet.getRange(i + 1, statusIdx + 1).setValue(data.status);
+          found = true;
+        }
+        if (uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
+        if (found) break;
+      }
+    }
+    if (found) {
+       if (uuid) logGlobalAction(uuid, "Payment Success", name, { orderId: orderId, status: data.status });
+       break;
+    }
+  }
+  
+  if (found) return createSuccessResponse("Payment status updated across sheets");
+  return createErrorResponse("Lead with OrderID not found");
 }
 
 function createSuccessResponse(message) {

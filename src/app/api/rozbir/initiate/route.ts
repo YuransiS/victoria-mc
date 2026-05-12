@@ -23,6 +23,37 @@ export async function POST(req: Request) {
     const amountStr = String(amount);
 
     // 1. Log Lead to Google Sheets
+    let uuid = null;
+    const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
+
+    if (GOOGLE_SCRIPT_CRM) {
+      try {
+        const res = await fetch(GOOGLE_SCRIPT_CRM, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'log_lead',
+            target_sheet: "Ленд 3",
+            orderId: orderReference,
+            name,
+            social,
+            phone,
+            amount,
+            utm_source: utm_source || '',
+            utm_medium: utm_medium || '',
+            utm_campaign: utm_campaign || '',
+            utm_content: utm_content || '',
+            utm_term: utm_term || '',
+            api_key: SHEETS_API_KEY
+          })
+        });
+        const resData = await res.json();
+        if (resData.uuid) uuid = resData.uuid;
+      } catch (err) {
+        console.error('CRM logging failed:', err);
+      }
+    }
+
     if (GOOGLE_SCRIPT_URL) {
       const leadData = {
         target_sheet: "Ленд 3",
@@ -46,7 +77,7 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadData)
-      }).catch(err => console.error('Lead logging failed:', err));
+      }).catch(err => console.error('Stvoryui logging failed:', err));
     }
 
     // 2. Generate WayForPay Signature
@@ -89,7 +120,7 @@ export async function POST(req: Request) {
       serviceUrl: `${currentDomain}/api/payment-callback`
     };
 
-    return NextResponse.json(paymentData);
+    return NextResponse.json({ ...paymentData, uuid });
 
   } catch (error) {
     console.error('Initiate Error:', error);

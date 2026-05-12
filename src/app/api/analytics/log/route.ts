@@ -5,7 +5,7 @@ const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { visitorId, path, utms } = body;
+    const { visitorId, path, utms, name, phone, social, uuid } = body;
 
     // Log to Google Sheets via central script
     if (GOOGLE_SCRIPT_URL) {
@@ -17,6 +17,10 @@ export async function POST(req: Request) {
           action: 'log_traffic',
           api_key: process.env.SHEETS_API_KEY,
           visitorId,
+          uuid,
+          name,
+          phone,
+          social,
           path,
           utm_source: utms?.utm_source || '',
           utm_medium: utms?.utm_medium || '',

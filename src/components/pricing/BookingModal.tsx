@@ -43,31 +43,35 @@ export const BookingModal = ({
 
   const [isTestMode, setIsTestMode] = useState(false);
 
-  // Restore data from session storage on mount
+  // Restore data from localStorage on mount
   useEffect(() => {
-    const saved = sessionStorage.getItem('savedFormData');
-    if (saved) {
-      try {
-        setFormData(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse saved form data");
-      }
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
+    
+    if (savedName || savedPhone || savedSocial) {
+      setFormData(prev => ({
+        ...prev,
+        name: savedName || prev.name,
+        phone: savedPhone || prev.phone,
+        telegram: savedSocial || prev.telegram
+      }));
     }
 
     // Auto-open if coming from a retry
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('retry') === 'payment' && !isOpen) {
-      // Note: This logic depends on how the parent opens the modal
-      // For now, we just ensure data is there.
+      // Logic for retry can be handled by parent
     }
   }, []);
 
-  // Sync data to session storage
+  // Sync data to localStorage
   useEffect(() => {
-    if (formData.name || formData.phone || formData.telegram) {
-      sessionStorage.setItem('savedFormData', JSON.stringify(formData));
-    }
-    // Also save context
+    if (formData.name) localStorage.setItem('lead_name', formData.name);
+    if (formData.phone) localStorage.setItem('lead_phone', formData.phone);
+    if (formData.telegram) localStorage.setItem('lead_social', formData.telegram);
+    
+    // Also save context for retry logic
     if (tariffName) {
       sessionStorage.setItem('lastTariffName', tariffName);
       sessionStorage.setItem('lastAmount', amount.toString());
@@ -159,13 +163,14 @@ export const BookingModal = ({
     };
 
     try {
-      // 1. Create Payment first to get the Order ID
+      // 1. Create Payment first to get the Order ID and UUID
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
           currency,
+          targetSheet: targetSheetName || "Бронювання",
           successUrl,
           failUrl
         })
@@ -179,24 +184,15 @@ export const BookingModal = ({
         return;
       }
 
-      // 2. Track Lead to Google Sheets (via secure proxy)
-      fetch('/api/leads', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: formData.name + (isTestMode ? " (TEST)" : ""),
-          phone: sanitizedPhone,
-          tariff: tariffName,
-          amount: actualAmount,
-          currency: currency,
-          order_id: paymentData.orderReference, // Linked ID
-          target_sheet_id: "1127634999", 
-          target_sheet_name: targetSheetName,
-          ...utmData
-        }),
-      }).catch(e => console.error("Lead log error:", e));
+      // Save user identification for cross-page persistence
+      localStorage.setItem('lead_name', formData.name);
+      localStorage.setItem('lead_phone', sanitizedPhone);
+      localStorage.setItem('lead_social', formData.telegram);
+      if (paymentData.uuid) {
+        localStorage.setItem('lead_uuid', paymentData.uuid);
+      }
       
-      // 2.5 Track Lead to Facebook
+      // 2. Track Lead to Facebook
       trackFBEvent("Lead", { 
         content_name: tariffName, 
         value: actualAmount, 

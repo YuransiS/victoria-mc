@@ -22,6 +22,12 @@ export function PracticumHeroForm({
   const [activeUsers, setActiveUsers] = useState(7);
 
   useEffect(() => {
+    // Load saved data
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
+    if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
+
     const interval = setInterval(() => {
       setActiveUsers(prev => {
         const change = Math.random() > 0.5 ? 1 : -1;
@@ -33,8 +39,11 @@ export function PracticumHeroForm({
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: "" }));
+    // Persist on the fly
+    localStorage.setItem(`lead_${name === 'telegram' ? 'social' : name}`, value);
   };
 
   const validate = () => {
@@ -89,7 +98,8 @@ export function PracticumHeroForm({
       customerPhone: sanitizedPhone,
       telegram: formData.telegram,
       amount: amount,
-      tariffName: tariffName
+      tariffName: tariffName,
+      targetSheet: "Практикум"
     };
 
     try {
@@ -112,21 +122,13 @@ export function PracticumHeroForm({
         return;
       }
 
-      // 2. Track Lead
-      fetch('/api/leads', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: formData.name,
-          phone: sanitizedPhone,
-          tariff: tariffName,
-          amount: amount,
-          order_id: paymentData.orderReference,
-          target_sheet_id: "1127634999", 
-          target_sheet_name: "Практикум",
-          ...utmData
-        }),
-      }).catch(e => console.error("Lead log error:", e));
+      // Save to localStorage for cross-page persistence
+      localStorage.setItem('lead_name', formData.name);
+      localStorage.setItem('lead_phone', sanitizedPhone);
+      localStorage.setItem('lead_social', formData.telegram);
+      if (paymentData.uuid) {
+        localStorage.setItem('lead_uuid', paymentData.uuid);
+      }
 
       sessionStorage.setItem('paymentAttempted', 'true');
       sessionStorage.setItem('lastOrderId', paymentData.orderReference);

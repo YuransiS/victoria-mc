@@ -222,6 +222,10 @@ export default function RozbirPage() {
       localStorage.setItem('purchase_price', String(currentPriceObj.current));
       localStorage.setItem('lead_name', data.name);
       localStorage.setItem('lead_phone', fullPhone);
+      localStorage.setItem('lead_social', data.social || '');
+      if (paymentData.uuid) {
+        localStorage.setItem('lead_uuid', paymentData.uuid);
+      }
 
       trackFBEvent('Lead', {
         value: currentPriceObj.current,
