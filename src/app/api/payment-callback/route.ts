@@ -35,7 +35,35 @@ export async function POST(request: Request) {
       }).catch(err => console.error('Sheet update error:', err));
     }
 
-    // 2. Respond to WayForPay with 'accept'
+    // 2. Telegram Notification for Success
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const topicId = process.env.TOPIC_ID;
+
+    if (token && chatId && (transactionStatus === 'Approved' || transactionStatus === 'Settled')) {
+      const clientName = data.clientName || data.clientFirstName || '-';
+      const clientPhone = data.phone || data.clientPhone || '-';
+      
+      const message = `✅ <b>ОПЛАТА УСПІШНА!</b>\n\n` +
+        `👤 <b>Клієнт:</b> ${clientName}\n` +
+        `📞 <b>Телефон:</b> ${clientPhone}\n` +
+        `💰 <b>Сума:</b> ${amount} ${data.currency || 'UAH'}\n` +
+        `🆔 <b>ID:</b> <code>${orderReference}</code>\n` +
+        `💳 <b>Система:</b> ${data.paymentSystem || '-'}`;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_thread_id: topicId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      }).catch(err => console.error('Telegram notification failed:', err));
+    }
+
+    // 3. Respond to WayForPay with 'accept'
     const time = Math.floor(Date.now() / 1000);
     const responseSignatureData = [orderReference, 'accept', time].join(';');
     const merchantSecretKey = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim() || "";

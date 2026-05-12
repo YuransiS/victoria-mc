@@ -71,6 +71,31 @@ export async function POST(request: Request) {
       returnUrl: returnUrl,
     };
 
+    // Telegram Notification
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const topicId = process.env.TOPIC_ID;
+
+    if (token && chatId) {
+      const message = `⏳ <b>Очікується оплата (Бронь)</b>\n\n` +
+        `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
+        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n` +
+        `📦 <b>Тариф:</b> ${tariffName}\n` +
+        `💰 <b>Сума:</b> ${amount} ${currency}\n` +
+        `🆔 <b>ID:</b> <code>${orderReference}</code>`;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_thread_id: topicId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      }).catch(err => console.error('Telegram notification failed:', err));
+    }
+
     return NextResponse.json(paymentData);
   } catch (error) {
     console.error('WFP Error:', error);
