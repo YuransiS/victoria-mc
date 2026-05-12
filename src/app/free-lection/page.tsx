@@ -13,7 +13,6 @@ interface FormData {
   social: string;
 }
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSaSkvHXzOlz-7N1eQQWW8Rt7k-dWSNoZrTmcZ0TMOUg7n6VGPDTyK66ed2eD1Uk6f/exec';
 const BOT_REDIRECT_URL = 'https://t.me/victoriameshcheriakova_bot?start=6979295699cc89ca5d0f02d5';
 
 export default function FreeLectionPage() {
@@ -25,7 +24,7 @@ export default function FreeLectionPage() {
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const itiRef = useRef<any>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
 
   useEffect(() => {
     trackFBEvent('PageView', {});
@@ -49,20 +48,26 @@ export default function FreeLectionPage() {
   }, []);
 
   useEffect(() => {
+    let active = true;
     if (phoneInputRef.current && !itiRef.current) {
       itiRef.current = intlTelInput(phoneInputRef.current, {
         initialCountry: "auto",
         geoIpLookup: (callback: (countryCode: string) => void) => {
           fetch("https://get.geojs.io/v1/ip/country.json")
             .then(res => res.json())
-            .then(data => callback(data.country))
-            .catch(() => callback("ua"));
+            .then(data => {
+               if (active) callback(data.country);
+            })
+            .catch(() => {
+               if (active) callback("ua");
+            });
         },
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/26.9.2/js/utils.js",
         separateDialCode: true,
       } as any);
     }
     return () => {
+      active = false;
       if (itiRef.current) {
         itiRef.current.destroy();
         itiRef.current = null;
@@ -88,6 +93,27 @@ export default function FreeLectionPage() {
     }
   };
 
+  useEffect(() => {
+    // Load saved data
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
+
+    if (savedName) setValue('name', savedName);
+    if (savedSocial) setValue('social', savedSocial);
+    
+    // Restore phone with delay to ensure iti is initialized
+    if (savedPhone && phoneInputRef.current) {
+      setTimeout(() => {
+        if (itiRef.current) {
+          itiRef.current.setNumber(savedPhone);
+        } else {
+          phoneInputRef.current!.value = savedPhone;
+        }
+      }, 500);
+    }
+  }, []);
+
   const onSubmit = async (data: FormData) => {
     setLoading(true);
 
@@ -98,6 +124,11 @@ export default function FreeLectionPage() {
     if (!fullPhone && phoneInputRef.current) {
       fullPhone = phoneInputRef.current.value.trim();
     }
+
+    // Save to localStorage
+    localStorage.setItem('lead_name', data.name);
+    localStorage.setItem('lead_phone', fullPhone);
+    localStorage.setItem('lead_social', data.social || '');
 
     const params = new URLSearchParams(window.location.search);
     const utms = {
@@ -112,14 +143,18 @@ export default function FreeLectionPage() {
       name: data.name,
       phone: fullPhone,
       social: data.social,
-      sheetName: 'Ленд 1',
+      target_sheet: 'Ленд 1',
       ...utms
     };
 
+    // Final save before submission
+    localStorage.setItem('lead_name', data.name);
+    localStorage.setItem('lead_phone', fullPhone);
+    localStorage.setItem('lead_social', data.social || '');
+
     try {
-      await fetch(GOOGLE_SCRIPT_URL, {
+      await fetch('/api/lead', {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
@@ -129,6 +164,11 @@ export default function FreeLectionPage() {
       alert("Помилка відправки. Спробуйте ще раз.");
       setLoading(false);
     }
+  };
+
+  // Helper to save field on the fly
+  const handleFieldChange = (field: string, value: string) => {
+    localStorage.setItem(`lead_${field}`, value);
   };
 
   return (
@@ -511,7 +551,7 @@ export default function FreeLectionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
           </button>
-          <img src={lightboxSrc || ''} className="max-w-[95vw] max-h-[90vh] object-contain shadow-2xl rounded-sm transition-transform duration-200" onClick={e => e.stopPropagation()} />
+          <img src={lightboxSrc || undefined} className="max-w-[95vw] max-h-[90vh] object-contain shadow-2xl rounded-sm transition-transform duration-200" onClick={e => e.stopPropagation()} />
           <p className="absolute bottom-5 text-white/50 text-xs">Натисніть ESC або хрестик, щоб закрити</p>
       </div>
 
@@ -537,17 +577,31 @@ export default function FreeLectionPage() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   {/* Name */}
                   <div>
-                      <input type="text" {...register('name', { required: true })} placeholder="Ваше ім'я" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                      <input type="text" {...register('name', { 
+                        required: true,
+                        onChange: (e) => handleFieldChange('name', e.target.value)
+                      })} placeholder="Ваше ім'я" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
                   </div>
 
                   {/* Phone */}
                   <div>
-                      <input type="tel" {...register('phone_raw', { required: true })} ref={(e) => { register('phone_raw').ref(e); phoneInputRef.current = e; }} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                      <input type="tel" {...register('phone_raw', { 
+                        required: true,
+                        onChange: (e) => {
+                           if (itiRef.current) {
+                               localStorage.setItem('lead_phone', itiRef.current.getNumber());
+                           } else {
+                               localStorage.setItem('lead_phone', e.target.value);
+                           }
+                        }
+                      })} ref={(e) => { register('phone_raw').ref(e); phoneInputRef.current = e; }} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
                   </div>
 
                   {/* Social */}
                   <div>
-                      <input type="text" {...register('social')} placeholder="@Instagram / Telegram" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                      <input type="text" {...register('social', {
+                        onChange: (e) => handleFieldChange('social', e.target.value)
+                      })} placeholder="@Instagram / Telegram" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
                   </div>
 
                   <button type="submit" disabled={loading} className="w-full bg-black text-white py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-[#333] transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed">
