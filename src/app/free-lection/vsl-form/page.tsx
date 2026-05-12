@@ -32,7 +32,52 @@ export default function StvoryuiPage() {
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const itiRef = useRef<any>(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>();
+
+  // Restore data from localStorage
+  useEffect(() => {
+    const savedName = localStorage.getItem('lead_name');
+    const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
+
+    if (savedName) setValue('name', savedName);
+    if (savedSocial) setValue('social', savedSocial);
+    
+    // Restore phone with delay to ensure iti is initialized
+    if (savedPhone) {
+      const timer = setTimeout(() => {
+        if (itiRef.current) {
+          itiRef.current.setNumber(savedPhone);
+        } else if (phoneInputRef.current) {
+          phoneInputRef.current.value = savedPhone;
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [setValue]);
+
+  // Watch and save to localStorage
+  const watchedName = watch('name');
+  const watchedSocial = watch('social');
+  const watchedPhoneRaw = watch('phone_raw');
+
+  useEffect(() => {
+    if (watchedName) localStorage.setItem('lead_name', watchedName);
+  }, [watchedName]);
+
+  useEffect(() => {
+    if (watchedSocial) localStorage.setItem('lead_social', watchedSocial);
+  }, [watchedSocial]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (itiRef.current) {
+        const fullNumber = itiRef.current.getNumber();
+        if (fullNumber) localStorage.setItem('lead_phone', fullNumber);
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [watchedPhoneRaw]);
 
   useEffect(() => {
     trackFBEvent('ViewContent', {
