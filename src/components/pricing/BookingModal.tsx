@@ -170,7 +170,8 @@ export const BookingModal = ({
         body: JSON.stringify({
           ...data,
           ...utmData,
-          currency,
+          currency: isTestMode ? "UAH" : currency,
+          amount: isTestMode ? 1 : actualAmount,
           targetSheet: targetSheetName || "Бронювання",
           successUrl,
           failUrl
