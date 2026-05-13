@@ -30,6 +30,7 @@ export async function POST(request: Request) {
           action: 'update_payment_status',
           order_id: orderReference,
           status: transactionStatus,
+          amount: amount,
           api_key: apiKey
         }),
       }).catch(err => console.error('Sheet update error:', err));

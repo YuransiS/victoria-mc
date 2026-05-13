@@ -20,8 +20,9 @@ export async function POST(req: Request) {
       utm_term: data.utm_term || '-',
     };
 
-    const isVSL = data.target_sheet === 'Ленд2' || data.target_sheet === 'Ленд 2';
-    const formTitle = isVSL ? 'АНКЕТА VSL (СТВОРЮЙ)' : 'ЛЕКЦІЯ (ЛЕНД 1)';
+    const isVSL = data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2';
+    const isVSL1 = data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)';
+    const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : 'ЗАЯВКА');
 
     let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
@@ -60,25 +61,25 @@ export async function POST(req: Request) {
     const submissions: Array<{url: string, body: any}> = [];
     const apiKey = process.env.SHEETS_API_KEY;
 
-    if (data.target_sheet === 'Ленд 1') {
+    if (data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)') {
       // Parallel submission as requested by the user
-      // 1. To google_apps_script_stvoryui.js (primary for Lend 1)
+      // 1. To google_apps_script_stvoryui.js (primary for VSL 1 етап)
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,
-          body: { ...data, ...utms, sheetName: 'Ленд 1', api_key: apiKey }
+          body: { ...data, ...utms, sheetName: 'VSL 1 етап', api_key: apiKey }
         });
       }
       // 2. To google_apps_script.js (Unified CRM) with specific sheet ID
       if (GOOGLE_SCRIPT_URL_MAIN) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_MAIN,
-          body: { ...data, ...utms, sheet_id: '43961418', api_key: apiKey }
+          body: { ...data, ...utms, target_sheet: 'VSL 1 етап', sheet_id: '43961418', api_key: apiKey }
         });
       }
-    } else if (data.target_sheet === 'Ленд2' || data.target_sheet === 'Ленд 2') {
+    } else if (data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2') {
       // Parallel submission for VSL
-      // 1. To google_apps_script_stvoryui.js (primary for Lend 2)
+      // 1. To google_apps_script_stvoryui.js (primary for VSL Form)
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,

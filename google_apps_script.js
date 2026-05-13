@@ -181,6 +181,12 @@ function logTraffic(data) {
 }
 
 function handleLegacyLeadLogging(data) {
+  // Safeguard: Don't log "ghost" leads that have no identifying info
+  const hasIdentity = data.name || data.phone || data.telegram || data.social || data.orderId || data.order_id || data.orderReference || data["Ім'я"] || data["Телефон"];
+  if (!hasIdentity) {
+    return createSuccessResponse("Ignored empty lead");
+  }
+
   const uuid = getOrCreateUser(data);
   data.UUID = uuid;
   
@@ -208,12 +214,14 @@ function handleLegacyLeadLogging(data) {
     sheet = ss.getSheetByName(rawSheetName);
     if (!sheet) {
       sheet = ss.insertSheet(rawSheetName);
-      if (rawSheetName === 'Ленд 1') {
-        sheet.appendRow(["Date", "Name", "Phone", "Social", "UTM Source", "UTM Medium", "UTM Campaign", "UTM Content"]);
+      if (rawSheetName === 'VSL 1 етап') {
+        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Social", "Source", "Medium", "Campaign", "Content", "Term", "UUID"]);
       } else if (rawSheetName === 'VSL Форма') {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Social", "Ніша", "Source", "Medium", "Campaign", "Content", "Term", "OrderID", "UUID"]);
+      } else if (rawSheetName === 'Практикум' || rawSheetName === 'Бронювання') {
+        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус", "Коментар", "UUID"]);
       } else {
-        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус", "UUID"]);
+        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "UUID", "RawData"]);
       }
       sheet.setFrozenRows(1);
     }
@@ -222,6 +230,7 @@ function handleLegacyLeadLogging(data) {
     sheet = ss.getSheetByName("Unsorted_Leads") || ss.insertSheet("Unsorted_Leads");
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "UUID", "RawData"]);
+      sheet.setFrozenRows(1);
     }
   }
   
@@ -250,14 +259,15 @@ function handleLegacyLeadLogging(data) {
 
   if (rowToUpdate !== -1) {
     if ((data.status || data.transactionStatus) && statusIdx !== -1) {
-      sheet.getRange(rowToUpdate, statusIdx + 1).setValue(data.status || data.transactionStatus);
-      logGlobalAction(uuid, "Status Update", rawSheetName, {status: data.status || data.transactionStatus});
+      const finalStatus = formatStatus(data.status || data.transactionStatus, rawSheetName);
+      sheet.getRange(rowToUpdate, statusIdx + 1).setValue(finalStatus);
+      logGlobalAction(uuid, "Status Update", rawSheetName, {status: finalStatus});
     }
     return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Updated legacy lead", uuid: uuid})).setMimeType(ContentService.MimeType.JSON);
   } 
   
   const timestamp = Utilities.formatDate(new Date(), "Europe/Kiev", "dd.MM.yyyy HH:mm:ss");
-  const isFreeLection = (currentSheetName === 'Ленд 1' || String(targetGid) === '43961418');
+  const isFreeLection = (currentSheetName === 'VSL 1 етап' || String(targetGid) === '43961418');
 
   const headerMap = {
     "дата": timestamp, "date": timestamp,
@@ -273,7 +283,7 @@ function handleLegacyLeadLogging(data) {
     "ніша": data.niche || "", "niche": data.niche || "",
     "тариф": data.tariff || "", "сума": data.amount || "", "ціна": data.amount || "",
     "orderid": orderId, "номер заказу": orderId, "номер замовлення": orderId,
-    "статус": isFreeLection ? "" : (data.status || data.transactionStatus || ""),
+    "статус": isFreeLection ? "" : formatStatus(data.status || data.transactionStatus || "", rawSheetName),
     "uuid": uuid
   };
 
@@ -325,7 +335,8 @@ function updateLeadField(data, fieldType) {
         if(uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
         
         if (fieldType === "status" && statusIdx !== -1) {
-          currentSheet.getRange(i + 1, statusIdx + 1).setValue(data.status);
+          const finalStatus = formatStatus(data.status, currentSheet.getName());
+          currentSheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
           found = true;
         } else if (fieldType === "comment") {
           if (commentIdx !== -1) {
@@ -476,7 +487,11 @@ function getAdminData() {
           obj._originalData[h] = data[i][j];
         });
         
-        if (!isTest && (obj.phone || obj.name || obj.telegram || obj.orderId || obj.visitorId || obj.UUID)) {
+        // Fix Anonymous: ensure name has a value if some identifying info exists
+        if (!isTest && (obj.phone || obj.name || obj.telegram || obj.orderId || obj.UUID)) {
+          if (!obj.name || obj.name.toString().trim() === "") {
+            obj.name = obj.phone || obj.telegram || obj.orderId || "Анонім";
+          }
           result.leads.push(obj);
         }
       }
@@ -516,7 +531,8 @@ function updatePaymentStatus(data) {
     for (let i = 1; i < dataRange.length; i++) {
       if ((dataRange[i][orderIdIdx] || "").toString().trim() === orderId) {
         if (statusIdx !== -1) {
-          currentSheet.getRange(i + 1, statusIdx + 1).setValue(data.status);
+          const finalStatus = formatStatus(data.status, name, data.amount);
+          currentSheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
           found = true;
         }
         if (uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
@@ -531,6 +547,36 @@ function updatePaymentStatus(data) {
   
   if (found) return createSuccessResponse("Payment status updated across sheets");
   return createErrorResponse("Lead with OrderID not found");
+}
+
+/**
+ * Maps payment status to human-readable format based on product type
+ */
+function formatStatus(status, sheetName, amount) {
+  if (!status) return "";
+  const s = status.toString().toUpperCase();
+  const amt = parseFloat(amount) || 0;
+  
+  // Successful payment detection
+  const isPaid = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS") || s.includes("ОПЛАЧЕНО") || s.includes("ОПЛАТА");
+  
+  if (isPaid) {
+    // 1. If explicitly Practicum sheet
+    if (sheetName === "Практикум") {
+      return "Купив(-ла) трипвайєр";
+    }
+    
+    // 2. Based on amount (9/39 are tripwires)
+    if (amt === 9 || amt === 39) {
+      return "Купив(-ла) трипвайєр";
+    }
+    
+    // 3. Otherwise "Оплачено" (Course or Booking)
+    // We can assume if it's not a tripwire amount, it's a course/booking
+    return "Оплачено";
+  }
+  
+  return status;
 }
 
 function createSuccessResponse(message) {

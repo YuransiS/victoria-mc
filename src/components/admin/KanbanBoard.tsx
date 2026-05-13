@@ -44,9 +44,12 @@ function SortableLeadCard({ lead, onClick }: any) {
         <div>
           <p className="font-bold text-xs text-white/90 truncate max-w-[140px]">{lead.name || lead["Ім'я"] || 'Anonymous'}</p>
           <div className="flex items-center gap-1 mt-0.5">
-            {lead._tags?.slice(0, 1).map((tag: string) => (
+             {lead._tags?.slice(0, 1).map((tag: string) => (
                 <span key={tag} className="text-[6px] px-1 py-0.5 rounded-sm bg-white/5 border border-white/5 text-white/40 uppercase font-black">{tag}</span>
             ))}
+            {lead._computedStatus === 'Купив(-ла) трипвайєр' && (
+                <span className="text-[6px] px-1 py-0.5 rounded-sm bg-[#C4A47C]/10 border border-[#C4A47C]/20 text-[#C4A47C] uppercase font-black">Tripwire</span>
+            )}
           </div>
         </div>
       </div>
@@ -85,7 +88,7 @@ export default function KanbanBoard({ leads, updateLeadStatus, onLeadClick, glob
        let status = statusMap.get(uuid) || 'Новий';
        
        // Sync with actual financial status automatically if needed
-       if (l._computedStatus === 'Оплачено') status = 'Оплачено';
+       if (l._computedStatus === 'Оплачено' || l._computedStatus === 'Купив(-ла) трипвайєр') status = 'Оплачено';
        if (l._computedStatus === 'Відхилено') status = 'Відмова';
        if (l._computedStatus === 'Заброньовано' && status === 'Новий') status = 'Ждемо оплату';
 

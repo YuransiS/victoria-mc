@@ -108,26 +108,48 @@ export default function AdminDashboard() {
     let revenueUSD = 0;
 
     // Numerical extraction
-    const amountVal = parseFloat(amountStr.replace(/[^0-9.]/g, '')) || 0;
+    const amountVal = parseFloat(amountStr.replace(/[^\d.]/g, '')) || 0;
+    const isPaid = statusRaw.includes('оплачено') || 
+                   statusRaw.includes('approved') || 
+                   statusRaw.includes('success') || 
+                   statusRaw.includes('трипвайєр') || 
+                   statusRaw.includes('тріпваєр') || 
+                   statusRaw.includes('трипвайер');
 
-    if (amountVal === 1000 || statusRaw.includes('бронь') || statusRaw.includes('забронировано') || statusRaw.includes('заброньовано')) {
-      status = 'Заброньовано';
-      weight = 3;
-      revenueUAH = 1000;
-    } else if (amountVal === 9 || amountVal === 39 || statusRaw.includes('трипвайер') || statusRaw.includes('тріпваєр')) {
-      status = 'Купив тріпваєр';
-      weight = 2;
-      revenueUSD = amountVal || (amountRaw.includes('39') ? 39 : 9);
-    } else if (statusRaw.includes('оплачено')) {
+    const isTripwirePrice = amountVal === 9 || amountVal === 39;
+    const isBookingPrice = amountVal === 1000;
+
+    if ((isBookingPrice || statusRaw.includes('бронь') || statusRaw.includes('заброньовано')) && isPaid) {
       status = 'Оплачено';
+      weight = 5;
+      revenueUAH = isBookingPrice ? 1000 : 0;
+    } else if ((isTripwirePrice || statusRaw.includes('трипвайєр') || statusRaw.includes('тріпваєр') || statusRaw.includes('трипвайер')) && isPaid) {
+      status = 'Купив(-ла) трипвайєр';
       weight = 4;
+      revenueUSD = amountVal || (amountRaw.includes('39') ? 39 : 9);
+    } else if (isPaid && amountVal >= 100) {
+      // If amount is 1000 UAH or more (e.g. course payment), it's full Paid
+      status = 'Оплачено';
+      weight = 5;
       if (tariffRaw.includes('ІНДИВІДУАЛЬНИЙ')) revenueUSD = 911;
       else if (tariffRaw.includes('ГРУПОВИЙ')) revenueUSD = 505;
       else if (tariffRaw.includes('САМОСТІЙНИЙ')) revenueUSD = 399;
-      else revenueUSD = amountVal;
+      else {
+        // If it's in UAH (like booking 1000), don't treat as USD
+        if (amountVal === 1000) revenueUAH = 1000;
+        else revenueUSD = amountVal;
+      }
+    } else if (isPaid && (amountVal > 0 || isTripwirePrice)) {
+      status = 'Купив(-ла) трипвайєр';
+      weight = 4;
+      revenueUSD = amountVal || (amountRaw.includes('39') ? 39 : 9);
     } else if (statusRaw.includes('відхилено') || statusRaw.includes('скасовано')) {
       status = 'Відхилено';
       weight = 0;
+    } else if (isPaid) {
+      // General paid status if we couldn't determine type but it's clearly paid
+      status = 'Оплачено';
+      weight = 5;
     }
 
     return { status, weight, revenueUAH, revenueUSD, tariff: tariffRaw, niche: String(lead.niche || lead["Ніша"] || lead["Niche"] || '') };
@@ -135,6 +157,12 @@ export default function AdminDashboard() {
 
   const normalizePhone = (p: any) => p?.toString().replace(/\D/g, '') || '';
   const normalizeTg = (t: any) => t?.toString().toLowerCase().replace('@', '').trim() || '';
+
+  const getSheetName = (name: string) => {
+    if (name === 'VSL 1 етап' || name === 'Ленд 1') return 'VSL Воронка (старт)';
+    if (name === 'VSL Форма' || name === 'Ленд 2') return 'VSL Форма';
+    return name;
+  };
 
   // Process and deduplicate leads
   const processedLeads = useMemo(() => {
@@ -157,7 +185,7 @@ export default function AdminDashboard() {
         _revenueUSD: sData.revenueUSD,
         _tariff: sData.tariff,
         _niche: sData.niche,
-        _allSheets: [l._sheet],
+        _allSheets: [getSheetName(l._sheet)],
         _tags: [] as string[],
         _latestAction: leadDate
       };
@@ -172,8 +200,9 @@ export default function AdminDashboard() {
         if (!existing._tags.includes('Повтор')) existing._tags.push('Повтор');
         
         // Merge sheets
-        if (!existing._allSheets.includes(l._sheet)) {
-          existing._allSheets.push(l._sheet);
+        const mappedSheet = getSheetName(l._sheet);
+        if (!existing._allSheets.includes(mappedSheet)) {
+          existing._allSheets.push(mappedSheet);
         }
         
         // Update latest action if newer
@@ -410,8 +439,7 @@ export default function AdminDashboard() {
             options={[
               { v: 'all', l: 'Всі статуси' },
               { v: 'Оплачено', l: 'Оплачено' },
-              { v: 'Заброньовано', l: 'Бронь' },
-              { v: 'Купив тріпваєр', l: 'Тріпваєр' },
+              { v: 'Купив(-ла) трипвайєр', l: 'Тріпваєр' },
               { v: 'Очікує', l: 'Очікує' }
             ]}
           />
@@ -556,9 +584,8 @@ export default function AdminDashboard() {
                       onChange={(e) => updateLeadStatus(e.target.value)}
                       className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider appearance-none cursor-pointer focus:outline-none focus:border-[#C4A47C] text-[#C4A47C] w-full text-center"
                     >
-                      <option value="Оплачено" className="bg-[#111]">Оплачено</option>
-                      <option value="Заброньовано" className="bg-[#111]">Заброньовано (1000₴)</option>
-                      <option value="Купив тріпваєр" className="bg-[#111]">Тріпваєр ($9/$39)</option>
+                      <option value="Оплачено" className="bg-[#111]">Оплачено (Курс/Бронь)</option>
+                      <option value="Купив(-ла) трипвайєр" className="bg-[#111]">Тріпваєр ($9/$39)</option>
                       <option value="Відхилено" className="bg-[#111]">Відхилено</option>
                       <option value="Очікує" className="bg-[#111]">Очікує</option>
                       </select>
@@ -634,7 +661,7 @@ export default function AdminDashboard() {
                             {isLead ? (
                               <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mt-2">
                                 <div className="flex items-center justify-between">
-                                    <p className="font-bold text-[11px] text-white/80">Заявка: {event._sheet}</p>
+                                    <p className="font-bold text-[11px] text-white/80">Заявка: {getSheetName(event._sheet)}</p>
                                     <span className="text-[11px] font-bold text-[#C4A47C]">{event.amount || event["Сума"] || '—'}</span>
                                 </div>
                               </div>
@@ -803,8 +830,7 @@ LeadRow.displayName = 'LeadRow';
 function getStatusColor(status: string) {
   switch (status) {
     case 'Оплачено': return 'text-[#C4A47C]';
-    case 'Заброньовано': return 'text-amber-400';
-    case 'Купив тріпваєр': return 'text-emerald-400';
+    case 'Купив(-ла) трипвайєр': return 'text-emerald-400';
     case 'Відхилено': return 'text-rose-500';
     default: return 'text-white/40';
   }

@@ -143,7 +143,7 @@ export default function FreeLectionPage() {
       name: data.name,
       phone: fullPhone,
       social: data.social,
-      target_sheet: 'Ленд 1',
+      target_sheet: 'VSL Воронка (старт)',
       ...utms
     };
 
