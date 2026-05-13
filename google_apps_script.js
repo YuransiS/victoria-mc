@@ -219,7 +219,7 @@ function handleLegacyLeadLogging(data) {
       } else if (rawSheetName === 'VSL Форма') {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Social", "Ніша", "Source", "Medium", "Campaign", "Content", "Term", "OrderID", "UUID"]);
       } else if (rawSheetName === 'Практикум' || rawSheetName === 'Бронювання') {
-        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус", "Коментар", "UUID"]);
+        sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус", "Коментар", "UUID", "TG_Msg_ID"]);
       } else {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "UUID", "RawData"]);
       }
@@ -284,7 +284,8 @@ function handleLegacyLeadLogging(data) {
     "тариф": data.tariff || "", "сума": data.amount || "", "ціна": data.amount || "",
     "orderid": orderId, "номер заказу": orderId, "номер замовлення": orderId,
     "статус": isFreeLection ? "" : formatStatus(data.status || data.transactionStatus || "", rawSheetName, data.amount),
-    "uuid": uuid
+    "uuid": uuid,
+    "tg_msg_id": data.tg_msg_id || ""
   };
 
   const newRow = new Array(headers.length).fill("");
@@ -518,12 +519,13 @@ function updatePaymentStatus(data) {
     const dataRange = currentSheet.getDataRange().getValues();
     const headers = dataRange[0];
     
-    let orderIdIdx = -1, statusIdx = -1, uuidIdx = -1;
+    let orderIdIdx = -1, statusIdx = -1, uuidIdx = -1, tgMsgIdIdx = -1;
     headers.forEach((h, i) => {
       const lowH = h.toString().toLowerCase();
       if (lowH.includes("orderid") || lowH.includes("номер замовлення") || lowH.includes("visitor id")) orderIdIdx = i;
       if (lowH.includes("статус")) statusIdx = i;
       if (lowH === "uuid") uuidIdx = i;
+      if (lowH === "tg_msg_id" || lowH === "tg msg id") tgMsgIdIdx = i;
     });
     
     if (orderIdIdx === -1) continue;
@@ -536,16 +538,18 @@ function updatePaymentStatus(data) {
           found = true;
         }
         if (uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
+        if (tgMsgIdIdx !== -1) foundTgMsgId = dataRange[i][tgMsgIdIdx];
         if (found) break;
       }
     }
+    let foundTgMsgId = "";
     if (found) {
        if (uuid) logGlobalAction(uuid, "Payment Success", name, { orderId: orderId, status: data.status });
        break;
     }
   }
   
-  if (found) return createSuccessResponse("Payment status updated across sheets");
+  if (found) return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Payment status updated", tg_msg_id: foundTgMsgId})).setMimeType(ContentService.MimeType.JSON);
   return createErrorResponse("Lead with OrderID not found");
 }
 

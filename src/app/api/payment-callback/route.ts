@@ -22,18 +22,27 @@ export async function POST(request: Request) {
     const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
     const apiKey = process.env.SHEETS_API_KEY;
 
+    let tgMsgId = null;
     if (scriptUrl) {
-      await fetch(scriptUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: 'update_payment_status',
-          order_id: orderReference,
-          status: transactionStatus,
-          amount: amount,
-          api_key: apiKey
-        }),
-      }).catch(err => console.error('Sheet update error:', err));
+      try {
+        const res = await fetch(scriptUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            action: 'update_payment_status',
+            order_id: orderReference,
+            status: transactionStatus,
+            amount: amount,
+            api_key: apiKey
+          }),
+        });
+        const resData = await res.json();
+        if (resData.tg_msg_id) {
+          tgMsgId = resData.tg_msg_id;
+        }
+      } catch (err) {
+        console.error('Sheet update error:', err);
+      }
     }
 
     // 2. Telegram Notification for Success
@@ -52,15 +61,23 @@ export async function POST(request: Request) {
         `🆔 <b>ID:</b> <code>${orderReference}</code>\n` +
         `💳 <b>Система:</b> ${data.paymentSystem || '-'}`;
 
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      const tgMethod = tgMsgId ? 'editMessageText' : 'sendMessage';
+      const tgPayload: any = {
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML',
+      };
+      
+      if (tgMsgId) {
+        tgPayload.message_id = tgMsgId;
+      } else {
+        tgPayload.message_thread_id = topicId;
+      }
+
+      await fetch(`https://api.telegram.org/bot${token}/${tgMethod}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_thread_id: topicId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
+        body: JSON.stringify(tgPayload),
       }).catch(err => console.error('Telegram notification failed:', err));
     }
 

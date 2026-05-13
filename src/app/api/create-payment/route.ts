@@ -88,6 +88,45 @@ export async function POST(request: Request) {
       returnUrl: returnUrl,
     };
 
+    // Telegram Notification
+    let tgMsgId = null;
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const topicId = process.env.TOPIC_ID;
+
+    if (token && chatId) {
+      const isPracticum = targetSheet === "Практикум";
+      const title = isPracticum ? "⏳ <b>Очікується оплата (Практикум)</b>" : "⏳ <b>Очікується оплата (Бронь)</b>";
+      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
+
+      const message = `${title}\n\n` +
+        `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
+        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n` +
+        `📦 <b>Тариф:</b> ${tariffName}\n` +
+        `💰 <b>Сума:</b> ${amount} ${currency}\n` +
+        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
+        utmInfo;
+
+      try {
+        const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            message_thread_id: topicId,
+            text: message,
+            parse_mode: 'HTML',
+          }),
+        });
+        const tgData = await tgRes.json();
+        if (tgData.result?.message_id) {
+          tgMsgId = tgData.result.message_id;
+        }
+      } catch (err) {
+        console.error('Telegram notification failed:', err);
+      }
+    }
+
     // CRM Logging & UUID Generation
     let uuid = null;
     const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
@@ -113,6 +152,7 @@ export async function POST(request: Request) {
             utm_content,
             utm_term,
             full_url,
+            tg_msg_id: tgMsgId,
             api_key: process.env.SHEETS_API_KEY
           })
         });
@@ -121,37 +161,6 @@ export async function POST(request: Request) {
       } catch (err) {
         console.error('CRM logging failed:', err);
       }
-    }
-
-    // Telegram Notification
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    const topicId = process.env.TOPIC_ID;
-
-    if (token && chatId) {
-      const isPracticum = targetSheet === "Практикум";
-      const title = isPracticum ? "⏳ <b>Очікується оплата (Практикум)</b>" : "⏳ <b>Очікується оплата (Бронь)</b>";
-      
-      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
-
-      const message = `${title}\n\n` +
-        `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
-        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n` +
-        `📦 <b>Тариф:</b> ${tariffName}\n` +
-        `💰 <b>Сума:</b> ${amount} ${currency}\n` +
-        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
-        utmInfo;
-
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_thread_id: topicId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      }).catch(err => console.error('Telegram notification failed:', err));
     }
 
     return NextResponse.json({ ...paymentData, uuid });
