@@ -24,19 +24,27 @@ export default function ThanksPage() {
 
     // Trigger status update to Google Sheets (Client-side confirmation)
     if (activeOrderId) {
-      fetch('/api/leads', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "update_status",
-          order_id: activeOrderId,
-          status: "APPROVED (Redirect)",
-          target_sheet_id: "1127634999"
-        }),
-      }).then(() => {
-        if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
-        sessionStorage.removeItem('savedFormData'); // Clear form on success
-      }).catch(e => console.error("Update failed:", e));
+      const transactionStatus = searchParams.get('transactionStatus');
+      
+      // ONLY update if it's actually Approved or missing (fallback to previous behavior but safer)
+      if (!transactionStatus || transactionStatus.toUpperCase() === 'APPROVED') {
+        fetch('/api/leads', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            action: "update_status",
+            order_id: activeOrderId,
+            status: "APPROVED (Redirect)",
+            target_sheet_id: "1127634999"
+          }),
+        }).then(() => {
+          if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
+          sessionStorage.removeItem('savedFormData'); // Clear form on success
+        }).catch(e => console.error("Update failed:", e));
+      } else {
+        console.log("Payment not approved on redirect:", transactionStatus);
+        // If it's explicitly Declined, we don't mark as Paid
+      }
     }
   }, [router]);
 

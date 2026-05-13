@@ -248,23 +248,51 @@ function handleLegacyLeadLogging(data) {
   });
 
   let rowToUpdate = -1;
-  if (orderId && orderIdIdx !== -1) {
+  let foundTgMsgId = "";
+  
+  // Search for the order in ALL sheets to be sure, and capture TG_Msg_ID
+  const sheets = ss.getSheets();
+  for (let s = 0; s < sheets.length; s++) {
+    const currentSheet = sheets[s];
+    const sheetName = currentSheet.getName();
+    if (sheetName === "System_Logs" || sheetName === "Errors") continue;
+    
+    const dataRange = currentSheet.getDataRange().getValues();
+    const headers = dataRange[0];
+    let orderIdIdx = -1, statusIdx = -1, tgMsgIdIdx = -1;
+    
+    headers.forEach((h, i) => {
+      const lowH = h.toString().toLowerCase().trim();
+      if (lowH.includes("orderid") || lowH.includes("номер замовлення")) orderIdIdx = i;
+      if (lowH.includes("статус")) statusIdx = i;
+      if (lowH === "tg_msg_id" || lowH === "tg msg id") tgMsgIdIdx = i;
+    });
+    
+    if (orderIdIdx === -1) continue;
+    
     for (let i = 1; i < dataRange.length; i++) {
       if ((dataRange[i][orderIdIdx] || "").toString().trim() === orderId) {
-        rowToUpdate = i + 1;
-        break;
+        if (statusIdx !== -1) {
+          const finalStatus = formatStatus(data.status || data.transactionStatus, sheetName, data.amount);
+          currentSheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
+          rowToUpdate = i + 1;
+        }
+        if (tgMsgIdIdx !== -1) {
+          const msgIdVal = (dataRange[i][tgMsgIdIdx] || "").toString().trim();
+          if (msgIdVal) foundTgMsgId = msgIdVal;
+        }
       }
     }
   }
 
   if (rowToUpdate !== -1) {
-    if ((data.status || data.transactionStatus) && statusIdx !== -1) {
-      const finalStatus = formatStatus(data.status || data.transactionStatus, rawSheetName);
-      sheet.getRange(rowToUpdate, statusIdx + 1).setValue(finalStatus);
-      logGlobalAction(uuid, "Status Update", rawSheetName, {status: finalStatus});
-    }
-    return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Updated legacy lead", uuid: uuid})).setMimeType(ContentService.MimeType.JSON);
-  } 
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success", 
+      message: "Status updated", 
+      tg_msg_id: foundTgMsgId,
+      uuid: uuid
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
   
   const timestamp = Utilities.formatDate(new Date(), "Europe/Kiev", "dd.MM.yyyy HH:mm:ss");
   const isFreeLection = (currentSheetName === 'VSL 1 етап' || String(targetGid) === '43961418');
