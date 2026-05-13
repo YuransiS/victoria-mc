@@ -26,32 +26,14 @@ export async function POST(req: Request) {
       if (comment !== undefined) payload.comment = comment;
     }
 
-    const urls = [
-      process.env.GOOGLE_SCRIPT_URL,
-      process.env.GOOGLE_SCRIPT_URL_STVORYUI
-    ].filter(Boolean) as string[];
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-    let lastResult = { error: "No lead found to update" };
-
-    for (const url of urls) {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.status === "success") {
-          return NextResponse.json(result);
-        }
-        lastResult = result;
-      } catch (e) {
-        console.error(`Update error for ${url}:`, e);
-      }
-    }
-
-    return NextResponse.json(lastResult);
+    const result = await response.json();
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Admin Update Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
