@@ -67,28 +67,46 @@ export async function POST(request: Request) {
         `🆔 <b>ID:</b> <code>${orderReference}</code>\n` +
         `💳 <b>Система:</b> ${data.paymentSystem || '-'}`;
 
-      const tgMethod = tgMsgId ? 'editMessageText' : 'sendMessage';
+      // Ensure message_id is an integer for Telegram API
+      const messageId = tgMsgId ? parseInt(tgMsgId.toString()) : null;
+      const tgMethod = messageId ? 'editMessageText' : 'sendMessage';
+      
       const tgPayload: any = {
         chat_id: chatId,
         text: message,
         parse_mode: 'HTML',
       };
       
-      if (tgMsgId) {
-        tgPayload.message_id = tgMsgId;
+      if (messageId) {
+        tgPayload.message_id = messageId;
       } else {
-        // Only send new message if we don't have an ID to edit
         tgPayload.message_thread_id = topicId;
       }
 
-      // We only edit if we have an ID, or send a new message IF it's a success
-      // (to avoid spamming errors if we don't have an ID)
-      if (tgMsgId || isSuccess) {
-        await fetch(`https://api.telegram.org/bot${token}/${tgMethod}`, {
+      if (messageId || isSuccess) {
+        const tgRes = await fetch(`https://api.telegram.org/bot${token}/${tgMethod}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(tgPayload),
-        }).catch(err => console.error('Telegram notification failed:', err));
+        });
+        
+        const tgResult = await tgRes.json();
+        if (!tgResult.ok) {
+          console.error(`Telegram API Error (${tgMethod}):`, tgResult);
+          // If editing failed, try sending a new message as fallback if it's a success
+          if (messageId && isSuccess) {
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: chatId,
+                message_thread_id: topicId,
+                text: message,
+                parse_mode: 'HTML',
+              }),
+            });
+          }
+        }
       }
     }
 

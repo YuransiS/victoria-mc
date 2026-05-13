@@ -522,7 +522,7 @@ function updatePaymentStatus(data) {
     
     let orderIdIdx = -1, statusIdx = -1, uuidIdx = -1, tgMsgIdIdx = -1;
     headers.forEach((h, i) => {
-      const lowH = h.toString().toLowerCase();
+      const lowH = h.toString().toLowerCase().trim();
       if (lowH.includes("orderid") || lowH.includes("номер замовлення") || lowH.includes("visitor id")) orderIdIdx = i;
       if (lowH.includes("статус")) statusIdx = i;
       if (lowH === "uuid") uuidIdx = i;
@@ -538,15 +538,20 @@ function updatePaymentStatus(data) {
           currentSheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
           found = true;
         }
-        if (uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
-        if (tgMsgIdIdx !== -1) foundTgMsgId = dataRange[i][tgMsgIdIdx];
-        if (found) break;
+        if (uuidIdx !== -1 && !uuid) uuid = dataRange[i][uuidIdx];
+        
+        // Only capture TG_Msg_ID if we don't have one yet, or if this one is not empty
+        if (tgMsgIdIdx !== -1) {
+          const msgIdVal = (dataRange[i][tgMsgIdIdx] || "").toString().trim();
+          if (msgIdVal) foundTgMsgId = msgIdVal;
+        }
       }
     }
-    if (found) {
-       if (uuid) logGlobalAction(uuid, "Payment Success", name, { orderId: orderId, status: data.status });
-       break;
-    }
+    // We don't break the outer loop anymore because we want to update status in ALL sheets (backups etc)
+  }
+  
+  if (found) {
+     if (uuid) logGlobalAction(uuid, "Payment Update", "System", { orderId: orderId, status: data.status });
   }
   
   if (found) return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Payment status updated", tg_msg_id: foundTgMsgId})).setMimeType(ContentService.MimeType.JSON);
