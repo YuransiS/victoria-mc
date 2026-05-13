@@ -45,16 +45,22 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Telegram Notification for Success
+    // 2. Telegram Notification
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     const topicId = process.env.TOPIC_ID;
 
-    if (token && chatId && (transactionStatus === 'Approved' || transactionStatus === 'Settled')) {
+    const s = (transactionStatus || "").toString().toUpperCase();
+    const isSuccess = s.includes('APPROVED') || s.includes('SETTLED') || s.includes('SUCCESS');
+
+    if (token && chatId) {
       const clientName = data.clientName || data.clientFirstName || '-';
       const clientPhone = data.phone || data.clientPhone || '-';
       
-      const message = `✅ <b>ОПЛАТА УСПІШНА!</b>\n\n` +
+      let statusEmoji = isSuccess ? "✅" : "❌";
+      let statusTitle = isSuccess ? "ОПЛАТА УСПІШНА!" : `ПОМИЛКА ОПЛАТИ (${transactionStatus})`;
+      
+      const message = `${statusEmoji} <b>${statusTitle}</b>\n\n` +
         `👤 <b>Клієнт:</b> ${clientName}\n` +
         `📞 <b>Телефон:</b> ${clientPhone}\n` +
         `💰 <b>Сума:</b> ${amount} ${data.currency || 'UAH'}\n` +
@@ -71,14 +77,19 @@ export async function POST(request: Request) {
       if (tgMsgId) {
         tgPayload.message_id = tgMsgId;
       } else {
+        // Only send new message if we don't have an ID to edit
         tgPayload.message_thread_id = topicId;
       }
 
-      await fetch(`https://api.telegram.org/bot${token}/${tgMethod}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(tgPayload),
-      }).catch(err => console.error('Telegram notification failed:', err));
+      // We only edit if we have an ID, or send a new message IF it's a success
+      // (to avoid spamming errors if we don't have an ID)
+      if (tgMsgId || isSuccess) {
+        await fetch(`https://api.telegram.org/bot${token}/${tgMethod}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(tgPayload),
+        }).catch(err => console.error('Telegram notification failed:', err));
+      }
     }
 
     // 3. Respond to WayForPay with 'accept'

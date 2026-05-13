@@ -510,6 +510,7 @@ function updatePaymentStatus(data) {
   const sheets = ss.getSheets();
   let found = false;
   let uuid = "";
+  let foundTgMsgId = "";
   
   for (let s = 0; s < sheets.length; s++) {
     const currentSheet = sheets[s];
@@ -542,7 +543,6 @@ function updatePaymentStatus(data) {
         if (found) break;
       }
     }
-    let foundTgMsgId = "";
     if (found) {
        if (uuid) logGlobalAction(uuid, "Payment Success", name, { orderId: orderId, status: data.status });
        break;
@@ -562,8 +562,8 @@ function formatStatus(status, sheetName, amount) {
   const amt = parseFloat(amount) || 0;
   
   // Successful payment detection
-  // Strict matching to avoid "Очікується оплата" triggering isPaid
-  const isPaid = ["APPROVED", "SETTLED", "SUCCESS", "ОПЛАЧЕНО", "ОПЛАТА"].includes(s);
+  // We use substring matching to handle "Approved (Redirect)" and similar
+  const isPaid = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS") || s.includes("ОПЛАЧЕНО") || s.includes("ОПЛАТА");
   
   if (isPaid) {
     // 1. If explicitly Practicum sheet
