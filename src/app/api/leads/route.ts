@@ -23,9 +23,11 @@ export async function POST(request: Request) {
 
     const resData = await response.json();
     const messageId = resData.tg_msg_id;
+    console.log('CRM Response ID:', messageId);
 
     // 2. If it's a status update and we have a message ID, update Telegram too
     if (data.action === "update_status" && messageId) {
+      console.log(`Updating TG message ${messageId} for order ${data.order_id}`);
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
       const customerName = orderId ? orderId.split('_')[0] : 'Клієнт';
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
           : `❌ Оплата відхилена (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус: ${data.status || 'Declined'}`;
 
         try {
-          await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+          const tgRes = await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -48,6 +50,8 @@ export async function POST(request: Request) {
               text: text
             })
           });
+          const tgData = await tgRes.json();
+          console.log('Telegram Edit Result:', tgData);
         } catch (err) {
           console.error('Failed to update TG from redirect proxy:', err);
         }

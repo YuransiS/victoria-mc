@@ -262,10 +262,10 @@ function handleLegacyLeadLogging(data) {
     let orderIdIdx = -1, statusIdx = -1, tgMsgIdIdx = -1;
     
     headers.forEach((h, i) => {
-      const lowH = h.toString().toLowerCase().trim();
-      if (lowH.includes("orderid") || lowH.includes("номер замовлення")) orderIdIdx = i;
+      const lowH = h.toString().toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+      if (lowH.includes("orderid") || lowH.includes("номерзамовлення") || lowH.includes("номерзаказу")) orderIdIdx = i;
       if (lowH.includes("статус")) statusIdx = i;
-      if (lowH === "tg_msg_id" || lowH === "tg msg id") tgMsgIdIdx = i;
+      if (lowH.includes("tgmsgid") || lowH.includes("tgmsg") || lowH === "id" || lowH === "tgid") tgMsgIdIdx = i;
     });
     
     if (orderIdIdx === -1) continue;
