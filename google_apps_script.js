@@ -566,27 +566,21 @@ function formatStatus(status, sheetName, amount) {
   const s = status.toString().toUpperCase();
   const amt = parseFloat(amount) || 0;
   
-  // Successful payment detection
-  // We use substring matching to handle "Approved (Redirect)" and similar
-  const isPaid = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS") || s.includes("ОПЛАЧЕНО") || s.includes("ОПЛАТА");
+  // Successful payment detection - must have APPROVED and NOT have DECLINED/FAIL
+  const isApproved = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS");
+  const isError = s.includes("DECLINED") || s.includes("FAIL") || s.includes("ERROR") || s.includes("REJECT");
+  
+  const isPaid = isApproved && !isError;
   
   if (isPaid) {
-    // 1. If explicitly Practicum sheet
-    if (sheetName === "Практикум") {
-      return "Купив(-ла) трипвайєр";
-    }
-    
-    // 2. Based on amount (9/39 are tripwires)
-    if (amt === 9 || amt === 39) {
-      return "Купив(-ла) трипвайєр";
-    }
-    
-    // 3. Otherwise "Оплачено" (Course or Booking)
-    // We can assume if it's not a tripwire amount, it's a course/booking
-    return "Оплачено";
+    if (sheetName === "Практикум") return "Купив(-ла) трипвайєр";
+    if (amt === 9 || amt === 39) return "Купив(-ла) трипвайєр";
+    return "Оплачено " + amt + " USD (" + sheetName + ")";
   }
   
-  return status;
+  if (s.includes("PENDING") || s.includes("ОЧІКУЄ")) return "⏳ Очікується оплата";
+  
+  return status; 
 }
 
 function createSuccessResponse(message) {
