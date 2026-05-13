@@ -27,10 +27,10 @@ export async function POST(request: Request) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          action: 'update_payment_status',
           order_id: orderReference,
           status: transactionStatus,
-          api_key: apiKey,
-          target_sheet_id: "1127634999"
+          api_key: apiKey
         }),
       }).catch(err => console.error('Sheet update error:', err));
     }

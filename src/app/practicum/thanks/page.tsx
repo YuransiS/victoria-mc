@@ -43,9 +43,10 @@ export default function PracticumThanksPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          action: "update_status",
           order_id: activeOrderId,
           status: "APPROVED (Redirect)",
-          target_sheet_name: "Практикум"
+          targetSheet: "Практикум"
         }),
       }).then(() => {
         if (sessionOrderId) sessionStorage.removeItem('lastOrderId');

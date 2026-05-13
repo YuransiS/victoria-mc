@@ -109,6 +109,7 @@ export function PracticumHeroForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          ...utmData,
           successUrl: "/practicum/thanks",
           failUrl: "/practicum/fail"
         })

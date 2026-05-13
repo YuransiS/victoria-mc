@@ -185,7 +185,7 @@ function handleLegacyLeadLogging(data) {
   data.UUID = uuid;
   
   const rawSheetName = data.sheetName || data.target_sheet_name || data.target_sheet || data.sheet_name;
-  const targetGid = data.sheet_id || data.gid;
+  const targetGid = data.sheet_id || data.gid || data.target_sheet_id;
   
   logGlobalAction(uuid, "Lead", rawSheetName || targetGid || "Unknown", data);
 
@@ -226,7 +226,7 @@ function handleLegacyLeadLogging(data) {
   }
   
   const currentSheetName = sheet.getName();
-  const orderId = (data.order_id || data.orderReference || "").toString().trim();
+  const orderId = (data.order_id || data.orderId || data.orderReference || "").toString().trim();
   const dataRange = sheet.getDataRange().getValues();
   const headers = dataRange[0];
   
@@ -293,8 +293,8 @@ function handleLegacyLeadLogging(data) {
 
 function updateLeadField(data, fieldType) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const targetSheetName = data.targetSheet;
-  const orderId = (data.orderId || "").toString().trim();
+  const targetSheetName = data.targetSheet || data.target_sheet || data.target_sheet_name || data.sheetName || data.sheet_name;
+  const orderId = (data.orderId || data.order_id || data.orderReference || "").toString().trim();
   
   if (!orderId) return createErrorResponse("No OrderID provided");
   
@@ -488,7 +488,7 @@ function getAdminData() {
 
 function updatePaymentStatus(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const orderId = (data.orderId || "").toString().trim();
+  const orderId = (data.orderId || data.order_id || data.orderReference || "").toString().trim();
   if (!orderId) return createErrorResponse("No OrderID provided");
 
   const sheets = ss.getSheets();

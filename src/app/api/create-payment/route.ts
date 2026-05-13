@@ -3,7 +3,23 @@ import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency: reqCurrency, tariffName, customerEmail, customerName, customerPhone, successUrl, failUrl, targetSheet } = await request.json();
+    const { 
+      amount, 
+      currency: reqCurrency, 
+      tariffName, 
+      customerEmail, 
+      customerName, 
+      customerPhone, 
+      telegram,
+      successUrl, 
+      failUrl, 
+      targetSheet,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term
+    } = await request.json();
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -83,11 +99,18 @@ export async function POST(request: Request) {
             action: 'log_lead',
             target_sheet: targetSheet || "Бронювання",
             orderId: orderReference,
+            order_id: orderReference,
             name: customerName,
             phone: customerPhone,
+            telegram: telegram,
             amount: amount,
             tariff: tariffName,
             status: "⏳ Очікується оплата",
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_content,
+            utm_term,
             api_key: process.env.SHEETS_API_KEY
           })
         });
@@ -104,12 +127,18 @@ export async function POST(request: Request) {
     const topicId = process.env.TOPIC_ID;
 
     if (token && chatId) {
-      const message = `⏳ <b>Очікується оплата (Бронь)</b>\n\n` +
+      const isPracticum = targetSheet === "Практикум";
+      const title = isPracticum ? "⏳ <b>Очікується оплата (Практикум)</b>" : "⏳ <b>Очікується оплата (Бронь)</b>";
+      
+      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
+
+      const message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
         `📞 <b>Телефон:</b> ${customerPhone || '-'}\n` +
         `📦 <b>Тариф:</b> ${tariffName}\n` +
         `💰 <b>Сума:</b> ${amount} ${currency}\n` +
-        `🆔 <b>ID:</b> <code>${orderReference}</code>`;
+        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
+        utmInfo;
 
       fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',

@@ -169,6 +169,7 @@ export const BookingModal = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          ...utmData,
           currency,
           targetSheet: targetSheetName || "Бронювання",
           successUrl,
