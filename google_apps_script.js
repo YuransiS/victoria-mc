@@ -283,7 +283,7 @@ function handleLegacyLeadLogging(data) {
     "ніша": data.niche || "", "niche": data.niche || "",
     "тариф": data.tariff || "", "сума": data.amount || "", "ціна": data.amount || "",
     "orderid": orderId, "номер заказу": orderId, "номер замовлення": orderId,
-    "статус": isFreeLection ? "" : formatStatus(data.status || data.transactionStatus || "", rawSheetName),
+    "статус": isFreeLection ? "" : formatStatus(data.status || data.transactionStatus || "", rawSheetName, data.amount),
     "uuid": uuid
   };
 
@@ -558,7 +558,8 @@ function formatStatus(status, sheetName, amount) {
   const amt = parseFloat(amount) || 0;
   
   // Successful payment detection
-  const isPaid = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS") || s.includes("ОПЛАЧЕНО") || s.includes("ОПЛАТА");
+  // Strict matching to avoid "Очікується оплата" triggering isPaid
+  const isPaid = ["APPROVED", "SETTLED", "SUCCESS", "ОПЛАЧЕНО", "ОПЛАТА"].includes(s);
   
   if (isPaid) {
     // 1. If explicitly Practicum sheet

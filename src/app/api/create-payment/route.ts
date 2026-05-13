@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       utm_medium,
       utm_campaign,
       utm_content,
-      utm_term
+      utm_term,
+      full_url
     } = await request.json();
 
     const host = request.headers.get('host');
@@ -111,6 +112,7 @@ export async function POST(request: Request) {
             utm_campaign,
             utm_content,
             utm_term,
+            full_url,
             api_key: process.env.SHEETS_API_KEY
           })
         });
