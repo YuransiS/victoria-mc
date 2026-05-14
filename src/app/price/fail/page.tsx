@@ -22,6 +22,7 @@ export default function PaymentErrorPage() {
     let activeTgMsgId = null;
     
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    console.log('DEBUG: Raw localStorage data (Fail):', tgDataRaw);
     if (tgDataRaw) {
       try {
         const tgData = JSON.parse(tgDataRaw);
@@ -41,7 +42,12 @@ export default function PaymentErrorPage() {
     const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || lastOrderId;
-    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
+    if (urlTgMsgId) {
+      activeTgMsgId = urlTgMsgId;
+      console.log('DEBUG: Found TG Msg ID in URL (Fail):', urlTgMsgId);
+    }
+
+    console.log('DEBUG: Final TG Msg ID to update (Fail):', activeTgMsgId);
 
     if (activeOrderId) {
       setOrderDetails({ id: activeOrderId });

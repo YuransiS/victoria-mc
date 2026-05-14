@@ -15,6 +15,7 @@ export default function ThanksPage() {
     // Get TG Message ID from localStorage with 24h expiry check
     let activeTgMsgId = null;
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    console.log('DEBUG: Raw localStorage data:', tgDataRaw);
     if (tgDataRaw) {
       try {
         const tgData = JSON.parse(tgDataRaw);
@@ -34,7 +35,13 @@ export default function ThanksPage() {
     const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || sessionOrderId;
-    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
+    if (urlTgMsgId) {
+      activeTgMsgId = urlTgMsgId;
+      console.log('DEBUG: Found TG Msg ID in URL:', urlTgMsgId);
+    }
+
+    console.log('DEBUG: Final TG Msg ID to update:', activeTgMsgId);
+    console.log('DEBUG: Active Order ID:', activeOrderId);
 
     if (!attempt && !urlOrderId) {
       router.push('/');

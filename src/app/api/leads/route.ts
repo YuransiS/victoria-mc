@@ -3,65 +3,102 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    
-    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
-    const apiKey = process.env.SHEETS_API_KEY;
+    console.log('Lead Proxy Request Data:', JSON.stringify(data));
 
-    if (!scriptUrl) {
-      return NextResponse.json({ error: 'Google Script URL not configured' }, { status: 500 });
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    let chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    // Ensure chatId for supergroups starts with -100 if it's numeric and positive
+    if (chatId && /^\d+$/.test(chatId)) {
+      chatId = `-100${chatId}`;
     }
 
-    // 1. Forward the request to Google Apps Script
-    const response = await fetch(scriptUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
+    const messageId = data.tg_msg_id;
+    const isStatusUpdate = data.action === "update_status";
+
+    // 1. CRITICAL: Immediate TG Update
+    if (isStatusUpdate && messageId && token && chatId) {
+      const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
+      const orderId = data.order_id || data.orderId;
+      
+      // Try to get name from orderId (VMC_Name_Timestamp) or fallback
+      let customerName = 'Клієнт';
+      if (orderId && orderId.includes('_')) {
+        const parts = orderId.split('_');
+        if (parts.length >= 2 && parts[0] === 'VMC') customerName = 'Клієнт'; // It's VMC_Timestamp
+        else customerName = parts[0]; 
+      }
+
+      console.log(`DEBUG: Updating TG message ${messageId} in chat ${chatId}`);
+      
+      const text = isSuccess 
+        ? `✅ <b>Оплата успішна!</b> (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус оновлено.`
+        : `❌ <b>Оплата відхилена</b> (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус: ${data.status || 'Declined'}`;
+
+      try {
+        const url = `https://api.telegram.org/bot${token}/editMessageText`;
+        const body = {
+          chat_id: chatId,
+          message_id: parseInt(messageId.toString()),
+          text: text,
+          parse_mode: 'HTML'
+        };
+        
+        console.log('DEBUG: Telegram Request Body:', JSON.stringify(body));
+
+        const tgRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        
+        const tgResult = await tgRes.json();
+        console.log('DEBUG: Telegram API Response:', JSON.stringify(tgResult));
+        
+        if (!tgResult.ok) {
+          console.error('DEBUG: Telegram API Error Details:', tgResult.description);
+        }
+      } catch (tgErr) {
+        console.error('DEBUG: Telegram Fetch Catch Error:', tgErr);
+      }
+    }
+
+    // 2. Now talk to Google Sheets
+    const response = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         ...data,
-        api_key: apiKey
+        api_key: process.env.SHEETS_API_KEY
       }),
     });
 
     const resData = await response.json();
-    const messageId = resData.tg_msg_id || data.tg_msg_id; // Priority to Sheet, fallback to Browser
-    console.log('CRM Response ID:', messageId);
+    console.log('CRM Sheet Response:', resData);
 
-    // 2. If it's a status update and we have a message ID, update Telegram too
-    if (data.action === "update_status" && messageId) {
-      console.log(`Updating TG message ${messageId} for order ${data.order_id}`);
+    // 3. If sheet returned an ID that we didn't have before, try updating TG now
+    if (isStatusUpdate && !messageId && resData.tg_msg_id && token && chatId) {
+      // (This is a fallback for when browser didn't have the ID)
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
       const customerName = orderId ? orderId.split('_')[0] : 'Клієнт';
       
-      const token = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
+      const text = isSuccess ? "✅ Оплата успішна!" : "❌ Оплата відхилена";
 
-      if (token && chatId) {
-        const text = isSuccess 
-          ? `✅ Оплата успішна! (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус оновлено через редирект.`
-          : `❌ Оплата відхилена (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус: ${data.status || 'Declined'}`;
-
-        try {
-          const tgRes = await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              message_id: parseInt(messageId.toString()),
-              text: text
-            })
-          });
-          const tgData = await tgRes.json();
-          console.log('Telegram Edit Result:', tgData);
-        } catch (err) {
-          console.error('Failed to update TG from redirect proxy:', err);
-        }
-      }
+      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_id: parseInt(resData.tg_msg_id),
+          text: `${text}\n\n👤 ${customerName}\n🆔 ${orderId}`
+        })
+      }).catch(e => console.error('Fallback TG update failed:', e));
     }
 
     return NextResponse.json(resData);
-
   } catch (error) {
-    console.error('Lead proxy error:', error);
-    return NextResponse.json({ error: 'Failed to submit lead' }, { status: 500 });
+    console.error('Lead Proxy Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
