@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { trackFBEvent } from "@/components/FacebookPixel";
 
 export default function PracticumThanksPage() {
   const router = useRouter();
@@ -39,6 +40,20 @@ export default function PracticumThanksPage() {
       const transactionStatus = searchParams.get('transactionStatus');
       
       if (!transactionStatus || transactionStatus.toUpperCase() === 'APPROVED') {
+        // Track Purchase
+        const amount = parseFloat(localStorage.getItem('lead_amount') || '0');
+        const currency = localStorage.getItem('lead_currency') || 'USD';
+        const tariff = localStorage.getItem('lead_tariff') || 'Практикум';
+        
+        if (amount > 0) {
+          trackFBEvent("Purchase", {
+            value: amount,
+            currency: currency,
+            content_name: tariff,
+            content_type: "product"
+          });
+        }
+
         fetch('/api/leads', {
           method: "POST",
           headers: { "Content-Type": "application/json" },

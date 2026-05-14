@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./PracticumHeroForm.module.css";
 import { Input } from "@/components/Input";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackFBEvent } from "@/components/FacebookPixel";
 
 interface PracticumHeroFormProps {
   buttonText?: string;
@@ -11,10 +12,10 @@ interface PracticumHeroFormProps {
   amount: number;
 }
 
-export function PracticumHeroForm({ 
-  buttonText = "ВЗЯТИ УЧАСТЬ", 
-  tariffName, 
-  amount 
+export function PracticumHeroForm({
+  buttonText = "ВЗЯТИ УЧАСТЬ",
+  tariffName,
+  amount
 }: PracticumHeroFormProps) {
   const [formData, setFormData] = useState({ name: "", phone: "", telegram: "" });
   const [errors, setErrors] = useState<{ name?: string; phone?: string; telegram?: string }>({});
@@ -35,6 +36,14 @@ export function PracticumHeroForm({
         return newValue < 5 ? 5 : newValue > 12 ? 12 : newValue;
       });
     }, 4000);
+
+    // Track InitiateCheckout when form is seen
+    trackFBEvent("InitiateCheckout", {
+      content_name: tariffName,
+      value: amount,
+      currency: "USD"
+    });
+
     return () => clearInterval(interval);
   }, []);
 
@@ -80,7 +89,7 @@ export function PracticumHeroForm({
     setStatus("loading");
 
     const sanitizedPhone = formData.phone.replace(/[\s()-]/g, "");
-    
+
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
     const utmData = {
@@ -101,6 +110,14 @@ export function PracticumHeroForm({
       tariffName: tariffName,
       targetSheet: "Практикум"
     };
+
+    // Track Lead
+    trackFBEvent("Lead", {
+      content_name: tariffName,
+      value: amount,
+      currency: "USD",
+      ...utmData
+    });
 
     try {
       // 1. Create Payment
@@ -159,7 +176,11 @@ export function PracticumHeroForm({
       });
 
       document.body.appendChild(form);
-      form.submit();
+      
+      // Give Meta Pixel time to fire the Lead event before navigation
+      setTimeout(() => {
+        form.submit();
+      }, 500);
     } catch (error) {
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
@@ -174,45 +195,50 @@ export function PracticumHeroForm({
           <span className={styles.liveDot}></span>
           <span>зараз дивляться: {activeUsers} людей</span>
         </div>
-        
+
         <div className={styles.inputGrid}>
-          <Input 
-            label="ВАШЕ ІМ'Я" 
-            name="name" 
-            placeholder="Ім'я" 
+          <Input
+            label="ВАШЕ ІМ'Я"
+            name="name"
+            placeholder="Ім'я"
             value={formData.name}
             onChange={handleChange}
             error={errors.name}
             disabled={status !== "idle"}
           />
-          <Input 
-            label="TELEGRAM" 
-            name="telegram" 
-            placeholder="@username" 
+          <Input
+            label="TELEGRAM"
+            name="telegram"
+            placeholder="@username"
             value={formData.telegram}
             onChange={handleChange}
             error={errors.telegram}
             disabled={status !== "idle"}
           />
         </div>
-        
-        <Input 
-          label="НОМЕР ТЕЛЕФОНУ" 
-          name="phone" 
-          type="tel" 
-          placeholder="+380..." 
+
+        <Input
+          label="НОМЕР ТЕЛЕФОНУ"
+          name="phone"
+          type="tel"
+          placeholder="+380..."
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
           disabled={status !== "idle"}
         />
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className={styles.submitBtn}
           disabled={status !== "idle"}
         >
-          {status === "loading" ? "ВІДПРАВКА..." : buttonText}
+          {status === "loading" ? (
+            <div className={styles.btnContent}>
+              <div className={styles.spinner} />
+              <span>ПЕРЕНАПРАВЛЕННЯ...</span>
+            </div>
+          ) : buttonText}
         </button>
 
         <p className={styles.secureText}>
