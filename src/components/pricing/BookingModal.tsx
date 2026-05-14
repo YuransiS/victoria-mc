@@ -209,6 +209,11 @@ export const BookingModal = ({
       localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
       localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
       
+      // Save Tariff and Amount for the final TG update
+      localStorage.setItem('lead_tariff', tariffName);
+      localStorage.setItem('lead_amount', actualAmount.toString());
+      localStorage.setItem('lead_currency', currency);
+      
       // 2. Track Lead to Facebook
       trackFBEvent("Lead", { 
         content_name: tariffName, 

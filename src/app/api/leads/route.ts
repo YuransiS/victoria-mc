@@ -33,11 +33,23 @@ export async function POST(request: Request) {
       
       const utmSource = data.utm_source || '';
       const utmMedium = data.utm_medium || '';
+      const customerPhone = data.customer_phone || '-';
+      const tariff = data.tariff || '-';
+      const amount = data.amount || '-';
+      const currency = data.currency || 'USD';
       const utmInfo = utmSource ? `\n\n🔍 <b>Джерело:</b> ${utmSource} / ${utmMedium || '-'}` : "";
 
-      const text = isSuccess 
-        ? `✅ <b>Оплата успішна! (Практикум)</b>\n\n👤 <b>Клієнт:</b> ${customerName}\n🆔 <b>ID:</b> <code>${orderId}</code>${utmInfo}\n\nСтатус оновлено.`
-        : `❌ <b>Оплата відхилена (Практикум)</b>\n\n👤 <b>Клієнт:</b> ${customerName}\n🆔 <b>ID:</b> <code>${orderId}</code>${utmInfo}\n\nСтатус оновлено.`;
+      const statusTitle = isSuccess 
+        ? `✅ <b>Оплата успішна! (Практикум)</b>` 
+        : `❌ <b>Оплата відхилена (Практикум)</b>`;
+
+      const text = `${statusTitle}\n\n` +
+        `👤 <b>Клієнт:</b> ${customerName}\n` +
+        `📞 <b>Телефон:</b> <code>${customerPhone}</code>\n` +
+        `📦 <b>Тариф:</b> ${tariff}\n` +
+        `💰 <b>Сума:</b> ${amount} ${currency}\n` +
+        `🆔 <b>ID:</b> <code>${orderId}</code>` +
+        utmInfo;
 
       try {
         const url = `https://api.telegram.org/bot${token}/editMessageText`;
