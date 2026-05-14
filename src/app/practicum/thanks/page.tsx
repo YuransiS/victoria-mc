@@ -1,65 +1,77 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { trackFBEvent } from "@/components/FacebookPixel";
 
 export default function PracticumThanksPage() {
   const router = useRouter();
+  const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
 
   useEffect(() => {
     const attempt = sessionStorage.getItem('paymentAttempted');
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
-    const lastAmount = sessionStorage.getItem('lastAmount') || "9";
-    const lastTariff = sessionStorage.getItem('lastTariffName') || "Практикум";
     
+    // Get TG Message ID from localStorage with 24h expiry check
+    let activeTgMsgId = null;
+    const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    
+    let debug = `Order: ${sessionOrderId || 'None'}\nRaw TG Data: ${tgDataRaw || 'Empty'}`;
+
+    if (tgDataRaw) {
+      try {
+        const tgData = JSON.parse(tgDataRaw);
+        const isExpired = Date.now() - tgData.timestamp > 24 * 60 * 60 * 1000;
+        if (!isExpired) {
+          activeTgMsgId = tgData.id;
+          debug += `\nFound ID: ${activeTgMsgId}`;
+        } else {
+          debug += `\nID Expired!`;
+          localStorage.removeItem('tg_msg_id_data');
+        }
+      } catch (e) {
+        debug += `\nParse Error!`;
+        localStorage.removeItem('tg_msg_id_data');
+      }
+    }
+    
+    setDebugInfo(debug);
+
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || sessionOrderId;
-
-    if (!attempt && !urlOrderId) {
-      router.push('/practicum');
-      return;
-    }
-
-    // Track Purchase to Facebook (only once)
-    const tracked = sessionStorage.getItem('pixelPurchaseTracked');
-    if (!tracked) {
-      trackFBEvent("Purchase", {
-        value: parseFloat(lastAmount),
-        currency: "USD",
-        content_name: lastTariff,
-        order_id: activeOrderId
-      });
-      sessionStorage.setItem('pixelPurchaseTracked', 'true');
-    }
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     // Trigger status update
     if (activeOrderId) {
-      fetch('/api/leads', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "update_status",
-          order_id: activeOrderId,
-          status: "APPROVED (Redirect)",
-          targetSheet: "Практикум"
-        }),
-      }).then(() => {
-        if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
-        sessionStorage.removeItem('savedFormData');
-      }).catch(e => console.error("Update failed:", e));
+      const transactionStatus = searchParams.get('transactionStatus');
+      
+      if (!transactionStatus || transactionStatus.toUpperCase() === 'APPROVED') {
+        setDebugInfo(prev => prev + "\nSending update request...");
+        fetch('/api/leads', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            action: "update_status",
+            order_id: activeOrderId,
+            status: "APPROVED (Redirect)",
+            tg_msg_id: activeTgMsgId,
+            target_sheet_id: "1127634999"
+          }),
+        }).then(async (res) => {
+          const data = await res.json();
+          setDebugInfo(prev => prev + `\nServer Response: ${JSON.stringify(data)}`);
+          localStorage.removeItem('tg_msg_id_data');
+        }).catch(e => {
+          setDebugInfo(prev => prev + `\nUpdate Failed: ${e.message}`);
+        });
+      } else {
+        setDebugInfo(prev => prev + `\nPayment not approved: ${transactionStatus}`);
+      }
     }
-
-    // Auto-redirect to Telegram after 3 seconds
-    const timer = setTimeout(() => {
-      window.location.href = "https://t.me/+HQF8RU3-T2UyYjU0";
-    }, 3000);
-
-    return () => clearTimeout(timer);
   }, [router]);
 
   return (
@@ -74,35 +86,26 @@ export default function PracticumThanksPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="mb-12 flex justify-center">
-            <div className="w-24 h-24 border border-white/20 rounded-full flex items-center justify-center">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M5 13l4 4L19 7" strokeLinecap="square" strokeLinejoin="miter"/>
-              </svg>
-            </div>
-          </div>
-
           <h1 className="font-manrope text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 italic">
             ДЯКУЄМО!
           </h1>
           
-          <p className="font-inter text-lg text-white/60 mb-12 leading-relaxed">
-            Оплата успішно зафіксована. Зараз ви будете автоматично перенаправлені в закритий Telegram-канал практикуму. Якщо цього не сталося — натисніть кнопку нижче.
+          <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
+            Ваша бронь на Практикум успішно зафіксована.
           </p>
 
+          {/* DEBUG BLOCK FOR USER */}
+          <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-xl text-left font-mono text-xs text-green-400/70 whitespace-pre-wrap">
+            <div className="text-white/40 mb-2 uppercase text-[10px] tracking-widest">Debug Info (Test Mode):</div>
+            {debugInfo}
+          </div>
+
           <div className="space-y-4">
-            <a 
-              href="https://t.me/+HQF8RU3-T2UyYjU0" 
-              className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all text-center"
-            >
-              ПЕРЕЙТИ В КАНАЛ
-            </a>
-            
             <Link 
-              href="/practicum" 
-              className="block w-full border border-white/20 py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
+              href="https://t.me/vika_cooperation" 
+              className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
-              ПОВЕРНУТИСЯ НА САЙТ
+              НАПИСАТИ В TELEGRAM
             </Link>
           </div>
         </motion.div>

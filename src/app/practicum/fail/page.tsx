@@ -1,31 +1,69 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function PracticumFailPage() {
   const router = useRouter();
+  const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
 
   useEffect(() => {
-    const sessionOrderId = sessionStorage.getItem('lastOrderId');
+    const attempt = sessionStorage.getItem('paymentAttempted');
+    const lastOrderId = sessionStorage.getItem('lastOrderId');
+    let activeTgMsgId = null;
+    
+    const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    let debug = `Order: ${lastOrderId || 'None'}\nRaw TG Data: ${tgDataRaw || 'Empty'}`;
+
+    if (tgDataRaw) {
+      try {
+        const tgData = JSON.parse(tgDataRaw);
+        const isExpired = Date.now() - tgData.timestamp > 24 * 60 * 60 * 1000;
+        if (!isExpired) {
+          activeTgMsgId = tgData.id;
+          debug += `\nFound ID: ${activeTgMsgId}`;
+        } else {
+          debug += `\nID Expired!`;
+          localStorage.removeItem('tg_msg_id_data');
+        }
+      } catch (e) {
+        debug += `\nParse Error!`;
+        localStorage.removeItem('tg_msg_id_data');
+      }
+    }
+    
+    setDebugInfo(debug);
+
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
-    const activeOrderId = urlOrderId || sessionOrderId;
+    const urlTgMsgId = searchParams.get('tg_msg_id');
+    
+    const activeOrderId = urlOrderId || lastOrderId;
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     if (activeOrderId) {
+      setDebugInfo(prev => prev + "\nSending failure update request...");
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          action: "update_status",
           order_id: activeOrderId,
           status: "DECLINED (Redirect)",
-          target_sheet_name: "Практикум"
+          tg_msg_id: activeTgMsgId,
+          target_sheet_id: "1127634999"
         }),
-      }).catch(e => console.error("Update failed:", e));
+      }).then(async (res) => {
+        const data = await res.json();
+        setDebugInfo(prev => prev + `\nServer Response: ${JSON.stringify(data)}`);
+        localStorage.removeItem('tg_msg_id_data');
+      }).catch(e => {
+        setDebugInfo(prev => prev + `\nUpdate Failed: ${e.message}`);
+      });
     }
-  }, []);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center p-8 overflow-hidden relative">
@@ -39,36 +77,27 @@ export default function PracticumFailPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="mb-12 flex justify-center">
-            <div className="w-24 h-24 border border-red-500/20 rounded-full flex items-center justify-center">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="square" strokeLinejoin="miter"/>
-              </svg>
-            </div>
-          </div>
-
-          <h1 className="font-manrope text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 italic">
-            ПОМИЛКА
+          <h1 className="font-manrope text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 italic text-red-500">
+            ПОМИЛКА ОПЛАТИ
           </h1>
           
-          <p className="font-inter text-lg text-white/60 mb-12 leading-relaxed">
-            На жаль, оплата не була успішною. Перевірте ліміти вашої картки або спробуйте інший спосіб оплати.
+          <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
+            На жаль, платіж за Практикум не було завершено.
           </p>
 
+          {/* DEBUG BLOCK FOR USER */}
+          <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-xl text-left font-mono text-xs text-red-400 whitespace-pre-wrap">
+            <div className="text-white/40 mb-2 uppercase text-[10px] tracking-widest">Debug Info (Test Mode):</div>
+            {debugInfo}
+          </div>
+
           <div className="space-y-4">
-            <Link 
-              href="/practicum" 
+            <button 
+              onClick={() => router.push('/practicum#register')}
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               СПРОБУВАТИ ЩЕ РАЗ
-            </Link>
-            
-            <Link 
-              href="https://t.me/vika_cooperation" 
-              className="block w-full border border-white/20 py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
-            >
-              ПІДТРИМКА
-            </Link>
+            </button>
           </div>
         </motion.div>
       </div>
