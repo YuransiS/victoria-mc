@@ -35,6 +35,15 @@ export default function CheckoutClient({ payload }: { payload: any }) {
       });
 
       const paymentData = await res.json();
+      
+      // Save TG Message ID to local storage with timestamp for later use
+      if (paymentData.tgMsgId) {
+        const tgData = {
+          id: paymentData.tgMsgId.toString(),
+          timestamp: Date.now()
+        };
+        localStorage.setItem('tg_msg_id_data', JSON.stringify(tgData));
+      }
 
       if (paymentData.error) {
         alert('Помилка створення платежу. Спробуйте пізніше.');

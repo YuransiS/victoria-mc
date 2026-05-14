@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     });
 
     const resData = await response.json();
-    const messageId = resData.tg_msg_id;
+    const messageId = resData.tg_msg_id || data.tg_msg_id; // Priority to Sheet, fallback to Browser
     console.log('CRM Response ID:', messageId);
 
     // 2. If it's a status update and we have a message ID, update Telegram too

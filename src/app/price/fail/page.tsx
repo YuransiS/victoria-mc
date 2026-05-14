@@ -17,24 +17,49 @@ export default function PaymentErrorPage() {
       return;
     }
 
-    // Try to get some context about what failed
+    // Get order and TG info with 24h check
     const lastOrderId = sessionStorage.getItem('lastOrderId');
+    let activeTgMsgId = null;
+    
+    const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    if (tgDataRaw) {
+      try {
+        const tgData = JSON.parse(tgDataRaw);
+        const isExpired = Date.now() - tgData.timestamp > 24 * 60 * 60 * 1000;
+        if (!isExpired) {
+          activeTgMsgId = tgData.id;
+        } else {
+          localStorage.removeItem('tg_msg_id_data');
+        }
+      } catch (e) {
+        localStorage.removeItem('tg_msg_id_data');
+      }
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    const urlTgMsgId = searchParams.get('tg_msg_id');
+    
     const activeOrderId = urlOrderId || lastOrderId;
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     if (activeOrderId) {
       setOrderDetails({ id: activeOrderId });
       
-      // Update status in sheets
+      // Update status in sheets AND Telegram
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          action: "update_status",
           order_id: activeOrderId,
           status: "DECLINED (Redirect)",
+          tg_msg_id: activeTgMsgId, // Use the ID from browser storage!
           target_sheet_id: "1127634999"
         }),
+      }).then(() => {
+        // Clear session info after failed update attempt to keep it clean
+        localStorage.removeItem('tg_msg_id_data');
       }).catch(e => console.error("Update failed:", e));
     }
   }, [router]);

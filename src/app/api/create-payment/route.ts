@@ -163,7 +163,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ ...paymentData, uuid });
+    return NextResponse.json({ ...paymentData, uuid, tgMsgId });
   } catch (error) {
     console.error('WFP Error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

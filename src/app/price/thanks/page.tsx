@@ -12,10 +12,29 @@ export default function ThanksPage() {
     const attempt = sessionStorage.getItem('paymentAttempted');
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
     
+    // Get TG Message ID from localStorage with 24h expiry check
+    let activeTgMsgId = null;
+    const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    if (tgDataRaw) {
+      try {
+        const tgData = JSON.parse(tgDataRaw);
+        const isExpired = Date.now() - tgData.timestamp > 24 * 60 * 60 * 1000;
+        if (!isExpired) {
+          activeTgMsgId = tgData.id;
+        } else {
+          localStorage.removeItem('tg_msg_id_data'); // Cleanup expired
+        }
+      } catch (e) {
+        localStorage.removeItem('tg_msg_id_data');
+      }
+    }
+    
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
+    const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || sessionOrderId;
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     if (!attempt && !urlOrderId) {
       router.push('/');
@@ -35,15 +54,16 @@ export default function ThanksPage() {
             action: "update_status",
             order_id: activeOrderId,
             status: "APPROVED (Redirect)",
+            tg_msg_id: activeTgMsgId, // Use the ID from browser storage!
             target_sheet_id: "1127634999"
           }),
         }).then(() => {
           if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
+          localStorage.removeItem('tg_msg_id_data'); // Clear after use
           sessionStorage.removeItem('savedFormData'); // Clear form on success
         }).catch(e => console.error("Update failed:", e));
       } else {
         console.log("Payment not approved on redirect:", transactionStatus);
-        // If it's explicitly Declined, we don't mark as Paid
       }
     }
   }, [router]);
@@ -51,7 +71,6 @@ export default function ThanksPage() {
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center p-8 overflow-hidden relative">
       <div className="absolute inset-0 z-0">
-         {/* Subtle background glow */}
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full" />
       </div>
 
