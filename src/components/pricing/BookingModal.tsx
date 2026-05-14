@@ -205,6 +205,10 @@ export const BookingModal = ({
         localStorage.setItem('lead_uuid', paymentData.uuid);
       }
       
+      // Save UTMs to localStorage for the final TG update
+      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+      
       // 2. Track Lead to Facebook
       trackFBEvent("Lead", { 
         content_name: tariffName, 

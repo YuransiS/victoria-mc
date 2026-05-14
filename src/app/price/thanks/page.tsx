@@ -9,13 +9,11 @@ export default function ThanksPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const attempt = sessionStorage.getItem('paymentAttempted');
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
     
-    // Get TG Message ID from localStorage with 24h expiry check
     let activeTgMsgId = null;
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
-    console.log('DEBUG: Raw localStorage data:', tgDataRaw);
+    
     if (tgDataRaw) {
       try {
         const tgData = JSON.parse(tgDataRaw);
@@ -23,36 +21,23 @@ export default function ThanksPage() {
         if (!isExpired) {
           activeTgMsgId = tgData.id;
         } else {
-          localStorage.removeItem('tg_msg_id_data'); // Cleanup expired
+          localStorage.removeItem('tg_msg_id_data');
         }
       } catch (e) {
         localStorage.removeItem('tg_msg_id_data');
       }
     }
-    
+
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
     const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || sessionOrderId;
-    if (urlTgMsgId) {
-      activeTgMsgId = urlTgMsgId;
-      console.log('DEBUG: Found TG Msg ID in URL:', urlTgMsgId);
-    }
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
-    console.log('DEBUG: Final TG Msg ID to update:', activeTgMsgId);
-    console.log('DEBUG: Active Order ID:', activeOrderId);
-
-    if (!attempt && !urlOrderId) {
-      router.push('/');
-      return;
-    }
-
-    // Trigger status update to Google Sheets (Client-side confirmation)
     if (activeOrderId) {
       const transactionStatus = searchParams.get('transactionStatus');
       
-      // ONLY update if it's actually Approved or missing (fallback to previous behavior but safer)
       if (!transactionStatus || transactionStatus.toUpperCase() === 'APPROVED') {
         fetch('/api/leads', {
           method: "POST",
@@ -60,17 +45,15 @@ export default function ThanksPage() {
           body: JSON.stringify({ 
             action: "update_status",
             order_id: activeOrderId,
+            customer_name: localStorage.getItem('lead_name') || 'Клієнт',
+            utm_source: localStorage.getItem('lead_utm_source') || '',
+            utm_medium: localStorage.getItem('lead_utm_medium') || '',
             status: "APPROVED (Redirect)",
-            tg_msg_id: activeTgMsgId, // Use the ID from browser storage!
-            target_sheet_id: "1127634999"
+            tg_msg_id: activeTgMsgId
           }),
-        }).then(() => {
-          if (sessionOrderId) sessionStorage.removeItem('lastOrderId');
-          localStorage.removeItem('tg_msg_id_data'); // Clear after use
-          sessionStorage.removeItem('savedFormData'); // Clear form on success
-        }).catch(e => console.error("Update failed:", e));
-      } else {
-        console.log("Payment not approved on redirect:", transactionStatus);
+        }).finally(() => {
+          localStorage.removeItem('tg_msg_id_data');
+        });
       }
     }
   }, [router]);
@@ -87,20 +70,13 @@ export default function ThanksPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="mb-12 flex justify-center">
-            <div className="w-24 h-24 border border-white/20 rounded-full flex items-center justify-center">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M5 13l4 4L19 7" strokeLinecap="square" strokeLinejoin="miter"/>
-              </svg>
-            </div>
-          </div>
-
           <h1 className="font-manrope text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 italic">
             ДЯКУЄМО!
           </h1>
           
-          <p className="font-inter text-lg text-white/60 mb-12 leading-relaxed">
-            Ваша бронь успішно зафіксована. Найближчим часом ми зв{`'`}яжемося з вами через Telegram для уточнення деталей та надання доступу до бонусів.
+          <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
+            Ваша бронь успішно зафіксована.<br/>
+            Напишіть нам у Telegram для отримання подальших інструкцій.
           </p>
 
           <div className="space-y-4">
@@ -109,13 +85,6 @@ export default function ThanksPage() {
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               НАПИСАТИ В TELEGRAM
-            </Link>
-            
-            <Link 
-              href="/" 
-              className="block w-full border border-white/20 py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
-            >
-              НА ГОЛОВНУ
             </Link>
           </div>
         </motion.div>

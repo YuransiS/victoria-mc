@@ -1,28 +1,18 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function PaymentErrorPage() {
+export default function FailPage() {
   const router = useRouter();
-  const [orderDetails, setOrderDetails] = useState<any>(null);
 
   useEffect(() => {
-    // Check if we have payment attempt info
-    const attempt = sessionStorage.getItem('paymentAttempted');
-    if (!attempt) {
-      router.push('/');
-      return;
-    }
-
-    // Get order and TG info with 24h check
     const lastOrderId = sessionStorage.getItem('lastOrderId');
     let activeTgMsgId = null;
     
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
-    console.log('DEBUG: Raw localStorage data (Fail):', tgDataRaw);
+
     if (tgDataRaw) {
       try {
         const tgData = JSON.parse(tgDataRaw);
@@ -42,31 +32,24 @@ export default function PaymentErrorPage() {
     const urlTgMsgId = searchParams.get('tg_msg_id');
     
     const activeOrderId = urlOrderId || lastOrderId;
-    if (urlTgMsgId) {
-      activeTgMsgId = urlTgMsgId;
-      console.log('DEBUG: Found TG Msg ID in URL (Fail):', urlTgMsgId);
-    }
-
-    console.log('DEBUG: Final TG Msg ID to update (Fail):', activeTgMsgId);
+    if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     if (activeOrderId) {
-      setOrderDetails({ id: activeOrderId });
-      
-      // Update status in sheets AND Telegram
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           action: "update_status",
           order_id: activeOrderId,
+          customer_name: localStorage.getItem('lead_name') || 'Клієнт',
+          utm_source: localStorage.getItem('lead_utm_source') || '',
+          utm_medium: localStorage.getItem('lead_utm_medium') || '',
           status: "DECLINED (Redirect)",
-          tg_msg_id: activeTgMsgId, // Use the ID from browser storage!
-          target_sheet_id: "1127634999"
+          tg_msg_id: activeTgMsgId
         }),
-      }).then(() => {
-        // Clear session info after failed update attempt to keep it clean
+      }).finally(() => {
         localStorage.removeItem('tg_msg_id_data');
-      }).catch(e => console.error("Update failed:", e));
+      });
     }
   }, [router]);
 
@@ -82,38 +65,22 @@ export default function PaymentErrorPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="mb-12 flex justify-center">
-            <div className="w-24 h-24 border border-red-500/20 rounded-full flex items-center justify-center">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5">
-                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="square" strokeLinejoin="miter"/>
-              </svg>
-            </div>
-          </div>
-
           <h1 className="font-manrope text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 italic text-red-500">
             ПОМИЛКА ОПЛАТИ
           </h1>
           
-          <p className="font-inter text-lg text-white/60 mb-12 leading-relaxed">
-            На жаль, платіж не було завершено. Це могло статися через недостатню кількість коштів, ліміти банку або технічну відмову. 
-            <br /><br />
-            Ваші дані збережені, ви можете спробувати ще раз.
+          <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
+            На жаль, платіж не було завершено.<br/>
+            Спробуйте ще раз або зверніться до підтримки.
           </p>
 
           <div className="space-y-4">
             <button 
-              onClick={() => router.push('/price?retry=payment')}
+              onClick={() => router.back()}
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               СПРОБУВАТИ ЩЕ РАЗ
             </button>
-            
-            <Link 
-              href="https://t.me/vika_cooperation" 
-              className="block w-full border border-white/20 py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
-            >
-              ДОПОМОГА В TELEGRAM
-            </Link>
           </div>
         </motion.div>
       </div>

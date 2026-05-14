@@ -1,21 +1,17 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function PracticumFailPage() {
   const router = useRouter();
-  const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
 
   useEffect(() => {
-    const attempt = sessionStorage.getItem('paymentAttempted');
     const lastOrderId = sessionStorage.getItem('lastOrderId');
     let activeTgMsgId = null;
     
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
-    let debug = `Order: ${lastOrderId || 'None'}\nRaw TG Data: ${tgDataRaw || 'Empty'}`;
 
     if (tgDataRaw) {
       try {
@@ -23,18 +19,13 @@ export default function PracticumFailPage() {
         const isExpired = Date.now() - tgData.timestamp > 24 * 60 * 60 * 1000;
         if (!isExpired) {
           activeTgMsgId = tgData.id;
-          debug += `\nFound ID: ${activeTgMsgId}`;
         } else {
-          debug += `\nID Expired!`;
           localStorage.removeItem('tg_msg_id_data');
         }
       } catch (e) {
-        debug += `\nParse Error!`;
         localStorage.removeItem('tg_msg_id_data');
       }
     }
-    
-    setDebugInfo(debug);
 
     const searchParams = new URLSearchParams(window.location.search);
     const urlOrderId = searchParams.get('orderReference') || searchParams.get('order_id');
@@ -44,23 +35,21 @@ export default function PracticumFailPage() {
     if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     if (activeOrderId) {
-      setDebugInfo(prev => prev + "\nSending failure update request...");
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           action: "update_status",
           order_id: activeOrderId,
+          customer_name: localStorage.getItem('lead_name') || 'Клієнт',
+          utm_source: localStorage.getItem('lead_utm_source') || '',
+          utm_medium: localStorage.getItem('lead_utm_medium') || '',
           status: "DECLINED (Redirect)",
           tg_msg_id: activeTgMsgId,
           target_sheet_id: "1127634999"
         }),
-      }).then(async (res) => {
-        const data = await res.json();
-        setDebugInfo(prev => prev + `\nServer Response: ${JSON.stringify(data)}`);
+      }).finally(() => {
         localStorage.removeItem('tg_msg_id_data');
-      }).catch(e => {
-        setDebugInfo(prev => prev + `\nUpdate Failed: ${e.message}`);
       });
     }
   }, [router]);
@@ -82,14 +71,9 @@ export default function PracticumFailPage() {
           </h1>
           
           <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
-            На жаль, платіж за Практикум не було завершено.
+            На жаль, платіж за Практикум не було завершено.<br/>
+            Спробуйте ще раз або зверніться до підтримки.
           </p>
-
-          {/* DEBUG BLOCK FOR USER */}
-          <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-xl text-left font-mono text-xs text-red-400 whitespace-pre-wrap">
-            <div className="text-white/40 mb-2 uppercase text-[10px] tracking-widest">Debug Info (Test Mode):</div>
-            {debugInfo}
-          </div>
 
           <div className="space-y-4">
             <button 

@@ -21,19 +21,23 @@ export async function POST(request: Request) {
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
       
-      // Try to get name from orderId (VMC_Name_Timestamp) or fallback
-      let customerName = 'Клієнт';
-      if (orderId && orderId.includes('_')) {
+      // Get name from request or try to extract from orderId, fallback to 'Клієнт'
+      let customerName = data.customer_name || 'Клієнт';
+      
+      if (customerName === 'Клієнт' && orderId && orderId.includes('_')) {
         const parts = orderId.split('_');
-        if (parts.length >= 2 && parts[0] === 'VMC') customerName = 'Клієнт'; // It's VMC_Timestamp
-        else customerName = parts[0]; 
+        if (parts[0] !== 'VMC') customerName = parts[0]; 
       }
 
       console.log(`DEBUG: Updating TG message ${messageId} in chat ${chatId}`);
       
+      const utmSource = data.utm_source || '';
+      const utmMedium = data.utm_medium || '';
+      const utmInfo = utmSource ? `\n\n🔍 <b>Джерело:</b> ${utmSource} / ${utmMedium || '-'}` : "";
+
       const text = isSuccess 
-        ? `✅ <b>Оплата успішна!</b> (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус оновлено.`
-        : `❌ <b>Оплата відхилена</b> (Практикум)\n\n👤 Клієнт: ${customerName}\n🆔 ID: ${orderId}\n\nСтатус: ${data.status || 'Declined'}`;
+        ? `✅ <b>Оплата успішна! (Практикум)</b>\n\n👤 <b>Клієнт:</b> ${customerName}\n🆔 <b>ID:</b> <code>${orderId}</code>${utmInfo}\n\nСтатус оновлено.`
+        : `❌ <b>Оплата відхилена (Практикум)</b>\n\n👤 <b>Клієнт:</b> ${customerName}\n🆔 <b>ID:</b> <code>${orderId}</code>${utmInfo}\n\nСтатус оновлено.`;
 
       try {
         const url = `https://api.telegram.org/bot${token}/editMessageText`;
