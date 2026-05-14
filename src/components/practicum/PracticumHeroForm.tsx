@@ -148,6 +148,21 @@ export function PracticumHeroForm({
         localStorage.setItem('lead_uuid', paymentData.uuid);
       }
 
+      // CRITICAL: Save data for the final TG update on Thanks page
+      localStorage.setItem('lead_tariff', tariffName);
+      localStorage.setItem('lead_amount', amount.toString());
+      localStorage.setItem('lead_currency', "USD");
+      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+
+      if (paymentData.tgMsgId) {
+        const tgData = {
+          id: paymentData.tgMsgId.toString(),
+          timestamp: Date.now()
+        };
+        localStorage.setItem('tg_msg_id_data', JSON.stringify(tgData));
+      }
+
       sessionStorage.setItem('paymentAttempted', 'true');
       sessionStorage.setItem('lastOrderId', paymentData.orderReference);
 

@@ -67,11 +67,24 @@ export const BookingModal = ({
 
   // Sync data to localStorage
   useEffect(() => {
+    // Sync core lead data
     if (formData.name) localStorage.setItem('lead_name', formData.name);
     if (formData.phone) localStorage.setItem('lead_phone', formData.phone);
     if (formData.telegram) localStorage.setItem('lead_social', formData.telegram);
 
-    // Also save context for retry logic
+    // Sync product/transaction data reactively
+    if (tariffName) localStorage.setItem('lead_tariff', tariffName);
+    if (amount) localStorage.setItem('lead_amount', amount.toString());
+    if (currency) localStorage.setItem('lead_currency', currency);
+
+    // Sync UTMs reactively if present in URL
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get('utm_source');
+    const medium = params.get('utm_medium');
+    if (source) localStorage.setItem('lead_utm_source', source);
+    if (medium) localStorage.setItem('lead_utm_medium', medium);
+
+    // Also save context for retry logic in sessionStorage
     if (tariffName) {
       sessionStorage.setItem('lastTariffName', tariffName);
       sessionStorage.setItem('lastAmount', amount.toString());
@@ -259,7 +272,11 @@ export const BookingModal = ({
       });
 
       document.body.appendChild(form);
-      form.submit();
+      
+      // Give Meta Pixel and localStorage time to finalize before navigation
+      setTimeout(() => {
+        form.submit();
+      }, 500);
     } catch (error) {
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");

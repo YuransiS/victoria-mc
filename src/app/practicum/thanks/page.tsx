@@ -69,7 +69,7 @@ export default function PracticumThanksPage() {
             utm_medium: localStorage.getItem('lead_utm_medium') || '',
             status: "APPROVED (Redirect)",
             tg_msg_id: activeTgMsgId,
-            target_sheet_id: "1127634999"
+            target_sheet: "Практикум"
           }),
         }).finally(() => {
           localStorage.removeItem('tg_msg_id_data');
