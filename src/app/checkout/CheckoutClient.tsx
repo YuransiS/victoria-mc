@@ -35,14 +35,18 @@ export default function CheckoutClient({ payload }: { payload: any }) {
       });
 
       const paymentData = await res.json();
+      console.log('DEBUG: Payment Data from Server:', paymentData);
       
       // Save TG Message ID to local storage with timestamp for later use
       if (paymentData.tgMsgId) {
+        console.log('DEBUG: Storing TG Msg ID:', paymentData.tgMsgId);
         const tgData = {
           id: paymentData.tgMsgId.toString(),
           timestamp: Date.now()
         };
         localStorage.setItem('tg_msg_id_data', JSON.stringify(tgData));
+      } else {
+        console.warn('DEBUG: No tgMsgId received from server!');
       }
 
       if (paymentData.error) {
@@ -134,11 +138,18 @@ export default function CheckoutClient({ payload }: { payload: any }) {
           {isLoading ? (
             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : status === 'declined' ? (
-            'Спробувати ще раз'
+            'СПРОБУВАТИ ЩЕ РАЗ'
           ) : (
-            'Перейти до оплати'
+            'ПЕРЕЙТИ ДО ОПЛАТИ'
           )}
         </button>
+
+        {/* Small hidden debug hint for testing */}
+        {typeof window !== 'undefined' && localStorage.getItem('tg_msg_id_data') && (
+          <div className="mt-2 text-[8px] text-white/10 uppercase tracking-tighter">
+            TG ID Stored
+          </div>
+        )}
         
         <div className="mt-6 flex items-center gap-2 justify-center opacity-50 relative z-10">
           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

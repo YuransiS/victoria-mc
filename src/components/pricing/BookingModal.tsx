@@ -190,6 +190,17 @@ export const BookingModal = ({
       localStorage.setItem('lead_name', formData.name);
       localStorage.setItem('lead_phone', sanitizedPhone);
       localStorage.setItem('lead_social', formData.telegram);
+      
+      // CRITICAL: Save TG Message ID to local storage for Thanks page
+      if (paymentData.tgMsgId) {
+        console.log('DEBUG: Storing TG Msg ID from Modal:', paymentData.tgMsgId);
+        const tgData = {
+          id: paymentData.tgMsgId.toString(),
+          timestamp: Date.now()
+        };
+        localStorage.setItem('tg_msg_id_data', JSON.stringify(tgData));
+      }
+
       if (paymentData.uuid) {
         localStorage.setItem('lead_uuid', paymentData.uuid);
       }
