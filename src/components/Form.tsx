@@ -91,7 +91,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     };
 
     // Track Lead
-    trackFBEvent("Lead", { 
+    trackFBEvent("Lead", {
       content_name: "Masterclass Registration",
       value: 0,
       currency: "UAH",
@@ -102,7 +102,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       const res = await fetch('/api/lead', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           ...formData,
           ...utmData,
           target_sheet: "Masterclass_Leads" // Set a descriptive sheet name
@@ -120,7 +120,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     }
 
     setStatus("redirecting");
-    
+
     setTimeout(() => {
       window.location.href = TELEGRAM_LINK;
     }, 1500);
@@ -133,21 +133,21 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
           <span className={styles.liveDot}></span>
           <span>зараз заповнюють анкету: {activeUsers} людини</span>
         </div>
-        <Input 
-          label="ІМ'Я ТА ПРІЗВИЩЕ" 
-          name="name" 
-          type="text" 
-          placeholder="Ваше ім'я" 
+        <Input
+          label="ІМ'Я ТА ПРІЗВИЩЕ"
+          name="name"
+          type="text"
+          placeholder="Ваше ім'я"
           value={formData.name}
           onChange={handleChange}
           error={errors.name}
           disabled={status !== "idle"}
         />
-        <Input 
-          label="ТЕЛЕГРАМ @НІК АБО НОМЕР ТЕЛЕФОНУ" 
-          name="phone" 
-          type="text" 
-          placeholder="@nickname або номер телефону" 
+        <Input
+          label="ТЕЛЕГРАМ @НІК АБО НОМЕР ТЕЛЕФОНУ"
+          name="phone"
+          type="text"
+          placeholder="@nickname або номер телефону"
           value={formData.phone}
           onChange={handleChange}
           error={errors.phone}
@@ -155,26 +155,26 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
           disabled={status !== "idle"}
         />
 
-        <Button 
-          type="submit" 
-          variant="primary" 
+        <Button
+          type="submit"
+          variant="primary"
           className={styles.submitBtn}
           disabled={status !== "idle"}
           style={{ width: "100%" }}
         >
-          {status === "loading" ? "ВІДПРАВКА..." : 
-           status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : 
-           buttonText}
+          {status === "loading" ? "ВІДПРАВКА..." :
+            status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." :
+              buttonText}
         </Button>
 
         <p className={styles.bonusText}>
-          <strong>Бонус:</strong> Готова структура блогу на 6 місяців (отримаєш відразу після реєстрації).
+          <strong>Бонус:</strong> 50 тем для контенту (отримаєш відразу після реєстрації)
         </p>
       </form>
 
       <AnimatePresence>
         {status === "redirecting" && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className={styles.redirectOverlay}

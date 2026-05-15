@@ -23,14 +23,14 @@ export function ExitIntentModal() {
 
       const currentScrollY = window.scrollY;
       const scrollSpeed = lastScrollY - currentScrollY;
-      
+
       // Increased threshold to 150px/frame and require being at least 500px down 
       // This detects a very aggressive "flick" upwards which usually means trying to leave/refresh
       if (scrollSpeed > 150 && currentScrollY > 500) {
         setIsVisible(true);
         setHasShown(true);
       }
-      
+
       lastScrollY = currentScrollY;
     };
 
@@ -46,7 +46,7 @@ export function ExitIntentModal() {
     document.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('scroll', handleScroll);
@@ -58,7 +58,7 @@ export function ExitIntentModal() {
   const scrollToHero = () => {
     setIsVisible(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Slight delay, then focus the form input if we have one
     setTimeout(() => {
       const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement | null;
@@ -72,7 +72,7 @@ export function ExitIntentModal() {
     <AnimatePresence>
       {isVisible && (
         <div className={styles.overlay} onClick={() => setIsVisible(false)}>
-          <motion.div 
+          <motion.div
             className={styles.modal}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -84,7 +84,7 @@ export function ExitIntentModal() {
             <div className={styles.content}>
               <h2 className={styles.title}>ЗАЧЕКАЙТЕ! 🛑</h2>
               <p className={styles.subtitle}>Ви точно хочете пропустити це?</p>
-              <p className={styles.mainText}>На майстер-клас залишилося лише <b>3 місця</b> з крутим бонусом: «Готова структура блогу на 6 місяців».</p>
+              <p className={styles.mainText}>На майстер-клас залишилося лише <b>3 місця</b> з крутим бонусом: 50 тем для контенту</p>
               <button className={styles.ctaButton} onClick={scrollToHero}>
                 ЗАБРАТИ СВІЙ БОНУС
               </button>
