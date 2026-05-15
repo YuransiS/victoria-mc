@@ -94,7 +94,7 @@ export const PricingSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTariff, setSelectedTariff] = useState<{name: string, amount: number}>({name: "", amount: 1000});
   
-  const { isExpired, timeParts } = usePersistentTimer(24);
+  const { isExpired, timeParts, reset } = usePersistentTimer(24);
 
   const handleBook = (tariffName: string) => {
     setSelectedTariff({ name: tariffName, amount: 1000 });
@@ -213,8 +213,7 @@ export const PricingSection = () => {
                 className="flex gap-4 font-headline text-4xl font-black bg-black text-white px-6 py-2 rounded-lg cursor-pointer"
                 onClick={(e) => {
                   if (e.detail === 3) {
-                    localStorage.removeItem('visitStartTime');
-                    window.location.reload();
+                    reset();
                   }
                 }}
                 title="Triple click to reset (Dev)"

@@ -8,6 +8,15 @@ import { motion } from "framer-motion";
 
 export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
+  const [formattedDate, setFormattedDate] = useState("");
+
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const d = String(tomorrow.getDate()).padStart(2, '0');
+    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    setFormattedDate(`${d}.${m}`);
+  }, []);
 
   useEffect(() => {
     const handleNewRegistration = () => {
@@ -47,8 +56,8 @@ export function Block1Hero() {
               animate={{ opacity: 0.8, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              <span>21.04</span>
-              <span>18:00 ЗА КИЄВОМ</span>
+              <span>{formattedDate || "..."}</span>
+              <span>19:00 ЗА КИЄВОМ</span>
             </motion.div>
 
             <motion.h1

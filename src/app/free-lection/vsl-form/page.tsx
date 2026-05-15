@@ -16,6 +16,8 @@ interface FormData {
   target_sheet: string;
 }
 
+const REDIRECT_URL = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
+
 const names = ["Олена", "Марія", "Ірина", "Анастасія", "Тетяна", "Юлія", "Наталія", "Світлана", "Оксана", "Вікторія", "Дарина", "Анна", "Христина"];
 const actions = ["заповнила анкету", "забронювала місце", "щойно переглянула відео-урок", "хоче на курс"];
 
@@ -197,6 +199,11 @@ export default function StvoryuiPage() {
         setSuccess(true);
         reset();
         document.body.classList.add('modal-open');
+        
+        // Redirect to Telegram
+        setTimeout(() => {
+          window.location.href = REDIRECT_URL;
+        }, 2000);
       } else {
         alert('Щось пішло не так. Спробуйте ще раз.');
       }
@@ -211,6 +218,7 @@ export default function StvoryuiPage() {
   const closeSuccessModal = () => {
     setSuccess(false);
     document.body.classList.remove('modal-open');
+    window.location.href = REDIRECT_URL;
   };
 
   return (

@@ -5,11 +5,21 @@ export const usePersistentTimer = (durationHours: number = 24) => {
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    // Check if we are in search of a reset trigger
+    // Check for reset triggers in the URL
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('dev_reset') === 'secret_token_123') {
+    const isAdminReset = urlParams.get('admin_reset') === 'victoria';
+    const isUserReset = urlParams.has('latedate-newcounter');
+
+    if (isAdminReset) {
       localStorage.removeItem('visitStartTimeV2');
-      // Remove the param from URL without refreshing
+      localStorage.removeItem('timerResetUsed'); // Reset the usage flag too for admin convenience
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (isUserReset) {
+      const alreadyReset = localStorage.getItem('timerResetUsed');
+      if (!alreadyReset) {
+        localStorage.removeItem('visitStartTimeV2');
+        localStorage.setItem('timerResetUsed', 'true');
+      }
       window.history.replaceState({}, '', window.location.pathname);
     }
 
@@ -53,6 +63,7 @@ export const usePersistentTimer = (durationHours: number = 24) => {
     timeParts: getTimeParts(),
     reset: () => {
       localStorage.removeItem('visitStartTimeV2');
+      localStorage.removeItem('timerResetUsed');
       window.location.reload();
     }
   };
