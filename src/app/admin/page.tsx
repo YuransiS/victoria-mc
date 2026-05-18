@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, MousePointer2, CreditCard, Search, ChevronRight, User, Phone,
   Activity, History, Tag, BarChart3, PieChart as PieChartIcon,
-  Filter, DollarSign, Copy, Check, Send, LogOut, Loader2, LayoutGrid, List
+  Filter, DollarSign, Copy, Check, Send, LogOut, Loader2, LayoutGrid, List,
+  Compass, Globe, ExternalLink, FileText, Target, Calendar
 } from 'lucide-react';
 import KanbanBoard from '@/components/admin/KanbanBoard';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
@@ -75,13 +76,23 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
+    const elements = [document.body, document.documentElement];
     if (selectedVisitorId) {
-      document.body.style.overflow = 'hidden';
+      elements.forEach(el => {
+        el.style.overflow = 'hidden';
+        el.style.height = '100vh';
+      });
     } else {
-      document.body.style.overflow = '';
+      elements.forEach(el => {
+        el.style.overflow = '';
+        el.style.height = '';
+      });
     }
     return () => {
-      document.body.style.overflow = '';
+      elements.forEach(el => {
+        el.style.overflow = '';
+        el.style.height = '';
+      });
     };
   }, [selectedVisitorId]);
 
@@ -117,9 +128,18 @@ export default function AdminDashboard() {
       return parseInt(str);
     }
     
+    // Try native Date.parse first (useful for ISO formats like 2026-05-10T12:41:34.000Z)
+    const nativeParsed = Date.parse(str);
+    if (!isNaN(nativeParsed)) {
+      return nativeParsed;
+    }
+    
+    // Normalize: replace comma with space, replace multiple spaces with single space
+    const cleanStr = str.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+    
     // Parse DD.MM.YYYY HH:MM:SS or DD.MM.YYYY HH:MM or DD.MM.YYYY
     const dmyRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/;
-    const match = str.match(dmyRegex);
+    const match = cleanStr.match(dmyRegex);
     if (match) {
       const day = parseInt(match[1]);
       const month = parseInt(match[2]) - 1; // JS months are 0-11
@@ -130,9 +150,10 @@ export default function AdminDashboard() {
       return new Date(year, month, day, hour, minute, second).getTime();
     }
     
-    // Fallback to standard new Date()
-    const parsed = new Date(str.replace(/-/g, '/')).getTime(); // Replace dashes for safari/compat
-    return isNaN(parsed) ? 0 : parsed;
+    // Fallback for dates like YYYY-MM-DD HH:MM:SS by replacing dashes only if it doesn't have 'T'
+    const normalizedStr = str.includes('T') ? str : str.replace(/-/g, '/');
+    const fallbackParsed = Date.parse(normalizedStr);
+    return isNaN(fallbackParsed) ? 0 : fallbackParsed;
   };
 
   const getStatusData = (lead: Lead) => {
@@ -169,7 +190,7 @@ export default function AdminDashboard() {
     const isExpired = !isPaid && !isFailed && leadDateTime > 0 && (Date.now() - leadDateTime > 24 * 60 * 60 * 1000);
 
     const sheetNameClean = getSheetName(lead._sheet || '').toLowerCase();
-    const isFreeSheet = ['vsl 1 етап', 'vsl форма', 'vsl воронка (старт)', 'безкоштовна лекція', 'ленд 1', 'ленд 2', 'мастеркласс'].some(s => sheetNameClean.includes(s)) ||
+    const isFreeSheet = ['vsl 1 етап', 'vsl форма', 'vsl воронка (старт)', 'безкоштовна лекція', 'ленд 1', 'ленд 2', 'мастеркласс', 'майстер клас'].some(s => sheetNameClean.includes(s)) ||
                         (!isPaid && amountVal === 0 && !tariffRaw && !statusRaw.includes('очікує') && !statusRaw.includes('pending'));
 
     const isTripwirePrice = amountVal === 9 || amountVal === 39;
@@ -223,6 +244,7 @@ export default function AdminDashboard() {
   const getSheetName = (name: string) => {
     if (name === 'VSL 1 етап' || name === 'Ленд 1') return 'VSL Воронка (старт)';
     if (name === 'VSL Форма' || name === 'Ленд 2') return 'VSL Форма';
+    if (name === 'Лиды МК' || name === 'Masterclass_Leads') return 'Майстер-клас';
     return name;
   };
 
@@ -281,7 +303,7 @@ export default function AdminDashboard() {
   };
 
   // Process and deduplicate leads
-  const processedLeads = useMemo(() => {
+  const { processedLeads, visitorToSelectionId, uuidToSelectionId } = useMemo(() => {
     const map = new Map<string, any>();
     
     leads.forEach((l, index) => {
@@ -305,7 +327,7 @@ export default function AdminDashboard() {
       const isValidVisitor = cleanVisitor.length > 5 && 
                              !cleanVisitor.toLowerCase().includes('null') && 
                              !cleanVisitor.toLowerCase().includes('undefined');
-
+      
       if (cleanUUID) {
         identifier = cleanUUID;
       } else if (isValidPhone) {
@@ -332,7 +354,9 @@ export default function AdminDashboard() {
         _niche: sData.niche,
         _allSheets: [getSheetName(l._sheet)],
         _tags: [] as string[],
-        _latestAction: leadDate
+        _latestAction: leadDate,
+        _allVisitorIds: cleanVisitor ? [cleanVisitor] : [],
+        _allUUIDs: cleanUUID ? [cleanUUID] : []
       };
 
       if (!map.has(identifier)) {
@@ -355,6 +379,14 @@ export default function AdminDashboard() {
           existing._latestAction = leadDate;
         }
 
+        // Update all associated visitor IDs and UUIDs
+        if (cleanVisitor && !existing._allVisitorIds.includes(cleanVisitor)) {
+          existing._allVisitorIds.push(cleanVisitor);
+        }
+        if (cleanUUID && !existing._allUUIDs.includes(cleanUUID)) {
+          existing._allUUIDs.push(cleanUUID);
+        }
+
         // Merge phones/telegrams visually
         if (phone && String(existing.phone) !== String(phone) && !String(existing.phone || '').includes(phone)) {
             existing.phone = [existing.phone, phone].filter(Boolean).join(', ');
@@ -374,6 +406,8 @@ export default function AdminDashboard() {
             _isDuplicate: true,
             _tags: mergedTags,
             _latestAction: existing._latestAction, // Preserve the latest action we just updated
+            _allVisitorIds: existing._allVisitorIds,
+            _allUUIDs: existing._allUUIDs,
             phone: existing.phone, // preserve merged
             telegram: existing.telegram, // preserve merged
             comment: l.comment || l["Коментар"] || existing.comment || existing["Коментар"]
@@ -392,18 +426,38 @@ export default function AdminDashboard() {
         }
     });
 
+    // Build lookup indexes for correct traffic matching
+    const visitorToSelectionId = new Map<string, string>();
+    const uuidToSelectionId = new Map<string, string>();
+
+    map.forEach((lead) => {
+      lead._allVisitorIds.forEach((vid: string) => {
+        visitorToSelectionId.set(vid, lead._selectionId);
+      });
+      lead._allUUIDs.forEach((uuid: string) => {
+        uuidToSelectionId.set(uuid, lead._selectionId);
+      });
+    });
+
     // Process traffic to update latest action timestamp for existing leads
     traffic.forEach(t => {
        const vid = t.visitorId || t["Visitor ID"];
        const tUuid = (t as any).UUID;
        const tDate = parseSheetDate(t.date || t["Дата та час"] || t["Дата"]);
        
-       if (tUuid && map.has(tUuid)) {
-           const user = map.get(tUuid);
-           if (tDate > user._latestAction) user._latestAction = tDate;
-       } else if (vid && map.has(vid)) {
-           const user = map.get(vid);
-           if (tDate > user._latestAction) user._latestAction = tDate;
+       let matchedSelectionId: string | undefined;
+       if (tUuid) {
+         matchedSelectionId = uuidToSelectionId.get(tUuid);
+       }
+       if (!matchedSelectionId && vid) {
+         matchedSelectionId = visitorToSelectionId.get(vid);
+       }
+       
+       if (matchedSelectionId && map.has(matchedSelectionId)) {
+         const user = map.get(matchedSelectionId);
+         if (tDate > user._latestAction) {
+           user._latestAction = tDate;
+         }
        }
     });
 
@@ -416,8 +470,12 @@ export default function AdminDashboard() {
         return { ...lead, _tags: tags };
     });
     
-    return result.sort((a, b) => b._latestAction - a._latestAction);
-  }, [leads, traffic]);
+    return {
+      processedLeads: result.sort((a, b) => b._latestAction - a._latestAction),
+      visitorToSelectionId,
+      uuidToSelectionId
+    };
+  }, [leads, traffic, globalUsers]);
 
   // Apply filters
   const finalLeads = useMemo(() => {
@@ -566,6 +624,8 @@ export default function AdminDashboard() {
       setLocalComment(selectedLead.comment || selectedLead["Коментар"] || '');
     }
   }, [selectedVisitorId]);
+
+
 
   if (loading && leads.length === 0) {
     return (
@@ -743,10 +803,16 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="relative w-full max-w-4xl bg-[#111111] border border-white/10 rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:h-[650px] md:max-h-[80vh]"
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              className="relative w-full max-w-4xl bg-[#111111] border border-white/10 rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:h-[650px] md:max-h-[80vh] premium-scrollbar"
             >
               {/* Left Column */}
-              <div className="w-full md:w-[360px] bg-[#0A0A0A] p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/5 md:overflow-y-auto md:h-full shrink-0">
+              <div 
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                className="w-full md:w-[360px] bg-[#0A0A0A] p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/5 md:overflow-y-auto md:h-full shrink-0 premium-scrollbar"
+              >
                 <div className="flex items-center justify-between mb-8">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#222] to-[#111] border border-white/5 flex items-center justify-center text-2xl font-bold text-white/80 shadow-inner">
                     {selectedLead["Ім'я"]?.[0] || 'U'}
@@ -791,6 +857,91 @@ export default function AdminDashboard() {
                     <InfoRow icon={<Activity size={14} />} label="Ніша" value={selectedLead._niche || '—'} italic />
                   </div>
 
+                  <div className="pt-6 border-t border-white/5 space-y-4">
+                    <p className="text-[9px] uppercase font-bold text-white/30 tracking-[0.2em] mb-1">Маркетингове джерело (UTM)</p>
+                    <InfoRow icon={<Compass size={14} />} label="Джерело" value={selectedLead.utm_source || selectedLead["utm_source"] || selectedLead["Source"] || selectedLead["Джерело"] || '—'} />
+                    <InfoRow icon={<Globe size={14} />} label="Канал" value={selectedLead.utm_medium || selectedLead["utm_medium"] || selectedLead["Medium"] || selectedLead["Канал"] || '—'} />
+                    <InfoRow icon={<Target size={14} />} label="Кампанія" value={selectedLead.utm_campaign || selectedLead["utm_campaign"] || selectedLead["Campaign"] || selectedLead["Кампанія"] || '—'} />
+                    {(selectedLead.utm_content || selectedLead["utm_content"] || selectedLead["Content"]) && (
+                      <InfoRow icon={<FileText size={14} />} label="Контент" value={selectedLead.utm_content || selectedLead["utm_content"] || selectedLead["Content"] || '—'} />
+                    )}
+                    {(selectedLead.url || selectedLead["url"] || selectedLead["URL"]) && (
+                      <InfoRow icon={<ExternalLink size={14} />} label="URL першого торкання" value={selectedLead.url || selectedLead["url"] || selectedLead["URL"] || '—'} isCopyable />
+                    )}
+                  </div>
+
+                  {/* First Touch Block */}
+                  {(() => {
+                    const leadPhone = normalizePhone(selectedLead.phone || selectedLead["Телефон"]);
+                    const leadTg = normalizeTg(selectedLead.telegram || selectedLead["Telegram"]);
+                    
+                    const fLeads = leads.filter(l => {
+                      if (selectedLead.UUID && l.UUID && l.UUID === selectedLead.UUID) return true;
+                      const vid = l.visitorId || l["Visitor ID"];
+                      const selVid = selectedLead.visitorId || selectedLead["Visitor ID"];
+                      if (vid && selVid && vid === selVid && vid.length > 5) return true;
+                      const p = normalizePhone(l.phone || l["Телефон"]);
+                      if (p && leadPhone && leadPhone.includes(p) && p.length >= 7) return true;
+                      const t = normalizeTg(l.telegram || l["Telegram"]);
+                      const isValidTg = t && t.length > 2 && t !== 'direct' && t !== 'none' && t !== 'null' && t !== 'undefined';
+                      const isSelectedLeadTgValid = leadTg && leadTg.length > 2 && leadTg !== 'direct' && leadTg !== 'none' && leadTg !== 'null' && leadTg !== 'undefined';
+                      if (isValidTg && isSelectedLeadTgValid && leadTg.includes(t)) return true;
+                      return false;
+                    });
+
+                    const fTraffic = traffic.filter(t => {
+                      const vid = t.visitorId || t["Visitor ID"];
+                      const tUuid = (t as any).UUID;
+                      if (tUuid && uuidToSelectionId.get(tUuid) === selectedLead._selectionId) return true;
+                      if (vid && visitorToSelectionId.get(vid) === selectedLead._selectionId) return true;
+                      if (selectedLead.visitorId && (t.visitorId === selectedLead.visitorId || t["Visitor ID"] === selectedLead.visitorId)) return true;
+                      if (selectedLead.UUID && (t as any).UUID === selectedLead.UUID) return true;
+                      const matchedVisitorIds = fLeads.map(l => l.visitorId || l["Visitor ID"]).filter(Boolean);
+                      if (vid && matchedVisitorIds.includes(vid)) return true;
+                      return false;
+                    });
+
+                    const sortedChronological = [...fTraffic, ...fLeads].sort((a, b) => {
+                      const dateA = parseSheetDate(a.date || a["Дата та час"] || a["Дата"]);
+                      const dateB = parseSheetDate(b.date || b["Дата та час"] || b["Дата"]);
+                      return dateA - dateB;
+                    });
+
+                    if (sortedChronological.length > 0) {
+                      const firstEvent = sortedChronological[0];
+                      const isLead = !!firstEvent._sheet;
+                      const firstTouchDate = new Date(firstEvent.date || firstEvent["Дата та час"] || firstEvent["Дата"]).toLocaleString('uk-UA');
+                      const firstTouchPage = isLead 
+                        ? `Заявка: ${getSheetName(firstEvent._sheet)}` 
+                        : getFriendlyPathName(firstEvent.path || firstEvent["Шлях"]);
+
+                      return (
+                        <div className="pt-6 border-t border-white/5 space-y-3">
+                          <p className="text-[9px] uppercase font-bold text-white/30 tracking-[0.2em] mb-1 flex items-center gap-1.5">
+                            <Calendar size={10} className="text-[#C4A47C]" /> Перше касання (First Touch)
+                          </p>
+                          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4 space-y-3">
+                            <div>
+                              <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">Дата та час</span>
+                              <span className="text-xs font-medium text-white/80">{firstTouchDate}</span>
+                            </div>
+                            <div>
+                              <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">Сторінка входу</span>
+                              <span className="text-xs font-semibold text-[#C4A47C]">{firstTouchPage}</span>
+                            </div>
+                            {(firstEvent.utm_source || firstEvent["utm_source"] || firstEvent["Source"]) && (
+                              <div>
+                                <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">UTM Source (Перше касання)</span>
+                                <span className="text-xs font-medium text-white/70">{firstEvent.utm_source || firstEvent["utm_source"] || firstEvent["Source"]}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <div className="pt-8 border-t border-white/5 mt-auto">
                     <p className="text-[9px] uppercase font-bold text-white/30 mb-3 tracking-[0.2em]">Нотатки</p>
                     <div className="relative group">
@@ -813,7 +964,11 @@ export default function AdminDashboard() {
               </div>
 
               {/* Right Column: History */}
-              <div className="flex-1 p-6 md:p-8 md:overflow-y-auto md:h-full">
+              <div 
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                className="flex-1 p-6 md:p-8 md:overflow-y-auto md:h-full premium-scrollbar"
+              >
                 <div className="flex items-center gap-3 mb-8">
                   <History size={16} className="text-white/30" />
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white/70">Історія активності</h3>
@@ -845,17 +1000,25 @@ export default function AdminDashboard() {
                     });
 
                     const filteredTraffic = traffic.filter(t => {
+                      const vid = t.visitorId || t["Visitor ID"];
+                      const tUuid = (t as any).UUID;
+                      if (tUuid && uuidToSelectionId.get(tUuid) === selectedLead._selectionId) return true;
+                      if (vid && visitorToSelectionId.get(vid) === selectedLead._selectionId) return true;
                       if (selectedLead.visitorId && (t.visitorId === selectedLead.visitorId || t["Visitor ID"] === selectedLead.visitorId)) return true;
                       if (selectedLead.UUID && (t as any).UUID === selectedLead.UUID) return true;
                       
                       const matchedVisitorIds = filteredLeads.map(l => l.visitorId || l["Visitor ID"]).filter(Boolean);
-                      if (matchedVisitorIds.includes(t.visitorId || t["Visitor ID"])) return true;
+                      if (vid && matchedVisitorIds.includes(vid)) return true;
 
                       return false;
                     });
 
                     const allEvents = [...filteredTraffic, ...filteredLeads] as any[];
-                    allEvents.sort((a, b) => new Date(b.date || b["Дата та час"] || 0).getTime() - new Date(a.date || a["Дата та час"] || 0).getTime());
+                    allEvents.sort((a, b) => {
+                      const dateA = parseSheetDate(a.date || a["Дата та час"] || a["Дата"]);
+                      const dateB = parseSheetDate(b.date || b["Дата та час"] || b["Дата"]);
+                      return dateB - dateA;
+                    });
 
                     return allEvents.map((event, i) => {
                       const isLead = !!event._sheet;

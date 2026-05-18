@@ -102,6 +102,11 @@ html, body {
 }
 
 /* Premium Custom Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 164, 124, 0.2) transparent;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -119,4 +124,30 @@ html, body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(196, 164, 124, 0.35);
+}
+
+.premium-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 164, 124, 0.25) transparent;
+}
+
+.premium-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(196, 164, 124, 0.25);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(196, 164, 124, 0.45);
 }
