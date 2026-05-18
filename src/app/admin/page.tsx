@@ -96,6 +96,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const parseSheetDate = (dateStr: any): number => {
+    if (!dateStr) return 0;
+    const str = dateStr.toString().trim();
+    if (!str) return 0;
+    
+    // Check if it's already a timestamp
+    if (/^\d+$/.test(str)) {
+      return parseInt(str);
+    }
+    
+    // Parse DD.MM.YYYY HH:MM:SS or DD.MM.YYYY HH:MM or DD.MM.YYYY
+    const dmyRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/;
+    const match = str.match(dmyRegex);
+    if (match) {
+      const day = parseInt(match[1]);
+      const month = parseInt(match[2]) - 1; // JS months are 0-11
+      const year = parseInt(match[3]);
+      const hour = match[4] ? parseInt(match[4]) : 0;
+      const minute = match[5] ? parseInt(match[5]) : 0;
+      const second = match[6] ? parseInt(match[6]) : 0;
+      return new Date(year, month, day, hour, minute, second).getTime();
+    }
+    
+    // Fallback to standard new Date()
+    const parsed = new Date(str.replace(/-/g, '/')).getTime(); // Replace dashes for safari/compat
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const getStatusData = (lead: Lead) => {
     const statusRaw = (lead.status || lead["Статус оплати"] || lead["Статус"] || '').toString().toLowerCase();
     const amountStr = (lead.amount || lead["Сума"] || lead["Ціна"] || '').toString();
@@ -125,10 +153,21 @@ export default function AdminDashboard() {
                      statusRaw.includes('скасовано') ||
                      statusRaw.includes('помилка');
 
+    const leadDateStr = lead.date || lead["Дата та час"] || lead["Дата"];
+    const leadDateTime = parseSheetDate(leadDateStr);
+    const isExpired = !isPaid && !isFailed && leadDateTime > 0 && (Date.now() - leadDateTime > 24 * 60 * 60 * 1000);
+
+    const sheetNameClean = getSheetName(lead._sheet || '').toLowerCase();
+    const isFreeSheet = ['vsl 1 етап', 'vsl форма', 'vsl воронка (старт)', 'безкоштовна лекція', 'ленд 1', 'ленд 2', 'мастеркласс'].some(s => sheetNameClean.includes(s)) ||
+                        (!isPaid && amountVal === 0 && !tariffRaw && !statusRaw.includes('очікує') && !statusRaw.includes('pending'));
+
     const isTripwirePrice = amountVal === 9 || amountVal === 39;
     const isBookingPrice = amountVal === 1000;
 
-    if ((isBookingPrice || statusRaw.includes('бронь') || statusRaw.includes('заброньовано')) && isPaid) {
+    if (isFreeSheet) {
+      status = 'Заявка';
+      weight = 3;
+    } else if ((isBookingPrice || statusRaw.includes('бронь') || statusRaw.includes('заброньовано')) && isPaid) {
       status = 'Оплачено';
       weight = 5;
       revenueUAH = isBookingPrice ? 1000 : 0;
@@ -155,6 +194,9 @@ export default function AdminDashboard() {
     } else if (isFailed || statusRaw.includes('відхилено') || statusRaw.includes('скасовано')) {
       status = 'Відхилено';
       weight = 0;
+    } else if (isExpired) {
+      status = 'Минув термін';
+      weight = 0;
     } else if (isPaid) {
       // General paid status if we couldn't determine type but it's clearly paid
       status = 'Оплачено';
@@ -163,7 +205,6 @@ export default function AdminDashboard() {
 
     return { status, weight, revenueUAH, revenueUSD, tariff: tariffRaw, niche: String(lead.niche || lead["Ніша"] || lead["Niche"] || '') };
   };
-
 
   const normalizePhone = (p: any) => p?.toString().replace(/\D/g, '') || '';
   const normalizeTg = (t: any) => t?.toString().toLowerCase().replace('@', '').trim() || '';
@@ -204,10 +245,20 @@ export default function AdminDashboard() {
           bg: 'bg-[#C4A47C]/10 border-[#C4A47C]/20 text-[#C4A47C]',
           label: 'Трипвайєр ⚡'
         };
+      case 'Заявка':
+        return {
+          bg: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+          label: 'Заявка 📝'
+        };
       case 'Відхилено':
         return {
           bg: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
           label: 'Відхилено ❌'
+        };
+      case 'Минув термін':
+        return {
+          bg: 'bg-red-500/10 border-red-500/10 text-red-400/60',
+          label: 'Минув термін ⏳'
         };
       case 'Очікує':
       default:
@@ -217,7 +268,6 @@ export default function AdminDashboard() {
         };
     }
   };
-
 
   // Process and deduplicate leads
   const processedLeads = useMemo(() => {
@@ -229,7 +279,7 @@ export default function AdminDashboard() {
       const identifier = l.UUID || phone || tg || l.visitorId || l["Visitor ID"] || `temp-${Math.random()}`;
       
       const sData = getStatusData(l);
-      const leadDate = new Date(l.date || l["Дата та час"] || 0).getTime();
+      const leadDate = parseSheetDate(l.date || l["Дата та час"] || l["Дата"]);
       
       const enhancedLead = {
         ...l,
@@ -274,7 +324,7 @@ export default function AdminDashboard() {
         }
         
         // Update if new lead has higher priority status, or if same priority but newer date
-        const existingDate = new Date(existing.date || existing["Дата та час"] || 0).getTime();
+        const existingDate = parseSheetDate(existing.date || existing["Дата та час"] || existing["Дата"]);
         
         if (sData.weight > existing._computedWeight || (sData.weight === existing._computedWeight && leadDate > existingDate)) {
           const mergedTags = [...new Set([...existing._tags, 'Повтор'])];
@@ -306,7 +356,7 @@ export default function AdminDashboard() {
     traffic.forEach(t => {
        const vid = t.visitorId || t["Visitor ID"];
        const tUuid = (t as any).UUID;
-       const tDate = new Date(t.date || t["Дата та час"] || 0).getTime();
+       const tDate = parseSheetDate(t.date || t["Дата та час"] || t["Дата"]);
        
        if (tUuid && map.has(tUuid)) {
            const user = map.get(tUuid);
@@ -341,7 +391,33 @@ export default function AdminDashboard() {
       if (search && !name.includes(searchLower) && !phone.includes(search) && !tg.includes(searchLower)) return false;
 
       // Status
-      if (filterStatus !== 'all' && l._computedStatus !== filterStatus) return false;
+      if (filterStatus !== 'all') {
+        if (filterStatus === 'unpaid_intent') {
+          // 1. Must NOT be paid anywhere
+          const isPaidAnywhere = l._computedStatus === 'Оплачено' || l._computedStatus === 'Купив(-ла) трипвайєр';
+          if (isPaidAnywhere) return false;
+
+          // 2. Must have either attempted to pay or visited one of the paid pages
+          const hasUnpaidLeadAttempt = l._allSheets.some((sheet: string) => 
+            ['практикум', 'бронювання', 'розбір', 'price', 'checkout'].some(ps => sheet.toLowerCase().includes(ps))
+          );
+          
+          const visitorTraffic = traffic.filter(t => {
+            if (l.visitorId && (t.visitorId === l.visitorId || t["Visitor ID"] === l.visitorId)) return true;
+            if (l.UUID && (t as any).UUID === l.UUID) return true;
+            return false;
+          });
+          
+          const hasVisitedPaidPage = visitorTraffic.some(t => {
+            const path = (t.path || t["Шлях"] || '').toLowerCase();
+            return path.includes('/practicum') || path.includes('/checkout') || path.includes('/price') || path.includes('/rozbir');
+          });
+
+          if (!hasUnpaidLeadAttempt && !hasVisitedPaidPage) return false;
+        } else {
+          if (l._computedStatus !== filterStatus) return false;
+        }
+      }
       
       // Source
       if (filterSource !== 'all' && !l._allSheets.includes(filterSource)) return false;
@@ -495,7 +571,11 @@ export default function AdminDashboard() {
               { v: 'all', l: 'Всі статуси' },
               { v: 'Оплачено', l: 'Оплачено' },
               { v: 'Купив(-ла) трипвайєр', l: 'Тріпваєр' },
-              { v: 'Очікує', l: 'Очікує' }
+              { v: 'unpaid_intent', l: '🔥 Хотів купити, але не сплатив' },
+              { v: 'Очікує', l: 'Очікує' },
+              { v: 'Відхилено', l: 'Відхилено' },
+              { v: 'Минув термін (Expired)', l: 'Минув термін' },
+              { v: 'Заявка', l: 'Заявка (Безкоштовно)' }
             ]}
           />
 
