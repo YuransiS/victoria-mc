@@ -653,7 +653,7 @@ function formatStatus(status, sheetName, amount) {
   
   // Successful payment detection - must have APPROVED and NOT have DECLINED/FAIL
   const isApproved = s.includes("APPROVED") || s.includes("SETTLED") || s.includes("SUCCESS");
-  const isError = s.includes("DECLINED") || s.includes("FAIL") || s.includes("ERROR") || s.includes("REJECT");
+  const isError = s.includes("DECLINED") || s.includes("FAIL") || s.includes("ERROR") || s.includes("REJECT") || s.includes("EXPIRED");
   
   const isPaid = isApproved && !isError;
   
@@ -664,6 +664,7 @@ function formatStatus(status, sheetName, amount) {
   }
   
   if (s.includes("PENDING") || s.includes("ОЧІКУЄ")) return "⏳ Очікується оплата";
+  if (isError) return "Відхилено ❌";
   
   return status; 
 }

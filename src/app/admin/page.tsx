@@ -116,6 +116,15 @@ export default function AdminDashboard() {
                    statusRaw.includes('тріпваєр') || 
                    statusRaw.includes('трипвайер');
 
+    const isFailed = statusRaw.includes('declined') ||
+                     statusRaw.includes('failed') ||
+                     statusRaw.includes('expired') ||
+                     statusRaw.includes('error') ||
+                     statusRaw.includes('reject') ||
+                     statusRaw.includes('відхилено') ||
+                     statusRaw.includes('скасовано') ||
+                     statusRaw.includes('помилка');
+
     const isTripwirePrice = amountVal === 9 || amountVal === 39;
     const isBookingPrice = amountVal === 1000;
 
@@ -143,7 +152,7 @@ export default function AdminDashboard() {
       status = 'Купив(-ла) трипвайєр';
       weight = 4;
       revenueUSD = amountVal || (amountRaw.includes('39') ? 39 : 9);
-    } else if (statusRaw.includes('відхилено') || statusRaw.includes('скасовано')) {
+    } else if (isFailed || statusRaw.includes('відхилено') || statusRaw.includes('скасовано')) {
       status = 'Відхилено';
       weight = 0;
     } else if (isPaid) {
@@ -155,6 +164,7 @@ export default function AdminDashboard() {
     return { status, weight, revenueUAH, revenueUSD, tariff: tariffRaw, niche: String(lead.niche || lead["Ніша"] || lead["Niche"] || '') };
   };
 
+
   const normalizePhone = (p: any) => p?.toString().replace(/\D/g, '') || '';
   const normalizeTg = (t: any) => t?.toString().toLowerCase().replace('@', '').trim() || '';
 
@@ -163,6 +173,51 @@ export default function AdminDashboard() {
     if (name === 'VSL Форма' || name === 'Ленд 2') return 'VSL Форма';
     return name;
   };
+
+  const getFriendlyPathName = (path: string) => {
+    if (!path) return "🔗 Відвідування сайту";
+    const p = path.toLowerCase().trim();
+    
+    if (p === '/' || p === '') return "🏠 Головна сторінка (VSL)";
+    if (p.includes('/practicum')) return "📚 Практикум (Лендінг)";
+    if (p.includes('/checkout')) return "💳 Сторінка оплати (Checkout)";
+    if (p.includes('/free-lection')) return "🎥 Безкоштовна лекція";
+    if (p.includes('/rozbir')) return "🎯 Запис на розбір";
+    if (p.includes('/price')) return "💰 Прайс-лист";
+    if (p.includes('/offer')) return "📜 Публічна оферта";
+    if (p.includes('/privacy')) return "🔒 Політика конфіденційності";
+    if (p.includes('/admin')) return "🖥️ Панель адміністратора";
+    if (p.includes('/summarizer')) return "📝 Інструмент конспектування";
+    
+    return `🔗 Перегляд: ${path}`;
+  };
+
+  const getHistoryLeadStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Оплачено':
+        return {
+          bg: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+          label: 'Оплачено ✅'
+        };
+      case 'Купив(-ла) трипвайєр':
+        return {
+          bg: 'bg-[#C4A47C]/10 border-[#C4A47C]/20 text-[#C4A47C]',
+          label: 'Трипвайєр ⚡'
+        };
+      case 'Відхилено':
+        return {
+          bg: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+          label: 'Відхилено ❌'
+        };
+      case 'Очікує':
+      default:
+        return {
+          bg: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+          label: 'Очікує ⏳'
+        };
+    }
+  };
+
 
   // Process and deduplicate leads
   const processedLeads = useMemo(() => {
@@ -647,33 +702,107 @@ export default function AdminDashboard() {
                 <div className="space-y-6 relative">
                   <div className="absolute left-[15px] top-2 bottom-2 w-px bg-white/5" />
 
-                  {([...traffic.filter(t => t.visitorId === selectedVisitorId || t["Visitor ID"] === selectedVisitorId || (t as any).UUID === selectedVisitorId), ...leads.filter(l => l.visitorId === selectedVisitorId || l["Visitor ID"] === selectedVisitorId || (l as any).UUID === selectedVisitorId || normalizePhone(l.phone || l["Телефон"]) === normalizePhone(selectedLead.phone || selectedLead["Телефон"]))] as any[])
-                    .sort((a, b) => new Date(b.date || b["Дата та час"] || 0).getTime() - new Date(a.date || a["Дата та час"] || 0).getTime())
-                    .map((event, i) => {
-                      const isLead = event._sheet;
+                  {(() => {
+                    const leadPhone = normalizePhone(selectedLead.phone || selectedLead["Телефон"]);
+                    const leadTg = normalizeTg(selectedLead.telegram || selectedLead["Telegram"]);
+                    
+                    const filteredLeads = leads.filter(l => {
+                      if (selectedLead.UUID && l.UUID === selectedLead.UUID) return true;
+                      
+                      const vid = l.visitorId || l["Visitor ID"];
+                      if (selectedVisitorId && vid === selectedVisitorId) return true;
+                      
+                      const p = normalizePhone(l.phone || l["Телефон"]);
+                      if (p && leadPhone && p === leadPhone) return true;
+                      
+                      const t = normalizeTg(l.telegram || l["Telegram"]);
+                      if (t && leadTg && t === leadTg) return true;
+                      
+                      return false;
+                    });
+
+                    const filteredTraffic = traffic.filter(t => {
+                      if (selectedVisitorId && (t.visitorId === selectedVisitorId || t["Visitor ID"] === selectedVisitorId)) return true;
+                      if (selectedLead.UUID && (t as any).UUID === selectedLead.UUID) return true;
+                      
+                      const matchedVisitorIds = filteredLeads.map(l => l.visitorId || l["Visitor ID"]).filter(Boolean);
+                      if (matchedVisitorIds.includes(t.visitorId || t["Visitor ID"])) return true;
+
+                      return false;
+                    });
+
+                    const allEvents = [...filteredTraffic, ...filteredLeads] as any[];
+                    allEvents.sort((a, b) => new Date(b.date || b["Дата та час"] || 0).getTime() - new Date(a.date || a["Дата та час"] || 0).getTime());
+
+                    return allEvents.map((event, i) => {
+                      const isLead = !!event._sheet;
+                      const sData = getStatusData(event);
+                      const badge = getHistoryLeadStatusBadge(sData.status);
+                      const eventSheet = isLead ? getSheetName(event._sheet) : '';
+                      const tariff = event.tariff || event["Тариф"] || event["Пакет"] || '';
+                      const orderId = event.orderId || event["Номер замовлення"] || event["ID замовлення"] || '';
+                      const amount = event.amount || event["Сума"] || event["Ціна"] || '';
+                      const friendlyPath = !isLead ? getFriendlyPathName(event.path || event["Шлях"]) : '';
+
                       return (
                         <div key={i} className="relative pl-10 group/event">
-                          <div className={`absolute left-0 top-0.5 h-8 w-8 rounded-full flex items-center justify-center z-10 border border-white/5 transition-colors ${isLead ? 'bg-[#C4A47C]/10 text-[#C4A47C]' : 'bg-[#111] text-white/20'}`}>
+                          <div className={`absolute left-0 top-0.5 h-8 w-8 rounded-full flex items-center justify-center z-10 border border-white/5 transition-colors ${isLead ? 'bg-[#C4A47C]/10 text-[#C4A47C]' : 'bg-white/[0.02] text-white/20'}`}>
                             {isLead ? <CreditCard size={12} /> : <MousePointer2 size={12} />}
                           </div>
                           <div>
                             <p className="text-[9px] text-white/30 font-medium mb-1 tracking-wider">{new Date(event.date || event["Дата та час"]).toLocaleString('uk-UA')}</p>
                             {isLead ? (
-                              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mt-2">
-                                <div className="flex items-center justify-between">
-                                    <p className="font-bold text-[11px] text-white/80">Заявка: {getSheetName(event._sheet)}</p>
-                                    <span className="text-[11px] font-bold text-[#C4A47C]">{event.amount || event["Сума"] || '—'}</span>
+                              <div className="bg-[#161616] border border-white/5 rounded-2xl p-5 mt-2 space-y-4 shadow-xl transition-all duration-300 hover:border-white/10 animate-fade-in">
+                                <div className="flex items-center justify-between gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-[9px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border ${badge.bg}`}>
+                                      {badge.label}
+                                    </span>
+                                    {amount && (
+                                      <span className="text-[9px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border border-white/5 bg-white/[0.02] text-white/60">
+                                        💵 {amount}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {eventSheet && (
+                                    <span className="text-[9px] text-white/40 font-medium bg-white/[0.01] px-2 py-0.5 rounded-md border border-white/[0.02]">
+                                      🎯 {eventSheet}
+                                    </span>
+                                  )}
                                 </div>
+                                
+                                {(tariff || orderId) && (
+                                  <div className="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-white/[0.03]">
+                                    {tariff && (
+                                      <div>
+                                        <span className="text-white/35 text-[9px] uppercase font-bold tracking-wider block mb-0.5">Тариф</span>
+                                        <span className="font-semibold text-white/80">{tariff}</span>
+                                      </div>
+                                    )}
+                                    {orderId && (
+                                      <div>
+                                        <span className="text-white/35 text-[9px] uppercase font-bold tracking-wider block mb-0.5">ID Замовлення</span>
+                                        <span className="font-semibold text-white/50 font-mono truncate block max-w-[130px]" title={orderId}>{orderId}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             ) : (
-                              <div className="py-1">
-                                <p className="font-medium text-xs text-white/60">Перегляд: <span className="text-white/90">{event.path || event["Шлях"]}</span></p>
+                              <div className="bg-[#111111]/40 border border-white/[0.02] rounded-xl p-3.5 mt-2 transition-all duration-300 hover:bg-[#111111]/60">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-6 w-6 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/30">
+                                    <MousePointer2 size={11} />
+                                  </div>
+                                  <p className="font-medium text-xs text-white/80">{friendlyPath}</p>
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
                       );
-                    })}
+                    });
+                  })()}
                 </div>
               </div>
             </motion.div>
