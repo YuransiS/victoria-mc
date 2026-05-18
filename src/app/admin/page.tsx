@@ -74,6 +74,17 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (selectedVisitorId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedVisitorId]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -273,10 +284,39 @@ export default function AdminDashboard() {
   const processedLeads = useMemo(() => {
     const map = new Map<string, any>();
     
-    leads.forEach(l => {
+    leads.forEach((l, index) => {
       const phone = normalizePhone(l.phone || l["Телефон"]);
       const tg = normalizeTg(l.telegram || l["Telegram"] || l["Телеграм"]);
-      const identifier = l.UUID || phone || tg || l.visitorId || l["Visitor ID"] || `temp-${Math.random()}`;
+      
+      let identifier = '';
+      const cleanUUID = (l.UUID || '').trim();
+      const cleanPhone = phone;
+      const cleanTg = tg;
+      const cleanVisitor = (l.visitorId || l["Visitor ID"] || '').trim();
+
+      const isValidPhone = cleanPhone.length >= 7;
+      const isValidTg = cleanTg && 
+                        cleanTg.length > 2 && 
+                        cleanTg !== 'direct' && 
+                        cleanTg !== 'none' && 
+                        cleanTg !== 'null' && 
+                        cleanTg !== 'undefined';
+      
+      const isValidVisitor = cleanVisitor.length > 5 && 
+                             !cleanVisitor.toLowerCase().includes('null') && 
+                             !cleanVisitor.toLowerCase().includes('undefined');
+
+      if (cleanUUID) {
+        identifier = cleanUUID;
+      } else if (isValidPhone) {
+        identifier = `phone-${cleanPhone}`;
+      } else if (isValidTg) {
+        identifier = `tg-${cleanTg}`;
+      } else if (isValidVisitor) {
+        identifier = `visitor-${cleanVisitor}`;
+      } else {
+        identifier = `temp-${index}-${Date.now()}-${Math.random()}`;
+      }
       
       const sData = getStatusData(l);
       const leadDate = parseSheetDate(l.date || l["Дата та час"] || l["Дата"]);
@@ -703,10 +743,10 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="relative w-full max-w-4xl bg-[#111111] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[85vh]"
+              className="relative w-full max-w-4xl bg-[#111111] border border-white/10 rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:h-[650px] md:max-h-[80vh]"
             >
               {/* Left Column */}
-              <div className="w-full md:w-[360px] bg-[#0A0A0A] p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/5 overflow-y-auto">
+              <div className="w-full md:w-[360px] bg-[#0A0A0A] p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/5 md:overflow-y-auto md:h-full shrink-0">
                 <div className="flex items-center justify-between mb-8">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#222] to-[#111] border border-white/5 flex items-center justify-center text-2xl font-bold text-white/80 shadow-inner">
                     {selectedLead["Ім'я"]?.[0] || 'U'}
@@ -773,7 +813,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Right Column: History */}
-              <div className="flex-1 p-8 overflow-y-auto">
+              <div className="flex-1 p-6 md:p-8 md:overflow-y-auto md:h-full">
                 <div className="flex items-center gap-3 mb-8">
                   <History size={16} className="text-white/30" />
                   <h3 className="text-sm font-bold uppercase tracking-widest text-white/70">Історія активності</h3>
@@ -787,22 +827,25 @@ export default function AdminDashboard() {
                     const leadTg = normalizeTg(selectedLead.telegram || selectedLead["Telegram"]);
                     
                     const filteredLeads = leads.filter(l => {
-                      if (selectedLead.UUID && l.UUID === selectedLead.UUID) return true;
+                      if (selectedLead.UUID && l.UUID && l.UUID === selectedLead.UUID) return true;
                       
                       const vid = l.visitorId || l["Visitor ID"];
-                      if (selectedVisitorId && vid === selectedVisitorId) return true;
+                      const selVid = selectedLead.visitorId || selectedLead["Visitor ID"];
+                      if (vid && selVid && vid === selVid && vid.length > 5) return true;
                       
                       const p = normalizePhone(l.phone || l["Телефон"]);
-                      if (p && leadPhone && p === leadPhone) return true;
+                      if (p && leadPhone && leadPhone.includes(p) && p.length >= 7) return true;
                       
                       const t = normalizeTg(l.telegram || l["Telegram"]);
-                      if (t && leadTg && t === leadTg) return true;
+                      const isValidTg = t && t.length > 2 && t !== 'direct' && t !== 'none' && t !== 'null' && t !== 'undefined';
+                      const isSelectedLeadTgValid = leadTg && leadTg.length > 2 && leadTg !== 'direct' && leadTg !== 'none' && leadTg !== 'null' && leadTg !== 'undefined';
+                      if (isValidTg && isSelectedLeadTgValid && leadTg.includes(t)) return true;
                       
                       return false;
                     });
 
                     const filteredTraffic = traffic.filter(t => {
-                      if (selectedVisitorId && (t.visitorId === selectedVisitorId || t["Visitor ID"] === selectedVisitorId)) return true;
+                      if (selectedLead.visitorId && (t.visitorId === selectedLead.visitorId || t["Visitor ID"] === selectedLead.visitorId)) return true;
                       if (selectedLead.UUID && (t as any).UUID === selectedLead.UUID) return true;
                       
                       const matchedVisitorIds = filteredLeads.map(l => l.visitorId || l["Visitor ID"]).filter(Boolean);
