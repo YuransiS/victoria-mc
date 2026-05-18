@@ -342,29 +342,32 @@ function updateLeadField(data, fieldType) {
   
   let found = false;
   let uuid = "";
+  let foundTgMsgId = "";
   
   for (let s = 0; s < sheetsToSearch.length; s++) {
     const currentSheet = sheetsToSearch[s];
     const dataRange = currentSheet.getDataRange().getValues();
+    if (dataRange.length === 0) continue;
     const headers = dataRange[0];
     
-    let orderIdIdx = -1, statusIdx = -1, commentIdx = -1, uuidIdx = -1;
+    let orderIdIdx = -1, statusIdx = -1, commentIdx = -1, uuidIdx = -1, tgMsgIdIdx = -1;
     headers.forEach((h, i) => {
-      const lowH = h.toString().toLowerCase();
-      if (lowH.includes("orderid") || lowH.includes("номер замовлення") || lowH.includes("visitor id")) orderIdIdx = i;
+      const lowH = h.toString().toLowerCase().trim().replace(/[^a-z0-9а-яіїє']/g, '');
+      if (lowH.includes("orderid") || lowH.includes("номерзамовлення") || lowH.includes("visitorid")) orderIdIdx = i;
       if (lowH.includes("статус")) statusIdx = i;
       if (lowH.includes("коментар") || lowH.includes("comment")) commentIdx = i;
       if (lowH === "uuid") uuidIdx = i;
+      if (lowH === "tgmsgid" || lowH === "tgmsg" || lowH === "tg_msg_id") tgMsgIdIdx = i;
     });
     
     if (orderIdIdx === -1) continue;
     
     for (let i = 1; i < dataRange.length; i++) {
       if ((dataRange[i][orderIdIdx] || "").toString().trim() === orderId) {
-        if(uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
+        if (uuidIdx !== -1) uuid = dataRange[i][uuidIdx];
         
         if (fieldType === "status" && statusIdx !== -1) {
-          const finalStatus = formatStatus(data.status, currentSheet.getName());
+          const finalStatus = formatStatus(data.status, currentSheet.getName(), data.amount);
           currentSheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
           found = true;
         } else if (fieldType === "comment") {
@@ -373,15 +376,26 @@ function updateLeadField(data, fieldType) {
              found = true;
           }
         }
+        
+        if (tgMsgIdIdx !== -1) {
+          const msgIdVal = (dataRange[i][tgMsgIdIdx] || "").toString().trim();
+          if (msgIdVal) foundTgMsgId = msgIdVal;
+        }
+        
         if (found) break;
       }
     }
     if (found) break;
   }
   
-  if(found) {
-     if(uuid) logGlobalAction(uuid, fieldType === "status" ? "Status Update" : "Comment Update", targetSheetName, data);
-     return createSuccessResponse("Field updated");
+  if (found) {
+     if (uuid) logGlobalAction(uuid, fieldType === "status" ? "Status Update" : "Comment Update", targetSheetName, data);
+     return ContentService.createTextOutput(JSON.stringify({
+       status: "success", 
+       result: "success", 
+       message: "Field updated", 
+       tg_msg_id: foundTgMsgId
+     })).setMimeType(ContentService.MimeType.JSON);
   }
   return createErrorResponse("Lead not found");
 }
@@ -539,6 +553,12 @@ function updatePaymentStatus(data) {
   let found = false;
   let uuid = "";
   let foundTgMsgId = "";
+  let customerName = "";
+  let customerPhone = "";
+  let telegramNick = "";
+  let tariffName = "";
+  let amountVal = "";
+  let matchedSheetName = "";
   
   for (let s = 0; s < sheets.length; s++) {
     const currentSheet = sheets[s];
@@ -546,15 +566,22 @@ function updatePaymentStatus(data) {
     if (name === "System_Logs" || name === "Errors" || name === "Global_Users" || name === "Global_Actions" || name === "Traffic") continue;
     
     const dataRange = currentSheet.getDataRange().getValues();
+    if (dataRange.length === 0) continue;
     const headers = dataRange[0];
     
     let orderIdIdx = -1, statusIdx = -1, uuidIdx = -1, tgMsgIdIdx = -1;
+    let nameIdx = -1, phoneIdx = -1, telegramIdx = -1, tariffIdx = -1, amountIdx = -1;
     headers.forEach((h, i) => {
-      const lowH = h.toString().toLowerCase().trim();
-      if (lowH.includes("orderid") || lowH.includes("номер замовлення") || lowH.includes("visitor id")) orderIdIdx = i;
+      const lowH = h.toString().toLowerCase().trim().replace(/[^a-z0-9а-яіїє']/g, '');
+      if (lowH.includes("orderid") || lowH.includes("номерзамовлення") || lowH.includes("visitorid")) orderIdIdx = i;
       if (lowH.includes("статус")) statusIdx = i;
       if (lowH === "uuid") uuidIdx = i;
-      if (lowH === "tg_msg_id" || lowH === "tg msg id") tgMsgIdIdx = i;
+      if (lowH === "tgmsgid" || lowH === "tgmsg" || lowH === "tg_msg_id") tgMsgIdIdx = i;
+      if (lowH === "ім'я" || lowH === "імя" || lowH === "name" || lowH === "имя") nameIdx = i;
+      if (lowH === "телефон" || lowH === "phone" || lowH === "контакт") phoneIdx = i;
+      if (lowH === "telegram" || lowH === "tg" || lowH === "телеграм" || lowH === "social") telegramIdx = i;
+      if (lowH === "тариф" || lowH === "tariff") tariffIdx = i;
+      if (lowH === "сума" || lowH === "amount" || lowH === "сумма") amountIdx = i;
     });
     
     if (orderIdIdx === -1) continue;
@@ -573,16 +600,36 @@ function updatePaymentStatus(data) {
           const msgIdVal = (dataRange[i][tgMsgIdIdx] || "").toString().trim();
           if (msgIdVal) foundTgMsgId = msgIdVal;
         }
+
+        // Capture other fields if not already captured
+        if (nameIdx !== -1 && !customerName) customerName = (dataRange[i][nameIdx] || "").toString().trim();
+        if (phoneIdx !== -1 && !customerPhone) customerPhone = (dataRange[i][phoneIdx] || "").toString().trim();
+        if (telegramIdx !== -1 && !telegramNick) telegramNick = (dataRange[i][telegramIdx] || "").toString().trim();
+        if (tariffIdx !== -1 && !tariffName) tariffName = (dataRange[i][tariffIdx] || "").toString().trim();
+        if (amountIdx !== -1 && !amountVal) amountVal = (dataRange[i][amountIdx] || "").toString().trim();
+        if (!matchedSheetName) matchedSheetName = name;
       }
     }
-    // We don't break the outer loop anymore because we want to update status in ALL sheets (backups etc)
   }
   
   if (found) {
      if (uuid) logGlobalAction(uuid, "Payment Update", "System", { orderId: orderId, status: data.status });
   }
   
-  if (found) return ContentService.createTextOutput(JSON.stringify({status: "success", result: "success", message: "Payment status updated", tg_msg_id: foundTgMsgId})).setMimeType(ContentService.MimeType.JSON);
+  if (found) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success", 
+      result: "success", 
+      message: "Payment status updated", 
+      tg_msg_id: foundTgMsgId,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      telegram: telegramNick,
+      tariff: tariffName,
+      amount: amountVal,
+      sheetName: matchedSheetName
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
   return createErrorResponse("Lead with OrderID not found");
 }
 

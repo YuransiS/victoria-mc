@@ -39,9 +39,13 @@ export async function POST(request: Request) {
       const currency = data.currency || 'USD';
       const utmInfo = utmSource ? `\n\n🔍 <b>Джерело:</b> ${utmSource} / ${utmMedium || '-'}` : "";
 
+      const targetSheet = data.target_sheet || data.targetSheet || '';
+      const isPracticum = targetSheet === "Практикум" || currency === "USD";
+      const label = isPracticum ? "Практикум" : "Бронь";
+
       const statusTitle = isSuccess 
-        ? `✅ <b>Оплата успішна! (Практикум)</b>` 
-        : `❌ <b>Оплата відхилена (Практикум)</b>`;
+        ? `✅ <b>Оплата успішна! (${label})</b>` 
+        : `❌ <b>Оплата відхилена (${label})</b>`;
 
       const text = `${statusTitle}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName}\n` +
@@ -97,9 +101,30 @@ export async function POST(request: Request) {
       // (This is a fallback for when browser didn't have the ID)
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
-      const customerName = orderId ? orderId.split('_')[0] : 'Клієнт';
       
-      const text = isSuccess ? "✅ Оплата успішна!" : "❌ Оплата відхилена";
+      let customerName = data.customer_name || resData.customerName || 'Клієнт';
+      if (customerName === 'Клієнт' && orderId && orderId.includes('_')) {
+        const parts = orderId.split('_');
+        if (parts[0] !== 'VMC') customerName = parts[0]; 
+      }
+      
+      const targetSheet = data.target_sheet || data.targetSheet || resData.sheetName || '';
+      const isPracticum = targetSheet === "Практикум" || data.currency === "USD" || resData.sheetName === "Практикум";
+      const label = isPracticum ? "Практикум" : "Бронь";
+      
+      const statusTitle = isSuccess ? `✅ Оплата успішна! (${label})` : `❌ Оплата відхилена (${label})`;
+
+      const customerPhone = data.customer_phone || resData.customerPhone || '-';
+      const tariff = data.tariff || resData.tariff || '-';
+      const amount = data.amount || resData.amount || '-';
+      const currency = data.currency || (resData.sheetName === 'Практикум' ? 'USD' : 'UAH');
+
+      const text = `${statusTitle}\n\n` +
+        `👤 Клієнт: ${customerName}\n` +
+        `📞 Телефон: ${customerPhone}\n` +
+        `📦 Тариф: ${tariff}\n` +
+        `💰 Сума: ${amount} ${currency}\n` +
+        `🆔 ID: ${orderId}`;
 
       await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
         method: 'POST',
@@ -107,7 +132,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           chat_id: chatId,
           message_id: parseInt(resData.tg_msg_id),
-          text: `${text}\n\n👤 ${customerName}\n🆔 ${orderId}`
+          text: text
         })
       }).catch(e => console.error('Fallback TG update failed:', e));
     }

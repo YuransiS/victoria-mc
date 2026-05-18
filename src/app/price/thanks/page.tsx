@@ -61,10 +61,15 @@ export default function ThanksPage() {
             action: "update_status",
             order_id: activeOrderId,
             customer_name: localStorage.getItem('lead_name') || 'Клієнт',
+            customer_phone: localStorage.getItem('lead_phone') || '-',
+            tariff: localStorage.getItem('lead_tariff') || '-',
+            amount: localStorage.getItem('lead_amount') || '-',
+            currency: localStorage.getItem('lead_currency') || 'UAH',
             utm_source: localStorage.getItem('lead_utm_source') || '',
             utm_medium: localStorage.getItem('lead_utm_medium') || '',
             status: "APPROVED (Redirect)",
-            tg_msg_id: activeTgMsgId
+            tg_msg_id: activeTgMsgId,
+            target_sheet: "Бронювання"
           }),
         }).finally(() => {
           localStorage.removeItem('tg_msg_id_data');
