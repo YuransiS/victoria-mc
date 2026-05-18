@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://victoria-mc.vercel.app/free-lection/vsl-form",
+      "permanent": true
+    }
+  ]
+}

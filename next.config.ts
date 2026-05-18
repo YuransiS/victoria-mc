@@ -17,6 +17,21 @@ const config: NextConfig = {
       }
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'victoria-visualcontent.vercel.app',
+          },
+        ],
+        destination: 'https://victoria-mc.vercel.app/free-lection/vsl-form',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default config;
