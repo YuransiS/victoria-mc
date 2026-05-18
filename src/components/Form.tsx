@@ -105,7 +105,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         body: JSON.stringify({
           ...formData,
           ...utmData,
-          target_sheet: "Masterclass_Leads" // Set a descriptive sheet name
+          target_sheet: "Автовеб",
+          sheet_id: "726331330"
         }),
       });
       const resData = await res.json();

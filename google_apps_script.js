@@ -204,6 +204,14 @@ function handleLegacyLeadLogging(data) {
     for (let i = 0; i < allSheets.length; i++) {
       if (allSheets[i].getSheetId().toString() === targetGid.toString()) {
         sheet = allSheets[i];
+        // Auto-rename to Автовеб if it has the autoweb GID and has a different name
+        if (targetGid.toString() === "726331330" && sheet.getName() !== "Автовеб") {
+          try {
+            sheet.setName("Автовеб");
+          } catch(e) {
+            // Log error silently
+          }
+        }
         break;
       }
     }
@@ -220,6 +228,8 @@ function handleLegacyLeadLogging(data) {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Social", "Ніша", "Source", "Medium", "Campaign", "Content", "Term", "OrderID", "UUID"]);
       } else if (rawSheetName === 'Практикум' || rawSheetName === 'Бронювання') {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "Content", "Term", "URL", "Тариф", "Сума", "OrderID", "Статус", "Коментар", "UUID", "TG_Msg_ID"]);
+      } else if (rawSheetName === 'Автовеб' || rawSheetName === 'Masterclass_Leads') {
+        sheet.appendRow(["Дата", "Ім'я", "Телефон/Telegram", "Source", "Medium", "Campaign", "UUID"]);
       } else {
         sheet.appendRow(["Дата", "Ім'я", "Телефон", "Telegram", "Source", "Medium", "Campaign", "UUID", "RawData"]);
       }

@@ -22,11 +22,12 @@ export async function POST(req: Request) {
 
     const isVSL = data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2';
     const isVSL1 = data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)';
-    const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : 'ЗАЯВКА');
+    const isAutoweb = data.target_sheet === 'Автовеб' || data.target_sheet === 'Masterclass_Leads' || data.sheet_id === '726331330';
+    const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : (isAutoweb ? 'АВТОВЕБ' : 'ЗАЯВКА'));
 
     let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
-    message += `📞 <b>Телефон:</b> ${phone || '-'}\n`;
+    message += `📞 <b>Телефон/Telegram:</b> ${phone || '-'}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;
     
     if (niche) {
@@ -41,8 +42,8 @@ export async function POST(req: Request) {
     // Define notification tasks
     const tasks = [];
 
-    // 1. Telegram Task (Only for VSL Form)
-    if (token && chatId && isVSL) {
+    // 1. Telegram Task (Only for VSL Form and Autoweb)
+    if (token && chatId && (isVSL || isAutoweb)) {
       tasks.push(
         fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',
