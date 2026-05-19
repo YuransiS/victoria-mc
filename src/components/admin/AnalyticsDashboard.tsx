@@ -38,26 +38,57 @@ const parseDate = (dString: any): number | null => {
   if (typeof dString === 'number') return dString;
   
   const str = dString.toString().trim();
-  
-  // Hand-tuned Ukrainian format parser, e.g., "19.05.2026 17:04:40" or "19.05.2026"
-  const uaMatch = str.match(/^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
-  if (uaMatch) {
-    const [, day, month, year, hour = '00', minute = '00', second = '00'] = uaMatch;
-    return new Date(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hour),
-      parseInt(minute),
-      parseInt(second)
-    ).getTime();
+  if (!str) return null;
+
+  // Check if it's already a timestamp
+  if (/^\d+$/.test(str)) {
+    return parseInt(str);
   }
   
-  const parsed = Date.parse(str.replace(/-/g, '/'));
-  return isNaN(parsed) ? null : parsed;
+  // Try native Date.parse first
+  const nativeParsed = Date.parse(str);
+  if (!isNaN(nativeParsed)) {
+    return nativeParsed;
+  }
+  
+  // Normalize: replace comma with space, replace multiple spaces with single space
+  const cleanStr = str.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+  
+  // Parse DD.MM.YYYY HH:MM:SS or DD.MM.YYYY HH:MM or DD.MM.YYYY
+  const dmyRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/;
+  const match = cleanStr.match(dmyRegex);
+  if (match) {
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]) - 1; // JS months are 0-11
+    const year = parseInt(match[3]);
+    const hour = match[4] ? parseInt(match[4]) : 0;
+    const minute = match[5] ? parseInt(match[5]) : 0;
+    const second = match[6] ? parseInt(match[6]) : 0;
+    return new Date(year, month, day, hour, minute, second).getTime();
+  }
+  
+  // Fallback for YYYY-MM-DD HH:MM:SS
+  const normalizedStr = str.includes('T') ? str : str.replace(/-/g, '/');
+  const fallbackParsed = Date.parse(normalizedStr);
+  return isNaN(fallbackParsed) ? null : fallbackParsed;
 };
 
-export default function AnalyticsDashboard({ leads, traffic, globalActions }: AnalyticsDashboardProps) {
+export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffic, globalActions }: AnalyticsDashboardProps) {
+  // Filter for real paid traffic (only count those with "traff" in utm_source)
+  const leads = useMemo(() => {
+    return rawLeads.filter((l) => {
+      const utmSource = (l.utm_source || l.source || l["Source"] || l["Джерело"] || '').toString().toLowerCase();
+      return utmSource.includes('traff');
+    });
+  }, [rawLeads]);
+
+  const traffic = useMemo(() => {
+    return rawTraffic.filter((tr) => {
+      const utmSource = (tr.utm_source || tr.source || tr["UTM Source"] || '').toString().toLowerCase();
+      return utmSource.includes('traff');
+    });
+  }, [rawTraffic]);
+
   // 1. Funnel component local filters (Autonomous)
   const [funnelPeriod, setFunnelPeriod] = useState<'month' | 'prev_month' | 'all' | 'custom'>('month');
   const [funnelCustomStart, setFunnelCustomStart] = useState<string>('');
@@ -255,7 +286,8 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
     const sources: Record<string, { leads: number; tripwires: number; revenueUSD: number }> = {};
     
     utmFilteredLeads.forEach((l) => {
-      let source = l.utm_source || l.source || l["Source"] || l["Джерело"] || 'Direct / Unknown';
+      // Group by utm_medium or campaign to display the actual advertising campaign/set instead of broad 'traff'
+      let source = l.utm_medium || l.utm_campaign || 'Direct / Unknown';
       source = source.toString().trim();
       if (source === '' || source === 'none' || source === 'null' || source === 'undefined') {
         source = 'Direct / Unknown';
