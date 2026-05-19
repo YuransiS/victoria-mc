@@ -123,7 +123,7 @@ export default function Sidebar({ role, username }: SidebarProps) {
   return (
     <>
       {/* Mobile Toggle Button */}
-      <div className="lg:hidden fixed top-4 right-4 z-50">
+      <div className="lg:hidden fixed top-4 right-4 z-50" id="admin-sidebar-mobile">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-3 bg-[#0E0E11] border border-white/5 rounded-xl text-[#C4A47C] active:scale-95 transition-all shadow-lg"
@@ -148,7 +148,7 @@ export default function Sidebar({ role, username }: SidebarProps) {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block w-64 shrink-0 h-screen sticky top-0">
+      <div className="hidden lg:block w-64 shrink-0 h-screen sticky top-0" id="admin-sidebar">
         {sidebarContent}
       </div>
     </>

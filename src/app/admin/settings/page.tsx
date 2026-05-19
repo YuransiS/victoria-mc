@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { verifyToken } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import { Settings, User, Shield, Key, Bell, Database, Check } from 'lucide-react';
+import DeveloperResetButton from '@/components/admin/DeveloperResetButton';
 
 export default async function AdminSettingsPage() {
   const cookieStore = await cookies();
@@ -91,6 +92,16 @@ export default async function AdminSettingsPage() {
                   <div className="w-4.5 h-4.5 bg-[#C4A47C] rounded-full" />
                 </div>
               </div>
+
+              {decoded.role === 'DEVELOPER' && (
+                <div className="flex items-center justify-between p-4 bg-white/[0.01] border border-white/5 rounded-2xl border-dashed border-[#C4A47C]/20">
+                  <div>
+                    <h3 className="text-xs font-bold text-white/95 mb-0.5">Інтерактивні підказки</h3>
+                    <p className="text-[10px] text-white/40">Скинути проходження туру та запустити його заново для тестування</p>
+                  </div>
+                  <DeveloperResetButton />
+                </div>
+              )}
             </div>
           </div>
 

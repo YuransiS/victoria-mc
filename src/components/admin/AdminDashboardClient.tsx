@@ -12,6 +12,7 @@ import KanbanBoard from '@/components/admin/KanbanBoard';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import PaymentLinkGenerator from '@/components/admin/PaymentLinkGenerator';
 import { logoutAction } from '@/actions/auth';
+import OnboardingTour from '@/components/admin/OnboardingTour';
 
 interface Lead {
   date?: string;
@@ -917,7 +918,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
       {/* Premium Stats Grid */}
       {onlyView !== 'analytics' && (
-        <div className={`grid grid-cols-1 ${isSales ? 'max-w-md' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6 mb-12`}>
+        <div id="admin-metrics-grid" className={`grid grid-cols-1 ${isSales ? 'max-w-md' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6 mb-12`}>
           <StatCard 
             icon={<Users className="text-[#C4A47C]" />}
             label="Унікальних лідів"
@@ -945,7 +946,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
       {/* View Switcher / Tabs */}
       {onlyView === 'leads' ? (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div id="admin-view-switcher" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-2 bg-[#111] p-1 rounded-2xl w-fit border border-white/5">
             <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
               <LayoutGrid size={14} /> Канбан
@@ -965,7 +966,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
           </div>
         </div>
       ) : onlyView !== 'analytics' ? (
-        <div className="flex items-center gap-2 mb-8 bg-[#111] p-1 rounded-2xl w-fit border border-white/5">
+        <div id="admin-view-switcher" className="flex items-center gap-2 mb-8 bg-[#111] p-1 rounded-2xl w-fit border border-white/5">
           <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
             <LayoutGrid size={14} /> Канбан
           </button>
@@ -1333,6 +1334,8 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
         onClose={() => setIsPaymentLinkOpen(false)} 
         selectedLead={selectedLead} 
       />
+
+      <OnboardingTour activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab as any)} />
     </div>
   );
 }

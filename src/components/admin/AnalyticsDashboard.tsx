@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LabelList } from 'recharts';
-import { DollarSign, MousePointer2, Users, CreditCard, TrendingUp, Layers, Globe, Activity } from 'lucide-react';
+import { DollarSign, MousePointer2, Users, CreditCard, TrendingUp, Layers, Globe, Calendar, Filter } from 'lucide-react';
 
 interface Lead {
   _leadDate: number;
@@ -10,6 +10,8 @@ interface Lead {
   _revenueUAH: number;
   _revenueUSD: number;
   _bookingUAH: number;
+  _allSheets?: string[];
+  _sheet?: string;
   utm_source?: string;
   source?: string;
   Source?: string;
@@ -19,6 +21,9 @@ interface Lead {
 interface Traffic {
   date?: string;
   visitorId?: string;
+  "Дата та час"?: string;
+  "Дата"?: string;
+  created_at?: string;
   [key: string]: any;
 }
 
@@ -28,45 +33,164 @@ interface AnalyticsDashboardProps {
   globalActions?: any;
 }
 
-export default function AnalyticsDashboard({ leads, traffic, globalActions }: AnalyticsDashboardProps) {
-  const [period, setPeriod] = useState<'month' | 'all'>('month');
+const parseDate = (dString: any): number | null => {
+  if (!dString) return null;
+  if (typeof dString === 'number') return dString;
+  
+  const str = dString.toString().trim();
+  
+  // Hand-tuned Ukrainian format parser, e.g., "19.05.2026 17:04:40" or "19.05.2026"
+  const uaMatch = str.match(/^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
+  if (uaMatch) {
+    const [, day, month, year, hour = '00', minute = '00', second = '00'] = uaMatch;
+    return new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day),
+      parseInt(hour),
+      parseInt(minute),
+      parseInt(second)
+    ).getTime();
+  }
+  
+  const parsed = Date.parse(str.replace(/-/g, '/'));
+  return isNaN(parsed) ? null : parsed;
+};
 
-  // Simple stats calculation
+export default function AnalyticsDashboard({ leads, traffic, globalActions }: AnalyticsDashboardProps) {
+  // 1. Funnel component local filters (Autonomous)
+  const [funnelPeriod, setFunnelPeriod] = useState<'month' | 'prev_month' | 'all' | 'custom'>('month');
+  const [funnelCustomStart, setFunnelCustomStart] = useState<string>('');
+  const [funnelCustomEnd, setFunnelCustomEnd] = useState<string>('');
+  const [funnelSheet, setFunnelSheet] = useState<string>('all');
+
+  // 2. UTM Source local filters (Autonomous)
+  const [utmPeriod, setUtmPeriod] = useState<'month' | 'all'>('month');
+  const [utmSheet, setUtmSheet] = useState<string>('all');
+
+  // 3. Trends local filters (Autonomous)
+  const [trendPeriod, setTrendPeriod] = useState<'month' | 'all'>('month');
+  const [trendSheet, setTrendSheet] = useState<string>('all');
+
+  // Dynamically extract sheet list from leads for dropdowns
+  const sheetNames = useMemo(() => {
+    const names = new Set<string>();
+    leads.forEach((l) => {
+      if (l._allSheets && Array.isArray(l._allSheets)) {
+        l._allSheets.forEach((s) => {
+          if (s) names.add(s.toString().trim());
+        });
+      } else if (l._sheet) {
+        names.add(l._sheet.toString().trim());
+      }
+    });
+    return Array.from(names).sort();
+  }, [leads]);
+
+  // FUNNEL FILTERED LEADS
+  const funnelFilteredLeads = useMemo(() => {
+    return leads.filter((l) => {
+      // Sheet/tab filter
+      if (funnelSheet !== 'all') {
+        const sheets = l._allSheets || [];
+        const matchesSheet = sheets.includes(funnelSheet) || l._sheet === funnelSheet;
+        if (!matchesSheet) return false;
+      }
+
+      // Date range filter
+      let t = l._leadDate;
+      if (!t) {
+        const dateStr = l.date || l["Дата та час"] || l["Дата"] || l.created_at;
+        const parsed = parseDate(dateStr);
+        if (parsed) t = parsed;
+      }
+      if (!t) return false;
+
+      if (funnelPeriod === 'month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        return t >= start;
+      } else if (funnelPeriod === 'prev_month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() - 1, 1).getTime();
+        const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999).getTime();
+        return t >= start && t <= end;
+      } else if (funnelPeriod === 'custom') {
+        const start = funnelCustomStart ? new Date(funnelCustomStart + 'T00:00:00').getTime() : 0;
+        const end = funnelCustomEnd ? new Date(funnelCustomEnd + 'T23:59:59').getTime() : Infinity;
+        return t >= start && t <= end;
+      }
+      return true; // 'all'
+    });
+  }, [leads, funnelPeriod, funnelCustomStart, funnelCustomEnd, funnelSheet]);
+
+  // FUNNEL FILTERED TRAFFIC
+  const funnelFilteredTraffic = useMemo(() => {
+    return traffic.filter((tr) => {
+      // Traffic is sheet-agnostic (to prevent visit count from going to 0 on sheet filter),
+      // but it must obey the date/period filter with complete robust date mapping.
+      let t = tr._leadDate;
+      if (!t) {
+        const dateStr = tr.date || tr["Дата та час"] || tr["Дата"] || tr.created_at;
+        const parsed = parseDate(dateStr);
+        if (parsed) t = parsed;
+      }
+      if (!t) return false;
+
+      if (funnelPeriod === 'month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        return t >= start;
+      } else if (funnelPeriod === 'prev_month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() - 1, 1).getTime();
+        const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999).getTime();
+        return t >= start && t <= end;
+      } else if (funnelPeriod === 'custom') {
+        const start = funnelCustomStart ? new Date(funnelCustomStart + 'T00:00:00').getTime() : 0;
+        const end = funnelCustomEnd ? new Date(funnelCustomEnd + 'T23:59:59').getTime() : Infinity;
+        return t >= start && t <= end;
+      }
+      return true; // 'all'
+    });
+  }, [traffic, funnelPeriod, funnelCustomStart, funnelCustomEnd]);
+
+  // TOP STATS - Synchronized with currently filtered Funnel data
   const stats = useMemo(() => {
     let totalUAH = 0;
     let totalUSD = 0;
     let totalBookings = 0;
     
-    leads.forEach((l) => {
+    funnelFilteredLeads.forEach((l) => {
       totalUAH += l._revenueUAH || 0;
       totalUSD += l._revenueUSD || 0;
       totalBookings += l._bookingUAH || 0;
     });
 
-    const overallConversion = traffic.length > 0 
-      ? ((leads.length / traffic.length) * 100).toFixed(1) 
+    const overallConversion = funnelFilteredTraffic.length > 0 
+      ? ((funnelFilteredLeads.length / funnelFilteredTraffic.length) * 100).toFixed(1) 
       : '0.0';
 
     return {
-      totalViews: traffic.length,
-      totalLeads: leads.length,
+      totalViews: funnelFilteredTraffic.length,
+      totalLeads: funnelFilteredLeads.length,
       totalUAH,
       totalUSD,
       totalBookings,
       overallConversion
     };
-  }, [leads, traffic]);
+  }, [funnelFilteredLeads, funnelFilteredTraffic]);
 
-  // Conversion Funnel data
+  // Conversion Funnel Data
   const funnelData = useMemo(() => {
-    const visits = traffic.length;
-    const registrations = leads.length;
+    const visits = funnelFilteredTraffic.length;
+    const registrations = funnelFilteredLeads.length;
     
     let paidTripwire = 0;
     let booked = 0;
     let paidFull = 0;
 
-    leads.forEach((l) => {
+    funnelFilteredLeads.forEach((l) => {
       const status = (l._computedStatus || '').toString().toLowerCase();
       const isTripwire = status.includes('трипвай') || status.includes('тріпва') || status === 'купив тріпваєр';
       const isBooking = (l._bookingUAH > 0) || status.includes('бронь') || status.includes('заброньовано');
@@ -92,17 +216,45 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
       return {
         ...step,
         percent: percent.toFixed(1),
-        // Ensure at least 5% width is visible in the Recharts bar so small conversions are clickable/visible
+        // Minimum visual bar width offset
         displayValue: Math.max(step.value, maxVal * 0.05)
       };
     });
-  }, [leads, traffic]);
+  }, [funnelFilteredLeads, funnelFilteredTraffic]);
 
-  // UTM Source Analysis with strictly separated UAH & USD columns directly from DSU merged totals
+  // UTM SOURCE LEADS (Filtered Locally by utmPeriod and utmSheet)
+  const utmFilteredLeads = useMemo(() => {
+    return leads.filter((l) => {
+      // Sheet/tab filter
+      if (utmSheet !== 'all') {
+        const sheets = l._allSheets || [];
+        const matchesSheet = sheets.includes(utmSheet) || l._sheet === utmSheet;
+        if (!matchesSheet) return false;
+      }
+
+      // Period filter
+      let t = l._leadDate;
+      if (!t) {
+        const dateStr = l.date || l["Дата та час"] || l["Дата"] || l.created_at;
+        const parsed = parseDate(dateStr);
+        if (parsed) t = parsed;
+      }
+      if (!t) return false;
+
+      if (utmPeriod === 'month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        return t >= start;
+      }
+      return true; // 'all'
+    });
+  }, [leads, utmPeriod, utmSheet]);
+
+  // UTM Source Analysis Grouping & Cascade Sort
   const utmData = useMemo(() => {
-    const sources: Record<string, { leads: number; paid: number; revenueUAH: number; revenueUSD: number }> = {};
+    const sources: Record<string, { leads: number; tripwires: number; revenueUSD: number }> = {};
     
-    leads.forEach((l) => {
+    utmFilteredLeads.forEach((l) => {
       let source = l.utm_source || l.source || l["Source"] || l["Джерело"] || 'Direct / Unknown';
       source = source.toString().trim();
       if (source === '' || source === 'none' || source === 'null' || source === 'undefined') {
@@ -110,48 +262,74 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
       }
 
       if (!sources[source]) {
-        sources[source] = { leads: 0, paid: 0, revenueUAH: 0, revenueUSD: 0 };
+        sources[source] = { leads: 0, tripwires: 0, revenueUSD: 0 };
       }
       
       sources[source].leads++;
       
       const status = (l._computedStatus || '').toString().toLowerCase();
-      const isPaid = status.includes('оплачено') || status.includes('трипвай') || status.includes('тріпва') || status.includes('заброньовано');
+      const isTripwire = status.includes('трипвай') || status.includes('тріпва') || status === 'купив тріпваєр';
       
-      if (isPaid) {
-        sources[source].paid++;
+      if (isTripwire) {
+        sources[source].tripwires++;
       }
       
-      // Sum UAH revenue (full + bookings) and USD revenue directly from normalized fields
-      sources[source].revenueUAH += (l._revenueUAH || 0) + (l._bookingUAH || 0);
       sources[source].revenueUSD += l._revenueUSD || 0;
     });
 
     return Object.entries(sources)
       .map(([name, data]) => ({ name, ...data }))
-      .sort((a, b) => b.leads - a.leads)
+      .sort((a, b) => {
+        if (b.tripwires !== a.tripwires) return b.tripwires - a.tripwires;
+        if (b.revenueUSD !== a.revenueUSD) return b.revenueUSD - a.revenueUSD;
+        return b.leads - a.leads;
+      })
       .slice(0, 5);
-  }, [leads]);
+  }, [utmFilteredLeads]);
 
-  // Daily Registration Trend with Date Padding & Period Selection
+  // TREND FILTERS (Filtered Locally by trendPeriod and trendSheet)
+  const trendFilteredLeads = useMemo(() => {
+    return leads.filter((l) => {
+      // Sheet/tab filter
+      if (trendSheet !== 'all') {
+        const sheets = l._allSheets || [];
+        const matchesSheet = sheets.includes(trendSheet) || l._sheet === trendSheet;
+        if (!matchesSheet) return false;
+      }
+
+      // Period filter
+      let t = l._leadDate;
+      if (!t) {
+        const dateStr = l.date || l["Дата та час"] || l["Дата"] || l.created_at;
+        const parsed = parseDate(dateStr);
+        if (parsed) t = parsed;
+      }
+      if (!t) return false;
+
+      if (trendPeriod === 'month') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        return t >= start;
+      }
+      return true; // 'all'
+    });
+  }, [leads, trendPeriod, trendSheet]);
+
+  // Trend Data Generation
   const trendData = useMemo(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    let startDate = new Date(now.getFullYear(), now.getMonth(), 1); // Current Month start
+    let startDate = new Date(now.getFullYear(), now.getMonth(), 1); // Month start
     
-    if (period === 'all') {
+    if (trendPeriod === 'all') {
       let minTimestamp = today.getTime();
-      leads.forEach((l) => {
+      trendFilteredLeads.forEach((l) => {
         let t = l._leadDate;
         if (!t) {
-          const dateStr = l.date || l["Дата та час"] || l.created_at;
-          if (dateStr) {
-            const nativeParsed = Date.parse(dateStr.toString().replace(/-/g, '/'));
-            if (!isNaN(nativeParsed)) {
-              t = nativeParsed;
-            }
-          }
+          const dateStr = l.date || l["Дата та час"] || l["Дата"] || l.created_at;
+          const parsed = parseDate(dateStr);
+          if (parsed) t = parsed;
         }
         if (t && t > 0 && t < minTimestamp) {
           minTimestamp = t;
@@ -160,11 +338,9 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
       startDate = new Date(minTimestamp);
     }
     
-    // Normalize start/end dates to midnight
     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     
-    // Generate full list of consecutive days
     const dateMap: Record<string, number> = {};
     const current = new Date(start.getTime());
     const limitDate = new Date(end.getTime());
@@ -177,17 +353,12 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
       safetyCount++;
     }
     
-    // Sum registrations per day
-    leads.forEach((l) => {
+    trendFilteredLeads.forEach((l) => {
       let t = l._leadDate;
       if (!t) {
-        const dateStr = l.date || l["Дата та час"] || l.created_at;
-        if (dateStr) {
-          const nativeParsed = Date.parse(dateStr.toString().replace(/-/g, '/'));
-          if (!isNaN(nativeParsed)) {
-            t = nativeParsed;
-          }
-        }
+        const dateStr = l.date || l["Дата та час"] || l["Дата"] || l.created_at;
+        const parsed = parseDate(dateStr);
+        if (parsed) t = parsed;
       }
       if (t && t > 0) {
         const d = new Date(t);
@@ -205,9 +376,9 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
         count
       };
     });
-  }, [leads, period]);
+  }, [trendFilteredLeads, trendPeriod]);
 
-  // Premium custom tooltip components
+  // Premium custom tooltips
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -242,7 +413,7 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
   };
 
   return (
-    <div className="space-y-8 pb-8 animate-fade-in">
+    <div className="space-y-8 pb-24 md:pb-32 animate-fade-in">
       {/* Top Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
         <Stat 
@@ -278,17 +449,88 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Funnel Chart */}
-        <div className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        {/* Funnel Chart with Integrated Autonomous Filters */}
+        <div id="admin-conversion-funnel" className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
           <div className="absolute top-0 right-0 h-40 w-40 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Воронка Конверсії</h3>
-              <p className="text-[10px] text-white/30 uppercase font-semibold">Шлях відвідувача до клієнта</p>
+          
+          <div className="flex flex-col gap-5 border-b border-white/[0.04] pb-6 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Воронка Конверсії</h3>
+                <p className="text-[10px] text-white/30 uppercase font-semibold">Шлях відвідувача до клієнта</p>
+              </div>
+              <Layers size={16} className="text-white/20" />
             </div>
-            <Layers size={16} className="text-white/20" />
+
+            {/* Micro-filter Panel for Funnel */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Period Dropdown Selector */}
+              <div className="flex flex-col gap-1 shrink-0 min-w-[150px]">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Calendar size={8} /> Період
+                </label>
+                <div className="relative">
+                  <select 
+                    value={funnelPeriod} 
+                    onChange={(e) => setFunnelPeriod(e.target.value as any)}
+                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2 text-[10px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
+                  >
+                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
+                    <option value="prev_month" className="bg-[#111115]">Минулий місяць</option>
+                    <option value="all" className="bg-[#111115]">За весь час</option>
+                    <option value="custom" className="bg-[#111115]">Кастомний діапазон</option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1.5 w-1.5 rotate-[135deg]" />
+                </div>
+              </div>
+
+              {/* Dynamic Google Sheet Dropdown Selector */}
+              <div className="flex flex-col gap-1 w-full sm:w-auto flex-1 min-w-[180px]">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Filter size={8} /> Джерело даних (Лист)
+                </label>
+                <div className="relative">
+                  <select 
+                    value={funnelSheet} 
+                    onChange={(e) => setFunnelSheet(e.target.value)}
+                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2 text-[10px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
+                  >
+                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    {sheetNames.map((name) => (
+                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1.5 w-1.5 rotate-[135deg]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Sliding custom date range inputs when 'custom' is selected */}
+            {funnelPeriod === 'custom' && (
+              <div className="grid grid-cols-2 gap-3 p-4 bg-black/30 rounded-2xl border border-white/[0.05] animate-scale-in">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase tracking-wider text-white/40">Початок періоду</label>
+                  <input 
+                    type="date" 
+                    value={funnelCustomStart} 
+                    onChange={(e) => setFunnelCustomStart(e.target.value)} 
+                    className="bg-[#18181C] border border-white/[0.08] rounded-xl px-3 py-2 text-[10px] font-bold text-white focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full [color-scheme:dark]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase tracking-wider text-white/40">Кінець періоду</label>
+                  <input 
+                    type="date" 
+                    value={funnelCustomEnd} 
+                    onChange={(e) => setFunnelCustomEnd(e.target.value)} 
+                    className="bg-[#18181C] border border-white/[0.08] rounded-xl px-3 py-2 text-[10px] font-bold text-white focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <div className="h-[300px]">
+
+          <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={funnelData} layout="vertical" margin={{ top: 0, right: 50, left: 30, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" horizontal={false} />
@@ -319,24 +561,67 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
           </div>
         </div>
 
-        {/* Source Analysis */}
-        <div className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        {/* Top 5 UTM Sources with Autonomous Filters */}
+        <div id="admin-utm-sources" className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
           <div className="absolute top-0 right-0 h-40 w-40 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">ТОП-5 Джерел (UTM)</h3>
-              <p className="text-[10px] text-white/30 uppercase font-semibold">Розподіл трафіку та прибутковості</p>
+          
+          <div className="flex flex-col gap-4 border-b border-white/[0.04] pb-6 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">ТОП-5 Джерел (UTM)</h3>
+                <p className="text-[10px] text-white/30 uppercase font-semibold">Розподіл трафіку та прибутковості</p>
+              </div>
+              <Globe size={16} className="text-white/20" />
             </div>
-            <Globe size={16} className="text-white/20" />
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* UTM Period Selector */}
+              <div className="flex flex-col gap-1 shrink-0">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Calendar size={8} /> Період
+                </label>
+                <div className="relative">
+                  <select 
+                    value={utmPeriod} 
+                    onChange={(e) => setUtmPeriod(e.target.value as any)}
+                    className="appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                  >
+                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
+                    <option value="all" className="bg-[#111115]">За весь час</option>
+                  </select>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                </div>
+              </div>
+
+              {/* UTM Sheet Selector */}
+              <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Filter size={8} /> Джерело даних (Лист)
+                </label>
+                <div className="relative">
+                  <select 
+                    value={utmSheet} 
+                    onChange={(e) => setUtmSheet(e.target.value)}
+                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                  >
+                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    {sheetNames.map((name) => (
+                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                </div>
+              </div>
+            </div>
           </div>
+
           <div className="overflow-x-auto premium-scrollbar">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[9px] uppercase font-black text-white/20 tracking-wider border-b border-white/[0.05] bg-white/[0.01]">
                   <th className="pb-4 pt-2 px-3">Джерело</th>
                   <th className="pb-4 pt-2 px-3 text-right">Ліди</th>
-                  <th className="pb-4 pt-2 px-3 text-right">Клієнти</th>
-                  <th className="pb-4 pt-2 px-3 text-right">Дохід UAH</th>
+                  <th className="pb-4 pt-2 px-3 text-right">Трипваєри (кол-во)</th>
                   <th className="pb-4 pt-2 px-3 text-right">Дохід USD</th>
                 </tr>
               </thead>
@@ -350,38 +635,73 @@ export default function AnalyticsDashboard({ leads, traffic, globalActions }: An
                       </div>
                     </td>
                     <td className="py-4 px-3 text-xs text-white/50 text-right font-medium">{row.leads}</td>
-                    <td className="py-4 px-3 text-xs text-[#C4A47C] font-bold text-right">{row.paid}</td>
-                    <td className="py-4 px-3 text-xs text-white/80 font-semibold text-right">{row.revenueUAH.toLocaleString()} ₴</td>
+                    <td className="py-4 px-3 text-xs text-[#C4A47C] font-bold text-right">{row.tripwires}</td>
                     <td className="py-4 px-3 text-xs text-emerald-400 font-extrabold text-right">${row.revenueUSD.toLocaleString()}</td>
                   </tr>
                 ))}
+                {utmData.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-[10px] uppercase font-bold text-white/20 tracking-widest">
+                      Немає даних за обраний період
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Trend Chart with Premium Date Toggles */}
-        <div className="lg:col-span-2 bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        {/* Trend Chart with Autonomous Filters */}
+        <div id="admin-registrations-chart" className="lg:col-span-2 bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
           <div className="absolute top-0 right-0 h-48 w-48 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-            <div>
-              <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Динаміка реєстрацій</h3>
-              <p className="text-[10px] text-white/30 uppercase font-semibold">Денний темп приросту лідів</p>
+          
+          <div className="flex flex-col gap-4 border-b border-white/[0.04] pb-6 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Динаміка реєстрацій</h3>
+                <p className="text-[10px] text-white/30 uppercase font-semibold">Денний темп приросту лідів за обраний період</p>
+              </div>
+              <TrendingUp size={16} className="text-white/20" />
             </div>
-            
-            <div className="flex items-center gap-1.5 bg-black/40 border border-white/[0.05] p-1 rounded-xl">
-              <button 
-                onClick={() => setPeriod('month')}
-                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 ${period === 'month' ? 'bg-[#C4A47C] text-black shadow-lg shadow-[#C4A47C]/15 scale-[1.02]' : 'text-white/40 hover:text-white/80'}`}
-              >
-                Поточний місяць
-              </button>
-              <button 
-                onClick={() => setPeriod('all')}
-                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 ${period === 'all' ? 'bg-[#C4A47C] text-black shadow-lg shadow-[#C4A47C]/15 scale-[1.02]' : 'text-white/40 hover:text-white/80'}`}
-              >
-                За весь час
-              </button>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Trend Period Selector */}
+              <div className="flex flex-col gap-1 shrink-0">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Calendar size={8} /> Період
+                </label>
+                <div className="relative">
+                  <select 
+                    value={trendPeriod} 
+                    onChange={(e) => setTrendPeriod(e.target.value as any)}
+                    className="appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                  >
+                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
+                    <option value="all" className="bg-[#111115]">За весь час</option>
+                  </select>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                </div>
+              </div>
+
+              {/* Trend Sheet Selector */}
+              <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                  <Filter size={8} /> Джерело даних (Лист)
+                </label>
+                <div className="relative">
+                  <select 
+                    value={trendSheet} 
+                    onChange={(e) => setTrendSheet(e.target.value)}
+                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                  >
+                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    {sheetNames.map((name) => (
+                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                </div>
+              </div>
             </div>
           </div>
           
