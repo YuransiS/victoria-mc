@@ -17,6 +17,7 @@
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.38.0",
     "intl-tel-input": "^26.9.2",
+    "jose": "^6.2.3",
     "lenis": "^1.3.21",
     "lucide-react": "^1.14.0",
     "next": "16.2.2",

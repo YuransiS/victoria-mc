@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/actions/auth';
+import AdminDashboardClient from '@/components/admin/AdminDashboardClient';
 import { redirect } from 'next/navigation';
 
-export default async function AdminPage() {
+export default async function AdminAnalyticsPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('admin_session')?.value;
   
@@ -15,9 +16,16 @@ export default async function AdminPage() {
     redirect('/login');
   }
 
+  // Double guard check: SALES cannot view analytics page
   if (decoded.role === 'SALES') {
     redirect('/admin/leads');
-  } else {
-    redirect('/admin/analytics');
   }
+
+  return (
+    <AdminDashboardClient 
+      role={decoded.role} 
+      username={decoded.username} 
+      onlyView="analytics" 
+    />
+  );
 }

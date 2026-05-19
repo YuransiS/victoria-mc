@@ -1,30 +1,71 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(request: NextRequest) {
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'victoria_super_secret_jwt_key_at_least_32_characters_long'
+);
+
+async function verifyToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload as { role: 'OP' | 'SALES' | 'DEVELOPER'; username: string };
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = request.cookies.get('admin_session');
-  const isAuthenticated = session?.value === 'authenticated_yuransis';
+  const token = request.cookies.get('admin_session')?.value;
 
-  // 1. If trying to access admin login page while already authenticated
-  if (pathname === '/admin/login' && isAuthenticated) {
-    return NextResponse.redirect(new URL('/admin', request.url));
+  const isProtectedRoute = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+  const isLoginRoute = pathname === '/login' || pathname === '/api/admin/login';
+
+  // 1. If not authenticated and trying to access a protected route
+  if (isProtectedRoute && !isLoginRoute) {
+    if (!token) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    const payload = await verifyToken(token);
+    if (!payload) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      response.cookies.delete('admin_session');
+      return response;
+    }
+
+    const role = payload.role;
+
+    // 2. Role-Based Access Control (RBAC)
+    if (role === 'SALES') {
+      // SALES is allowed ONLY to access /admin/leads and public API calls
+      const isSalesAllowedPath = pathname === '/admin/leads' || pathname.startsWith('/api/admin');
+      
+      if (!isSalesAllowedPath) {
+        return NextResponse.redirect(new URL('/admin/leads', request.url));
+      }
+    }
   }
 
-  // 2. Protect all /admin and /api/admin routes except login
-  const isProtectedRoute = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
-  const isLoginRoute = pathname === '/admin/login' || pathname === '/api/admin/login';
-
-  if (isProtectedRoute && !isLoginRoute && !isAuthenticated) {
-    if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // 3. If authenticated trying to access the login page
+  if (pathname === '/login' && token) {
+    const payload = await verifyToken(token);
+    if (payload) {
+      const redirectUrl = payload.role === 'SALES' ? '/admin/leads' : '/admin/analytics';
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
-    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*', '/api/admin', '/api/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/login'],
 };
