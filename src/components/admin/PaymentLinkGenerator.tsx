@@ -70,10 +70,10 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-lg bg-[#111] border border-white/10 rounded-3xl p-8 shadow-2xl flex flex-col max-h-[90vh]">
-        <button onClick={onClose} className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors">
+      <div className="relative w-full max-w-lg bg-admin-surface border border-admin-border rounded-3xl p-8 shadow-2xl flex flex-col max-h-[90vh] transition-colors duration-300">
+        <button onClick={onClose} className="absolute top-6 right-6 text-admin-text-dim hover:text-admin-text transition-colors">
           <X size={20} />
         </button>
 
@@ -82,25 +82,25 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
             <CreditCard size={20} />
           </div>
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-white/90">Генератор Оплат</h2>
-            <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">WayForPay Інвойси</p>
+            <h2 className="text-lg font-bold tracking-tight text-admin-text">Генератор Оплат</h2>
+            <p className="text-[10px] text-admin-text-dim uppercase tracking-widest font-bold">WayForPay Інвойси</p>
           </div>
         </div>
 
         {!invoiceUrl ? (
-          <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-6 overflow-y-auto pr-2 premium-scrollbar">
             {/* Predefined */}
             <div>
-              <h3 className="text-[10px] uppercase font-bold tracking-widest text-white/30 mb-3">Швидкі посилання</h3>
+              <h3 className="text-[10px] uppercase font-bold tracking-widest text-admin-text-dim/80 mb-3">Швидкі посилання</h3>
               <div className="grid grid-cols-1 gap-2">
                 {PREDEFINED_PACKAGES.map((pkg, i) => (
                   <button
                     key={i}
                     onClick={() => generateLink(pkg.name, pkg.amount, pkg.currency)}
                     disabled={loading}
-                    className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/5 hover:border-[#C4A47C]/30 transition-all text-left disabled:opacity-50"
+                    className="flex items-center justify-between p-4 rounded-xl border border-admin-border bg-admin-bg/40 hover:bg-admin-active-bg hover:border-[#C4A47C]/30 transition-all text-left disabled:opacity-50"
                   >
-                    <span className="text-xs font-bold text-white/80">{pkg.name}</span>
+                    <span className="text-xs font-bold text-admin-text-muted">{pkg.name}</span>
                     <span className="text-xs font-black text-[#C4A47C]">{pkg.amount} {pkg.currency === 'USD' ? '$' : '₴'}</span>
                   </button>
                 ))}
@@ -108,51 +108,51 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
             </div>
 
             <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-white/5"></div>
-              <span className="flex-shrink-0 mx-4 text-white/20 text-[10px] uppercase font-bold tracking-widest">АБО</span>
-              <div className="flex-grow border-t border-white/5"></div>
+              <div className="flex-grow border-t border-admin-border"></div>
+              <span className="flex-shrink-0 mx-4 text-admin-text-dim/40 text-[10px] uppercase font-bold tracking-widest">АБО</span>
+              <div className="flex-grow border-t border-admin-border"></div>
             </div>
 
             {/* Custom */}
             <div>
               <button 
                 onClick={() => setIsCustom(!isCustom)}
-                className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-white/50 hover:text-[#C4A47C] transition-colors mb-4"
+                className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-admin-text-muted hover:text-[#C4A47C] transition-colors mb-4"
               >
                 <Plus size={12} /> Власна сума
               </button>
 
               {isCustom && (
-                <div className="space-y-3 bg-white/[0.02] border border-white/5 p-4 rounded-xl">
+                <div className="space-y-3 bg-admin-bg/20 border border-admin-border p-4 rounded-xl">
                   <div>
-                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1">Назва платежу</label>
+                    <label className="text-[10px] font-bold text-admin-text-dim uppercase tracking-widest block mb-1">Назва платежу</label>
                     <input 
                       type="text" 
                       value={customName}
                       onChange={(e) => setCustomName(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C4A47C]"
+                      className="w-full bg-admin-input-bg border border-admin-border rounded-lg px-3 py-2 text-xs text-admin-text focus:outline-none focus:border-[#C4A47C] transition-colors"
                     />
                   </div>
                   <div className="flex gap-3">
                     <div className="flex-1">
-                      <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1">Сума</label>
+                      <label className="text-[10px] font-bold text-admin-text-dim uppercase tracking-widest block mb-1">Сума</label>
                       <input 
                         type="number" 
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
                         placeholder="500"
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C4A47C]"
+                        className="w-full bg-admin-input-bg border border-admin-border rounded-lg px-3 py-2 text-xs text-admin-text focus:outline-none focus:border-[#C4A47C] transition-colors"
                       />
                     </div>
                     <div className="w-24">
-                      <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1">Валюта</label>
+                      <label className="text-[10px] font-bold text-admin-text-dim uppercase tracking-widest block mb-1">Валюта</label>
                       <select 
                         value={customCurrency}
                         onChange={(e) => setCustomCurrency(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C4A47C] appearance-none"
+                        className="w-full bg-admin-input-bg border border-admin-border rounded-lg px-3 py-2 text-xs text-admin-text focus:outline-none focus:border-[#C4A47C] appearance-none transition-colors"
                       >
-                        <option value="UAH">UAH (₴)</option>
-                        <option value="USD">USD ($)</option>
+                        <option value="UAH" className="bg-admin-surface text-admin-text">UAH (₴)</option>
+                        <option value="USD" className="bg-admin-surface text-admin-text">USD ($)</option>
                       </select>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
                         generateLink(customName, Number(customAmount), customCurrency);
                     }}
                     disabled={loading || !customAmount}
-                    className="w-full mt-2 bg-[#C4A47C] text-black text-[10px] font-bold uppercase tracking-widest rounded-lg py-3 hover:bg-[#D4B48C] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full mt-2 bg-[#C4A47C] text-black text-[10px] font-bold uppercase tracking-widest rounded-lg py-3 hover:bg-[#D4B48C] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {loading ? <Loader2 size={14} className="animate-spin" /> : 'Згенерувати'}
                   </button>
@@ -175,19 +175,19 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
             <div className="h-16 w-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6">
               <Check size={32} />
             </div>
-            <h3 className="text-xl font-bold text-white/90 mb-2">Посилання Готове!</h3>
-            <p className="text-xs text-white/40 mb-8 max-w-[80%]">Відправте це посилання клієнту. При переході він потрапить на безпечну сторінку оплаты WayForPay.</p>
+            <h3 className="text-xl font-bold text-admin-text mb-2">Посилання Готове!</h3>
+            <p className="text-xs text-admin-text-dim/80 mb-8 max-w-[80%]">Відправте це посилання клієнту. При переході він потрапить на безпечну сторінку оплаты WayForPay.</p>
             
             <div className="w-full relative group">
               <input 
                 type="text" 
                 readOnly 
                 value={invoiceUrl} 
-                className="w-full bg-white/[0.02] border border-[#C4A47C]/50 rounded-xl py-4 pl-4 pr-12 text-xs text-white/80 focus:outline-none selection:bg-[#C4A47C]/30"
+                className="w-full bg-admin-bg/40 border border-[#C4A47C]/50 rounded-xl py-4 pl-4 pr-12 text-xs text-admin-text focus:outline-none selection:bg-[#C4A47C]/30 transition-colors"
               />
               <button 
                 onClick={handleCopy}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-white/5 rounded-lg transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-admin-active-bg rounded-lg transition-colors cursor-pointer"
               >
                 {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} className="text-[#C4A47C]" />}
               </button>
@@ -198,7 +198,7 @@ export default function PaymentLinkGenerator({ isOpen, onClose, selectedLead }: 
                   setInvoiceUrl('');
                   setCopied(false);
               }}
-              className="mt-8 text-[10px] uppercase font-bold tracking-widest text-white/30 hover:text-white transition-colors"
+              className="mt-8 text-[10px] uppercase font-bold tracking-widest text-admin-text-dim hover:text-[#C4A47C] transition-colors cursor-pointer"
             >
               Створити ще одне
             </button>

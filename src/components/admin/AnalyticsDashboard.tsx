@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LabelList } from 'recharts';
 import { DollarSign, MousePointer2, Users, CreditCard, TrendingUp, Layers, Globe, Calendar, Filter } from 'lucide-react';
+import { useAdminTheme } from './AdminThemeProvider';
 
 interface Lead {
   _leadDate: number;
@@ -74,6 +75,16 @@ const parseDate = (dString: any): number | null => {
 };
 
 export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffic, globalActions }: AnalyticsDashboardProps) {
+  const { theme } = useAdminTheme();
+  const isLight = theme === 'light';
+
+  // Dynamic colors for Recharts SVGs based on theme
+  const gridColor = isLight ? 'rgba(24, 24, 27, 0.05)' : 'rgba(255, 255, 255, 0.03)';
+  const axisStroke = isLight ? 'rgba(24, 24, 27, 0.15)' : 'rgba(255, 255, 255, 0.12)';
+  const tickFill = isLight ? 'rgba(24, 24, 27, 0.6)' : 'rgba(255, 255, 255, 0.45)';
+  const tooltipCursor = isLight ? 'rgba(24, 24, 27, 0.02)' : 'rgba(255, 255, 255, 0.02)';
+  const labelFill = isLight ? 'rgba(24, 24, 27, 0.7)' : 'rgba(255, 255, 255, 0.65)';
+
   // Filter for real paid traffic (only count those with "traff" in utm_source)
   const leads = useMemo(() => {
     return rawLeads.filter((l) => {
@@ -232,11 +243,11 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
       if (isFullPaid) paidFull++;
     });
 
-    const rawSteps = [
-      { name: 'Відвідувачі (Traffic)', value: visits, color: '#1A1A1E' },
-      { name: 'Ліди (Реєстрації)', value: registrations, color: '#2A2A30' },
-      { name: 'Тріпваєр ($9/$39)', value: paidTripwire, color: '#4A3D2C' },
-      { name: 'Бронь (1000₴)', value: booked, color: '#A08058' },
+        const rawSteps = [
+      { name: 'Відвідувачі (Traffic)', value: visits, color: isLight ? '#E4E6EA' : '#1A1A1E' },
+      { name: 'Ліди (Реєстрації)', value: registrations, color: isLight ? '#CDD1D8' : '#2A2A30' },
+      { name: 'Тріпваєр ($9/$39)', value: paidTripwire, color: isLight ? '#E5D6C3' : '#4A3D2C' },
+      { name: 'Бронь (1000₴)', value: booked, color: isLight ? '#D0B38F' : '#A08058' },
       { name: 'Повна Оплата', value: paidFull, color: '#C4A47C' },
     ];
 
@@ -414,12 +425,12 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#0D0D11]/95 backdrop-blur-md border border-white/[0.08] p-3 rounded-xl shadow-2xl animate-scale-in">
-          <p className="text-[9px] uppercase font-bold text-white/40 tracking-wider mb-1">{label}</p>
+        <div className="bg-admin-surface/95 backdrop-blur-md border border-admin-border-strong p-3 rounded-xl shadow-2xl animate-scale-in transition-colors duration-300">
+          <p className="text-[9px] uppercase font-bold text-admin-text-dim tracking-wider mb-1">{label}</p>
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full bg-[#C4A47C]" />
             <p className="text-xs font-bold text-[#C4A47C]">
-              Реєстрацій: <span className="text-white font-extrabold">{payload[0].value}</span>
+              Реєстрацій: <span className="text-admin-text font-extrabold">{payload[0].value}</span>
             </p>
           </div>
         </div>
@@ -432,11 +443,11 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-[#0D0D11]/95 backdrop-blur-md border border-white/[0.08] p-4 rounded-xl shadow-2xl animate-scale-in">
-          <p className="text-xs font-black text-white uppercase tracking-wider mb-2 border-b border-white/5 pb-1.5">{data.name}</p>
+        <div className="bg-admin-surface/95 backdrop-blur-md border border-admin-border-strong p-4 rounded-xl shadow-2xl animate-scale-in transition-colors duration-300">
+          <p className="text-xs font-black text-admin-text uppercase tracking-wider mb-2 border-b border-admin-border pb-1.5">{data.name}</p>
           <div className="space-y-1 text-xs">
-            <p className="text-white/50">Кількість: <span className="text-white font-bold">{data.value}</span></p>
-            <p className="text-white/50">Конверсія від трафіку: <span className="text-[#C4A47C] font-bold">{data.percent}%</span></p>
+            <p className="text-admin-text-muted">Кількість: <span className="text-admin-text font-bold">{data.value}</span></p>
+            <p className="text-admin-text-muted">Конверсія від трафіку: <span className="text-[#C4A47C] font-bold">{data.percent}%</span></p>
           </div>
         </div>
       );
@@ -452,110 +463,112 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
           icon={<MousePointer2 className="text-[#C4A47C]" size={20} />} 
           label="Трафік (Візити)" 
           value={stats.totalViews.toLocaleString()} 
-          glowColor="rgba(196,164,124,0.05)"
+          glowColor={isLight ? "rgba(196,164,124,0.02)" : "rgba(196,164,124,0.05)"}
         />
         <Stat 
           icon={<Users className="text-[#C4A47C]" size={20} />} 
           label="Всього лідів" 
           value={stats.totalLeads.toLocaleString()} 
-          glowColor="rgba(196,164,124,0.05)"
+          glowColor={isLight ? "rgba(196,164,124,0.02)" : "rgba(196,164,124,0.05)"}
         />
         <Stat 
-          icon={<TrendingUp className="text-emerald-400" size={20} />} 
+          icon={<TrendingUp className="text-emerald-600 dark:text-emerald-400" size={20} />} 
           label="Конверсія" 
           value={`${stats.overallConversion}%`} 
-          glowColor="rgba(52,211,153,0.05)"
+          glowColor={isLight ? "rgba(52,211,153,0.02)" : "rgba(52,211,153,0.05)"}
         />
         <Stat 
-          icon={<CreditCard className="text-[#3B82F6]" size={20} />} 
+          icon={<CreditCard className="text-blue-600 dark:text-[#3B82F6]" size={20} />} 
           label="Бронювання (UAH)" 
           value={`${stats.totalBookings.toLocaleString()} ₴`} 
-          glowColor="rgba(59,130,246,0.05)"
+          glowColor={isLight ? "rgba(59,130,246,0.02)" : "rgba(59,130,246,0.05)"}
         />
         <Stat 
-          icon={<DollarSign className="text-emerald-400" size={20} />} 
+          icon={<DollarSign className="text-emerald-600 dark:text-emerald-400" size={20} />} 
           label="Дохід (USD)" 
           value={`$${stats.totalUSD.toLocaleString()}`} 
-          glowColor="rgba(16,185,129,0.05)"
+          glowColor={isLight ? "rgba(16,185,129,0.02)" : "rgba(16,185,129,0.05)"}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Funnel Chart with Integrated Autonomous Filters */}
-        <div id="admin-conversion-funnel" className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        <div id="admin-conversion-funnel" className="bg-admin-surface border border-admin-border p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-admin-border-strong transition-all duration-500">
           <div className="absolute top-0 right-0 h-40 w-40 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
           
-          <div className="flex flex-col gap-5 border-b border-white/[0.04] pb-6 mb-6">
+          <div className="flex flex-col gap-5 border-b border-admin-border pb-6 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Воронка Конверсії</h3>
-                <p className="text-[10px] text-white/30 uppercase font-semibold">Шлях відвідувача до клієнта</p>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1 font-headline">Воронка Конверсії</h3>
+                <p className="text-[10px] text-admin-text-dim uppercase font-semibold">Шлях відвідувача до клієнта</p>
               </div>
-              <Layers size={16} className="text-white/20" />
+              <Layers size={16} className="text-admin-text-dim/40" />
             </div>
 
             {/* Micro-filter Panel for Funnel */}
             <div className="flex flex-wrap items-center gap-3">
               {/* Period Dropdown Selector */}
               <div className="flex flex-col gap-1 shrink-0 min-w-[150px]">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Calendar size={8} /> Період
                 </label>
                 <div className="relative">
                   <select 
                     value={funnelPeriod} 
                     onChange={(e) => setFunnelPeriod(e.target.value as any)}
-                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2 text-[10px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
+                    className="w-full appearance-none bg-admin-bg border border-admin-border rounded-xl px-4 py-2 text-[10px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
                   >
-                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
-                    <option value="prev_month" className="bg-[#111115]">Минулий місяць</option>
-                    <option value="all" className="bg-[#111115]">За весь час</option>
-                    <option value="custom" className="bg-[#111115]">Кастомний діапазон</option>
+                    <option value="month" className="bg-admin-surface text-admin-text">Поточний місяць</option>
+                    <option value="prev_month" className="bg-admin-surface text-admin-text">Минулий місяць</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">За весь час</option>
+                    <option value="custom" className="bg-admin-surface text-admin-text">Кастомний діапазон</option>
                   </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1.5 w-1.5 rotate-[135deg]" />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1.5 w-1.5 rotate-[135deg]" />
                 </div>
               </div>
 
               {/* Dynamic Google Sheet Dropdown Selector */}
               <div className="flex flex-col gap-1 w-full sm:w-auto flex-1 min-w-[180px]">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Filter size={8} /> Джерело даних (Лист)
                 </label>
                 <div className="relative">
                   <select 
                     value={funnelSheet} 
                     onChange={(e) => setFunnelSheet(e.target.value)}
-                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2 text-[10px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
+                    className="w-full appearance-none bg-admin-bg border border-admin-border rounded-xl px-4 py-2 text-[10px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-8 cursor-pointer"
                   >
-                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">Всі листи</option>
                     {sheetNames.map((name) => (
-                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                      <option key={name} value={name} className="bg-admin-surface text-admin-text">{name}</option>
                     ))}
                   </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1.5 w-1.5 rotate-[135deg]" />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1.5 w-1.5 rotate-[135deg]" />
                 </div>
               </div>
             </div>
 
             {/* Sliding custom date range inputs when 'custom' is selected */}
             {funnelPeriod === 'custom' && (
-              <div className="grid grid-cols-2 gap-3 p-4 bg-black/30 rounded-2xl border border-white/[0.05] animate-scale-in">
+              <div className="grid grid-cols-2 gap-3 p-4 bg-admin-bg/50 rounded-2xl border border-admin-border animate-scale-in">
                 <div className="flex flex-col gap-1">
-                  <label className="text-[8px] font-black uppercase tracking-wider text-white/40">Початок періоду</label>
+                  <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim">Початок періоду</label>
                   <input 
                     type="date" 
                     value={funnelCustomStart} 
                     onChange={(e) => setFunnelCustomStart(e.target.value)} 
-                    className="bg-[#18181C] border border-white/[0.08] rounded-xl px-3 py-2 text-[10px] font-bold text-white focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full [color-scheme:dark]"
+                    style={{ colorScheme: theme }}
+                    className="bg-admin-input-bg border border-admin-border rounded-xl px-3 py-2 text-[10px] font-bold text-admin-text focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-[8px] font-black uppercase tracking-wider text-white/40">Кінець періоду</label>
+                  <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim">Кінець періоду</label>
                   <input 
                     type="date" 
                     value={funnelCustomEnd} 
                     onChange={(e) => setFunnelCustomEnd(e.target.value)} 
-                    className="bg-[#18181C] border border-white/[0.08] rounded-xl px-3 py-2 text-[10px] font-bold text-white focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full [color-scheme:dark]"
+                    style={{ colorScheme: theme }}
+                    className="bg-admin-input-bg border border-admin-border rounded-xl px-3 py-2 text-[10px] font-bold text-admin-text focus:outline-none focus:border-[#C4A47C]/30 transition-colors w-full"
                   />
                 </div>
               </div>
@@ -565,10 +578,10 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
           <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={funnelData} layout="vertical" margin={{ top: 0, right: 50, left: 30, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" horizontal={false} />
-                <XAxis type="number" stroke="#ffffff20" hide />
-                <YAxis dataKey="name" type="category" stroke="#ffffff30" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }} width={120} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} content={<FunnelTooltip />} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                <XAxis type="number" stroke={axisStroke} hide />
+                <YAxis dataKey="name" type="category" stroke={axisStroke} tick={{ fontSize: 9, fill: tickFill, fontWeight: 'bold' }} width={120} />
+                <Tooltip cursor={{ fill: tooltipCursor }} content={<FunnelTooltip />} />
                 <Bar dataKey="displayValue" radius={[0, 8, 8, 0]}>
                   {funnelData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} className="transition-all duration-500 hover:opacity-80" />
@@ -576,7 +589,7 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
                   <LabelList 
                     dataKey="value" 
                     position="right" 
-                    fill="rgba(255, 255, 255, 0.6)" 
+                    fill={labelFill} 
                     fontSize={10} 
                     fontWeight="bold"
                     formatter={((val: any, index: any) => {
@@ -594,54 +607,54 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
         </div>
 
         {/* Top 5 UTM Sources with Autonomous Filters */}
-        <div id="admin-utm-sources" className="bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        <div id="admin-utm-sources" className="bg-admin-surface border border-admin-border p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-admin-border-strong transition-all duration-500">
           <div className="absolute top-0 right-0 h-40 w-40 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
           
-          <div className="flex flex-col gap-4 border-b border-white/[0.04] pb-6 mb-6">
+          <div className="flex flex-col gap-4 border-b border-admin-border pb-6 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">ТОП-5 Джерел (UTM)</h3>
-                <p className="text-[10px] text-white/30 uppercase font-semibold">Розподіл трафіку та прибутковості</p>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1 font-headline">ТОП-5 Джерел (UTM)</h3>
+                <p className="text-[10px] text-admin-text-dim uppercase font-semibold">Розподіл трафіку та прибутковості</p>
               </div>
-              <Globe size={16} className="text-white/20" />
+              <Globe size={16} className="text-admin-text-dim/40" />
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* UTM Period Selector */}
               <div className="flex flex-col gap-1 shrink-0">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Calendar size={8} /> Період
                 </label>
                 <div className="relative">
                   <select 
                     value={utmPeriod} 
                     onChange={(e) => setUtmPeriod(e.target.value as any)}
-                    className="appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                    className="appearance-none bg-admin-bg border border-admin-border rounded-xl px-3 py-1.5 text-[9px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
                   >
-                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
-                    <option value="all" className="bg-[#111115]">За весь час</option>
+                    <option value="month" className="bg-admin-surface text-admin-text">Поточний місяць</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">За весь час</option>
                   </select>
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1 w-1 rotate-[135deg]" />
                 </div>
               </div>
 
               {/* UTM Sheet Selector */}
               <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Filter size={8} /> Джерело даних (Лист)
                 </label>
                 <div className="relative">
                   <select 
                     value={utmSheet} 
                     onChange={(e) => setUtmSheet(e.target.value)}
-                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                    className="w-full appearance-none bg-admin-bg border border-admin-border rounded-xl px-3 py-1.5 text-[9px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
                   >
-                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">Всі листи</option>
                     {sheetNames.map((name) => (
-                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                      <option key={name} value={name} className="bg-admin-surface text-admin-text">{name}</option>
                     ))}
                   </select>
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1 w-1 rotate-[135deg]" />
                 </div>
               </div>
             </div>
@@ -650,30 +663,30 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
           <div className="overflow-x-auto premium-scrollbar">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-[9px] uppercase font-black text-white/20 tracking-wider border-b border-white/[0.05] bg-white/[0.01]">
+                <tr className="text-[9px] uppercase font-black text-admin-text-dim/60 tracking-wider border-b border-admin-border bg-admin-active-bg/30">
                   <th className="pb-4 pt-2 px-3">Джерело</th>
                   <th className="pb-4 pt-2 px-3 text-right">Ліди</th>
                   <th className="pb-4 pt-2 px-3 text-right">Трипваєри (кол-во)</th>
                   <th className="pb-4 pt-2 px-3 text-right">Дохід USD</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-admin-border">
                 {utmData.map((row) => (
-                  <tr key={row.name} className="hover:bg-white/[0.02] transition-colors group/row">
-                    <td className="py-4 px-3 text-xs font-bold text-white/80 max-w-[140px] truncate" title={row.name}>
+                  <tr key={row.name} className="hover:bg-admin-card-hover transition-colors group/row">
+                    <td className="py-4 px-3 text-xs font-bold text-admin-text-muted max-w-[140px] truncate" title={row.name}>
                       <div className="flex items-center gap-2">
                         <div className="h-1.5 w-1.5 rounded-full bg-[#C4A47C] opacity-40 group-hover/row:opacity-100 transition-opacity" />
                         {row.name}
                       </div>
                     </td>
-                    <td className="py-4 px-3 text-xs text-white/50 text-right font-medium">{row.leads}</td>
+                    <td className="py-4 px-3 text-xs text-admin-text-dim text-right font-medium">{row.leads}</td>
                     <td className="py-4 px-3 text-xs text-[#C4A47C] font-bold text-right">{row.tripwires}</td>
-                    <td className="py-4 px-3 text-xs text-emerald-400 font-extrabold text-right">${row.revenueUSD.toLocaleString()}</td>
+                    <td className="py-4 px-3 text-xs text-emerald-600 dark:text-emerald-400 font-extrabold text-right">${row.revenueUSD.toLocaleString()}</td>
                   </tr>
                 ))}
                 {utmData.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-8 text-center text-[10px] uppercase font-bold text-white/20 tracking-widest">
+                    <td colSpan={4} className="py-8 text-center text-[10px] uppercase font-bold text-admin-text-dim tracking-widest">
                       Немає даних за обраний період
                     </td>
                   </tr>
@@ -684,54 +697,54 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
         </div>
 
         {/* Trend Chart with Autonomous Filters */}
-        <div id="admin-registrations-chart" className="lg:col-span-2 bg-[#111115] border border-white/[0.04] p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-white/[0.08] transition-all duration-500">
+        <div id="admin-registrations-chart" className="lg:col-span-2 bg-admin-surface border border-admin-border p-6 rounded-3xl relative overflow-hidden group shadow-2xl hover:border-admin-border-strong transition-all duration-500">
           <div className="absolute top-0 right-0 h-48 w-48 bg-[#C4A47C]/[0.01] rounded-full blur-3xl pointer-events-none" />
           
-          <div className="flex flex-col gap-4 border-b border-white/[0.04] pb-6 mb-6">
+          <div className="flex flex-col gap-4 border-b border-admin-border pb-6 mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1">Динаміка реєстрацій</h3>
-                <p className="text-[10px] text-white/30 uppercase font-semibold">Денний темп приросту лідів за обраний період</p>
+                <h3 className="text-xs uppercase font-extrabold text-[#C4A47C] tracking-[0.2em] mb-1 font-headline">Динаміка реєстрацій</h3>
+                <p className="text-[10px] text-admin-text-dim uppercase font-semibold">Денний темп приросту лідів за обраний період</p>
               </div>
-              <TrendingUp size={16} className="text-white/20" />
+              <TrendingUp size={16} className="text-admin-text-dim/40" />
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* Trend Period Selector */}
               <div className="flex flex-col gap-1 shrink-0">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Calendar size={8} /> Період
                 </label>
                 <div className="relative">
                   <select 
                     value={trendPeriod} 
                     onChange={(e) => setTrendPeriod(e.target.value as any)}
-                    className="appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                    className="appearance-none bg-admin-bg border border-admin-border rounded-xl px-3 py-1.5 text-[9px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
                   >
-                    <option value="month" className="bg-[#111115]">Поточний місяць</option>
-                    <option value="all" className="bg-[#111115]">За весь час</option>
+                    <option value="month" className="bg-admin-surface text-admin-text">Поточний місяць</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">За весь час</option>
                   </select>
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1 w-1 rotate-[135deg]" />
                 </div>
               </div>
 
               {/* Trend Sheet Selector */}
               <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                <label className="text-[8px] font-black uppercase tracking-wider text-white/30 flex items-center gap-1">
+                <label className="text-[8px] font-black uppercase tracking-wider text-admin-text-dim flex items-center gap-1">
                   <Filter size={8} /> Джерело даних (Лист)
                 </label>
                 <div className="relative">
                   <select 
                     value={trendSheet} 
                     onChange={(e) => setTrendSheet(e.target.value)}
-                    className="w-full appearance-none bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 text-[9px] font-bold text-white/80 focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
+                    className="w-full appearance-none bg-admin-bg border border-admin-border rounded-xl px-3 py-1.5 text-[9px] font-bold text-admin-text-muted focus:outline-none focus:border-[#C4A47C]/40 transition-colors pr-7 cursor-pointer"
                   >
-                    <option value="all" className="bg-[#111115]">Всі листи</option>
+                    <option value="all" className="bg-admin-surface text-admin-text">Всі листи</option>
                     {sheetNames.map((name) => (
-                      <option key={name} value={name} className="bg-[#111115]">{name}</option>
+                      <option key={name} value={name} className="bg-admin-surface text-admin-text">{name}</option>
                     ))}
                   </select>
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-white/20 h-1 w-1 rotate-[135deg]" />
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none border-l border-t border-admin-text-dim/40 h-1 w-1 rotate-[135deg]" />
                 </div>
               </div>
             </div>
@@ -748,17 +761,17 @@ export default function AnalyticsDashboard({ leads: rawLeads, traffic: rawTraffi
                 </defs>
                 <XAxis 
                   dataKey="name" 
-                  stroke="#ffffff20" 
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }} 
+                  stroke={axisStroke} 
+                  tick={{ fontSize: 9, fill: tickFill, fontWeight: 'bold' }} 
                   dy={10}
                 />
                 <YAxis 
-                  stroke="#ffffff20" 
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }} 
+                  stroke={axisStroke} 
+                  tick={{ fontSize: 9, fill: tickFill, fontWeight: 'bold' }} 
                   allowDecimals={false} 
                   dx={-5}
                 />
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
                   type="monotone" 
@@ -788,15 +801,15 @@ interface StatProps {
 function Stat({ icon, label, value, glowColor }: StatProps) {
   return (
     <div 
-      className="bg-[#111115] border border-white/[0.04] p-5 rounded-2xl flex items-center gap-4 transition-all duration-500 hover:-translate-y-1 hover:border-[#C4A47C]/30 shadow-xl group"
+      className="bg-admin-surface border border-admin-border p-5 rounded-2xl flex items-center gap-4 transition-all duration-500 hover:-translate-y-1 hover:border-[#C4A47C]/30 shadow-xl group"
       style={{ boxShadow: `0 10px 30px -10px ${glowColor}` }}
     >
-      <div className="h-12 w-12 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:border-[#C4A47C]/20 shrink-0">
+      <div className="h-12 w-12 rounded-xl bg-admin-active-bg border border-admin-border flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:border-[#C4A47C]/20 shrink-0">
         {icon}
       </div>
       <div className="overflow-hidden">
-        <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/30 truncate">{label}</p>
-        <p className="text-xl font-bold tracking-tight text-white/95 mt-0.5 truncate">{value}</p>
+        <p className="text-[9px] font-black uppercase tracking-[0.15em] text-admin-text-dim truncate">{label}</p>
+        <p className="text-xl font-bold tracking-tight text-admin-text mt-0.5 truncate">{value}</p>
       </div>
     </div>
   );

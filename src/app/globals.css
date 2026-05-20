@@ -21,6 +21,92 @@
   --surface-container: #eeeeee;
   --on-surface-variant: #48473c;
   --error: #ba1a1a;
+
+  /* Default Admin theme colors (Dark fallbacks) */
+  --admin-bg: #09090B;
+  --admin-surface: #111111;
+  --admin-surface-muted: #161619;
+  --admin-sidebar-bg: #0E0E11;
+  --admin-text: #FFFFFF;
+  --admin-text-muted: rgba(255, 255, 255, 0.7);
+  --admin-text-dim: rgba(255, 255, 255, 0.45);
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-border-strong: rgba(255, 255, 255, 0.15);
+  --admin-card-hover: rgba(255, 255, 255, 0.02);
+  --admin-active-bg: rgba(255, 255, 255, 0.06);
+  --admin-input-bg: rgba(255, 255, 255, 0.02);
+}
+
+.admin-theme-dark,
+html.admin-theme-dark,
+html.admin-theme-dark body {
+  --admin-bg: #09090B;
+  --admin-surface: #111111;
+  --admin-surface-muted: #161619;
+  --admin-sidebar-bg: #0E0E11;
+  --admin-text: #FFFFFF;
+  --admin-text-muted: rgba(255, 255, 255, 0.7);
+  --admin-text-dim: rgba(255, 255, 255, 0.45);
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-border-strong: rgba(255, 255, 255, 0.15);
+  --admin-card-hover: rgba(255, 255, 255, 0.02);
+  --admin-active-bg: rgba(255, 255, 255, 0.06);
+  --admin-input-bg: rgba(255, 255, 255, 0.02);
+
+  background-color: #09090B !important;
+  color: #FFFFFF !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, -webkit-system-font, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+
+  /* Map font-family tokens inside admin theme to the gorgeous macOS system font */
+  --font-headline: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+  --font-label: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+}
+
+.admin-theme-light,
+html.admin-theme-light,
+html.admin-theme-light body {
+  --admin-bg: #F4F5F6;
+  --admin-surface: #FFFFFF;
+  --admin-surface-muted: #F8F9FA;
+  --admin-sidebar-bg: #EAECEF;
+  --admin-text: #18181B;
+  --admin-text-muted: rgba(24, 24, 27, 0.75);
+  --admin-text-dim: rgba(24, 24, 27, 0.45);
+  --admin-border: rgba(24, 24, 27, 0.08);
+  --admin-border-strong: rgba(24, 24, 27, 0.15);
+  --admin-card-hover: rgba(24, 24, 27, 0.015);
+  --admin-active-bg: rgba(24, 24, 27, 0.05);
+  --admin-input-bg: rgba(24, 24, 27, 0.015);
+
+  background-color: #F4F5F6 !important;
+  color: #18181B !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, -webkit-system-font, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+
+  /* Map font-family tokens inside admin theme to the gorgeous macOS system font */
+  --font-headline: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+  --font-label: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif !important;
+}
+
+/* Premium Unified Transitions for Admin Panel */
+.admin-theme-light,
+.admin-theme-dark,
+html.admin-theme-light body,
+html.admin-theme-dark body,
+.admin-theme-light *,
+.admin-theme-dark * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 450ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Preload state to prevent animations/flashes on hydration or load */
+.preload-no-transition,
+.preload-no-transition *,
+.preload-no-transition *:before,
+.preload-no-transition *:after {
+  transition: none !important;
 }
 
 @theme {
@@ -38,7 +124,22 @@
   --font-headline: "Manrope", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
   --font-label: "Space Grotesk", sans-serif;
+
+  /* Custom admin theme properties mapping in Tailwind v4 */
+  --color-admin-bg: var(--admin-bg);
+  --color-admin-surface: var(--admin-surface);
+  --color-admin-surface-muted: var(--admin-surface-muted);
+  --color-admin-sidebar-bg: var(--admin-sidebar-bg);
+  --color-admin-text: var(--admin-text);
+  --color-admin-text-muted: var(--admin-text-muted);
+  --color-admin-text-dim: var(--admin-text-dim);
+  --color-admin-border: var(--admin-border);
+  --color-admin-border-strong: var(--admin-border-strong);
+  --color-admin-card-hover: var(--admin-card-hover);
+  --color-admin-active-bg: var(--admin-active-bg);
+  --color-admin-input-bg: var(--admin-input-bg);
 }
+
 
 /* Base styles */
 html, body {

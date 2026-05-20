@@ -829,7 +829,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
   if (loading && leads.length === 0) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#09090B]">
+      <div className="flex h-screen items-center justify-center bg-admin-bg">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-[#C4A47C]" />
           <p className="text-[#C4A47C] font-bold tracking-widest animate-pulse uppercase text-[10px]">Loading Dashboard...</p>
@@ -839,29 +839,29 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
   }
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-white p-0 font-sans selection:bg-[#C4A47C]/30">
+    <div className="min-h-screen bg-admin-bg text-admin-text p-0 font-sans selection:bg-[#C4A47C]/30">
       {/* Header & Controls */}
       <div className="mb-12 flex flex-col xl:flex-row xl:items-end justify-between gap-8 animate-fade-in">
         <div>
           <div className="inline-block border-l-2 border-[#C4A47C] pl-4 mb-2">
-            <h1 className="text-4xl font-black uppercase tracking-tighter text-white font-headline">
+            <h1 className="text-4xl font-black uppercase tracking-tighter text-admin-text font-headline">
               {onlyView === 'analytics' ? 'Аналітика' : (isSales ? 'Base of Leads' : 'Admin Portal')}
             </h1>
           </div>
-          <p className="text-white/30 text-xs uppercase tracking-[0.3em] font-bold">Victoria MC CRM</p>
+          <p className="text-admin-text-dim text-xs uppercase tracking-[0.3em] font-bold">Victoria MC CRM</p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:flex-wrap items-end gap-3">
           {onlyView !== 'analytics' && (
             <>
               <div className="col-span-2 md:col-span-2 lg:w-64 relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-[#C4A47C] transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-admin-text-dim group-focus-within:text-[#C4A47C] transition-colors" />
                 <input 
                   type="text" 
                   placeholder="Пошук..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#C4A47C] transition-all placeholder:text-white/20 text-xs font-bold"
+                  className="w-full bg-admin-input-bg border border-admin-border rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#C4A47C] transition-all placeholder:text-admin-text-dim text-admin-text text-xs font-bold"
                 />
               </div>
 
@@ -907,7 +907,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
             <button 
               onClick={fetchData} 
               disabled={loading}
-              className="bg-white/[0.02] border border-white/10 hover:bg-white/[0.05] text-white/80 hover:text-white transition-all rounded-xl px-5 h-[46px] text-xs font-bold uppercase tracking-wider flex items-center gap-2 active:scale-95"
+              className="bg-admin-input-bg border border-admin-border hover:bg-admin-active-bg text-admin-text-muted hover:text-admin-text transition-all rounded-xl px-5 h-[46px] text-xs font-bold uppercase tracking-wider flex items-center gap-2 active:scale-95"
             >
               <Loader2 size={14} className={loading ? 'animate-spin text-[#C4A47C]' : ''} />
               Оновити дані
@@ -947,11 +947,11 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
       {/* View Switcher / Tabs */}
       {onlyView === 'leads' ? (
         <div id="admin-view-switcher" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-2 bg-[#111] p-1 rounded-2xl w-fit border border-white/5">
-            <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+          <div className="flex items-center gap-2 bg-admin-surface p-1 rounded-2xl w-fit border border-admin-border">
+            <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-admin-text-dim hover:text-admin-text hover:bg-admin-active-bg'}`}>
               <LayoutGrid size={14} /> Канбан
             </button>
-            <button onClick={() => setActiveTab('table')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'table' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+            <button onClick={() => setActiveTab('table')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'table' ? 'bg-[#C4A47C] text-black' : 'text-admin-text-dim hover:text-admin-text hover:bg-admin-active-bg'}`}>
               <List size={14} /> Таблиця
             </button>
           </div>
@@ -959,22 +959,22 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
             <button onClick={() => setIsPaymentLinkOpen(true)} className="bg-gradient-to-r from-[#C4A47C] to-[#E5C9A3] hover:from-[#B0936C] hover:to-[#C4A47C] text-black transition-all duration-300 rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-[#C4A47C]/10 active:scale-95">
               <CreditCard size={14} /> Створити посилання
             </button>
-            <button onClick={fetchData} disabled={loading} className="bg-white/[0.02] border border-white/10 hover:bg-white/[0.05] text-white/80 hover:text-white transition-all rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-2 active:scale-95">
+            <button onClick={fetchData} disabled={loading} className="bg-admin-input-bg border border-admin-border hover:bg-admin-active-bg text-admin-text-muted hover:text-admin-text transition-all rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-2 active:scale-95">
               <Loader2 size={14} className={loading ? 'animate-spin text-[#C4A47C]' : ''} />
               Оновити дані
             </button>
           </div>
         </div>
       ) : onlyView !== 'analytics' ? (
-        <div id="admin-view-switcher" className="flex items-center gap-2 mb-8 bg-[#111] p-1 rounded-2xl w-fit border border-white/5">
-          <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+        <div id="admin-view-switcher" className="flex items-center gap-2 mb-8 bg-admin-surface p-1 rounded-2xl w-fit border border-admin-border">
+          <button onClick={() => setActiveTab('kanban')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'kanban' ? 'bg-[#C4A47C] text-black' : 'text-admin-text-dim hover:text-admin-text hover:bg-admin-active-bg'}`}>
             <LayoutGrid size={14} /> Канбан
           </button>
-          <button onClick={() => setActiveTab('table')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'table' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+          <button onClick={() => setActiveTab('table')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'table' ? 'bg-[#C4A47C] text-black' : 'text-admin-text-dim hover:text-admin-text hover:bg-admin-active-bg'}`}>
             <List size={14} /> Таблиця
           </button>
           {!shouldHideAnalytics && (
-            <button onClick={() => setActiveTab('analytics')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'analytics' ? 'bg-[#C4A47C] text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+            <button onClick={() => setActiveTab('analytics')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 ${activeTab === 'analytics' ? 'bg-[#C4A47C] text-black' : 'text-admin-text-dim hover:text-admin-text hover:bg-admin-active-bg'}`}>
               <BarChart3 size={14} /> Аналітика
             </button>
           )}
@@ -990,15 +990,15 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
       )}
 
       {activeTab === 'table' && (
-        <div className="bg-[#111111] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-          <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
-            <h2 className="font-black uppercase tracking-widest text-[10px] text-white/30">Client Database</h2>
+        <div className="bg-admin-surface border border-admin-border rounded-3xl overflow-hidden shadow-2xl">
+          <div className="px-8 py-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-muted">
+            <h2 className="font-black uppercase tracking-widest text-[10px] text-admin-text-dim">Client Database</h2>
           </div>
         
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-white/20 text-[9px] uppercase font-black tracking-[0.2em] bg-white/[0.02]">
+                <tr className="text-admin-text-dim text-[9px] uppercase font-black tracking-[0.2em] bg-admin-surface-muted">
                   <th className="px-8 py-5">Клієнт</th>
                   <th className="px-8 py-5">Контакти</th>
                   <th className="px-8 py-5">Статус / Пакет</th>
@@ -1006,7 +1006,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
                   <th className="px-8 py-5 text-right">Дії</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-admin-border">
                 {finalLeads.map((lead, i) => (
                   <LeadRow 
                     key={lead._selectionId} 
@@ -1038,30 +1038,30 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               onWheel={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl bg-[#111111] border border-white/10 rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:h-[650px] md:max-h-[80vh] premium-scrollbar"
+              className="relative w-full max-w-4xl bg-admin-surface border border-admin-border-strong rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:h-[650px] md:max-h-[80vh] premium-scrollbar"
             >
               {/* Left Column */}
               <div 
                 onWheel={(e) => e.stopPropagation()}
                 onTouchMove={(e) => e.stopPropagation()}
-                className="w-full md:w-[360px] bg-[#0A0A0A] p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/5 md:overflow-y-auto md:h-full shrink-0 premium-scrollbar"
+                className="w-full md:w-[360px] bg-admin-surface-muted p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-admin-border md:overflow-y-auto md:h-full shrink-0 premium-scrollbar"
               >
                 <div className="flex items-center justify-between mb-8">
-                  <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#222] to-[#111] border border-white/5 flex items-center justify-center text-2xl font-bold text-white/80 shadow-inner">
+                  <div className="h-16 w-16 rounded-full bg-admin-active-bg border border-admin-border flex items-center justify-center text-2xl font-bold text-admin-text shadow-inner">
                     {selectedLead["Ім'я"]?.[0] || 'U'}
                   </div>
                   <div className="text-right">
-                    <p className="text-[8px] uppercase font-bold text-white/30 tracking-[0.2em] mb-2">Змінити Статус</p>
+                    <p className="text-[8px] uppercase font-bold text-admin-text-dim tracking-[0.2em] mb-2">Змінити Статус</p>
                     <select 
                       value={selectedLead._computedStatus} 
                       disabled={updating}
                       onChange={(e) => updateLeadStatus(e.target.value)}
-                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider appearance-none cursor-pointer focus:outline-none focus:border-[#C4A47C] text-[#C4A47C] w-full text-center"
+                      className="bg-admin-input-bg border border-admin-border rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider appearance-none cursor-pointer focus:outline-none focus:border-[#C4A47C] text-[#C4A47C] w-full text-center"
                     >
-                      <option value="Оплачено" className="bg-[#111]">Оплачено (Курс/Бронь)</option>
-                      <option value="Купив(-ла) трипвайєр" className="bg-[#111]">Тріпваєр ($9/$39)</option>
-                      <option value="Відхилено" className="bg-[#111]">Відхилено</option>
-                      <option value="Очікує" className="bg-[#111]">Очікує</option>
+                      <option value="Оплачено" className="bg-admin-surface text-admin-text">Оплачено (Курс/Бронь)</option>
+                      <option value="Купив(-ла) трипвайєр" className="bg-admin-surface text-admin-text">Тріпваєр ($9/$39)</option>
+                      <option value="Відхилено" className="bg-admin-surface text-admin-text">Відхилено</option>
+                      <option value="Очікує" className="bg-admin-surface text-admin-text">Очікує</option>
                     </select>
                   </div>
                 </div>
@@ -1075,10 +1075,10 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-2xl font-bold tracking-tight mb-2">{selectedLead.name || selectedLead["Ім'я"] || 'Anonymous'}</h3>
+                    <h3 className="text-2xl font-bold tracking-tight mb-2 text-admin-text">{selectedLead.name || selectedLead["Ім'я"] || 'Anonymous'}</h3>
                     <div className="flex flex-wrap gap-2">
                         {selectedLead._allSheets.map((s: string) => (
-                            <span key={s} className="px-2 py-0.5 rounded bg-white/5 text-[8px] font-bold uppercase tracking-wider text-white/40">{s}</span>
+                            <span key={s} className="px-2 py-0.5 rounded bg-admin-active-bg text-[8px] font-bold uppercase tracking-wider text-admin-text-dim">{s}</span>
                         ))}
                     </div>
                   </div>
@@ -1090,8 +1090,8 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
                     <InfoRow icon={<Activity size={14} />} label="Ніша" value={selectedLead._niche || '—'} italic />
                   </div>
 
-                  <div className="pt-6 border-t border-white/5 space-y-4">
-                    <p className="text-[9px] uppercase font-bold text-white/30 tracking-[0.2em] mb-1">Маркетингове джерело (UTM)</p>
+                  <div className="pt-6 border-t border-admin-border space-y-4">
+                    <p className="text-[9px] uppercase font-bold text-admin-text-dim tracking-[0.2em] mb-1">Маркетингове джерело (UTM)</p>
                     <InfoRow icon={<Compass size={14} />} label="Джерело" value={selectedLead.utm_source || selectedLead["utm_source"] || selectedLead["Source"] || selectedLead["Джерело"] || '—'} />
                     <InfoRow icon={<Globe size={14} />} label="Канал" value={selectedLead.utm_medium || selectedLead["utm_medium"] || selectedLead["Medium"] || selectedLead["Канал"] || '—'} />
                     <InfoRow icon={<Target size={14} />} label="Кампанія" value={selectedLead.utm_campaign || selectedLead["utm_campaign"] || selectedLead["Campaign"] || selectedLead["Кампанія"] || '—'} />
@@ -1149,23 +1149,23 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
                         : getFriendlyPathName(firstEvent.path || firstEvent["Шлях"]);
 
                       return (
-                        <div className="pt-6 border-t border-white/5 space-y-3">
-                          <p className="text-[9px] uppercase font-bold text-white/30 tracking-[0.2em] mb-1 flex items-center gap-1.5">
+                        <div className="pt-6 border-t border-admin-border space-y-3">
+                          <p className="text-[9px] uppercase font-bold text-admin-text-dim tracking-[0.2em] mb-1 flex items-center gap-1.5">
                             <Calendar size={10} className="text-[#C4A47C]" /> Перше касання (First Touch)
                           </p>
-                          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4 space-y-3">
+                          <div className="bg-admin-input-bg border border-admin-border rounded-2xl p-4 space-y-3">
                             <div>
-                              <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">Дата та час</span>
-                              <span className="text-xs font-medium text-white/80">{firstTouchDate}</span>
+                              <span className="text-admin-text-dim text-[8px] uppercase font-bold tracking-wider block mb-0.5">Дата та час</span>
+                              <span className="text-xs font-medium text-admin-text-muted">{firstTouchDate}</span>
                             </div>
                             <div>
-                              <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">Сторінка входу</span>
+                              <span className="text-admin-text-dim text-[8px] uppercase font-bold tracking-wider block mb-0.5">Сторінка входу</span>
                               <span className="text-xs font-semibold text-[#C4A47C]">{firstTouchPage}</span>
                             </div>
                             {(firstEvent.utm_source || firstEvent["utm_source"] || firstEvent["Source"]) && (
                               <div>
-                                <span className="text-white/30 text-[8px] uppercase font-bold tracking-wider block mb-0.5">UTM Source (Перше касання)</span>
-                                <span className="text-xs font-medium text-white/70">{firstEvent.utm_source || firstEvent["utm_source"] || firstEvent["Source"]}</span>
+                                <span className="text-admin-text-dim text-[8px] uppercase font-bold tracking-wider block mb-0.5">UTM Source (Перше касання)</span>
+                                <span className="text-xs font-medium text-admin-text-muted">{firstEvent.utm_source || firstEvent["utm_source"] || firstEvent["Source"]}</span>
                               </div>
                             )}
                           </div>
@@ -1175,14 +1175,14 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
                     return null;
                   })()}
 
-                  <div className="pt-8 border-t border-white/5 mt-auto">
-                    <p className="text-[9px] uppercase font-bold text-white/30 mb-3 tracking-[0.2em]">Нотатки</p>
+                  <div className="pt-8 border-t border-admin-border mt-auto">
+                    <p className="text-[9px] uppercase font-bold text-admin-text-dim mb-3 tracking-[0.2em]">Нотатки</p>
                     <div className="relative group">
                       <textarea 
                         value={localComment}
                         onChange={(e) => setLocalComment(e.target.value)}
                         placeholder="Додати коментар..."
-                        className="w-full bg-white/[0.02] border border-white/5 rounded-xl p-4 text-xs text-white/80 focus:outline-none focus:border-[#C4A47C] min-h-[120px] resize-none transition-all placeholder:text-white/10"
+                        className="w-full bg-admin-input-bg border border-admin-border rounded-xl p-4 text-xs text-admin-text-muted focus:outline-none focus:border-[#C4A47C] min-h-[120px] resize-none transition-all placeholder:text-admin-text-dim"
                       />
                       <button 
                         onClick={saveComment}
@@ -1203,12 +1203,12 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
                 className="flex-1 p-6 md:p-8 md:overflow-y-auto md:h-full premium-scrollbar"
               >
                 <div className="flex items-center gap-3 mb-8">
-                  <History size={16} className="text-white/30" />
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white/70">Історія активності</h3>
+                  <History size={16} className="text-admin-text-dim" />
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-admin-text-muted">Історія активності</h3>
                 </div>
 
                 <div className="space-y-6 relative">
-                  <div className="absolute left-[15px] top-2 bottom-2 w-px bg-white/5" />
+                  <div className="absolute left-[15px] top-2 bottom-2 w-px bg-admin-border" />
 
                   {(() => {
                     const leadPhone = normalizePhone(selectedLead.phone || selectedLead["Телефон"]);
@@ -1265,55 +1265,55 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
                       return (
                         <div key={i} className="relative pl-10 group/event">
-                          <div className={`absolute left-0 top-0.5 h-8 w-8 rounded-full flex items-center justify-center z-10 border border-white/5 transition-colors ${isLead ? 'bg-[#C4A47C]/10 text-[#C4A47C]' : 'bg-white/[0.02] text-white/20'}`}>
+                          <div className={`absolute left-0 top-0.5 h-8 w-8 rounded-full flex items-center justify-center z-10 border border-admin-border transition-colors ${isLead ? 'bg-[#C4A47C]/10 text-[#C4A47C]' : 'bg-admin-input-bg text-admin-text-dim'}`}>
                             {isLead ? <CreditCard size={12} /> : <MousePointer2 size={12} />}
                           </div>
                           <div>
-                            <p className="text-[9px] text-white/30 font-medium mb-1 tracking-wider">{new Date(event.date || event["Дата та час"]).toLocaleString('uk-UA')}</p>
+                            <p className="text-[9px] text-admin-text-dim font-medium mb-1 tracking-wider">{new Date(event.date || event["Дата та час"]).toLocaleString('uk-UA')}</p>
                             {isLead ? (
-                              <div className="bg-[#161616] border border-white/5 rounded-2xl p-5 mt-2 space-y-4 shadow-xl transition-all duration-300 hover:border-white/10 animate-fade-in">
+                              <div className="bg-admin-surface-muted border border-admin-border rounded-2xl p-5 mt-2 space-y-4 shadow-xl transition-all duration-300 hover:border-admin-border-strong animate-fade-in">
                                 <div className="flex items-center justify-between gap-4">
                                   <div className="flex items-center gap-2">
                                     <span className={`text-[9px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border ${badge.bg}`}>
                                       {badge.label}
                                     </span>
                                     {amount && (
-                                      <span className="text-[9px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border border-white/5 bg-white/[0.02] text-white/60">
+                                      <span className="text-[9px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border border-admin-border bg-admin-input-bg text-admin-text-muted">
                                         💵 {amount}
                                       </span>
                                     )}
                                   </div>
                                   {eventSheet && (
-                                    <span className="text-[9px] text-white/40 font-medium bg-white/[0.01] px-2 py-0.5 rounded-md border border-white/[0.02]">
+                                    <span className="text-[9px] text-admin-text-dim font-medium bg-admin-input-bg px-2 py-0.5 rounded-md border border-admin-border">
                                       🎯 {eventSheet}
                                     </span>
                                   )}
                                 </div>
                                 
                                 {(tariff || orderId) && (
-                                  <div className="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-white/[0.03]">
+                                  <div className="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-admin-border">
                                     {tariff && (
                                       <div>
-                                        <span className="text-white/35 text-[9px] uppercase font-bold tracking-wider block mb-0.5">Тариф</span>
-                                        <span className="font-semibold text-white/80">{tariff}</span>
+                                        <span className="text-admin-text-dim text-[9px] uppercase font-bold tracking-wider block mb-0.5">Тариф</span>
+                                        <span className="font-semibold text-admin-text-muted">{tariff}</span>
                                       </div>
                                     )}
                                     {orderId && (
                                       <div>
-                                        <span className="text-white/35 text-[9px] uppercase font-bold tracking-wider block mb-0.5">ID Замовлення</span>
-                                        <span className="font-semibold text-white/50 font-mono truncate block max-w-[130px]" title={orderId}>{orderId}</span>
+                                        <span className="text-admin-text-dim text-[9px] uppercase font-bold tracking-wider block mb-0.5">ID Замовлення</span>
+                                        <span className="font-semibold text-admin-text-muted font-mono truncate block max-w-[130px]" title={orderId}>{orderId}</span>
                                       </div>
                                     )}
                                   </div>
                                 )}
                               </div>
                             ) : (
-                              <div className="bg-[#111111]/40 border border-white/[0.02] rounded-xl p-3.5 mt-2 transition-all duration-300 hover:bg-[#111111]/60">
+                              <div className="bg-admin-surface-muted/40 border border-admin-border rounded-xl p-3.5 mt-2 transition-all duration-300 hover:bg-admin-surface-muted/60">
                                 <div className="flex items-center gap-3">
-                                  <div className="h-6 w-6 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/30">
+                                  <div className="h-6 w-6 rounded-full bg-admin-active-bg border border-admin-border flex items-center justify-center text-admin-text-dim">
                                     <MousePointer2 size={11} />
                                   </div>
-                                  <p className="font-medium text-xs text-white/80">{friendlyPath}</p>
+                                  <p className="font-medium text-xs text-admin-text-muted">{friendlyPath}</p>
                                 </div>
                               </div>
                             )}
@@ -1342,25 +1342,25 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
 
 function StatCard({ icon, label, value, sub }: { icon: React.ReactNode, label: string, value: string | number, sub: string }) {
   return (
-    <div className="bg-[#111111] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+    <div className="bg-admin-surface border border-admin-border p-6 rounded-3xl relative overflow-hidden group">
       <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
         {React.cloneElement(icon as React.ReactElement<any>, { size: 100 })}
       </div>
       <div className="mb-3 flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-white/[0.02] flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full bg-admin-active-bg flex items-center justify-center">
           {icon}
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-admin-text-dim">{label}</span>
       </div>
       <div className="flex items-baseline gap-2">
-        <p className="text-3xl font-bold tracking-tight text-white/90">{value}</p>
-        <p className="text-[9px] font-medium text-white/30 tracking-wider">{sub}</p>
+        <p className="text-3xl font-bold tracking-tight text-admin-text">{value}</p>
+        <p className="text-[9px] font-medium text-admin-text-dim tracking-wider">{sub}</p>
       </div>
     </div>
   );
 }
 
-function InfoRow({ icon, label, value, color = "text-white/70", isCopyable = false, isTelegram = false, italic = false }: any) {
+function InfoRow({ icon, label, value, color = "text-admin-text-muted", isCopyable = false, isTelegram = false, italic = false }: any) {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     if (value && value !== '—') {
@@ -1372,10 +1372,10 @@ function InfoRow({ icon, label, value, color = "text-white/70", isCopyable = fal
   const tgLink = isTelegram && value && value !== '—' ? `https://t.me/${value.toString().replace('@', '').trim()}` : null;
   return (
     <div className="flex items-center gap-3 group/info">
-      <div className="text-white/20">{icon}</div>
+      <div className="text-admin-text-dim">{icon}</div>
       <div className="flex-1 flex items-center justify-between">
         <div>
-          <p className="text-[9px] uppercase font-bold text-white/30 tracking-wider mb-0.5">{label}</p>
+          <p className="text-[9px] uppercase font-bold text-admin-text-dim tracking-wider mb-0.5">{label}</p>
           {tgLink ? (
             <a href={tgLink} target="_blank" rel="noopener noreferrer" className={`text-xs font-medium ${color} hover:underline truncate`}>{value}</a>
           ) : (
@@ -1383,8 +1383,8 @@ function InfoRow({ icon, label, value, color = "text-white/70", isCopyable = fal
           )}
         </div>
         {isCopyable && value && value !== '—' && (
-          <button onClick={handleCopy} className="opacity-0 group-hover/info:opacity-100 transition-opacity p-2 hover:bg-white/5 rounded-lg">
-            {copied ? <Check size={14} className="text-[#C4A47C]" /> : <Copy size={14} className="text-white/30 hover:text-white" />}
+          <button onClick={handleCopy} className="opacity-0 group-hover/info:opacity-100 transition-opacity p-2 hover:bg-admin-active-bg rounded-lg">
+            {copied ? <Check size={14} className="text-[#C4A47C]" /> : <Copy size={14} className="text-admin-text-dim hover:text-admin-text" />}
           </button>
         )}
       </div>
@@ -1395,14 +1395,14 @@ function InfoRow({ icon, label, value, color = "text-white/70", isCopyable = fal
 function FilterSelect({ label, value, onChange, options }: any) {
   return (
     <div className="flex flex-col gap-1">
-      <p className="text-[9px] uppercase font-bold text-white/30 tracking-wider ml-1">{label}</p>
+      <p className="text-[9px] uppercase font-bold text-admin-text-dim tracking-wider ml-1">{label}</p>
       <select 
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-white/[0.02] border border-white/5 rounded-xl py-2 px-3 focus:outline-none focus:border-[#C4A47C] text-[10px] font-bold uppercase tracking-wider text-white/70 appearance-none cursor-pointer hover:bg-white/[0.04] transition-colors min-w-[140px]"
+        className="bg-admin-input-bg border border-admin-border rounded-xl py-2 px-3 focus:outline-none focus:border-[#C4A47C] text-[10px] font-bold uppercase tracking-wider text-admin-text-muted appearance-none cursor-pointer hover:bg-admin-active-bg transition-colors min-w-[140px]"
       >
         {options.map((o: any) => (
-          <option key={o.v} value={o.v} className="bg-[#111]">{o.l}</option>
+          <option key={o.v} value={o.v} className="bg-admin-surface text-admin-text">{o.l}</option>
         ))}
       </select>
     </div>
@@ -1413,35 +1413,35 @@ function FilterSelect({ label, value, onChange, options }: any) {
 const LeadRow = memo(({ lead, onClick }: { lead: any, onClick: () => void }) => {
   return (
     <tr 
-      className="hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-2 border-transparent hover:border-[#C4A47C]"
+      className="hover:bg-admin-card-hover transition-colors cursor-pointer group border-l-2 border-transparent hover:border-[#C4A47C]"
       onClick={onClick}
     >
       <td className="px-8 py-6">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#222] to-[#111] border border-white/10 flex items-center justify-center text-white/80 font-bold text-sm shadow-inner overflow-hidden">
-              {(lead.name || lead["Ім'я"])?.[0] || <User size={16} className="text-white/40" />}
+            <div className="h-10 w-10 rounded-full bg-admin-surface border border-admin-border flex items-center justify-center text-admin-text font-bold text-sm shadow-inner overflow-hidden">
+              {(lead.name || lead["Ім'я"])?.[0] || <User size={16} className="text-admin-text-dim" />}
             </div>
             {lead._isDuplicate && (
-              <div className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#C4A47C] border-2 border-[#0A0A0A] flex items-center justify-center" title="Повтор">
+              <div className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#C4A47C] border-2 border-admin-surface flex items-center justify-center" title="Повтор">
                 <span className="text-[6px] font-black text-black">!</span>
               </div>
             )}
           </div>
           <div>
-            <p className="font-bold text-sm text-white/90">{lead.name || lead["Ім'я"] || 'Anonymous'}</p>
+            <p className="font-bold text-sm text-admin-text">{lead.name || lead["Ім'я"] || 'Anonymous'}</p>
             <div className="flex items-center gap-2 mt-1">
                 {lead._tags?.slice(0, 2).map((tag: string) => (
-                    <span key={tag} className="text-[7px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/5 text-white/40 uppercase font-black tracking-tighter">{tag}</span>
+                    <span key={tag} className="text-[7px] px-1.5 py-0.5 rounded-full bg-admin-active-bg border border-admin-border text-admin-text-dim uppercase font-black tracking-tighter">{tag}</span>
                 ))}
-                <span className="text-[9px] text-white/20 font-mono tracking-widest uppercase">{lead._selectionId.slice(0, 8)}</span>
+                <span className="text-[9px] text-admin-text-dim font-mono tracking-widest uppercase">{lead._selectionId.slice(0, 8)}</span>
             </div>
           </div>
         </div>
       </td>
       <td className="px-8 py-6">
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium text-white/70 tracking-wide">{lead.phone || lead["Телефон"] || '—'}</p>
+          <p className="text-xs font-medium text-admin-text-muted tracking-wide">{lead.phone || lead["Телефон"] || '—'}</p>
           <p className="text-[10px] text-[#C4A47C]/80 font-medium tracking-wide">{lead.telegram || lead["Telegram"] || '—'}</p>
         </div>
       </td>
@@ -1451,13 +1451,13 @@ const LeadRow = memo(({ lead, onClick }: { lead: any, onClick: () => void }) => 
             <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
             {lead._computedStatus}
           </p>
-          <div className="inline-block px-2 py-0.5 rounded pl-0 text-[9px] font-bold uppercase tracking-wider text-white/30">
+          <div className="inline-block px-2 py-0.5 rounded pl-0 text-[9px] font-bold uppercase tracking-wider text-admin-text-dim">
             {lead._tariff || 'FREE'}
           </div>
         </div>
       </td>
       <td className="px-8 py-6">
-        <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider truncate max-w-[120px]">{lead._niche || '—'}</p>
+        <p className="text-[10px] text-admin-text-dim font-medium uppercase tracking-wider truncate max-w-[120px]">{lead._niche || '—'}</p>
       </td>
       <td className="px-8 py-6 text-right">
         <div className="flex items-center justify-end gap-4">
@@ -1466,7 +1466,7 @@ const LeadRow = memo(({ lead, onClick }: { lead: any, onClick: () => void }) => 
                 <Activity size={10} className="animate-pulse" />
             </div>
           )}
-          <div className="h-8 w-8 rounded-full bg-white/[0.03] flex items-center justify-center group-hover:bg-[#C4A47C] group-hover:text-black transition-all">
+          <div className="h-8 w-8 rounded-full bg-admin-active-bg flex items-center justify-center group-hover:bg-[#C4A47C] group-hover:text-black transition-all">
             <ChevronRight size={14} />
           </div>
         </div>
@@ -1482,6 +1482,6 @@ function getStatusColor(status: string) {
     case 'Оплачено': return 'text-[#C4A47C]';
     case 'Купив(-ла) трипвайєр': return 'text-emerald-400';
     case 'Відхилено': return 'text-rose-500';
-    default: return 'text-white/40';
+    default: return 'text-admin-text-dim';
   }
 }

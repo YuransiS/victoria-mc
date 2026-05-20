@@ -1,7 +1,6 @@
-'use client';
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sparkles, ChevronRight, ChevronLeft, EyeOff, Check } from 'lucide-react';
+import { useAdminTheme } from './AdminThemeProvider';
 
 interface OnboardingTourProps {
   activeTab?: string;
@@ -9,6 +8,9 @@ interface OnboardingTourProps {
 }
 
 export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTourProps) {
+  const { theme } = useAdminTheme();
+  const isLight = theme === 'light';
+
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [rect, setRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -219,6 +221,8 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
 
   if (!isOpen) return null;
 
+  const overlayBg = isLight ? 'rgba(228, 230, 235, 0.7)' : 'rgba(5, 5, 7, 0.85)';
+
   return (
     <div className="fixed inset-0 z-[9999] pointer-events-none font-sans">
       <style dangerouslySetInnerHTML={{ __html: `
@@ -249,7 +253,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
               left: 0,
               right: 0,
               height: `${Math.max(0, rect.y - 8)}px`,
-              backgroundColor: 'rgba(5, 5, 7, 0.85)',
+              backgroundColor: overlayBg,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
             onClick={handleComplete}
@@ -262,7 +266,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(5, 5, 7, 0.85)',
+              backgroundColor: overlayBg,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
             onClick={handleComplete}
@@ -275,7 +279,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
               left: 0,
               width: `${Math.max(0, rect.x - 8)}px`,
               height: `${rect.height + 16}px`,
-              backgroundColor: 'rgba(5, 5, 7, 0.85)',
+              backgroundColor: overlayBg,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
             onClick={handleComplete}
@@ -288,7 +292,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
               left: `${rect.x + rect.width + 8}px`,
               right: 0,
               height: `${rect.height + 16}px`,
-              backgroundColor: 'rgba(5, 5, 7, 0.85)',
+              backgroundColor: overlayBg,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
             onClick={handleComplete}
@@ -303,8 +307,8 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
               width: `${rect.width + 16}px`,
               height: `${rect.height + 16}px`,
               borderRadius: '20px',
-              border: '2px solid rgba(196, 164, 124, 0.4)',
-              boxShadow: '0 0 25px rgba(196, 164, 124, 0.15)',
+              border: isLight ? '2px solid rgba(196, 164, 124, 0.65)' : '2px solid rgba(196, 164, 124, 0.4)',
+              boxShadow: isLight ? '0 0 25px rgba(196, 164, 124, 0.25)' : '0 0 25px rgba(196, 164, 124, 0.15)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
             className="pointer-events-none"
@@ -312,7 +316,8 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
         </div>
       ) : (
         <div 
-          className="fixed inset-0 bg-[#050507]/85 pointer-events-auto z-[98] animate-fade-in-overlay"
+          style={{ backgroundColor: overlayBg }}
+          className="fixed inset-0 pointer-events-auto z-[98] animate-fade-in-overlay"
           onClick={handleComplete}
         />
       )}
@@ -320,7 +325,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
       {/* Onboarding Dialog Card */}
       <div
         style={popupStyle}
-        className="pointer-events-auto bg-[#0D0D11]/90 backdrop-blur-xl border border-[#C4A47C]/30 rounded-3xl p-6 shadow-[0_20px_50px_rgba(196,164,124,0.06)] animate-scale-in-card flex flex-col justify-between min-h-[170px]"
+        className="pointer-events-auto bg-admin-surface/95 backdrop-blur-xl border border-admin-border-strong rounded-3xl p-6 shadow-[0_20px_50px_rgba(196,164,124,0.06)] dark:shadow-[0_20px_50px_rgba(196,164,124,0.02)] animate-scale-in-card flex flex-col justify-between min-h-[170px] transition-colors duration-300"
       >
         <div>
           {/* Header */}
@@ -338,7 +343,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
                 <div
                   key={i}
                   className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentStep ? 'w-4 bg-[#C4A47C]' : 'bg-white/10'
+                    i === currentStep ? 'w-4 bg-[#C4A47C]' : (isLight ? 'bg-admin-text-dim/20' : 'bg-white/10')
                   }`}
                 />
               ))}
@@ -346,19 +351,19 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
           </div>
 
           {/* Title & Body */}
-          <h4 className="text-white text-xs font-black uppercase tracking-wider mb-2">
+          <h4 className="text-admin-text text-xs font-black uppercase tracking-wider mb-2">
             {currentStepData.title}
           </h4>
-          <p className="text-white/70 text-[10px] leading-relaxed font-medium">
+          <p className="text-admin-text-muted text-[10px] leading-relaxed font-medium">
             {currentStepData.text}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-admin-border">
           <button
             onClick={handleComplete}
-            className="flex items-center gap-1.5 text-white/40 hover:text-white/80 text-[9px] font-black uppercase tracking-wider transition-colors active:scale-95 duration-200"
+            className="flex items-center gap-1.5 text-admin-text-dim hover:text-admin-text text-[9px] font-black uppercase tracking-wider transition-colors active:scale-95 duration-200 cursor-pointer"
           >
             <EyeOff size={10} />
             Пропустити
@@ -368,7 +373,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
             {currentStep > 0 && (
               <button
                 onClick={handlePrev}
-                className="p-2 bg-white/5 border border-[#C4A47C]/20 hover:bg-white/10 text-white/80 rounded-xl transition-all duration-200 active:scale-90"
+                className="p-2 bg-admin-bg border border-admin-border hover:bg-admin-active-bg text-admin-text-muted rounded-xl transition-all duration-200 active:scale-90 cursor-pointer"
               >
                 <ChevronLeft size={12} />
               </button>
@@ -376,7 +381,7 @@ export default function OnboardingTour({ activeTab, setActiveTab }: OnboardingTo
 
             <button
               onClick={handleNext}
-              className="bg-gradient-to-r from-[#C4A47C] to-[#E5C9A3] hover:from-[#B0936C] hover:to-[#C4A47C] text-black font-black uppercase tracking-widest px-4 py-2 rounded-xl text-[9px] flex items-center gap-1 shadow-lg shadow-[#C4A47C]/10 transition-all duration-300 active:scale-95 hover:scale-[1.02]"
+              className="bg-gradient-to-r from-[#C4A47C] to-[#E5C9A3] hover:from-[#B0936C] hover:to-[#C4A47C] text-black font-black uppercase tracking-widest px-4 py-2 rounded-xl text-[9px] flex items-center gap-1 shadow-lg shadow-[#C4A47C]/10 transition-all duration-300 active:scale-95 hover:scale-[1.02] cursor-pointer"
             >
               {currentStep === steps.length - 1 ? (
                 <>

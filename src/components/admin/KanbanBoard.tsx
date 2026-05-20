@@ -35,17 +35,17 @@ function SortableLeadCard({ lead, onClick }: any) {
           // simple hack: check if e.detail === 1 or handle inside onClick
           onClick(lead);
       }}
-      className="bg-[#111111] p-4 rounded-xl border border-white/5 cursor-grab active:cursor-grabbing hover:border-[#C4A47C]/50 transition-colors flex flex-col gap-3 group"
+      className="bg-admin-surface p-4 rounded-xl border border-admin-border cursor-grab active:cursor-grabbing hover:border-[#C4A47C]/50 transition-colors duration-300 flex flex-col gap-3 group"
     >
       <div className="flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#222] to-[#111] border border-white/10 flex items-center justify-center text-white/80 font-bold text-xs">
-          {(lead.name || lead["Ім'я"])?.[0] || <User size={12} className="text-white/40" />}
+        <div className="h-8 w-8 rounded-full bg-admin-bg border border-admin-border-strong flex items-center justify-center text-admin-text-muted font-bold text-xs transition-colors duration-300">
+          {(lead.name || lead["Ім'я"])?.[0] || <User size={12} className="text-admin-text-dim" />}
         </div>
         <div>
-          <p className="font-bold text-xs text-white/90 truncate max-w-[140px]">{lead.name || lead["Ім'я"] || 'Anonymous'}</p>
+          <p className="font-bold text-xs text-admin-text truncate max-w-[140px] transition-colors duration-300">{lead.name || lead["Ім'я"] || 'Anonymous'}</p>
           <div className="flex items-center gap-1 mt-0.5">
              {lead._tags?.slice(0, 1).map((tag: string) => (
-                <span key={tag} className="text-[6px] px-1 py-0.5 rounded-sm bg-white/5 border border-white/5 text-white/40 uppercase font-black">{tag}</span>
+                <span key={tag} className="text-[6px] px-1 py-0.5 rounded-sm bg-admin-active-bg border border-admin-border text-admin-text-dim uppercase font-black transition-colors duration-300">{tag}</span>
             ))}
             {lead._computedStatus === 'Купив(-ла) трипвайєр' && (
                 <span className="text-[6px] px-1 py-0.5 rounded-sm bg-[#C4A47C]/10 border border-[#C4A47C]/20 text-[#C4A47C] uppercase font-black">Tripwire</span>
@@ -54,7 +54,7 @@ function SortableLeadCard({ lead, onClick }: any) {
         </div>
       </div>
       <div className="flex flex-col gap-1 text-[10px]">
-        {lead.phone && <div className="flex items-center gap-1.5 text-white/60"><Phone size={10} /> <span>{lead.phone}</span></div>}
+        {lead.phone && <div className="flex items-center gap-1.5 text-admin-text-muted transition-colors duration-300"><Phone size={10} /> <span>{lead.phone}</span></div>}
         {lead.telegram && <div className="flex items-center gap-1.5 text-[#C4A47C]/80"><Send size={10} /> <span className="truncate">{lead.telegram}</span></div>}
       </div>
       {(lead.comment || lead["Коментар"]) && (
@@ -94,15 +94,15 @@ export default function KanbanBoard({ leads, updateLeadStatus, onLeadClick, glob
 
        if (!cols[status]) cols['Новий'].push(l); // fallback
        else cols[status].push(l);
-    });
+     });
 
-    // sort inside column by date
-    Object.keys(cols).forEach(k => {
-       cols[k] = cols[k].sort((a: any, b: any) => b._latestAction - a._latestAction);
-    });
+     // sort inside column by date
+     Object.keys(cols).forEach(k => {
+        cols[k] = cols[k].sort((a: any, b: any) => b._latestAction - a._latestAction);
+     });
 
-    return cols;
-  }, [leads, statusMap]);
+     return cols;
+   }, [leads, statusMap]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -152,10 +152,10 @@ export default function KanbanBoard({ leads, updateLeadStatus, onLeadClick, glob
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-6 h-[calc(100vh-250px)] items-start">
         {COLUMNS.map(col => (
-          <div key={col.id} className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-4 min-w-[280px] w-[280px] flex flex-col max-h-full">
+          <div key={col.id} className="bg-admin-surface-muted border border-admin-border rounded-2xl p-4 min-w-[280px] w-[280px] flex flex-col max-h-full transition-colors duration-300">
             <div className="flex items-center justify-between mb-4 px-1">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-white/70">{col.title}</h3>
-              <span className="text-[10px] font-black text-white/30 bg-white/5 px-2 py-0.5 rounded">{columnsData[col.id].length}</span>
+              <h3 className="font-bold text-xs uppercase tracking-wider text-admin-text-muted transition-colors duration-300">{col.title}</h3>
+              <span className="text-[10px] font-black text-admin-text-dim bg-admin-active-bg px-2 py-0.5 rounded transition-colors duration-300">{columnsData[col.id].length}</span>
             </div>
             
             <SortableContext id={col.id} items={columnsData[col.id].map(l => l._selectionId)} strategy={verticalListSortingStrategy}>
@@ -171,12 +171,12 @@ export default function KanbanBoard({ leads, updateLeadStatus, onLeadClick, glob
 
       <DragOverlay>
         {activeLead ? (
-          <div className="bg-[#111111] p-4 rounded-xl border border-[#C4A47C] shadow-2xl opacity-90 scale-105 rotate-2 w-[250px]">
+          <div className="bg-admin-surface p-4 rounded-xl border border-[#C4A47C] shadow-2xl opacity-90 scale-105 rotate-2 w-[250px]">
              <div className="flex items-center gap-3">
-               <div className="h-8 w-8 rounded-full bg-[#222] border border-white/10 flex items-center justify-center font-bold text-xs">
+               <div className="h-8 w-8 rounded-full bg-admin-bg border border-admin-border-strong flex items-center justify-center font-bold text-xs text-admin-text transition-colors duration-300">
                  {(activeLead.name || activeLead["Ім'я"])?.[0] || 'U'}
                </div>
-               <p className="font-bold text-xs text-white/90 truncate">{activeLead.name || activeLead["Ім'я"] || 'Anonymous'}</p>
+               <p className="font-bold text-xs text-admin-text truncate transition-colors duration-300">{activeLead.name || activeLead["Ім'я"] || 'Anonymous'}</p>
              </div>
           </div>
         ) : null}
@@ -184,7 +184,7 @@ export default function KanbanBoard({ leads, updateLeadStatus, onLeadClick, glob
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--admin-border-strong); border-radius: 4px; }
       `}} />
     </DndContext>
   );

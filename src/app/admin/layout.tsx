@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/actions/auth';
 import Sidebar from '@/components/admin/Sidebar';
+import { AdminThemeProvider } from '@/components/admin/AdminThemeProvider';
 
 export default async function AdminLayout({
   children,
@@ -22,16 +23,17 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#09090B] text-white font-sans">
+    <AdminThemeProvider>
       {/* Dynamic Navigation Sidebar */}
       <Sidebar role={role} username={username} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden bg-admin-bg text-admin-text transition-colors duration-300">
         <main className="flex-1 p-4 md:p-8">
           {children}
         </main>
       </div>
-    </div>
+    </AdminThemeProvider>
   );
 }
+
