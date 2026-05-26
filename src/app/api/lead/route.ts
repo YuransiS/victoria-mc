@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { supabaseAdmin } from '@/lib/supabase';
 
 const GOOGLE_SCRIPT_URL_MAIN = process.env.GOOGLE_SCRIPT_URL;
 const GOOGLE_SCRIPT_URL_STVORYUI = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
+
+function cleanPhone(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned;
+}
 
 export async function POST(req: Request) {
   try {
@@ -63,15 +76,12 @@ export async function POST(req: Request) {
     const apiKey = process.env.SHEETS_API_KEY;
 
     if (data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)') {
-      // Parallel submission as requested by the user
-      // 1. To google_apps_script_stvoryui.js (primary for VSL 1 етап)
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,
           body: { ...data, ...utms, sheetName: 'VSL 1 етап', api_key: apiKey }
         });
       }
-      // 2. To google_apps_script.js (Unified CRM) with specific sheet ID
       if (GOOGLE_SCRIPT_URL_MAIN) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_MAIN,
@@ -79,15 +89,12 @@ export async function POST(req: Request) {
         });
       }
     } else if (data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2') {
-      // Parallel submission for VSL
-      // 1. To google_apps_script_stvoryui.js (primary for VSL Form)
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,
           body: { ...data, ...utms, target_sheet: 'Ленд 2', api_key: apiKey }
         });
       }
-      // 2. To google_apps_script.js (Unified CRM)
       if (GOOGLE_SCRIPT_URL_MAIN) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_MAIN,
@@ -95,7 +102,6 @@ export async function POST(req: Request) {
         });
       }
     } else {
-      // Normal single submission logic
       let scriptUrl = GOOGLE_SCRIPT_URL_MAIN;
       if (scriptUrl) {
         submissions.push({
@@ -106,7 +112,7 @@ export async function POST(req: Request) {
     }
 
     // 2. Google Sheets Tasks
-    const results = await Promise.allSettled(
+    const sheetsPromise = Promise.allSettled(
       submissions.map(async (sub) => {
         try {
           const res = await fetch(sub.url, {
@@ -123,14 +129,91 @@ export async function POST(req: Request) {
       })
     );
 
-    let uuid = null;
-    results.forEach(res => {
-      if (res.status === 'fulfilled' && res.value?.uuid) {
-        uuid = res.value.uuid;
-      }
-    });
+    // 3. Supabase Integration & Lead Stitching
+    const clientUuid = data.visitor_id || data.visitorId || null;
+    const phoneOrSocial = phone || social || '';
+    const isPhone = phoneOrSocial && !phoneOrSocial.startsWith('@') && phoneOrSocial.replace(/\D/g, '').length >= 7;
+    const normalizedPhone = isPhone ? cleanPhone(phoneOrSocial) : phoneOrSocial;
 
-    return NextResponse.json({ success: true, uuid });
+    let resolvedUuid = clientUuid;
+
+    if (normalizedPhone) {
+      try {
+        const { data: existingLeads, error: searchError } = await supabaseAdmin
+          .from("victoria_leads")
+          .select("visitor_uuid")
+          .eq("phone", normalizedPhone)
+          .not("visitor_uuid", "is", null)
+          .order("created_at", { ascending: true })
+          .limit(1);
+
+        if (searchError) {
+          console.error("[Lead Ingest] Supabase stitch search error:", searchError);
+        } else if (existingLeads && existingLeads.length > 0) {
+          resolvedUuid = existingLeads[0].visitor_uuid;
+          console.log(`[Lead Ingest] Stitched visitor from ${clientUuid} to ${resolvedUuid} based on phone ${normalizedPhone}`);
+        }
+      } catch (e: any) {
+        console.error("[Lead Ingest] Stitch exception:", e.message);
+      }
+    }
+
+    if (!resolvedUuid) {
+      resolvedUuid = crypto.randomUUID();
+    }
+
+    const dbPayload = {
+      name: name || null,
+      phone: normalizedPhone || null,
+      social: social || null,
+      niche: niche || null,
+      amount: 0,
+      status: 'Зареєстровано',
+      is_free: true,
+      utm_source: utms.utm_source,
+      utm_medium: utms.utm_medium,
+      utm_campaign: utms.utm_campaign,
+      utm_content: data.utm_content || '',
+      utm_term: data.utm_term || '',
+      target_sheet: data.target_sheet || null,
+      sheet_id: data.sheet_id || null,
+      page_path: data.page_path || '',
+      page_url: data.full_url || '',
+      visitor_uuid: resolvedUuid,
+      raw_payload: data
+    };
+
+    const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
+
+    // Await all parallel jobs
+    const results = await Promise.allSettled([sheetsPromise, supabasePromise, ...tasks]);
+
+    // Log sheets results
+    let uuid = null;
+    const sheetsResult = results[0];
+    if (sheetsResult.status === 'fulfilled') {
+      const sheetsData = sheetsResult.value;
+      sheetsData.forEach(res => {
+        if (res.status === 'fulfilled' && res.value?.uuid) {
+          uuid = res.value.uuid;
+        }
+      });
+    }
+
+    // Log Supabase results
+    const supabaseResult = results[1];
+    if (supabaseResult.status === 'rejected') {
+      console.error('[Lead Ingest] Supabase insert failed:', supabaseResult.reason);
+    } else {
+      const dbErr = (supabaseResult.value as any)?.error;
+      if (dbErr) {
+        console.error('[Lead Ingest] Supabase insert error payload:', dbErr);
+      } else {
+        console.log('[Lead Ingest] Successfully saved lead in Supabase');
+      }
+    }
+
+    return NextResponse.json({ success: true, uuid, visitor_uuid: resolvedUuid });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });

@@ -102,6 +102,27 @@ export const BookingModal = ({
         value: amount,
         currency: currency
       });
+
+      // Log telemetric form view event
+      try {
+        const visitorId = localStorage.getItem('visitor_id');
+        if (visitorId) {
+          fetch('/api/analytics/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              visitorId,
+              status: 'КликФормы',
+              path: window.location.pathname,
+              name: localStorage.getItem('lead_name'),
+              phone: localStorage.getItem('lead_phone'),
+              social: localStorage.getItem('lead_social'),
+              tariff: tariffName,
+              amount: amount
+            })
+          }).catch(() => {});
+        }
+      } catch (err) {}
     } else {
       document.body.style.overflow = "unset";
       document.body.removeAttribute("data-modal-open");
@@ -191,6 +212,7 @@ export const BookingModal = ({
         body: JSON.stringify({
           ...data,
           ...utmData,
+          visitor_id: localStorage.getItem('visitor_id') || '',
           currency: isTestMode ? "UAH" : currency,
           amount: isTestMode ? 1 : actualAmount,
           targetSheet: targetSheetName || "Бронювання",

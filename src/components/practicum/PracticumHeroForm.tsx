@@ -127,6 +127,7 @@ export function PracticumHeroForm({
         body: JSON.stringify({
           ...data,
           ...utmData,
+          visitor_id: localStorage.getItem('visitor_id') || '',
           successUrl: "/practicum/thanks",
           failUrl: "/practicum/fail"
         })

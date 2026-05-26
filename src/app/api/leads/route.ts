@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -15,6 +16,26 @@ export async function POST(request: Request) {
 
     const messageId = data.tg_msg_id;
     const isStatusUpdate = data.action === "update_status";
+
+    const orderIdVal = data.order_id || data.orderId;
+    if (isStatusUpdate && orderIdVal) {
+      const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
+      const parsedStatus = isSuccess ? 'Approved' : (data.status || 'Declined');
+      
+      try {
+        const { error } = await supabaseAdmin.from('victoria_leads')
+          .update({ status: parsedStatus })
+          .eq('order_id', String(orderIdVal));
+          
+        if (error) {
+          console.error('[CRM Status Sync] Supabase update error:', error);
+        } else {
+          console.log(`[CRM Status Sync] Supabase status updated to ${parsedStatus} for order ${orderIdVal}`);
+        }
+      } catch (err: any) {
+        console.error('[CRM Status Sync] Supabase exception:', err.message || err);
+      }
+    }
 
     // 1. CRITICAL: Immediate TG Update
     if (isStatusUpdate && messageId && token && chatId) {

@@ -209,6 +209,7 @@ export default function RozbirPage() {
           social: data.social,
           phone: fullPhone,
           amount: currentPriceObj.current,
+          visitor_id: localStorage.getItem('visitor_id') || '',
           ...utms
         })
       });

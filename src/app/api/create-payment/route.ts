@@ -1,8 +1,21 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { supabaseAdmin } from '@/lib/supabase';
+
+function cleanPhone(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned;
+}
 
 export async function POST(request: Request) {
   try {
+    const body = await request.json();
     const { 
       amount, 
       currency: reqCurrency, 
@@ -19,8 +32,9 @@ export async function POST(request: Request) {
       utm_campaign,
       utm_content,
       utm_term,
-      full_url
-    } = await request.json();
+      full_url,
+      visitor_id
+    } = body;
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -88,7 +102,7 @@ export async function POST(request: Request) {
       returnUrl: returnUrl,
     };
 
-    // Telegram Notification
+    // 1. Telegram Notification
     let tgMsgId = null;
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -127,43 +141,126 @@ export async function POST(request: Request) {
       }
     }
 
-    // CRM Logging & UUID Generation
-    let uuid = null;
+    // 2. Google Sheets CRM Logging
+    let sheetsUuid = null;
     const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
+    let sheetsPromise: Promise<any> = Promise.resolve();
+
     if (GOOGLE_SCRIPT_CRM) {
-      try {
-        const res = await fetch(GOOGLE_SCRIPT_CRM, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'log_lead',
-            target_sheet: targetSheet || "Бронювання",
-            orderId: orderReference,
-            order_id: orderReference,
-            name: customerName,
-            phone: customerPhone,
-            telegram: telegram,
-            amount: amount,
-            tariff: tariffName,
-            status: "⏳ Очікується оплата",
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            utm_term,
-            full_url,
-            tg_msg_id: tgMsgId,
-            api_key: process.env.SHEETS_API_KEY
-          })
-        });
+      sheetsPromise = fetch(GOOGLE_SCRIPT_CRM, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_lead',
+          target_sheet: targetSheet || "Бронювання",
+          orderId: orderReference,
+          order_id: orderReference,
+          name: customerName,
+          phone: customerPhone,
+          telegram: telegram,
+          amount: amount,
+          tariff: tariffName,
+          status: "⏳ Очікується оплата",
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
+          full_url,
+          tg_msg_id: tgMsgId,
+          api_key: process.env.SHEETS_API_KEY
+        })
+      }).then(async (res) => {
         const resData = await res.json();
-        if (resData.uuid) uuid = resData.uuid;
-      } catch (err) {
-        console.error('CRM logging failed:', err);
+        if (resData.uuid) sheetsUuid = resData.uuid;
+        return resData;
+      }).catch(err => {
+        console.error('CRM sheets logging failed:', err);
+      });
+    }
+
+    // 3. Supabase Integration & Lead Stitching
+    const clientUuid = visitor_id || null;
+    const phoneOrSocial = customerPhone || telegram || '';
+    const isPhone = phoneOrSocial && !phoneOrSocial.startsWith('@') && phoneOrSocial.replace(/\D/g, '').length >= 7;
+    const normalizedPhone = isPhone ? cleanPhone(phoneOrSocial) : phoneOrSocial;
+
+    let resolvedUuid = clientUuid;
+
+    if (normalizedPhone) {
+      try {
+        const { data: existingLeads, error: searchError } = await supabaseAdmin
+          .from("victoria_leads")
+          .select("visitor_uuid")
+          .eq("phone", normalizedPhone)
+          .not("visitor_uuid", "is", null)
+          .order("created_at", { ascending: true })
+          .limit(1);
+
+        if (searchError) {
+          console.error("[Create Payment] Supabase stitch search error:", searchError);
+        } else if (existingLeads && existingLeads.length > 0) {
+          resolvedUuid = existingLeads[0].visitor_uuid;
+          console.log(`[Create Payment] Stitched visitor from ${clientUuid} to ${resolvedUuid} based on phone ${normalizedPhone}`);
+        }
+      } catch (e: any) {
+        console.error("[Create Payment] Stitch lookup exception:", e.message);
       }
     }
 
-    return NextResponse.json({ ...paymentData, uuid, tgMsgId });
+    if (!resolvedUuid) {
+      resolvedUuid = crypto.randomUUID();
+    }
+
+    // Determine path from full url
+    let pagePath = '/';
+    if (full_url) {
+      try {
+        const urlObj = new URL(full_url);
+        pagePath = urlObj.pathname;
+      } catch (_) {}
+    }
+
+    const dbPayload = {
+      name: customerName || null,
+      phone: normalizedPhone || null,
+      social: telegram || null,
+      niche: null,
+      amount: Number(amount) || 0,
+      status: '⏳ Очікується оплата',
+      is_free: Number(amount) === 0,
+      order_id: orderReference,
+      sheet_id: null,
+      target_sheet: targetSheet || "Бронювання",
+      utm_source: utm_source || '',
+      utm_medium: utm_medium || '',
+      utm_campaign: utm_campaign || '',
+      utm_content: utm_content || '',
+      utm_term: utm_term || '',
+      page_path: pagePath,
+      page_url: full_url || '',
+      visitor_uuid: resolvedUuid,
+      raw_payload: body
+    };
+
+    const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
+
+    // Parallel execution
+    const results = await Promise.allSettled([sheetsPromise, supabasePromise]);
+
+    const supabaseResult = results[1];
+    if (supabaseResult.status === 'rejected') {
+      console.error('[Create Payment] Supabase insert failed:', supabaseResult.reason);
+    } else {
+      const dbErr = (supabaseResult.value as any)?.error;
+      if (dbErr) {
+        console.error('[Create Payment] Supabase insert error:', dbErr);
+      } else {
+        console.log('[Create Payment] Successfully saved lead in Supabase');
+      }
+    }
+
+    return NextResponse.json({ ...paymentData, uuid: sheetsUuid, visitor_uuid: resolvedUuid, tgMsgId });
   } catch (error) {
     console.error('WFP Error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

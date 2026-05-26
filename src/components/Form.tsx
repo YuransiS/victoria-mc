@@ -105,6 +105,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         body: JSON.stringify({
           ...formData,
           ...utmData,
+          visitor_id: localStorage.getItem('visitor_id') || '',
           target_sheet: "Автовеб",
           sheet_id: "726331330"
         }),

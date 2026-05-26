@@ -176,6 +176,7 @@ export default function StvoryuiPage() {
         body: JSON.stringify({
           ...data,
           phone: fullPhone,
+          visitor_id: localStorage.getItem('visitor_id') || '',
           ...utms
         }),
       });

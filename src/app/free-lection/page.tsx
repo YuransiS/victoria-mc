@@ -144,6 +144,7 @@ export default function FreeLectionPage() {
       phone: fullPhone,
       social: data.social,
       target_sheet: 'VSL Воронка (старт)',
+      visitor_id: localStorage.getItem('visitor_id') || '',
       ...utms
     };
 
