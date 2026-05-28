@@ -11,6 +11,7 @@ interface FormData {
   name: string;
   phone_raw: string;
   social: string;
+  instagram: string;
 }
 
 const BOT_REDIRECT_URL = 'https://t.me/victoriameshcheriakova_bot?start=6979295699cc89ca5d0f02d5';
@@ -99,8 +100,11 @@ export default function FreeLectionPage() {
     const savedPhone = localStorage.getItem('lead_phone');
     const savedSocial = localStorage.getItem('lead_social');
 
+    const savedInstagram = localStorage.getItem('lead_instagram');
+
     if (savedName) setValue('name', savedName);
     if (savedSocial) setValue('social', savedSocial);
+    if (savedInstagram) setValue('instagram', savedInstagram);
     
     // Restore phone with delay to ensure iti is initialized
     if (savedPhone && phoneInputRef.current) {
@@ -129,6 +133,7 @@ export default function FreeLectionPage() {
     localStorage.setItem('lead_name', data.name);
     localStorage.setItem('lead_phone', fullPhone);
     localStorage.setItem('lead_social', data.social || '');
+    localStorage.setItem('lead_instagram', data.instagram || '');
 
     const params = new URLSearchParams(window.location.search);
     const utms = {
@@ -143,6 +148,7 @@ export default function FreeLectionPage() {
       name: data.name,
       phone: fullPhone,
       social: data.social,
+      instagram: data.instagram,
       target_sheet: 'VSL Воронка (старт)',
       visitor_id: localStorage.getItem('visitor_id') || '',
       ...utms
@@ -152,6 +158,7 @@ export default function FreeLectionPage() {
     localStorage.setItem('lead_name', data.name);
     localStorage.setItem('lead_phone', fullPhone);
     localStorage.setItem('lead_social', data.social || '');
+    localStorage.setItem('lead_instagram', data.instagram || '');
 
     try {
       const response = await fetch('/api/lead', {
@@ -605,8 +612,17 @@ export default function FreeLectionPage() {
                   {/* Social */}
                   <div>
                       <input type="text" {...register('social', {
+                        required: true,
                         onChange: (e) => handleFieldChange('social', e.target.value)
-                      })} placeholder="@Instagram / Telegram" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                      })} placeholder="Ваш Telegram (@нікнейм)" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                  </div>
+
+                  {/* Instagram */}
+                  <div>
+                      <input type="text" {...register('instagram', {
+                        required: true,
+                        onChange: (e) => handleFieldChange('instagram', e.target.value)
+                      })} placeholder="Ваш Instagram (@нікнейм)" className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
                   </div>
 
                   <button type="submit" disabled={loading} className="w-full bg-black text-white py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-[#333] transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed">

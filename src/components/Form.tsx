@@ -14,8 +14,8 @@ interface FormProps {
 }
 
 export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ" }) => {
-  const [formData, setFormData] = useState({ name: "", phone: "" });
-  const [errors, setErrors] = useState({ name: "", phone: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", instagram: "" });
+  const [errors, setErrors] = useState({ name: "", phone: "", instagram: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
 
@@ -23,8 +23,10 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     // Load saved data from localStorage
     const savedName = localStorage.getItem('lead_name');
     const savedPhone = localStorage.getItem('lead_phone');
+    const savedInstagram = localStorage.getItem('lead_instagram');
     if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
     if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
+    if (savedInstagram) setFormData(prev => ({ ...prev, instagram: savedInstagram }));
 
     // Randomly fluctuate active users count to look "live"
     const interval = setInterval(() => {
@@ -47,7 +49,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
 
   const validate = () => {
     let valid = true;
-    const newErrors = { name: "", phone: "" };
+    const newErrors = { name: "", phone: "", instagram: "" };
 
     if (formData.name.trim().length < 2) {
       newErrors.name = "Будь ласка, введіть ваше ім'я";
@@ -67,6 +69,13 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         newErrors.phone = "Введіть коректний номер телефону або нік";
         valid = false;
       }
+    }
+
+    // Instagram validation
+    const insta = formData.instagram.trim();
+    if (insta.length < 3) {
+      newErrors.instagram = "Введіть ваш Instagram нікнейм";
+      valid = false;
     }
 
     setErrors(newErrors);
@@ -117,6 +126,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       // Also ensure fields are saved
       localStorage.setItem('lead_name', formData.name);
       localStorage.setItem('lead_phone', formData.phone);
+      localStorage.setItem('lead_instagram', formData.instagram);
     } catch (error) {
       console.error("Submission error:", error);
     }
@@ -154,6 +164,16 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
           onChange={handleChange}
           error={errors.phone}
           hint="Будь ласка, перевірте правильність номера або ніка, щоб ми могли з вами зв'язатися"
+          disabled={status !== "idle"}
+        />
+        <Input
+          label="INSTAGRAM @НІК"
+          name="instagram"
+          type="text"
+          placeholder="@nickname"
+          value={formData.instagram}
+          onChange={handleChange}
+          error={errors.instagram}
           disabled={status !== "idle"}
         />
 

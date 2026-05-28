@@ -22,7 +22,7 @@ function cleanPhone(phone: string): string {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, social, amount, utm_source, utm_medium, utm_campaign, utm_content, utm_term, visitor_id } = data;
+    const { name, phone, social, amount, utm_source, utm_medium, utm_campaign, utm_content, utm_term, visitor_id, instagram } = data;
 
     if (!WFP_SECRET_KEY || !WFP_MERCHANT_ACCOUNT) {
       return NextResponse.json({ error: 'WayForPay configuration missing' }, { status: 500 });
@@ -131,6 +131,7 @@ export async function POST(req: Request) {
       name: name || null,
       phone: normalizedPhone || null,
       social: social || null,
+      instagram: instagram || null,
       niche: null,
       amount: Number(amount) || 0,
       status: '⏳ Очікується оплата',
@@ -205,6 +206,7 @@ export async function POST(req: Request) {
         `👤 <b>Клієнт:</b> ${name || '-'}\n` +
         `📞 <b>Телефон:</b> ${phone || '-'}\n` +
         `📱 <b>Social:</b> ${social || '-'}\n` +
+        (instagram ? `📸 <b>Instagram:</b> ${instagram}\n` : '') +
         `💰 <b>Сума:</b> ${amount} UAH\n` +
         `🆔 <b>ID:</b> <code>${orderReference}</code>` +
         utmInfo;

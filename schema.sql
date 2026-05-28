@@ -5,6 +5,7 @@ create table if not exists public.victoria_leads (
   name text,
   phone text,
   social text,
+  instagram text,
   niche text,
   amount numeric default 0,
   status text default 'Зареєстровано',

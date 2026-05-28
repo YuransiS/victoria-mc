@@ -61,6 +61,7 @@ Table name: `victoria_leads`
 | `name` | `text` | `NULL` | Customer full name |
 | `phone` | `text` | `NULL` | Normalized phone number or Telegram nick |
 | `social` | `text` | `NULL` | Telegram social handle/nickname |
+| `instagram` | `text` | `NULL` | Instagram nickname / handle |
 | `niche` | `text` | `NULL` | Chosen professional niche/topic |
 | `amount` | `numeric` | `0` | Paid or pending order amount |
 | `status` | `text` | `'Зареєстровано'` | Lead status (`Клик`, `КликФормы`, `Зареєстровано`, `Approved`) |

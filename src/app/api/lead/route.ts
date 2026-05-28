@@ -19,7 +19,7 @@ function cleanPhone(phone: string): string {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, social, niche } = data;
+    const { name, phone, social, niche, instagram } = data;
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -42,6 +42,9 @@ export async function POST(req: Request) {
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
     message += `📞 <b>Телефон/Telegram:</b> ${phone || '-'}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;
+    if (instagram) {
+      message += `📸 <b>Instagram:</b> ${instagram}\n`;
+    }
     
     if (niche) {
       message += `💼 <b>Ніша:</b> ${niche}\n`;
@@ -166,6 +169,7 @@ export async function POST(req: Request) {
       name: name || null,
       phone: normalizedPhone || null,
       social: social || null,
+      instagram: instagram || null,
       niche: niche || null,
       amount: 0,
       status: 'Зареєстровано',

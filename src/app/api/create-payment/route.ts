@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       customerName, 
       customerPhone, 
       telegram,
+      instagram,
       successUrl, 
       failUrl, 
       targetSheet,
@@ -113,10 +114,16 @@ export async function POST(request: Request) {
       const title = isPracticum ? "⏳ <b>Очікується оплата (Практикум)</b>" : "⏳ <b>Очікується оплата (Бронь)</b>";
       const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
 
-      const message = `${title}\n\n` +
+      let message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
-        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n` +
-        `📦 <b>Тариф:</b> ${tariffName}\n` +
+        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n`;
+      if (telegram) {
+        message += `📱 <b>Telegram:</b> ${telegram}\n`;
+      }
+      if (instagram) {
+        message += `📸 <b>Instagram:</b> ${instagram}\n`;
+      }
+      message += `📦 <b>Тариф:</b> ${tariffName}\n` +
         `💰 <b>Сума:</b> ${amount} ${currency}\n` +
         `🆔 <b>ID:</b> <code>${orderReference}</code>` +
         utmInfo;
@@ -225,6 +232,7 @@ export async function POST(request: Request) {
       name: customerName || null,
       phone: normalizedPhone || null,
       social: telegram || null,
+      instagram: instagram || null,
       niche: null,
       amount: Number(amount) || 0,
       status: '⏳ Очікується оплата',

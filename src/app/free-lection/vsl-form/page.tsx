@@ -12,6 +12,7 @@ interface FormData {
   name: string;
   phone_raw: string;
   social: string;
+  instagram: string;
   niche: string;
   target_sheet: string;
 }
@@ -42,8 +43,11 @@ export default function StvoryuiPage() {
     const savedPhone = localStorage.getItem('lead_phone');
     const savedSocial = localStorage.getItem('lead_social');
 
+    const savedInstagram = localStorage.getItem('lead_instagram');
+
     if (savedName) setValue('name', savedName);
     if (savedSocial) setValue('social', savedSocial);
+    if (savedInstagram) setValue('instagram', savedInstagram);
     
     // Restore phone with delay to ensure iti is initialized
     if (savedPhone) {
@@ -63,6 +67,8 @@ export default function StvoryuiPage() {
   const watchedSocial = watch('social');
   const watchedPhoneRaw = watch('phone_raw');
 
+  const watchedInstagram = watch('instagram');
+
   useEffect(() => {
     if (watchedName) localStorage.setItem('lead_name', watchedName);
   }, [watchedName]);
@@ -70,6 +76,10 @@ export default function StvoryuiPage() {
   useEffect(() => {
     if (watchedSocial) localStorage.setItem('lead_social', watchedSocial);
   }, [watchedSocial]);
+
+  useEffect(() => {
+    if (watchedInstagram) localStorage.setItem('lead_instagram', watchedInstagram);
+  }, [watchedInstagram]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -188,6 +198,7 @@ export default function StvoryuiPage() {
         localStorage.setItem('lead_name', data.name);
         localStorage.setItem('lead_phone', fullPhone);
         localStorage.setItem('lead_social', data.social || '');
+        localStorage.setItem('lead_instagram', data.instagram || '');
         if (resData.uuid) {
           localStorage.setItem('lead_uuid', resData.uuid);
         }
@@ -308,7 +319,7 @@ export default function StvoryuiPage() {
               {/* Note: phone validation is handled via itiRef in onSubmit */}
             </div>
 
-            {/* Social */}
+            {/* Social (Telegram) */}
             <div className="relative group">
               <input 
                 type="text" 
@@ -316,8 +327,20 @@ export default function StvoryuiPage() {
                 placeholder=" " 
                 className={`peer w-full bg-transparent border-b ${errors.social ? 'border-red-500' : 'border-gray-200'} py-4 text-base focus:border-black focus:outline-none transition-colors`}
               />
-              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Instagram або Telegram (@нікнейм)</label>
+              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Твій Telegram (@нікнейм)</label>
               {errors.social && <div className="error-msg block">Мінімум 3 символи.</div>}
+            </div>
+
+            {/* Instagram */}
+            <div className="relative group">
+              <input 
+                type="text" 
+                {...register('instagram', { required: true, minLength: 3 })}
+                placeholder=" " 
+                className={`peer w-full bg-transparent border-b ${errors.instagram ? 'border-red-500' : 'border-gray-200'} py-4 text-base focus:border-black focus:outline-none transition-colors`}
+              />
+              <label className="absolute left-0 top-4 text-gray-400 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-black pointer-events-none">Твій Instagram (@нікнейм)</label>
+              {errors.instagram && <div className="error-msg block">Мінімум 3 символи.</div>}
             </div>
 
             {/* Niche */}
