@@ -55,8 +55,8 @@ export async function POST(req: Request) {
     // Define notification tasks
     const tasks = [];
 
-    // 1. Telegram Task (Only for VSL Form and Autoweb)
-    if (token && chatId && (isVSL || isAutoweb)) {
+    // 1. Telegram Task (For all incoming leads)
+    if (token && chatId) {
       tasks.push(
         fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',

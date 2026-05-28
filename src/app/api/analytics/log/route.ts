@@ -27,8 +27,7 @@ export async function POST(req: Request) {
           page_url: body.fullUrl || '',
           raw_payload: body,
           is_free: true,
-          amount: body.amount || 0,
-          tariff: body.tariff || null
+          amount: body.amount || 0
         });
 
         if (error) {

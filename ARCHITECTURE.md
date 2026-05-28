@@ -44,6 +44,10 @@ This live document outlines the architecture, routing structure, components, dat
 *   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
 
+### 🧪 QA Regression Tests (`tests/`)
+*   `tests/test_all_landings.js` — Universal E2E test script simulating page views and form submissions across all 6 landing pages.
+*   `tests/check_supabase.js` — DB validation script using `@supabase/supabase-js` to inspect and assert QA test lead records in Supabase.
+
 ---
 
 ## 🗄️ Database Schema & Supabase (`victoria_leads`)

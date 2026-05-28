@@ -191,8 +191,38 @@ export async function POST(req: Request) {
       serviceUrl: `${currentDomain}/api/payment-callback`
     };
 
+    // 4. Telegram Notification
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const topicId = process.env.TOPIC_ID;
+    let tgPromise: Promise<any> = Promise.resolve();
+
+    if (token && chatId) {
+      const title = "⏳ <b>Очікується оплата (Персональний розбір)</b>";
+      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
+
+      const message = `${title}\n\n` +
+        `👤 <b>Клієнт:</b> ${name || '-'}\n` +
+        `📞 <b>Телефон:</b> ${phone || '-'}\n` +
+        `📱 <b>Social:</b> ${social || '-'}\n` +
+        `💰 <b>Сума:</b> ${amount} UAH\n` +
+        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
+        utmInfo;
+
+      tgPromise = fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_thread_id: topicId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      }).catch(err => console.error('Telegram rozbir failed:', err));
+    }
+
     // Parallel execution
-    const results = await Promise.allSettled([sheetsPromise, stvoryuiPromise, supabasePromise]);
+    const results = await Promise.allSettled([sheetsPromise, stvoryuiPromise, supabasePromise, tgPromise]);
 
     const supabaseResult = results[2];
     if (supabaseResult.status === 'rejected') {
