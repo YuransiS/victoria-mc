@@ -17,7 +17,7 @@ interface FormProps {
 export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ" }) => {
   const [formData, setFormData] = useState({ name: "", phone: "", social: "", instagram: "" });
   const [errors, setErrors] = useState({ name: "", phone: "", social: "", instagram: "" });
-  const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
+  const [contactMethod, setContactMethod] = useState<"phone" | "telegram" | null>(null);
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
@@ -39,9 +39,15 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     const savedSocial = localStorage.getItem('lead_social');
     const savedInstagram = localStorage.getItem('lead_instagram');
     if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
-    if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
-    if (savedSocial) setFormData(prev => ({ ...prev, social: savedSocial }));
     if (savedInstagram) setFormData(prev => ({ ...prev, instagram: savedInstagram }));
+
+    if (savedPhone) {
+      setFormData(prev => ({ ...prev, phone: savedPhone }));
+      setContactMethod("phone");
+    } else if (savedSocial) {
+      setFormData(prev => ({ ...prev, social: savedSocial }));
+      setContactMethod("telegram");
+    }
 
     // Randomly fluctuate active users count to look "live"
     const interval = setInterval(() => {
@@ -71,7 +77,10 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       valid = false;
     }
 
-    if (contactMethod === "phone") {
+    if (contactMethod === null) {
+      newErrors.phone = "Будь ласка, оберіть спосіб зв'язку";
+      valid = false;
+    } else if (contactMethod === "phone") {
       if (!formData.phone.trim()) {
         newErrors.phone = "Будь ласка, введіть номер телефону";
         valid = false;
@@ -189,42 +198,58 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         />
 
         {/* Dynamic Contact Method Choice Switch */}
-        <div className="flex flex-col mb-[0.35rem] w-full">
-          <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.25rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
-            Оберіть спосіб зв{`'`}язку
-          </label>
-          <div className="flex gap-2 p-1 bg-black/30 border border-white/10 rounded-lg w-full mb-2">
-            <button
-              type="button"
-              onClick={() => setContactMethod("phone")}
-              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
-                contactMethod === "phone"
-                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              ТЕЛЕФОН
-            </button>
-            <button
-              type="button"
-              onClick={() => setContactMethod("telegram")}
-              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
-                contactMethod === "telegram"
-                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              TELEGRAM
-            </button>
-          </div>
-        </div>
-
-        {/* Dynamic Input based on selection */}
-        {contactMethod === "phone" ? (
+        {contactMethod === null ? (
           <div className="flex flex-col mb-[0.35rem] w-full">
-            <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.15rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
-              НОМЕР ТЕЛЕФОНУ
+            <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.25rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
+              Спосіб зв{`'`}язку для отримання бонусу
             </label>
+            <div className="flex gap-2 w-full">
+              <button
+                type="button"
+                onClick={() => setContactMethod("phone")}
+                className="flex-1 py-3 px-4 bg-black/35 border border-white/10 hover:border-[#d9b897]/50 hover:bg-white/5 rounded-lg text-white font-manrope text-[10px] font-extrabold uppercase tracking-[0.1em] transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>📞 ТЕЛЕФОН</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setContactMethod("telegram")}
+                className="flex-1 py-3 px-4 bg-black/35 border border-white/10 hover:border-[#d9b897]/50 hover:bg-white/5 rounded-lg text-white font-manrope text-[10px] font-extrabold uppercase tracking-[0.1em] transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>✈️ TELEGRAM</span>
+              </button>
+            </div>
+            <AnimatePresence>
+              {errors.phone && (
+                <motion.span
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="font-manrope text-[#ff4d4d] text-[0.65rem] mt-[0.25rem] ml-[0.5rem] block"
+                >
+                  {errors.phone}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : contactMethod === "phone" ? (
+          <div className="flex flex-col mb-[0.35rem] w-full">
+            <div className="flex justify-between items-center mb-[0.15rem] ml-[0.5rem] mr-[0.5rem]">
+              <label className="font-manrope text-[0.6rem] text-[#7a7a7a] uppercase tracking-[0.1em] font-bold">
+                НОМЕР ТЕЛЕФОНУ
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setContactMethod(null);
+                  setFormData(prev => ({ ...prev, phone: "" }));
+                  localStorage.removeItem('lead_phone');
+                }}
+                className="text-[#d9b897] hover:underline text-[9px] font-manrope uppercase tracking-wider font-extrabold"
+              >
+                Змінити
+              </button>
+            </div>
             <PhoneInput
               international
               defaultCountry={countryCode as any}
@@ -245,7 +270,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
               }}
             />
             <AnimatePresence>
-              {errors.phone ? (
+              {errors.phone && (
                 <motion.span
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -254,30 +279,49 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
                 >
                   {errors.phone}
                 </motion.span>
-              ) : (
-                <motion.span
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="font-manrope text-zinc-500 text-[0.65rem] mt-[0.15rem] ml-[0.5rem] block"
-                >
-                  Будь ласка, перевірте правильність номера, щоб ми могли з вами зв{`'`}язатися
-                </motion.span>
               )}
             </AnimatePresence>
           </div>
         ) : (
-          <Input
-            label="TELEGRAM @НІК"
-            name="social"
-            type="text"
-            placeholder="@username"
-            value={formData.social}
-            onChange={handleChange}
-            error={errors.social}
-            hint="Будь ласка, введіть ваш Telegram нікнейм, щоб ми могли з вами зв'язатися"
-            disabled={status !== "idle"}
-          />
+          <div className="flex flex-col mb-[0.35rem] w-full">
+            <div className="flex justify-between items-center mb-[0.15rem] ml-[0.5rem] mr-[0.5rem]">
+              <label className="font-manrope text-[0.6rem] text-[#7a7a7a] uppercase tracking-[0.1em] font-bold">
+                TELEGRAM @НІК
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setContactMethod(null);
+                  setFormData(prev => ({ ...prev, social: "" }));
+                  localStorage.removeItem('lead_social');
+                }}
+                className="text-[#d9b897] hover:underline text-[9px] font-manrope uppercase tracking-wider font-extrabold"
+              >
+                Змінити
+              </button>
+            </div>
+            <input
+              name="social"
+              type="text"
+              placeholder="@username"
+              value={formData.social}
+              onChange={handleChange}
+              disabled={status !== "idle"}
+              className={`w-full bg-black/30 border border-white/15 rounded-lg text-white font-manrope text-sm px-4 py-3 focus:border-[#d9b897]/50 focus:ring-4 focus:ring-[#d9b897]/10 transition-all focus:outline-none ${errors.social ? 'border-[#ff4d4d]' : ''}`}
+            />
+            <AnimatePresence>
+              {errors.social && (
+                <motion.span
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="font-manrope text-[#ff4d4d] text-[0.65rem] mt-[0.15rem] ml-[0.5rem] block"
+                >
+                  {errors.social}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
         )}
 
         <Input
