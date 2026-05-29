@@ -6,6 +6,7 @@ import { Input } from "./Input";
 import { Button } from "./Button";
 import { trackFBEvent } from "./FacebookPixel";
 import { motion, AnimatePresence } from "framer-motion";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 
 const TELEGRAM_LINK = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
@@ -14,18 +15,32 @@ interface FormProps {
 }
 
 export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ" }) => {
-  const [formData, setFormData] = useState({ name: "", phone: "", instagram: "" });
-  const [errors, setErrors] = useState({ name: "", phone: "", instagram: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", social: "", instagram: "" });
+  const [errors, setErrors] = useState({ name: "", phone: "", social: "", instagram: "" });
+  const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
+  const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
 
   useEffect(() => {
+    // Fetch user's country code via Edge API
+    fetch('/api/country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) {
+          setCountryCode(data.country.toUpperCase());
+        }
+      })
+      .catch(() => {});
+
     // Load saved data from localStorage
     const savedName = localStorage.getItem('lead_name');
     const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
     const savedInstagram = localStorage.getItem('lead_instagram');
     if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
     if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
+    if (savedSocial) setFormData(prev => ({ ...prev, social: savedSocial }));
     if (savedInstagram) setFormData(prev => ({ ...prev, instagram: savedInstagram }));
 
     // Randomly fluctuate active users count to look "live"
@@ -44,30 +59,37 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     setFormData(prev => ({ ...prev, [name]: value }));
     setErrors(prev => ({ ...prev, [name]: "" }));
     // Persist on the fly
-    localStorage.setItem(`lead_${name}`, value);
+    localStorage.setItem(`lead_${name === 'social' ? 'social' : name}`, value);
   };
 
   const validate = () => {
     let valid = true;
-    const newErrors = { name: "", phone: "", instagram: "" };
+    const newErrors = { name: "", phone: "", social: "", instagram: "" };
 
     if (formData.name.trim().length < 2) {
       newErrors.name = "Будь ласка, введіть ваше ім'я";
       valid = false;
     }
 
-    // Lenient: allow Telegram nick (@username) or phone number
-    const contact = formData.phone.trim();
-    if (contact.length < 3) {
-      newErrors.phone = "Введіть Telegram нік або номер телефону";
-      valid = false;
-    } else if (!contact.startsWith("@")) {
-      // If it doesn't start with @, it could be a phone or a nick
-      const digitsOnly = contact.replace(/\D/g, "");
-      // If it's mostly digits but too short, it's a bad phone number
-      if (digitsOnly.length > 0 && digitsOnly.length < 7) {
-        newErrors.phone = "Введіть коректний номер телефону або нік";
+    if (contactMethod === "phone") {
+      if (!formData.phone.trim()) {
+        newErrors.phone = "Будь ласка, введіть номер телефону";
         valid = false;
+      } else if (!isValidPhoneNumber(formData.phone)) {
+        newErrors.phone = "Введіть коректний номер телефону";
+        valid = false;
+      }
+    } else {
+      const tg = formData.social.trim();
+      if (!tg) {
+        newErrors.social = "Будь ласка, введіть Telegram нік";
+        valid = false;
+      } else {
+        const cleanTg = tg.replace("@", "");
+        if (cleanTg.length < 3) {
+          newErrors.social = "Нік у Telegram має бути не менше 3 символів";
+          valid = false;
+        }
       }
     }
 
@@ -107,17 +129,25 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       ...utmData
     });
 
+    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
+    const sanitizedSocial = contactMethod === "telegram" ? (formData.social.startsWith("@") ? formData.social : `@${formData.social}`) : "";
+
+    const payload = {
+      name: formData.name,
+      phone: sanitizedPhone,
+      social: sanitizedSocial,
+      instagram: formData.instagram,
+      ...utmData,
+      visitor_id: localStorage.getItem('visitor_id') || '',
+      target_sheet: "Автовеб",
+      sheet_id: "726331330"
+    };
+
     try {
       const res = await fetch('/api/lead', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          ...utmData,
-          visitor_id: localStorage.getItem('visitor_id') || '',
-          target_sheet: "Автовеб",
-          sheet_id: "726331330"
-        }),
+        body: JSON.stringify(payload),
       });
       const resData = await res.json();
       if (resData.uuid) {
@@ -125,7 +155,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       }
       // Also ensure fields are saved
       localStorage.setItem('lead_name', formData.name);
-      localStorage.setItem('lead_phone', formData.phone);
+      localStorage.setItem('lead_phone', sanitizedPhone);
+      localStorage.setItem('lead_social', sanitizedSocial);
       localStorage.setItem('lead_instagram', formData.instagram);
     } catch (error) {
       console.error("Submission error:", error);
@@ -145,6 +176,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
           <span className={styles.liveDot}></span>
           <span>зараз заповнюють анкету: {activeUsers} людини</span>
         </div>
+        
         <Input
           label="ІМ'Я ТА ПРІЗВИЩЕ"
           name="name"
@@ -155,17 +187,99 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
           error={errors.name}
           disabled={status !== "idle"}
         />
-        <Input
-          label="ТЕЛЕГРАМ @НІК АБО НОМЕР ТЕЛЕФОНУ"
-          name="phone"
-          type="text"
-          placeholder="@nickname або номер телефону"
-          value={formData.phone}
-          onChange={handleChange}
-          error={errors.phone}
-          hint="Будь ласка, перевірте правильність номера або ніка, щоб ми могли з вами зв'язатися"
-          disabled={status !== "idle"}
-        />
+
+        {/* Dynamic Contact Method Choice Switch */}
+        <div className="flex flex-col mb-[0.35rem] w-full">
+          <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.25rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
+            Оберіть спосіб зв{`'`}язку
+          </label>
+          <div className="flex gap-2 p-1 bg-black/30 border border-white/10 rounded-lg w-full mb-2">
+            <button
+              type="button"
+              onClick={() => setContactMethod("phone")}
+              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
+                contactMethod === "phone"
+                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              ТЕЛЕФОН
+            </button>
+            <button
+              type="button"
+              onClick={() => setContactMethod("telegram")}
+              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
+                contactMethod === "telegram"
+                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              TELEGRAM
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Input based on selection */}
+        {contactMethod === "phone" ? (
+          <div className="flex flex-col mb-[0.35rem] w-full">
+            <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.15rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
+              НОМЕР ТЕЛЕФОНУ
+            </label>
+            <PhoneInput
+              international
+              defaultCountry={countryCode as any}
+              value={formData.phone}
+              onChange={(val) => {
+                setFormData(prev => ({ ...prev, phone: val || "" }));
+                setErrors(prev => ({ ...prev, phone: "" }));
+                localStorage.setItem('lead_phone', val || "");
+              }}
+              disabled={status !== "idle"}
+              className="w-full flex items-center gap-2 react-phone-input-dark px-4 py-3 bg-black/30 border border-white/15 rounded-lg text-white font-manrope text-sm focus-within:border-[#d9b897]/50 focus-within:ring-4 focus-within:ring-[#d9b897]/10 transition-all"
+              numberInputProps={{
+                id: "phone",
+                autoComplete: "tel",
+                inputMode: "tel",
+                className: "w-full bg-transparent border-0 p-0 text-white font-manrope text-sm focus:ring-0 focus:outline-none placeholder:text-white/20",
+                placeholder: "+"
+              }}
+            />
+            <AnimatePresence>
+              {errors.phone ? (
+                <motion.span
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="font-manrope text-[#ff4d4d] text-[0.65rem] mt-[0.15rem] ml-[0.5rem] block"
+                >
+                  {errors.phone}
+                </motion.span>
+              ) : (
+                <motion.span
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="font-manrope text-zinc-500 text-[0.65rem] mt-[0.15rem] ml-[0.5rem] block"
+                >
+                  Будь ласка, перевірте правильність номера, щоб ми могли з вами зв{`'`}язатися
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <Input
+            label="TELEGRAM @НІК"
+            name="social"
+            type="text"
+            placeholder="@username"
+            value={formData.social}
+            onChange={handleChange}
+            error={errors.social}
+            hint="Будь ласка, введіть ваш Telegram нікнейм, щоб ми могли з вами зв'язатися"
+            disabled={status !== "idle"}
+          />
+        )}
+
         <Input
           label="INSTAGRAM @НІК"
           name="instagram"

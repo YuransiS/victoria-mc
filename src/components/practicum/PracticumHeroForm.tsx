@@ -5,6 +5,7 @@ import styles from "./PracticumHeroForm.module.css";
 import { Input } from "@/components/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 
 interface PracticumHeroFormProps {
   buttonText?: string;
@@ -19,15 +20,29 @@ export function PracticumHeroForm({
 }: PracticumHeroFormProps) {
   const [formData, setFormData] = useState({ name: "", phone: "", telegram: "" });
   const [errors, setErrors] = useState<{ name?: string; phone?: string; telegram?: string }>({});
+  const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
+  const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [activeUsers, setActiveUsers] = useState(7);
 
   useEffect(() => {
+    // Fetch country code via Edge API
+    fetch('/api/country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) {
+          setCountryCode(data.country.toUpperCase());
+        }
+      })
+      .catch(() => {});
+
     // Load saved data
     const savedName = localStorage.getItem('lead_name');
     const savedPhone = localStorage.getItem('lead_phone');
+    const savedSocial = localStorage.getItem('lead_social');
     if (savedName) setFormData(prev => ({ ...prev, name: savedName }));
     if (savedPhone) setFormData(prev => ({ ...prev, phone: savedPhone }));
+    if (savedSocial) setFormData(prev => ({ ...prev, telegram: savedSocial }));
 
     const interval = setInterval(() => {
       setActiveUsers(prev => {
@@ -64,18 +79,25 @@ export function PracticumHeroForm({
       valid = false;
     }
 
-    if (!formData.telegram.trim()) {
-      newErrors.telegram = "Введіть ваш Telegram";
-      valid = false;
-    }
-
-    const phoneRegex = /^\+?\d{7,15}$/;
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Введіть номер телефону";
-      valid = false;
-    } else if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ""))) {
-      newErrors.phone = "Некоректний номер";
-      valid = false;
+    if (contactMethod === "phone") {
+      if (!formData.phone.trim()) {
+        newErrors.phone = "Введіть номер телефону";
+        valid = false;
+      } else if (!isValidPhoneNumber(formData.phone)) {
+        newErrors.phone = "Некоректний номер";
+        valid = false;
+      }
+    } else {
+      if (!formData.telegram.trim()) {
+        newErrors.telegram = "Введіть ваш Telegram";
+        valid = false;
+      } else {
+        const cleanTg = formData.telegram.replace("@", "");
+        if (cleanTg.length < 3) {
+          newErrors.telegram = "Нік у Telegram має бути не менше 3 символів";
+          valid = false;
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -88,7 +110,8 @@ export function PracticumHeroForm({
 
     setStatus("loading");
 
-    const sanitizedPhone = formData.phone.replace(/[\s()-]/g, "");
+    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
+    const resolvedTelegram = contactMethod === "telegram" ? (formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`) : "";
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
@@ -103,9 +126,9 @@ export function PracticumHeroForm({
 
     const data = {
       customerName: formData.name,
-      customerEmail: `${formData.telegram.replace("@", "")}@telegram.com`,
+      customerEmail: resolvedTelegram ? `${resolvedTelegram.replace("@", "")}@telegram.com` : "phone-client@telegram.com",
       customerPhone: sanitizedPhone,
-      telegram: formData.telegram,
+      telegram: resolvedTelegram,
       amount: amount,
       tariffName: tariffName,
       targetSheet: "Практикум"
@@ -144,7 +167,7 @@ export function PracticumHeroForm({
       // Save to localStorage for cross-page persistence
       localStorage.setItem('lead_name', formData.name);
       localStorage.setItem('lead_phone', sanitizedPhone);
-      localStorage.setItem('lead_social', formData.telegram);
+      localStorage.setItem('lead_social', resolvedTelegram);
       if (paymentData.uuid) {
         localStorage.setItem('lead_uuid', paymentData.uuid);
       }
@@ -212,37 +235,114 @@ export function PracticumHeroForm({
           <span>зараз дивляться: {activeUsers} людей</span>
         </div>
 
-        <div className={styles.inputGrid}>
-          <Input
-            label="ВАШЕ ІМ'Я"
-            name="name"
-            placeholder="Ім'я"
-            value={formData.name}
-            onChange={handleChange}
-            error={errors.name}
-            disabled={status !== "idle"}
-          />
-          <Input
-            label="TELEGRAM"
-            name="telegram"
-            placeholder="@username"
-            value={formData.telegram}
-            onChange={handleChange}
-            error={errors.telegram}
-            disabled={status !== "idle"}
-          />
-        </div>
-
         <Input
-          label="НОМЕР ТЕЛЕФОНУ"
-          name="phone"
-          type="tel"
-          placeholder="+380..."
-          value={formData.phone}
+          label="ВАШЕ ІМ'Я"
+          name="name"
+          placeholder="Ім'я"
+          value={formData.name}
           onChange={handleChange}
-          error={errors.phone}
+          error={errors.name}
           disabled={status !== "idle"}
         />
+
+        {/* Dynamic Contact Method Choice Switch */}
+        <div className="flex flex-col mb-[0.35rem] w-full">
+          <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.25rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
+            Оберіть спосіб зв{`'`}язку
+          </label>
+          <div className="flex gap-2 p-1 bg-black/30 border border-white/10 rounded-lg w-full mb-2">
+            <button
+              type="button"
+              onClick={() => setContactMethod("phone")}
+              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
+                contactMethod === "phone"
+                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              ТЕЛЕФОН
+            </button>
+            <button
+              type="button"
+              onClick={() => setContactMethod("telegram")}
+              className={`flex-1 py-2 text-[10px] font-manrope font-extrabold uppercase tracking-[0.15em] rounded-md transition-all duration-300 ${
+                contactMethod === "telegram"
+                  ? "bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              TELEGRAM
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Input based on selection */}
+        <AnimatePresence mode="wait">
+          {contactMethod === "phone" ? (
+            <motion.div
+              key="phone-field"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col mb-[0.35rem] w-full"
+            >
+              <label className="font-manrope text-[0.6rem] text-[#7a7a7a] mb-[0.15rem] uppercase tracking-[0.1em] font-bold ml-[0.5rem]">
+                НОМЕР ТЕЛЕФОНУ
+              </label>
+              <PhoneInput
+                international
+                defaultCountry={countryCode as any}
+                value={formData.phone}
+                onChange={(val) => {
+                  setFormData(prev => ({ ...prev, phone: val || "" }));
+                  setErrors(prev => ({ ...prev, phone: "" }));
+                  localStorage.setItem('lead_phone', val || "");
+                }}
+                disabled={status !== "idle"}
+                className="w-full flex items-center gap-2 react-phone-input-dark px-4 py-3 bg-black/30 border border-white/15 rounded-lg text-white font-manrope text-sm focus-within:border-[#d9b897]/50 focus-within:ring-4 focus-within:ring-[#d9b897]/10 transition-all"
+                numberInputProps={{
+                  id: "phone",
+                  autoComplete: "tel",
+                  inputMode: "tel",
+                  className: "w-full bg-transparent border-0 p-0 text-white font-manrope text-sm focus:ring-0 focus:outline-none placeholder:text-white/20",
+                  placeholder: "+"
+                }}
+              />
+              <AnimatePresence>
+                {errors.phone && (
+                  <motion.span
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="font-manrope text-[#ff4d4d] text-[0.65rem] mt-[0.15rem] ml-[0.5rem] block"
+                  >
+                    {errors.phone}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="telegram-field"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="w-full"
+            >
+              <Input
+                label="TELEGRAM"
+                name="telegram"
+                placeholder="@username"
+                value={formData.telegram}
+                onChange={handleChange}
+                error={errors.telegram}
+                disabled={status !== "idle"}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <button
           type="submit"

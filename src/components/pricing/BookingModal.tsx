@@ -40,6 +40,7 @@ export const BookingModal = ({
     telegram: ""
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isTestMode, setIsTestMode] = useState(false);
@@ -156,20 +157,22 @@ export const BookingModal = ({
       newErrors.name = "Ім'я не може містити цифри";
     }
 
-    // Phone validation: strict check via react-phone-number-input
-    if (!formData.phone) {
-      newErrors.phone = "Будь ласка, введіть номер телефону";
-    } else if (!isValidPhoneNumber(formData.phone)) {
-      newErrors.phone = "Введіть коректний номер телефону";
-    }
-
-    // Telegram validation: Min 3 chars
-    if (!formData.telegram) {
-      newErrors.telegram = "Будь ласка, введіть нік у Telegram";
+    if (contactMethod === "phone") {
+      // Phone validation: strict check via react-phone-number-input
+      if (!formData.phone) {
+        newErrors.phone = "Будь ласка, введіть номер телефону";
+      } else if (!isValidPhoneNumber(formData.phone)) {
+        newErrors.phone = "Введіть коректний номер телефону";
+      }
     } else {
-      const tgNick = formData.telegram.replace("@", "");
-      if (tgNick.length < 3) {
-        newErrors.telegram = "Нік у Telegram має бути не менше 3 символів";
+      // Telegram validation: Min 3 chars
+      if (!formData.telegram) {
+        newErrors.telegram = "Будь ласка, введіть нік у Telegram";
+      } else {
+        const tgNick = formData.telegram.replace("@", "");
+        if (tgNick.length < 3) {
+          newErrors.telegram = "Нік у Telegram має бути не менше 3 символів";
+        }
       }
     }
 
@@ -186,7 +189,8 @@ export const BookingModal = ({
 
     setIsSubmitting(true);
 
-    const sanitizedPhone = formData.phone.replace(/[\s()-]/g, "");
+    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
+    const resolvedTelegram = contactMethod === "telegram" ? (formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`) : "";
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
@@ -209,9 +213,9 @@ export const BookingModal = ({
 
     const data = {
       customerName: formData.name,
-      customerEmail: `${formData.telegram.replace("@", "")}@telegram.com`, // Fallback
+      customerEmail: resolvedTelegram ? `${resolvedTelegram.replace("@", "")}@telegram.com` : "phone-client@telegram.com", // Fallback
       customerPhone: sanitizedPhone,
-      telegram: formData.telegram,
+      telegram: resolvedTelegram,
       amount: actualAmount,
       tariffName: tariffName
     };
@@ -414,79 +418,129 @@ export const BookingModal = ({
                       )}
                     </AnimatePresence>
                   </motion.div>
-
-                  {/* Input: Telegram */}
-                  <motion.div
-                    animate={errors.telegram ? shakeAnimation : {}}
-                    className="relative flex flex-col group"
-                  >
-                    <label htmlFor="telegram" className="font-inter text-[10px] text-[#666] mb-2 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
-                      Telegram @username
+                         {/* Choice Selector */}
+                  <div className="relative flex flex-col group">
+                    <label className="font-inter text-[10px] text-[#666] mb-3 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
+                      Оберіть спосіб зв{`'`}язку
                     </label>
-                    <input
-                      value={formData.telegram}
-                      onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
-                      type="text"
-                      id="telegram"
-                      disabled={isSubmitting}
-                      autoComplete="off"
-                      autoCapitalize="none"
-                      className={`w-full bg-transparent border-0 border-b ${errors.telegram ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
-                      placeholder="@username"
-                    />
-                    <AnimatePresence>
-                      {errors.telegram && (
-                        <motion.span
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="text-red-500 text-[9px] uppercase mt-2 font-bold tracking-widest"
-                        >
-                          {errors.telegram}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
+                    <div className="flex gap-2 p-1 bg-black/40 border border-white/5 rounded-lg w-full mb-2">
+                      <button
+                        type="button"
+                        onClick={() => setContactMethod("phone")}
+                        className={`flex-1 py-3 text-[10px] font-manrope font-black uppercase tracking-[0.15em] rounded transition-all duration-300 ${
+                          contactMethod === "phone"
+                            ? "bg-white text-black shadow-lg"
+                            : "text-[#666] hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        ТЕЛЕФОН
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setContactMethod("telegram")}
+                        className={`flex-1 py-3 text-[10px] font-manrope font-black uppercase tracking-[0.15em] rounded transition-all duration-300 ${
+                          contactMethod === "telegram"
+                            ? "bg-white text-black shadow-lg"
+                            : "text-[#666] hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        TELEGRAM
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* Input: Phone */}
-                  <motion.div
-                    animate={errors.phone ? shakeAnimation : {}}
-                    className="relative flex flex-col group"
-                  >
-                    <label htmlFor="phone" className="font-inter text-[10px] text-[#666] mb-1 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
-                      Номер телефону
-                    </label>
-                    <p className="text-[9px] text-[#444] uppercase tracking-wider mb-2 leading-relaxed">
-                      Перепроверьте номер. Якщо він буде невірним, ми не зможемо з вами зв{`'`}язатися
-                    </p>
-                    <PhoneInput
-                      international
-                      defaultCountry={countryCode as any}
-                      value={formData.phone}
-                      onChange={(val) => setFormData(prev => ({ ...prev, phone: val || "" }))}
-                      disabled={isSubmitting}
-                      className="w-full flex items-center gap-2 react-phone-input-dark"
-                      numberInputProps={{
-                        id: "phone",
-                        autoComplete: "tel",
-                        inputMode: "tel",
-                        className: `w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`,
-                        placeholder: "+"
-                      }}
-                    />
-                    <AnimatePresence>
-                      {errors.phone && (
-                        <motion.span
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="text-red-500 text-[9px] uppercase mt-2 font-bold tracking-widest"
+                  <AnimatePresence mode="wait">
+                    {contactMethod === "phone" ? (
+                      <motion.div
+                        key="phone-input-group"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {/* Input: Phone */}
+                        <motion.div
+                          animate={errors.phone ? shakeAnimation : {}}
+                          className="relative flex flex-col group"
                         >
-                          {errors.phone}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
+                          <label htmlFor="phone" className="font-inter text-[10px] text-[#666] mb-1 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
+                            Номер телефону
+                          </label>
+                          <p className="text-[9px] text-[#444] uppercase tracking-wider mb-2 leading-relaxed">
+                            Перевірте номер. Якщо він буде невірним, ми не зможемо з вами зв{`'`}язатися
+                          </p>
+                          <PhoneInput
+                            international
+                            defaultCountry={countryCode as any}
+                            value={formData.phone}
+                            onChange={(val) => setFormData(prev => ({ ...prev, phone: val || "" }))}
+                            disabled={isSubmitting}
+                            className="w-full flex items-center gap-2 react-phone-input-dark"
+                            numberInputProps={{
+                              id: "phone",
+                              autoComplete: "tel",
+                              inputMode: "tel",
+                              className: `w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`,
+                              placeholder: "+"
+                            }}
+                          />
+                          <AnimatePresence>
+                            {errors.phone && (
+                              <motion.span
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="text-red-500 text-[9px] uppercase mt-2 font-bold tracking-widest"
+                              >
+                                {errors.phone}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="telegram-input-group"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {/* Input: Telegram */}
+                        <motion.div
+                          animate={errors.telegram ? shakeAnimation : {}}
+                          className="relative flex flex-col group"
+                        >
+                          <label htmlFor="telegram" className="font-inter text-[10px] text-[#666] mb-2 uppercase tracking-[0.2em] font-bold group-focus-within:text-white transition-colors">
+                            Telegram @username
+                          </label>
+                          <input
+                            value={formData.telegram}
+                            onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                            type="text"
+                            id="telegram"
+                            disabled={isSubmitting}
+                            autoComplete="off"
+                            autoCapitalize="none"
+                            className={`w-full bg-transparent border-0 border-b ${errors.telegram ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
+                            placeholder="@username"
+                          />
+                          <AnimatePresence>
+                            {errors.telegram && (
+                              <motion.span
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="text-red-500 text-[9px] uppercase mt-2 font-bold tracking-widest"
+                              >
+                                {errors.telegram}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <div className="pt-6">
                     <button
