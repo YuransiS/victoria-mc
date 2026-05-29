@@ -37,11 +37,12 @@ This live document outlines the architecture, routing structure, components, dat
 *   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`) and Google Sheets CRM.
 *   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and Google Sheets when users reach thanks/fail landing pages or manually update states.
 *   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`).
+*   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.
 
 ### 🧩 UI Components (`src/components/`)
 *   `Form.tsx` — Core registration form component.
 *   `Analytics.tsx` — Client-side React tracking component. Generates a secure `visitor_id`, extracts UTM parameters, and logs telemetric sessions on load.
-*   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay.
+*   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay. Uses `react-phone-number-input` for exact international numbers with Edge CDN geo-detection.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
 
 ### 🧪 QA Regression Tests (`tests/`)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
 
@@ -42,6 +43,18 @@ export const BookingModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isTestMode, setIsTestMode] = useState(false);
+  const [countryCode, setCountryCode] = useState<string>("UA");
+
+  useEffect(() => {
+    fetch('/api/country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) {
+          setCountryCode(data.country.toUpperCase());
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Restore data from localStorage on mount
   useEffect(() => {
@@ -143,11 +156,10 @@ export const BookingModal = ({
       newErrors.name = "Ім'я не може містити цифри";
     }
 
-    // Phone validation: Relaxed for international numbers
-    const phoneRegex = /^\+?\d{5,20}$/;
+    // Phone validation: strict check via react-phone-number-input
     if (!formData.phone) {
       newErrors.phone = "Будь ласка, введіть номер телефону";
-    } else if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ""))) {
+    } else if (!isValidPhoneNumber(formData.phone)) {
       newErrors.phone = "Введіть коректний номер телефону";
     }
 
@@ -447,16 +459,20 @@ export const BookingModal = ({
                     <p className="text-[9px] text-[#444] uppercase tracking-wider mb-2 leading-relaxed">
                       Перепроверьте номер. Якщо він буде невірним, ми не зможемо з вами зв{`'`}язатися
                     </p>
-                    <input
+                    <PhoneInput
+                      international
+                      defaultCountry={countryCode as any}
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      type="tel"
-                      id="phone"
+                      onChange={(val) => setFormData(prev => ({ ...prev, phone: val || "" }))}
                       disabled={isSubmitting}
-                      autoComplete="tel"
-                      inputMode="tel"
-                      className={`w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`}
-                      placeholder="+"
+                      className="w-full flex items-center gap-2 react-phone-input-dark"
+                      numberInputProps={{
+                        id: "phone",
+                        autoComplete: "tel",
+                        inputMode: "tel",
+                        className: `w-full bg-transparent border-0 border-b ${errors.phone ? 'border-red-500' : 'border-white/10'} py-3 text-white font-inter text-lg focus:ring-0 focus:border-white focus:outline-none transition-all rounded-none px-0 placeholder:text-[#333]`,
+                        placeholder: "+"
+                      }}
                     />
                     <AnimatePresence>
                       {errors.phone && (

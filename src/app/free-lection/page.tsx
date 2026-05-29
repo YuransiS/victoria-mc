@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import intlTelInput from 'intl-tel-input';
-import 'intl-tel-input/build/css/intlTelInput.css';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import { trackFBEvent } from '@/components/FacebookPixel';
 import Image from 'next/image';
 
@@ -21,9 +20,9 @@ export default function FreeLectionPage() {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showStickyFooter, setShowStickyFooter] = useState(false);
-
-  const phoneInputRef = useRef<HTMLInputElement>(null);
-  const itiRef = useRef<any>(null);
+  const [phone, setPhone] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('UA');
+  const [phoneError, setPhoneError] = useState(false);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
 
@@ -49,31 +48,14 @@ export default function FreeLectionPage() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    if (phoneInputRef.current && !itiRef.current) {
-      itiRef.current = intlTelInput(phoneInputRef.current, {
-        initialCountry: "auto",
-        geoIpLookup: (callback: (countryCode: string) => void) => {
-          fetch("https://get.geojs.io/v1/ip/country.json")
-            .then(res => res.json())
-            .then(data => {
-               if (active) callback(data.country);
-            })
-            .catch(() => {
-               if (active) callback("ua");
-            });
-        },
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/26.9.2/js/utils.js",
-        separateDialCode: true,
-      } as any);
-    }
-    return () => {
-      active = false;
-      if (itiRef.current) {
-        itiRef.current.destroy();
-        itiRef.current = null;
-      }
-    };
+    fetch('/api/country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) {
+          setCountryCode(data.country.toUpperCase());
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const openLightbox = (src: string) => {
@@ -99,35 +81,23 @@ export default function FreeLectionPage() {
     const savedName = localStorage.getItem('lead_name');
     const savedPhone = localStorage.getItem('lead_phone');
     const savedSocial = localStorage.getItem('lead_social');
-
     const savedInstagram = localStorage.getItem('lead_instagram');
 
     if (savedName) setValue('name', savedName);
     if (savedSocial) setValue('social', savedSocial);
     if (savedInstagram) setValue('instagram', savedInstagram);
-    
-    // Restore phone with delay to ensure iti is initialized
-    if (savedPhone && phoneInputRef.current) {
-      setTimeout(() => {
-        if (itiRef.current) {
-          itiRef.current.setNumber(savedPhone);
-        } else {
-          phoneInputRef.current!.value = savedPhone;
-        }
-      }, 500);
-    }
+    if (savedPhone) setPhone(savedPhone);
   }, []);
 
   const onSubmit = async (data: FormData) => {
-    setLoading(true);
+    setPhoneError(false);
+    if (!phone || !isValidPhoneNumber(phone)) {
+      setPhoneError(true);
+      return;
+    }
 
-    let fullPhone = '';
-    if (itiRef.current) {
-      fullPhone = itiRef.current.getNumber();
-    }
-    if (!fullPhone && phoneInputRef.current) {
-      fullPhone = phoneInputRef.current.value.trim();
-    }
+    setLoading(true);
+    const fullPhone = phone;
 
     // Save to localStorage
     localStorage.setItem('lead_name', data.name);
@@ -185,7 +155,7 @@ export default function FreeLectionPage() {
 
   return (
     <div className="antialiased text-sm md:text-base pb-24 md:pb-0 bg-[#F9F9F9] text-[#0F0F0F] overflow-x-hidden font-sans min-h-screen">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
         
         .font-sans { font-family: 'Manrope', sans-serif; }
@@ -218,9 +188,7 @@ export default function FreeLectionPage() {
         .animate-slide-up {
             animation: slideUp 0.8s ease-out forwards;
         }
-        .iti { width: 100%; }
-        .iti__flag-container { z-index: 10; }
-      `}} />
+      `}</style>
 
       {/* HERO SECTION */}
       <section className="relative min-h-[100dvh] w-full overflow-hidden flex items-center bg-[#F9F9F9]">
@@ -597,16 +565,24 @@ export default function FreeLectionPage() {
 
                   {/* Phone */}
                   <div>
-                      <input type="tel" {...register('phone_raw', { 
-                        required: true,
-                        onChange: (e) => {
-                           if (itiRef.current) {
-                               localStorage.setItem('lead_phone', itiRef.current.getNumber());
-                           } else {
-                               localStorage.setItem('lead_phone', e.target.value);
-                           }
-                        }
-                      })} ref={(e) => { register('phone_raw').ref(e); phoneInputRef.current = e; }} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black" />
+                      <PhoneInput
+                        international
+                        defaultCountry={countryCode as any}
+                        value={phone}
+                        onChange={(val) => {
+                          setPhone(val || '');
+                          localStorage.setItem('lead_phone', val || '');
+                        }}
+                        className="w-full react-phone-input-light"
+                        numberInputProps={{
+                          id: "phone",
+                          autoComplete: "tel",
+                          inputMode: "tel",
+                          className: "w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-black focus:outline-none transition-colors text-black",
+                          placeholder: "Твій номер телефону"
+                        }}
+                      />
+                      {phoneError && <p className="text-red-500 text-[10px] mt-1">Перевірте правильність номеру</p>}
                   </div>
 
                   {/* Social */}

@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import Script from 'next/script';
 import { useForm } from 'react-hook-form';
-import intlTelInput from 'intl-tel-input';
-import 'intl-tel-input/build/css/intlTelInput.css';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -45,9 +44,9 @@ export default function RozbirPage() {
   const [stickyVisible, setStickyVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
+  const [phone, setPhone] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('UA');
 
-  const phoneInputRef = useRef<HTMLInputElement>(null);
-  const itiRef = useRef<any>(null);
   const heroRef = useRef<HTMLElement>(null);
   const storytellingRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
@@ -87,16 +86,7 @@ export default function RozbirPage() {
 
     if (savedName) setValue('name', savedName);
     if (savedSocial) setValue('social', savedSocial);
-    
-    if (savedPhone && phoneInputRef.current) {
-      setTimeout(() => {
-        if (itiRef.current) {
-          itiRef.current.setNumber(savedPhone);
-        } else {
-          phoneInputRef.current!.value = savedPhone;
-        }
-      }, 500);
-    }
+    if (savedPhone) setPhone(savedPhone);
 
     return () => {
       clearInterval(interval);
@@ -105,25 +95,14 @@ export default function RozbirPage() {
   }, []);
 
   useEffect(() => {
-    if (phoneInputRef.current && !itiRef.current) {
-      itiRef.current = intlTelInput(phoneInputRef.current, {
-        initialCountry: "auto",
-        geoIpLookup: (callback: (countryCode: string) => void) => {
-          fetch("https://get.geojs.io/v1/ip/country.json")
-            .then(res => res.json())
-            .then(data => callback(data.country))
-            .catch(() => callback("ua"));
-        },
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js",
-        separateDialCode: true,
-      } as any);
-    }
-    return () => {
-        if (itiRef.current) {
-            itiRef.current.destroy();
-            itiRef.current = null;
+    fetch('/api/country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) {
+          setCountryCode(data.country.toUpperCase());
         }
-    };
+      })
+      .catch(() => {});
   }, []);
 
   const openModal = () => {
@@ -183,13 +162,13 @@ export default function RozbirPage() {
 
   const onSubmit = async (data: FormData) => {
     setPhoneError(false);
-    if (!itiRef.current?.isValidNumber()) {
+    if (!phone || !isValidPhoneNumber(phone)) {
       setPhoneError(true);
       return;
     }
 
     setLoading(true);
-    const fullPhone = itiRef.current.getNumber();
+    const fullPhone = phone;
 
     const params = new URLSearchParams(window.location.search);
     const utms = {
@@ -253,9 +232,8 @@ export default function RozbirPage() {
         strategy="afterInteractive"
       />
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style>{`
         body { background-color: #F9F9F9; color: #0F0F0F; overflow-x: hidden; }
-        .iti { width: 100%; }
         input { background-color: transparent !important; border: 1px solid #E5E5E5 !important; color: #0F0F0F !important; border-radius: 0px !important; font-size: 14px !important; }
         input:focus { border-color: #0F0F0F !important; box-shadow: none !important; outline: none !important; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
@@ -264,7 +242,7 @@ export default function RozbirPage() {
         .text-glow { text-shadow: 0 2px 10px rgba(255, 255, 255, 1); }
         .font-sans { font-family: var(--font-manrope), sans-serif; }
         .font-serif { font-family: var(--font-playfair), serif; }
-      `}} />
+      `}</style>
 
       {/* HERO SECTION */}
       <section id="hero-section" ref={heroRef}
@@ -379,13 +357,32 @@ export default function RozbirPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { icon: Fingerprint, text: 'Немає <span class="text-black font-bold">відчуття "це я"</span>: виглядаєш "як усі", що не дозволяє виділитися і запам\'ятатися.' },
-              { icon: Clock, text: 'Витрачаєш години на <span class="text-black font-bold">"ідеальний пост"</span> — і все одно незадоволена. Або публікуєш хаотично, або не публікуєш взагалі.' },
-              { icon: Copy, text: 'Працюєш то по шаблонах, то по трендам — <span class="text-black font-bold">не розумієш як створювати контент</span>, який продає.' }
+              { 
+                icon: Fingerprint, 
+                prefix: 'Немає ', 
+                bold: 'відчуття "це я"', 
+                suffix: ': виглядаєш "як усі", що не дозволяє виділитися і запам\'ятатися.' 
+              },
+              { 
+                icon: Clock, 
+                prefix: 'Витрачаєш години на ', 
+                bold: '"ідеальний пост"', 
+                suffix: ' — і все одно незадоволена. Або публікуєш хаотично, або не публікуєш взагалі.' 
+              },
+              { 
+                icon: Copy, 
+                prefix: 'Працюєш то по шаблонах, то по трендам — ', 
+                bold: 'не розумієш як створювати контент', 
+                suffix: ', який продає.' 
+              }
             ].map((item, idx) => (
               <div key={idx} className="flex flex-col p-6 border-l border-gray-200 hover:border-black transition-colors duration-500 group bg-white shadow-sm">
                 <item.icon className="w-8 h-8 text-gray-300 group-hover:text-black transition-colors mb-4 stroke-[1.5]" />
-                <p className="text-sm md:text-base text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: item.text }} />
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                  {item.prefix}
+                  <span className="text-black font-bold">{item.bold}</span>
+                  {item.suffix}
+                </p>
               </div>
             ))}
           </div>
@@ -577,16 +574,23 @@ export default function RozbirPage() {
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Телефон</label>
-              <input type="tel" {...register('phone', { 
-                required: true,
-                onChange: (e) => {
-                  if (itiRef.current) {
-                    localStorage.setItem('lead_phone', itiRef.current.getNumber());
-                  } else {
-                    localStorage.setItem('lead_phone', e.target.value);
-                  }
-                }
-              })} ref={(e) => { register('phone').ref(e); phoneInputRef.current = e; }} className="w-full py-3 px-4" />
+              <PhoneInput
+                international
+                defaultCountry={countryCode as any}
+                value={phone}
+                onChange={(val) => {
+                  setPhone(val || '');
+                  localStorage.setItem('lead_phone', val || '');
+                }}
+                className="w-full react-phone-input-light"
+                numberInputProps={{
+                  id: "phone",
+                  autoComplete: "tel",
+                  inputMode: "tel",
+                  className: "w-full py-3 px-4",
+                  placeholder: "+"
+                }}
+              />
               {phoneError && <p className="text-red-500 text-[10px] mt-1">Перевірте правильність номеру</p>}
             </div>
             <button type="submit" disabled={loading}
