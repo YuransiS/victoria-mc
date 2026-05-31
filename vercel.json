@@ -11,5 +11,11 @@
       "destination": "https://victoria-mc.vercel.app/free-lection/vsl-form",
       "permanent": true
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/vsl-report",
+      "schedule": "0 6 * * *"
+    }
   ]
 }

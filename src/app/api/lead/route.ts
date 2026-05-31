@@ -58,8 +58,8 @@ export async function POST(req: Request) {
     // Define notification tasks
     const tasks = [];
 
-    // 1. Telegram Task (For all incoming leads)
-    if (token && chatId) {
+    // 1. Telegram Task (For all incoming leads EXCEPT stage 1 VSL)
+    if (token && chatId && !isVSL1) {
       tasks.push(
         fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',

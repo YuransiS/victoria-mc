@@ -32,12 +32,13 @@ This live document outlines the architecture, routing structure, components, dat
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 
 ### 🌐 API Endpoints (`src/app/api/`)
-*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Google Sheets CRM (Unified Sheets + Stvoryui) and Telegram, and registers the customer inside Supabase (`victoria_leads`) with visitor stitching.
+*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Google Sheets CRM (Unified Sheets + Stvoryui) and Telegram, and registers the customer inside Supabase (`victoria_leads`) with visitor stitching. Now omits individual Telegram notifications for VSL Stage 1 leads.
 *   `api/create-payment/` — Initiate checkout route. Registers pending payments in Google Sheets, starts Telegram payment alerts, and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
 *   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`) and Google Sheets CRM.
 *   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and Google Sheets when users reach thanks/fail landing pages or manually update states.
 *   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`).
 *   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.
+*   `api/cron/vsl-report/` — [NEW] Daily analytical cron route executed at 9:00 AM Kyiv time. Aggregates /free-lection registration counts, visitor stitches Step 2 funnel conversions, identifies the best source, and sends a summary report to Telegram.
 
 ### 🧩 UI Components (`src/components/`)
 *   `Form.tsx` — Core registration form component.
