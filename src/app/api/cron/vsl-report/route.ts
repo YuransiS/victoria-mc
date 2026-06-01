@@ -29,9 +29,14 @@ export async function GET(req: Request) {
       }
     }
 
-    // 2. Define timezone-agnostic 24h window (9:00 AM yesterday to 9:00 AM today Kyiv)
+    const type = searchParams.get('type') || 'daily';
+    const isWeekly = type === 'weekly';
+
+    // 2. Define timezone-agnostic window (7 days for weekly, 24h for daily)
     const endTime = new Date();
-    const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
+    const startTime = isWeekly
+      ? new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000)
+      : new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
 
     // 3. Fetch Stage 1 VSL leads within this window
     const { data: step1Leads, error: step1Error } = await supabaseAdmin
@@ -96,11 +101,13 @@ export async function GET(req: Request) {
 
     const conversionRate = totalRegistered > 0 ? Math.round((step2Count / totalRegistered) * 100) : 0;
 
-    // 6. Build the elegant daily report message
+    // 6. Build the elegant report message
     const formattedStart = formatKyivTime(startTime);
     const formattedEnd = formatKyivTime(endTime);
 
-    let message = `📊 <b>Звіт по воронці /free-lection</b>\n`;
+    let message = isWeekly
+      ? `📊 <b>Тижневий звіт по воронці /free-lection</b>\n`
+      : `📊 <b>Звіт по воронці /free-lection</b>\n`;
     message += `📅 <b>Період:</b> з <code>${formattedStart}</code>\n`;
     message += `📅 <b>по:</b> <code>${formattedEnd}</code> (Київ)\n\n`;
     message += `👤 <b>Зареєстровано нових лідів:</b> <code>${totalRegistered}</code>\n`;

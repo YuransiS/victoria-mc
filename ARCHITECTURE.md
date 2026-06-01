@@ -38,7 +38,10 @@ This live document outlines the architecture, routing structure, components, dat
 *   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and Google Sheets when users reach thanks/fail landing pages or manually update states.
 *   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`).
 *   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.
-*   `api/cron/vsl-report/` — [NEW] Daily analytical cron route executed at 9:00 AM Kyiv time. Aggregates /free-lection registration counts, visitor stitches Step 2 funnel conversions, identifies the best source, and sends a summary report to Telegram.
+*   `api/cron/vsl-report/` — [NEW] Analytical cron route.
+    *   **Daily:** Runs at 9:00 AM Kyiv time (`0 6 * * *` UTC) with 24-hour period.
+    *   **Weekly:** Runs on Mondays at 10:00 AM Kyiv time (`0 7 * * 1` UTC) when `?type=weekly` is specified, reporting over a 7-day period.
+    Aggregates `/free-lection` registration counts, performs visitor stitching for Step 2 conversions, identifies the best source, and sends a styled summary report to Telegram.
 
 ### 🧩 UI Components (`src/components/`)
 *   `Form.tsx` — Core registration form component.
