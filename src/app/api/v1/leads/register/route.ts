@@ -31,6 +31,9 @@ export async function POST(req: Request) {
 
     const projectId = project.id;
 
+    const customCreatedAt = lead?.created_at || metadata?.created_at || null;
+    const createdAtIso = customCreatedAt ? new Date(customCreatedAt).toISOString() : new Date().toISOString();
+
     // 3. Выделение и нормализация контактных данных лида
     const name = lead.name || null;
     let phone = lead.phone ? String(lead.phone).trim() : null;
@@ -83,7 +86,9 @@ export async function POST(req: Request) {
           name,
           phone,
           email,
-          telegram
+          telegram,
+          created_at: createdAtIso,
+          updated_at: createdAtIso
         })
         .select('id')
         .single();
@@ -156,7 +161,8 @@ export async function POST(req: Request) {
         page_path,
         page_url,
         visitor_uuid,
-        metadata: metadata || {}
+        metadata: metadata || {},
+        created_at: createdAtIso
       })
       .select('id')
       .single();

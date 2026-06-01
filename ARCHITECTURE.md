@@ -2,6 +2,9 @@
 
 This live document outlines the architecture, routing structure, components, database schemas, and integration details for the **Victoria** application.
 
+> [!TIP]
+> For a detailed, 1-to-1 blueprint of the leads capture, tracking analytics, and CRM stitching integrations designed for developers to clone on other projects, see the dedicated [CRM Architecture Guide](file:///c:/Users/yura3/Documents/Repositories/B&W%20Prod/EXPERTS/VICTORIA/victoria-mc/CRM_ARCHITECTURE.md).
+
 ---
 
 ## 🚀 Stack & Core Systems
