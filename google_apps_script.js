@@ -370,6 +370,9 @@ function updateLeadField(data, fieldType) {
       if (lowH === "tgmsgid" || lowH === "tgmsg" || lowH === "tg_msg_id") tgMsgIdIdx = i;
     });
     
+    if (orderIdIdx === -1 && uuidIdx !== -1) {
+      orderIdIdx = uuidIdx;
+    }
     if (orderIdIdx === -1) continue;
     
     for (let i = 1; i < dataRange.length; i++) {

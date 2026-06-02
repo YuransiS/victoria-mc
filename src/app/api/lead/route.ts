@@ -165,6 +165,24 @@ export async function POST(req: Request) {
       resolvedUuid = crypto.randomUUID();
     }
 
+    // Merge session logs from temporary clientUuid to resolved stitched UUID
+    if (clientUuid && resolvedUuid && clientUuid !== resolvedUuid) {
+      try {
+        const { error: mergeError } = await supabaseAdmin
+          .from("victoria_leads")
+          .update({ visitor_uuid: resolvedUuid })
+          .eq("visitor_uuid", clientUuid);
+        
+        if (mergeError) {
+          console.error("[Lead Ingest] Error merging visitor history:", mergeError);
+        } else {
+          console.log(`[Lead Ingest] Successfully merged history from ${clientUuid} to ${resolvedUuid}`);
+        }
+      } catch (e: any) {
+        console.error("[Lead Ingest] Merge exception:", e.message);
+      }
+    }
+
     const dbPayload = {
       name: name || null,
       phone: normalizedPhone || null,

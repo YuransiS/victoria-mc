@@ -37,6 +37,108 @@ export default function StvoryuiPage() {
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>();
 
+  // Video tracking state
+  const watchedSecondsRef = useRef(0);
+  const playedRef = useRef(false);
+  const fullyWatchedRef = useRef(false);
+  const lastSavedSecondsRef = useRef(0);
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    // 1. Get visitor ID
+    const visitorId = localStorage.getItem('visitor_id');
+    if (!visitorId) return;
+
+    // Helper to send progress
+    const sendProgress = async (forceStatus?: string) => {
+      try {
+        const status = forceStatus || (watchedSecondsRef.current >= 1200 ? 'полностью посмотрел' : (playedRef.current ? 'Дивився відео' : ''));
+        if (status === 'полностью посмотрел') {
+          fullyWatchedRef.current = true;
+        }
+        await fetch('/api/video-progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            visitor_id: visitorId,
+            seconds_watched: Math.round(watchedSecondsRef.current),
+            current_time: playerRef.current && typeof playerRef.current.getCurrentTime === 'function' ? Math.round(playerRef.current.getCurrentTime()) : 0,
+            played: playedRef.current,
+            status
+          })
+        });
+        lastSavedSecondsRef.current = watchedSecondsRef.current;
+      } catch (err) {
+        console.error('Failed to save progress:', err);
+      }
+    };
+
+    // Load YT API if not present
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
+
+    let interval: NodeJS.Timeout;
+
+    const initPlayer = () => {
+      playerRef.current = new (window as any).YT.Player('vsl-video-player', {
+        events: {
+          onStateChange: (event: any) => {
+            // YT.PlayerState.PLAYING = 1
+            if (event.data === 1) {
+              if (!playedRef.current) {
+                playedRef.current = true;
+                sendProgress();
+              }
+              
+              // Start tracking interval
+              interval = setInterval(() => {
+                watchedSecondsRef.current += 1;
+                
+                const watchedTime = watchedSecondsRef.current;
+                const currentTime = playerRef.current && typeof playerRef.current.getCurrentTime === 'function' 
+                  ? playerRef.current.getCurrentTime() 
+                  : 0;
+                
+                if ((watchedTime >= 1200 || currentTime >= 1200) && !fullyWatchedRef.current) {
+                  fullyWatchedRef.current = true;
+                  sendProgress('полностью посмотрел');
+                } else if (watchedTime - lastSavedSecondsRef.current >= 30) {
+                  sendProgress();
+                }
+              }, 1000);
+            } else {
+              // Paused, ended, etc.
+              clearInterval(interval);
+              if (watchedSecondsRef.current - lastSavedSecondsRef.current >= 5) {
+                sendProgress();
+              }
+            }
+          }
+        }
+      });
+    };
+
+    // Global callback for YT Player API
+    if ((window as any).YT && (window as any).YT.Player) {
+      initPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = () => {
+        initPlayer();
+      };
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (playedRef.current && watchedSecondsRef.current - lastSavedSecondsRef.current >= 2) {
+        sendProgress();
+      }
+    };
+  }, []);
+
   // Restore data from localStorage
   useEffect(() => {
     const savedName = localStorage.getItem('lead_name');
@@ -248,7 +350,8 @@ export default function StvoryuiPage() {
       <section className="px-4 md:px-12 max-w-5xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <div className="video-container">
           <iframe 
-            src="https://www.youtube.com/embed/XEON6uOBRv8?si=X8BC3prkh22PEh27?autoplay=1&rel=0&modestbranding=1" 
+            id="vsl-video-player"
+            src="https://www.youtube.com/embed/XEON6uOBRv8?si=X8BC3prkh22PEh27&autoplay=1&rel=0&modestbranding=1&enablejsapi=1" 
             title="YouTube video player" 
             frameBorder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
