@@ -32,8 +32,42 @@ export async function GET(req: Request) {
     const type = searchParams.get('type') || 'daily';
     const isWeekly = type === 'weekly';
 
-    // 2. Define timezone-agnostic window (7 days for weekly, 24h for daily)
-    const endTime = new Date();
+    // Helper to get exact Date object for target hour in Europe/Kyiv time
+    const getKyivDateAtHour = (baseDate: Date, hour: number): Date => {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Kyiv',
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      }).formatToParts(baseDate);
+
+      const year = parseInt(parts.find(p => p.type === 'year')!.value);
+      const month = parseInt(parts.find(p => p.type === 'month')!.value) - 1;
+      const day = parseInt(parts.find(p => p.type === 'day')!.value);
+
+      const testDate = new Date(Date.UTC(year, month, day, hour, 0, 0));
+      const kyivHourStr = testDate.toLocaleTimeString('en-US', {
+        timeZone: 'Europe/Kyiv',
+        hour12: false,
+        hour: 'numeric',
+      });
+      const kyivHour = parseInt(kyivHourStr);
+      const offsetHours = kyivHour - hour;
+      return new Date(Date.UTC(year, month, day, hour - offsetHours, 0, 0));
+    };
+
+    const now = new Date();
+    const currentKyivHour = parseInt(
+      now.toLocaleTimeString('en-US', { timeZone: 'Europe/Kyiv', hour12: false, hour: 'numeric' })
+    );
+
+    const reportHour = isWeekly ? 10 : 9;
+    let baseDate = now;
+    if (currentKyivHour < reportHour) {
+      baseDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
+
+    const endTime = getKyivDateAtHour(baseDate, reportHour);
     const startTime = isWeekly
       ? new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000)
       : new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
@@ -43,6 +77,7 @@ export async function GET(req: Request) {
       .from('victoria_leads')
       .select('visitor_uuid, phone, utm_source')
       .in('target_sheet', ['VSL Воронка (старт)', 'Ленд 1', 'VSL 1 етап'])
+      .eq('status', 'Зареєстровано')
       .gte('created_at', startTime.toISOString())
       .lte('created_at', endTime.toISOString());
 
@@ -63,7 +98,8 @@ export async function GET(req: Request) {
       const { data: step2Leads, error: step2Error } = await supabaseAdmin
         .from('victoria_leads')
         .select('visitor_uuid, phone')
-        .in('target_sheet', ['VSL Форма', 'Ленд 2', 'Ленд2']);
+        .in('target_sheet', ['VSL Форма', 'Ленд 2', 'Ленд2'])
+        .eq('status', 'Зареєстровано');
 
       if (step2Error) {
         console.error('[Cron VSL Report] Supabase Step 2 error:', step2Error);
@@ -102,13 +138,11 @@ export async function GET(req: Request) {
     const conversionRate = totalRegistered > 0 ? Math.round((step2Count / totalRegistered) * 100) : 0;
 
     // 6. Build the elegant report message
-    const formattedStart = formatKyivTime(startTime);
     const formattedEnd = formatKyivTime(endTime);
 
     let message = isWeekly
-      ? `📊 <b>Тижневий звіт по воронці /free-lection</b>\n`
-      : `📊 <b>Звіт по воронці /free-lection</b>\n`;
-    message += `📅 <b>Період:</b> з <code>${formattedStart}</code>\n`;
+      ? `📊 <b>Тижневий звіт по VSL воронці</b>\n`
+      : `📊 <b>Звіт по VSL воронці</b>\n`;
     message += `📅 <b>по:</b> <code>${formattedEnd}</code> (Київ)\n\n`;
     message += `👤 <b>Зареєстровано нових лідів:</b> <code>${totalRegistered}</code>\n`;
     message += `🎥 <b>Дійшли до VSL-форми:</b> <code>${step2Count}</code> (${conversionRate}%)\n`;
