@@ -215,7 +215,7 @@ export default function PreRegistrationAnketaPage() {
         .react-phone-input-custom .PhoneInputInput {
           width: 100%;
           background: transparent;
-          border-bottom: 1px solid rgba(93, 95, 44, 0.15);
+          border-bottom: 1px solid rgba(93, 95, 44, 0.2);
           padding: 1rem 0;
           font-size: 1rem;
           color: #1a1c1c;
@@ -233,18 +233,18 @@ export default function PreRegistrationAnketaPage() {
         }
       `}</style>
 
-      {/* FIXED PREMIUM BACKGROUND */}
-      <div className="fixed inset-0 z-0 bg-[#f5eee6] bg-[url('/subtle_paper.png')] bg-repeat">
+      {/* FIXED PREMIUM BACKGROUND - SLIGHTLY DARKER WARM TONE */}
+      <div className="fixed inset-0 z-0 bg-[#e4dcce] bg-[url('/subtle_paper.png')] bg-repeat">
         <div 
-          className="absolute inset-0 bg-[url('/anketa_bg.png')] bg-cover bg-center opacity-12 mix-blend-multiply"
+          className="absolute inset-0 bg-[url('/anketa_bg.png')] bg-cover bg-center opacity-20 mix-blend-multiply"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#f5eee6]/30 via-transparent to-[#f5eee6]/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#e4dcce]/40 via-transparent to-[#e4dcce]/65" />
       </div>
 
       <DecorativeLines />
 
       {/* HEADER */}
-      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#5d5f2c]/10 bg-[#f5eee6]/80 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(93,95,44,0.02)]">
+      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#5d5f2c]/15 bg-[#e4dcce]/85 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(93,95,44,0.03)]">
         <span className="font-serif text-lg md:text-xl font-bold uppercase tracking-[0.25em] text-[#5d5f2c]">Створюй</span>
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#5d5f2c] font-bold">
           <span className="w-1.5 h-1.5 rounded-full bg-[#5d5f2c] animate-pulse"></span>
@@ -258,17 +258,17 @@ export default function PreRegistrationAnketaPage() {
         <div className="text-center mb-8 relative">
           <SparkleSVG className="absolute -top-6 left-[15%] w-5 h-5 opacity-60 animate-sparkle" />
           <h1 className="font-serif text-4xl md:text-5xl font-medium tracking-tight text-[#1a1c1c] mb-3">Анкета передзапису</h1>
-          <p className="text-xs md:text-sm text-[#5d5f2c]/80 uppercase tracking-widest font-semibold">Заповнюй форму і отримай гарантовані бонуси:</p>
+          <p className="text-xs md:text-sm text-[#5d5f2c] uppercase tracking-widest font-bold">Заповнюй форму і отримай гарантовані бонуси:</p>
         </div>
 
         {/* BONUSES */}
-        <div className="bg-[#5d5f2c]/5 border border-[#5d5f2c]/10 p-6 rounded-2xl shadow-[inset_0_2px_8px_rgba(93,95,44,0.02)] space-y-4 mb-8 backdrop-blur-sm relative overflow-hidden">
+        <div className="bg-[#5d5f2c]/8 border border-[#5d5f2c]/15 p-6 rounded-2xl shadow-[inset_0_2px_8px_rgba(93,95,44,0.02)] space-y-4 mb-8 backdrop-blur-sm relative overflow-hidden">
           <div className="absolute top-[-20px] right-[-20px] w-20 h-20 bg-[#5d5f2c]/5 rounded-full blur-xl" />
-          <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-[#5d5f2c] opacity-80 flex items-center gap-2">
+          <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-[#5d5f2c] flex items-center gap-2">
             <span>Гарантовані бонуси:</span>
             <SparkleSVG className="w-3.5 h-3.5 inline animate-pulse" />
           </p>
-          <ul className="space-y-3.5 text-xs md:text-sm text-[#1a1c1c]/90">
+          <ul className="space-y-3.5 text-xs md:text-sm text-[#1a1c1c]">
             <li className="flex items-center gap-3">
               <span className="text-base">🎁</span>
               <span>Чек-лист <strong>&ldquo;50 тем для контенту&rdquo;</strong></span>
@@ -280,8 +280,8 @@ export default function PreRegistrationAnketaPage() {
           </ul>
         </div>
 
-        {/* FORM CONTAINER */}
-        <div className="bg-white/80 border border-[#5d5f2c]/10 p-6 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(93,95,44,0.06)] backdrop-blur-md relative overflow-hidden">
+        {/* FORM CONTAINER - SLIGHTLY MUTER CREAM CARD */}
+        <div className="bg-[#faf8f2]/90 border border-[#5d5f2c]/15 p-6 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(93,95,44,0.08)] backdrop-blur-md relative overflow-hidden">
           {/* Subtle line background detail */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#5d5f2c]/30 to-transparent" />
 
@@ -294,10 +294,10 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('name', { required: 'Введіть ваше ім’я', minLength: { value: 2, message: 'Мінімум 2 літери' } })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.name ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/15 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.name ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/80 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твоє ім'я</label>
-                {errors.name && <span className="text-red-500/80 text-xs mt-1.5 block font-manrope">{errors.name.message}</span>}
+                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твоє ім'я</label>
+                {errors.name && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.name.message}</span>}
               </div>
 
               {/* Telegram */}
@@ -306,15 +306,15 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('telegram', { required: 'Введіть Telegram нікнейм', minLength: { value: 3, message: 'Мінімум 3 символи' } })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.telegram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/15 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.telegram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/80 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій нік у telegram (@нікнейм)</label>
-                {errors.telegram && <span className="text-red-500/80 text-xs mt-1.5 block font-manrope">{errors.telegram.message}</span>}
+                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій нік у telegram (@нікнейм)</label>
+                {errors.telegram && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.telegram.message}</span>}
               </div>
 
               {/* Phone */}
               <div id="form-group-phone" className="relative group react-phone-input-custom transition-all duration-300">
-                <label className="text-gray-400/80 text-xs mb-1 block font-manrope">Номер телефону (WhatsApp / Viber)</label>
+                <label className="text-gray-400/90 text-xs mb-1 block font-manrope">Номер телефону (WhatsApp / Viber)</label>
                 <Controller
                   name="phone"
                   control={control}
@@ -332,7 +332,7 @@ export default function PreRegistrationAnketaPage() {
                     />
                   )}
                 />
-                {errors.phone && <span className="text-red-500/80 text-xs mt-1.5 block font-manrope">{errors.phone.message}</span>}
+                {errors.phone && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.phone.message}</span>}
               </div>
 
               {/* Instagram */}
@@ -341,10 +341,10 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('instagram', { required: 'Введіть Instagram нікнейм або лінк' })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.instagram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/15 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.instagram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/80 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій інстаграм (посилання чи нікнейм)</label>
-                {errors.instagram && <span className="text-red-500/80 text-xs mt-1.5 block font-manrope">{errors.instagram.message}</span>}
+                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій інстаграм (посилання чи нікнейм)</label>
+                {errors.instagram && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.instagram.message}</span>}
               </div>
 
               {/* Purpose */}
@@ -362,8 +362,8 @@ export default function PreRegistrationAnketaPage() {
                         key={option.id} 
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
                           isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/5 shadow-[0_4px_20px_rgba(93,95,44,0.05)]' 
-                            : 'border-[#5d5f2c]/10 bg-white/40 hover:bg-white hover:border-[#5d5f2c]/30'
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                            : 'border-[#5d5f2c]/10 bg-white/60 hover:bg-white hover:border-[#5d5f2c]/30'
                         }`}
                       >
                         <input 
@@ -381,13 +381,13 @@ export default function PreRegistrationAnketaPage() {
                           }`} />
                         </div>
                         <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-gray-600'
+                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-[#1a1c1c]/70'
                         }`}>{option.label}</span>
                       </label>
                     );
                   })}
                 </div>
-                {errors.purpose && <span className="text-red-500/80 text-xs block font-manrope">{errors.purpose.message}</span>}
+                {errors.purpose && <span className="text-red-500/90 text-xs block font-manrope">{errors.purpose.message}</span>}
               </div>
 
               {/* Difficulties */}
@@ -396,15 +396,15 @@ export default function PreRegistrationAnketaPage() {
                   {...register('difficulties', { required: 'Будь ласка, опишіть ваші складнощі' })}
                   placeholder=" " 
                   rows={3}
-                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/15 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] resize-none`}
+                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] resize-none`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/80 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Які зараз складнощі з блогом?</label>
-                {errors.difficulties && <span className="text-red-500/80 text-xs mt-1.5 block font-manrope">{errors.difficulties.message}</span>}
+                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Які зараз складнощі з блогом?</label>
+                {errors.difficulties && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.difficulties.message}</span>}
               </div>
 
               {/* Readiness */}
               <div id="form-group-readiness" className="space-y-4 transition-all duration-300">
-                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до роботи над контентом та візуалом?</label>
+                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до работы над контентом та візуалом?</label>
                 <div className="space-y-3">
                   {[
                     { id: 'not_ready', label: 'не дуже готова, просто цікаво дізнатись деталі' },
@@ -417,8 +417,8 @@ export default function PreRegistrationAnketaPage() {
                         key={option.id} 
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
                           isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/5 shadow-[0_4px_20px_rgba(93,95,44,0.05)]' 
-                            : 'border-[#5d5f2c]/10 bg-white/40 hover:bg-white hover:border-[#5d5f2c]/30'
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                            : 'border-[#5d5f2c]/10 bg-white/60 hover:bg-white hover:border-[#5d5f2c]/30'
                         }`}
                       >
                         <input 
@@ -436,13 +436,13 @@ export default function PreRegistrationAnketaPage() {
                           }`} />
                         </div>
                         <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-gray-600'
+                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-[#1a1c1c]/70'
                         }`}>{option.label}</span>
                       </label>
                     );
                   })}
                 </div>
-                {errors.readiness && <span className="text-red-500/80 text-xs block font-manrope">{errors.readiness.message}</span>}
+                {errors.readiness && <span className="text-red-500/90 text-xs block font-manrope">{errors.readiness.message}</span>}
               </div>
 
               {/* Consent */}
@@ -465,7 +465,7 @@ export default function PreRegistrationAnketaPage() {
                     Ознайомлений(а) з політикою конфіденційності і даю згоду на обробку персональних даних
                   </span>
                 </label>
-                {errors.consent && <span className="text-red-500/80 text-xs block font-manrope">{errors.consent.message}</span>}
+                {errors.consent && <span className="text-red-500/90 text-xs block font-manrope">{errors.consent.message}</span>}
               </div>
 
               {/* Submit */}
