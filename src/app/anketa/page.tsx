@@ -415,13 +415,18 @@ export default function PreRegistrationAnketaPage() {
                 {errors.purpose && <span className="text-red-500/90 text-xs block font-manrope">{errors.purpose.message}</span>}
               </div>
 
-              {/* Difficulties */}
+              {/* Difficulties - ADAPTIVE EXPANDING SINGLE-LINE TEXTAREA */}
               <div id="form-group-difficulties" className="relative group transition-all duration-300">
                 <textarea 
                   {...register('difficulties', { required: 'Будь ласка, опишіть ваші складнощі' })}
                   placeholder=" " 
-                  rows={3}
-                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] resize-none`}
+                  rows={1}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
+                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] overflow-hidden resize-none`}
                 />
                 <label className="absolute left-0 top-4 text-gray-500/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Які зараз складнощі з блогом?</label>
                 {errors.difficulties && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.difficulties.message}</span>}
@@ -494,19 +499,26 @@ export default function PreRegistrationAnketaPage() {
               </div>
 
               {/* Submit */}
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-[#5d5f2c] text-white py-5 rounded-xl text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-[#484a22] transition-all shadow-[0_10px_30px_rgba(93,95,44,0.15)] hover:shadow-[0_15px_35px_rgba(93,95,44,0.25)] transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-3 disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
-              >
-                <span>{loading ? 'Відправка...' : 'Відправити'}</span>
-                {loading && (
-                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                )}
-              </button>
+              <div className="space-y-4">
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-[#5d5f2c] text-white py-5 rounded-xl text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-[#484a22] transition-all shadow-[0_10px_30px_rgba(93,95,44,0.15)] hover:shadow-[0_15px_35px_rgba(93,95,44,0.25)] transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-3 disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
+                >
+                  <span>{loading ? 'Відправка...' : 'Відправити'}</span>
+                  {loading && (
+                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                </button>
+
+                {/* Footnote under submit button */}
+                <p className="text-center text-[10px] md:text-xs text-[#1a1c1c]/65 leading-relaxed font-light italic px-2">
+                  Після заповнення анкети я або моя команда напишемо тобі та підберемо час для коротенької зустрічі, щоб розказати тобі про всі деталі та як я зможу допомогти💛
+                </p>
+              </div>
 
             </form>
           ) : (
