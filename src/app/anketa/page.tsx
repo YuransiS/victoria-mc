@@ -215,7 +215,7 @@ export default function PreRegistrationAnketaPage() {
         .react-phone-input-custom .PhoneInputInput {
           width: 100%;
           background: transparent;
-          border-bottom: 1px solid rgba(93, 95, 44, 0.2);
+          border-bottom: 1px solid rgba(93, 95, 44, 0.3);
           padding: 1rem 0;
           font-size: 1rem;
           color: #1a1c1c;
@@ -274,39 +274,39 @@ export default function PreRegistrationAnketaPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* BONUS 1 */}
-            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/20 bg-gradient-to-br from-[#faf8f2]/95 to-[#f3ebd8]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/40 transition-all duration-300 group">
+            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#dbd4c2]/95 to-[#cfc8b5]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
               <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
               <div className="flex items-start gap-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
                   <span className="text-xl">🎁</span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/75">Чек-лист</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Чек-лист</span>
                   <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">«50 тем для контенту»</h4>
-                  <p className="text-[10px] text-gray-500 leading-normal font-light">Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів</p>
+                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів</p>
                 </div>
               </div>
             </div>
 
             {/* BONUS 2 */}
-            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/20 bg-gradient-to-br from-[#faf8f2]/95 to-[#f3ebd8]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/40 transition-all duration-300 group">
+            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#dbd4c2]/95 to-[#cfc8b5]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
               <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
               <div className="flex items-start gap-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
                   <span className="text-xl">🔥</span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/75">Найкраща ціна</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Найкраща ціна</span>
                   <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Максимальна знижка</h4>
-                  <p className="text-[10px] text-gray-500 leading-normal font-light">Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання</p>
+                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* FORM CONTAINER - SLIGHTLY MUTER CREAM CARD */}
-        <div className="bg-[#faf8f2]/90 border border-[#5d5f2c]/15 p-6 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(93,95,44,0.08)] backdrop-blur-md relative overflow-hidden">
+        {/* FORM CONTAINER - RICH MEDIUM-DARK WARM CREAM CARD */}
+        <div className="bg-[#dbd4c2]/90 border border-[#5d5f2c]/25 p-6 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(93,95,44,0.08)] backdrop-blur-md relative overflow-hidden">
           {/* Subtle line background detail */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#5d5f2c]/30 to-transparent" />
 
@@ -319,9 +319,9 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('name', { required: 'Введіть ваше ім’я', minLength: { value: 2, message: 'Мінімум 2 літери' } })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.name ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.name ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твоє ім'я</label>
+                <label className="absolute left-0 top-4 text-gray-500/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твоє ім'я</label>
                 {errors.name && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.name.message}</span>}
               </div>
 
@@ -331,15 +331,15 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('telegram', { required: 'Введіть Telegram нікнейм', minLength: { value: 3, message: 'Мінімум 3 символи' } })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.telegram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.telegram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій нік у telegram (@нікнейм)</label>
+                <label className="absolute left-0 top-4 text-gray-500/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій нік у telegram (@нікнейм)</label>
                 {errors.telegram && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.telegram.message}</span>}
               </div>
 
               {/* Phone */}
               <div id="form-group-phone" className="relative group react-phone-input-custom transition-all duration-300">
-                <label className="text-gray-400/90 text-xs mb-1 block font-manrope">Номер телефону (WhatsApp / Viber)</label>
+                <label className="text-gray-500/90 text-xs mb-1 block font-manrope">Номер телефону (WhatsApp / Viber)</label>
                 <Controller
                   name="phone"
                   control={control}
@@ -366,9 +366,9 @@ export default function PreRegistrationAnketaPage() {
                   type="text" 
                   {...register('instagram', { required: 'Введіть Instagram нікнейм або лінк' })}
                   placeholder=" " 
-                  className={`peer w-full bg-transparent border-b ${errors.instagram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
+                  className={`peer w-full bg-transparent border-b ${errors.instagram ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c]`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій інстаграм (посилання чи нікнейм)</label>
+                <label className="absolute left-0 top-4 text-gray-500/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Твій інстаграм (посилання чи нікнейм)</label>
                 {errors.instagram && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.instagram.message}</span>}
               </div>
 
@@ -387,8 +387,8 @@ export default function PreRegistrationAnketaPage() {
                         key={option.id} 
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
                           isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
-                            : 'border-[#5d5f2c]/10 bg-white/60 hover:bg-white hover:border-[#5d5f2c]/30'
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/15 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                            : 'border-[#5d5f2c]/15 bg-white/40 hover:bg-white/70 hover:border-[#5d5f2c]/40'
                         }`}
                       >
                         <input 
@@ -399,14 +399,14 @@ export default function PreRegistrationAnketaPage() {
                         />
                         {/* Custom radio button design */}
                         <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-300'
+                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
                         }`}>
                           <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
                             isSelected ? 'scale-100' : 'scale-0'
                           }`} />
                         </div>
                         <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-[#1a1c1c]/70'
+                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
                         }`}>{option.label}</span>
                       </label>
                     );
@@ -421,9 +421,9 @@ export default function PreRegistrationAnketaPage() {
                   {...register('difficulties', { required: 'Будь ласка, опишіть ваші складнощі' })}
                   placeholder=" " 
                   rows={3}
-                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] resize-none`}
+                  className={`peer w-full bg-transparent border-b ${errors.difficulties ? 'border-red-500/80 focus:border-red-500' : 'border-[#5d5f2c]/30 focus:border-[#5d5f2c]'} py-4 text-base focus:outline-none transition-colors text-[#1a1c1c] resize-none`}
                 />
-                <label className="absolute left-0 top-4 text-gray-400/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Які зараз складнощі з блогом?</label>
+                <label className="absolute left-0 top-4 text-gray-500/90 text-sm transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#5d5f2c] peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#5d5f2c] pointer-events-none font-manrope">Які зараз складнощі з блогом?</label>
                 {errors.difficulties && <span className="text-red-500/90 text-xs mt-1.5 block font-manrope">{errors.difficulties.message}</span>}
               </div>
 
@@ -442,8 +442,8 @@ export default function PreRegistrationAnketaPage() {
                         key={option.id} 
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
                           isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
-                            : 'border-[#5d5f2c]/10 bg-white/60 hover:bg-white hover:border-[#5d5f2c]/30'
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/15 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                            : 'border-[#5d5f2c]/15 bg-white/40 hover:bg-white/70 hover:border-[#5d5f2c]/40'
                         }`}
                       >
                         <input 
@@ -454,14 +454,14 @@ export default function PreRegistrationAnketaPage() {
                         />
                         {/* Custom radio button design */}
                         <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-300'
+                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
                         }`}>
                           <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
                             isSelected ? 'scale-100' : 'scale-0'
                           }`} />
                         </div>
                         <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-medium' : 'text-[#1a1c1c]/70'
+                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
                         }`}>{option.label}</span>
                       </label>
                     );
@@ -480,7 +480,7 @@ export default function PreRegistrationAnketaPage() {
                   />
                   {/* Custom checkbox design */}
                   <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                    consentValue ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-300'
+                    consentValue ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
                   }`}>
                     <svg className={`w-3.5 h-3.5 text-white transition-transform duration-300 ${consentValue ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
