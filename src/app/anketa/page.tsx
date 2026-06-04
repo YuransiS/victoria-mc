@@ -233,18 +233,18 @@ export default function PreRegistrationAnketaPage() {
         }
       `}</style>
 
-      {/* FIXED PREMIUM BACKGROUND - SLIGHTLY DARKER WARM TONE */}
-      <div className="fixed inset-0 z-0 bg-[#e4dcce] bg-[url('/subtle_paper.png')] bg-repeat">
+      {/* BACKGROUND - SCROLLABLE ON MOBILE, FIXED ON DESKTOP */}
+      <div className="absolute md:fixed inset-0 z-0 bg-[#cec5b2] bg-[url('/subtle_paper.png')] bg-repeat">
         <div 
-          className="absolute inset-0 bg-[url('/anketa_bg.png')] bg-cover bg-center opacity-20 mix-blend-multiply"
+          className="absolute inset-0 bg-[url('/anketa_bg.png')] bg-cover bg-center opacity-25 mix-blend-multiply"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#e4dcce]/40 via-transparent to-[#e4dcce]/65" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#cec5b2]/45 via-transparent to-[#cec5b2]/75" />
       </div>
 
       <DecorativeLines />
 
       {/* HEADER */}
-      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#5d5f2c]/15 bg-[#e4dcce]/85 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(93,95,44,0.03)]">
+      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#5d5f2c]/15 bg-[#cec5b2]/85 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(93,95,44,0.03)]">
         <span className="font-serif text-lg md:text-xl font-bold uppercase tracking-[0.25em] text-[#5d5f2c]">Створюй</span>
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#5d5f2c] font-bold">
           <span className="w-1.5 h-1.5 rounded-full bg-[#5d5f2c] animate-pulse"></span>
@@ -261,23 +261,48 @@ export default function PreRegistrationAnketaPage() {
           <p className="text-xs md:text-sm text-[#5d5f2c] uppercase tracking-widest font-bold">Заповнюй форму і отримай гарантовані бонуси:</p>
         </div>
 
-        {/* BONUSES */}
-        <div className="bg-[#5d5f2c]/8 border border-[#5d5f2c]/15 p-6 rounded-2xl shadow-[inset_0_2px_8px_rgba(93,95,44,0.02)] space-y-4 mb-8 backdrop-blur-sm relative overflow-hidden">
-          <div className="absolute top-[-20px] right-[-20px] w-20 h-20 bg-[#5d5f2c]/5 rounded-full blur-xl" />
-          <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-[#5d5f2c] flex items-center gap-2">
-            <span>Гарантовані бонуси:</span>
-            <SparkleSVG className="w-3.5 h-3.5 inline animate-pulse" />
-          </p>
-          <ul className="space-y-3.5 text-xs md:text-sm text-[#1a1c1c]">
-            <li className="flex items-center gap-3">
-              <span className="text-base">🎁</span>
-              <span>Чек-лист <strong>&ldquo;50 тем для контенту&rdquo;</strong></span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="text-base">🔥</span>
-              <span>Найвигідніші умови та ціни на навчання</span>
-            </li>
-          </ul>
+        {/* BONUSES - REDESIGNED PREMIUM GRID */}
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center gap-2 px-1">
+            <span className="h-[1px] flex-grow bg-[#5d5f2c]/20"></span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#5d5f2c] whitespace-nowrap flex items-center gap-1.5">
+              <SparkleSVG className="w-3.5 h-3.5 text-[#5d5f2c] animate-pulse" />
+              Твої ексклюзивні бонуси за заповнення
+            </span>
+            <span className="h-[1px] flex-grow bg-[#5d5f2c]/20"></span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* BONUS 1 */}
+            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/20 bg-gradient-to-br from-[#faf8f2]/95 to-[#f3ebd8]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/40 transition-all duration-300 group">
+              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
+              <div className="flex items-start gap-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-xl">🎁</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/75">Чек-лист</span>
+                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">«50 тем для контенту»</h4>
+                  <p className="text-[10px] text-gray-500 leading-normal font-light">Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів</p>
+                </div>
+              </div>
+            </div>
+
+            {/* BONUS 2 */}
+            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/20 bg-gradient-to-br from-[#faf8f2]/95 to-[#f3ebd8]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/40 transition-all duration-300 group">
+              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
+              <div className="flex items-start gap-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-xl">🔥</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/75">Найкраща ціна</span>
+                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Максимальна знижка</h4>
+                  <p className="text-[10px] text-gray-500 leading-normal font-light">Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* FORM CONTAINER - SLIGHTLY MUTER CREAM CARD */}
@@ -450,7 +475,7 @@ export default function PreRegistrationAnketaPage() {
                 <label className="flex items-start gap-4 cursor-pointer group select-none">
                   <input 
                     type="checkbox" 
-                    {...register('consent', { required: 'Для відправки необхідно дати згоду на обробку даних' })}
+                    {...register('consent', { required: 'Для відправки необхідно дати згоду на обробку данных' })}
                     className="sr-only"
                   />
                   {/* Custom checkbox design */}
@@ -494,7 +519,7 @@ export default function PreRegistrationAnketaPage() {
               </div>
               <h3 className="font-serif text-3xl font-bold text-[#1a1c1c] tracking-tight">Дякуємо!</h3>
               <p className="text-xs md:text-sm text-[#1a1c1c]/70 leading-relaxed max-w-sm mx-auto font-light">
-                Після заповнення анкети я або мої помічники зв’яжемося з тобою, щоб підібрати найвигідніші умови та обговорити твої цілі🤍
+                Після заповнення анкету я або мої помічники зв’яжемося з тобою, щоб підібрати найвигідніші умови та обговорити твої цілі🤍
               </p>
               
               <div className="pt-6">
