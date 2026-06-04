@@ -18,7 +18,8 @@ const pagesToVisit = [
   { path: '/practicum', label: 'Masterclass Practicum Landing' },
   { path: '/free-lection', label: 'VSL 1 Start Landing' },
   { path: '/free-lection/vsl-form', label: 'VSL Form Step 2' },
-  { path: '/rozbir', label: 'Rozbir Personal Breakdown Page' }
+  { path: '/rozbir', label: 'Rozbir Personal Breakdown Page' },
+  { path: '/anketa', label: 'Pre-registration Questionnaire Landing' }
 ];
 
 async function simulatePageViews() {
@@ -136,6 +137,22 @@ async function simulateFormSubmissions() {
     visitor_id: visitorId
   };
   await sendPayment('/api/rozbir/initiate', rozbirPayment, 'Ленд 3 (Розбір)');
+
+  // 7. Pre-registration Questionnaire Submission
+  const preRegLead = {
+    name: 'QA Pre-registration Lead',
+    phone: '380990000027',
+    social: '@qa_prereg_lead',
+    instagram: '@qa_prereg_insta',
+    purpose: 'для свого особистого-експертного блогу',
+    difficulties: 'Важко регулярно знімати контент',
+    readiness: 'готова на всі 100%',
+    target_sheet: 'Анкета передзапису',
+    visitor_id: visitorId,
+    ...utms,
+    full_url: `${BASE_URL}/anketa`
+  };
+  await sendLead('/api/lead', preRegLead, 'Анкета передзапису');
 }
 
 async function sendLead(endpoint, payload, sheetName) {

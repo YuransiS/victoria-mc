@@ -19,7 +19,7 @@ function cleanPhone(phone: string): string {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, social, niche, instagram } = data;
+    const { name, phone, social, niche, instagram, purpose, difficulties, readiness } = data;
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -36,11 +36,12 @@ export async function POST(req: Request) {
     const isVSL = data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2';
     const isVSL1 = data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)';
     const isAutoweb = data.target_sheet === 'Автовеб' || data.target_sheet === 'Masterclass_Leads' || data.sheet_id === '726331330';
-    const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : (isAutoweb ? 'АВТОВЕБ' : 'ЗАЯВКА'));
+    const isAnketa = data.target_sheet === 'Анкета передзапису';
+    const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : (isAutoweb ? 'АВТОВЕБ' : (isAnketa ? 'АНКЕТА ПЕРЕДЗАПИСУ' : 'ЗАЯВКА')));
 
     let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
-    message += `📞 <b>Телефон/Telegram:</b> ${phone || '-'}\n`;
+    message += `📞 <b>Телефон:</b> ${phone || '-'}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;
     if (instagram) {
       message += `📸 <b>Instagram:</b> ${instagram}\n`;
@@ -48,6 +49,18 @@ export async function POST(req: Request) {
     
     if (niche) {
       message += `💼 <b>Ніша:</b> ${niche}\n`;
+    }
+
+    if (purpose) {
+      message += `🎯 <b>Мета:</b> ${purpose}\n`;
+    }
+
+    if (difficulties) {
+      message += `⚠️ <b>Складнощі:</b> ${difficulties}\n`;
+    }
+
+    if (readiness) {
+      message += `⚡ <b>Готовність:</b> ${readiness}\n`;
     }
 
     message += `\n🌐 <b>Джерело:</b>\n`;
