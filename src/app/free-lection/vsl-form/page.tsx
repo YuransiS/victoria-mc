@@ -238,7 +238,7 @@ export default function StvoryuiPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Delayed form visibility check (15 minutes after play)
+  // Delayed form visibility check (15 minutes after play or page load fallback)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('showForm') === 'true' || params.get('qa') === 'true') {
@@ -246,10 +246,25 @@ export default function StvoryuiPage() {
       return;
     }
 
+    const PAGE_LOAD_KEY = 'vsl_page_load_time';
+    if (!localStorage.getItem(PAGE_LOAD_KEY)) {
+      localStorage.setItem(PAGE_LOAD_KEY, Date.now().toString());
+    }
+
     const checkPlayTimer = () => {
       const playStartTime = localStorage.getItem('vsl_play_start_time');
       if (playStartTime) {
         const elapsed = Date.now() - parseInt(playStartTime, 10);
+        if (elapsed >= 15 * 60 * 1000) { // 15 minutes
+          setShowForm(true);
+          return true;
+        }
+      }
+
+      // Fallback: Check page load time
+      const pageLoadTime = localStorage.getItem(PAGE_LOAD_KEY);
+      if (pageLoadTime) {
+        const elapsed = Date.now() - parseInt(pageLoadTime, 10);
         if (elapsed >= 15 * 60 * 1000) { // 15 minutes
           setShowForm(true);
           return true;
