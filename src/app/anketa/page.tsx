@@ -19,16 +19,16 @@ interface QuestionnaireFormData {
 
 const SparkleSVG = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" fill="#5d5f2c" />
+    <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" fill="currentColor" />
   </svg>
 );
 
 const DecorativeLines = () => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none">
-    <svg className="absolute top-[15%] left-[-15%] w-[45%] h-auto text-[#5d5f2c]/10 opacity-30 animate-float" viewBox="0 0 100 100">
+    <svg className="absolute top-[15%] left-[-15%] w-[45%] h-auto text-[#ebd8b8]/10 opacity-30 animate-float" viewBox="0 0 100 100">
       <path d="M0,50 Q25,20 50,50 T100,50" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1 2" />
     </svg>
-    <svg className="absolute bottom-[20%] right-[-15%] w-[45%] h-auto text-[#5d5f2c]/10 opacity-30 animate-float-delayed" viewBox="0 0 100 100">
+    <svg className="absolute bottom-[20%] right-[-15%] w-[45%] h-auto text-[#ebd8b8]/10 opacity-30 animate-float-delayed" viewBox="0 0 100 100">
       <path d="M0,50 Q25,80 50,50 T100,50" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1 2" />
     </svg>
   </div>
@@ -243,10 +243,10 @@ export default function PreRegistrationAnketaPage() {
       <DecorativeLines />
 
       {/* HEADER */}
-      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#5d5f2c]/15 bg-[#b5a78c]/85 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(93,95,44,0.03)]">
-        <span className="font-serif text-lg md:text-xl font-bold uppercase tracking-[0.25em] text-[#5d5f2c]">Створюй</span>
-        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#5d5f2c] font-bold">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#5d5f2c] animate-pulse"></span>
+      <header className="relative py-5 px-6 md:px-12 flex justify-between items-center border-b border-[#faf8f2]/10 bg-[#484338]/90 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.15)]">
+        <span className="font-serif text-lg md:text-xl font-bold uppercase tracking-[0.25em] text-[#faf8f2]">Створюй</span>
+        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#ebd8b8] font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#ebd8b8] animate-pulse"></span>
           <span>Анкета передзапису</span>
         </div>
       </header>
@@ -255,20 +255,20 @@ export default function PreRegistrationAnketaPage() {
       <main className="relative z-10 max-w-xl mx-auto px-5 mt-10 md:mt-16 animate-fade-in-up">
         {/* HERO HEADER */}
         <div className="text-center mb-8 relative">
-          <SparkleSVG className="absolute -top-6 left-[15%] w-5 h-5 opacity-60 animate-sparkle" />
-          <h1 className="font-serif text-4xl md:text-5xl font-medium tracking-tight text-[#1a1c1c] mb-3">Анкета передзапису</h1>
-          <p className="text-xs md:text-sm text-[#5d5f2c] uppercase tracking-widest font-bold">Заповнюй форму і отримай гарантовані бонуси:</p>
+          <SparkleSVG className="absolute -top-6 left-[15%] w-5 h-5 text-[#ebd8b8] opacity-80 animate-sparkle" />
+          <h1 className="font-serif text-4xl md:text-5xl font-medium tracking-tight text-[#faf8f2] mb-3">Анкета передзапису</h1>
+          <p className="text-xs md:text-sm text-[#ebd8b8] uppercase tracking-widest font-bold">Заповнюй форму і отримай гарантовані бонуси:</p>
         </div>
 
         {/* BONUSES - REDESIGNED PREMIUM GRID */}
         <div className="space-y-4 mb-8">
           <div className="flex items-center gap-2 px-1">
-            <span className="h-[1px] flex-grow bg-[#5d5f2c]/20"></span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#5d5f2c] whitespace-nowrap flex items-center gap-1.5">
-              <SparkleSVG className="w-3.5 h-3.5 text-[#5d5f2c] animate-pulse" />
+            <span className="h-[1px] flex-grow bg-[#ebd8b8]/20"></span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#ebd8b8] whitespace-nowrap flex items-center gap-1.5">
+              <SparkleSVG className="w-3.5 h-3.5 text-[#ebd8b8] animate-pulse" />
               Твої ексклюзивні бонуси за заповнення
             </span>
-            <span className="h-[1px] flex-grow bg-[#5d5f2c]/20"></span>
+            <span className="h-[1px] flex-grow bg-[#ebd8b8]/20"></span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
