@@ -43,10 +43,10 @@ This live document outlines the architecture, routing structure, components, dat
 *   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`).
 *   `api/video-progress/` — [NEW] Video watching progress tracking receiver. Logs played status, watch seconds, and updates lead status to `'полностью посмотрел'` once 20 minutes are reached.
 *   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.
-*   `api/cron/vsl-report/` — [NEW] Analytical cron route.
+*   `api/cron/vsl-report/` — Analytical cron route.
     *   **Daily:** Runs at 9:00 AM Kyiv time (`0 6 * * *` UTC) with 24-hour period.
     *   **Weekly:** Runs on Mondays at 10:00 AM Kyiv time (`0 7 * * 1` UTC) when `?type=weekly` is specified, reporting over a 7-day period.
-    Aggregates `/free-lection` registration counts, performs visitor stitching for Step 2 conversions, identifies the best source, and sends a styled summary report to Telegram.
+    *   Aggregates all funnels (VSL, Practicum, Pre-registration Anketa, Video Breakdown, Booking, Autoweb) and traffic/clicks metrics across all landing sites, performs conversion cohort matching, determines the best UTM source per funnel, and sends a comprehensive summary report to Telegram.
 
 ### 🧩 UI Components (`src/components/`)
 *   `Form.tsx` — Core registration form component.
