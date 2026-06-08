@@ -444,7 +444,7 @@ export default function StvoryuiPage() {
         <div className="video-container">
           <iframe 
             id="vsl-video-player"
-            src="https://www.youtube.com/embed/XEON6uOBRv8?si=X8BC3prkh22PEh27&autoplay=1&rel=0&modestbranding=1&enablejsapi=1" 
+            src="https://www.youtube.com/embed/Sy1TNtms-_8?autoplay=1&rel=0&modestbranding=1&enablejsapi=1" 
             title="YouTube video player" 
             frameBorder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

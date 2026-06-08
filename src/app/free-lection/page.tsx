@@ -13,7 +13,7 @@ interface FormData {
   instagram: string;
 }
 
-const BOT_REDIRECT_URL = 'https://t.me/victoriameshcheriakova_bot?start=6979295699cc89ca5d0f02d5';
+const BOT_REDIRECT_URL = 'https://t.me/victoriameshcheriakova_bot?start=6a2289635b7cd51e330436df';
 
 export default function FreeLectionPage() {
   const [modalOpen, setModalOpen] = useState(false);
