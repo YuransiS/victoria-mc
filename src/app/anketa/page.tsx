@@ -57,6 +57,15 @@ export default function PreRegistrationAnketaPage() {
   const consentValue = watch('consent');
 
   useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        window.location.href = 'https://t.me/+_Ar-BcoAuAw2YmF';
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  useEffect(() => {
     trackFBEvent('PageView', {});
     
     // Resolve user country on mount using Vercel Geo Endpoint
@@ -532,15 +541,15 @@ export default function PreRegistrationAnketaPage() {
               </div>
               <h3 className="font-serif text-3xl font-bold text-[#1a1c1c] tracking-tight">Дякуємо!</h3>
               <p className="text-xs md:text-sm text-[#1a1c1c]/70 leading-relaxed max-w-sm mx-auto font-light">
-                Після заповнення анкету я або мої помічники зв’яжемося з тобою, щоб підібрати найвигідніші умови та обговорити твої цілі🤍
+                Твою анкету успішно надіслано! Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>«50 тем для контенту»</strong> та додаткові бонуси🤍
               </p>
               
               <div className="pt-6">
                 <a 
-                  href="https://t.me/victoriameshcheriakova_bot?start=6979295699cc89ca5d0f02d5"
+                  href="https://t.me/+_Ar-BcoAuAw2YmF"
                   className="inline-block bg-[#5d5f2c] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:bg-[#484a22] transition-all hover:scale-[1.02] active:scale-[0.98] duration-300"
                 >
-                  Перейти в Telegram-бот
+                  Перейти в Telegram-канал
                 </a>
               </div>
             </div>
