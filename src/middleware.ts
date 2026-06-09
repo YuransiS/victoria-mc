@@ -20,10 +20,13 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('admin_session')?.value;
 
   const isProtectedRoute = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
-  const isLoginRoute = pathname === '/login' || pathname === '/api/admin/login';
+  const isExemptedRoute = 
+    pathname === '/login' || 
+    pathname === '/api/admin/login' || 
+    pathname === '/api/admin/generate-link';
 
   // 1. If not authenticated and trying to access a protected route
-  if (isProtectedRoute && !isLoginRoute) {
+  if (isProtectedRoute && !isExemptedRoute) {
     if (!token) {
       if (pathname.startsWith('/api/')) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -17,7 +17,7 @@ interface FormData {
   target_sheet: string;
 }
 
-const REDIRECT_URL = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
+const REDIRECT_URL = "https://t.me/+_Ar-BcoAuAw2YmFi";
 
 const names = ["Олена", "Марія", "Ірина", "Анастасія", "Тетяна", "Юлія", "Наталія", "Світлана", "Оксана", "Вікторія", "Дарина", "Анна", "Христина"];
 const actions = ["заповнила анкету", "забронювала місце", "щойно переглянула відео-урок", "хоче на курс"];
@@ -327,23 +327,37 @@ export default function StvoryuiPage() {
   }, []);
 
   // Notification Logic
+  const nextTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     const showNotification = () => {
       const randomName = names[Math.floor(Math.random() * names.length)];
-      const randomAction = actions[Math.floor(Math.random() * actions.length)];
+      
+      // If showForm is false, filter out form-related actions
+      const availableActions = showForm
+        ? actions
+        : actions.filter(a => a !== "заповнила анкету" && a !== "забронювала місце");
+
+      const randomAction = availableActions[Math.floor(Math.random() * availableActions.length)];
       
       setToast({ name: randomName, action: randomAction, show: true });
       
-      setTimeout(() => {
+      toastTimeoutRef.current = setTimeout(() => {
         setToast(prev => ({ ...prev, show: false }));
       }, 4000);
 
       const nextTime = Math.floor(Math.random() * (25000 - 10000) + 10000);
-      setTimeout(showNotification, nextTime);
+      nextTimeoutRef.current = setTimeout(showNotification, nextTime);
     };
-    const timer = setTimeout(showNotification, 5000);
-    return () => clearTimeout(timer);
-  }, []);
+
+    nextTimeoutRef.current = setTimeout(showNotification, 5000);
+
+    return () => {
+      if (nextTimeoutRef.current) clearTimeout(nextTimeoutRef.current);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, [showForm]);
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
@@ -424,10 +438,9 @@ export default function StvoryuiPage() {
       {/* HERO */}
       <section className="pt-12 pb-10 px-6 md:px-24 max-w-5xl mx-auto text-center animate-fade-in">
         <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.25em] text-gray-400 mb-6">Відео-урок</p>
-        <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] mb-4 text-black font-medium">
+        <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] mb-8 text-black font-medium">
           Як у 2026 році <br /><span className="italic text-gray-500">перейти від хаосу в систему</span> <br />та за допомогою контенту збільшити заявки на свої послуги або продукти?
         </h1>
-        <p className="font-sans text-xs md:text-sm font-medium text-gray-800 uppercase tracking-wide max-w-xl mx-auto border-t border-black/10 pt-4 mt-6">без хаосу та стресу і зробити це всього за один день</p>
         
         {/* TIMER */}
         <div className="flex justify-center mt-8">
@@ -479,13 +492,20 @@ export default function StvoryuiPage() {
         {/* FORM */}
         <section id="anketa" className="px-6 pb-24 bg-white border-t border-gray-100 pt-16">
           <div className="max-w-xl mx-auto">
-            <div className="text-center mb-12">
+            <div className="text-center mb-10">
               <h2 className="font-serif text-3xl md:text-4xl font-medium mb-4">Анкета курсу СТВОРЮЙ</h2>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="pulse-dot"></span>
                 <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-medium live-counter-anim">Зараз заповнюють: {liveCount} людей</p>
               </div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em]">Заповнюй форму нижче</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-4">Заповнюй форму нижче</p>
+              {/* Bouncing attention arrow */}
+              <div className="flex flex-col items-center justify-center animate-bounce">
+                <span className="text-[10px] uppercase tracking-wider text-black font-extrabold mb-1">Заповни анкету нижче</span>
+                <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+                </svg>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-10" noValidate>
@@ -693,7 +713,7 @@ export default function StvoryuiPage() {
                   <div className="mt-2">
                     <h3 className="font-serif text-2xl font-semibold leading-6 text-gray-900 mb-2">Анкету надіслано!</h3>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500 leading-relaxed">Дякую за твій інтерес до курсу СТВОРЮЙ. <br />Я отримала твою анкету і зв'яжусь з тобою в Instagram або Telegram найближчим часом.</p>
+                      <p className="text-sm text-gray-500 leading-relaxed">Дякую за твій інтерес до курсу СТВОРЮЙ. <br />Я отримала твою анкету. Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>«50 тем для контенту»</strong> та додаткові бонуси🤍</p>
                     </div>
                   </div>
                 </div>

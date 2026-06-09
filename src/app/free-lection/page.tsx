@@ -204,14 +204,11 @@ export default function FreeLectionPage() {
                   <div className="inline-block border-b border-black pb-1 mb-8">
                       <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.25em] text-black">БЕЗКОШТОВНА ЛЕКЦІЯ</p>
                   </div>
-                  <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-6 tracking-tight">
+                  <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl leading-[1.05] mb-10 tracking-tight">
                       <span className="block font-semibold text-black">Як у 2026 році</span>
-                      <span className="block font-normal text-[#6B6B6B] mt-2 italic">побудувати систему</span>
-                      <span className="block font-semibold text-black mt-2">роботи з контентом та візуалом</span>
+                      <span className="block font-normal text-[#6B6B6B] mt-2 italic">перейти від хаосу в систему</span>
+                      <span className="block font-semibold text-black mt-2 text-2xl md:text-4xl lg:text-5xl leading-tight">та за допомогою контенту збільшити заявки на свої послуги або продукты?</span>
                   </h1>
-                  <div className="max-w-[280px] md:max-w-md border-l-2 border-black pl-5 mb-10 mt-6">
-                      <p className="font-sans text-xs md:text-base font-medium text-gray-800 leading-relaxed">без хаосу та стресу і зробити це всього за один день</p>
-                  </div>
                   <div className="flex items-center gap-4 flex-wrap">
                       <button onClick={toggleModal} className="group relative inline-flex items-center justify-center bg-black text-white px-8 py-4 overflow-hidden font-medium transition duration-300 ease-out shadow-xl hover:bg-gray-800">
                           <span className="relative flex items-center gap-3 tracking-[0.15em] text-[10px] md:text-xs uppercase font-bold">
@@ -240,7 +237,7 @@ export default function FreeLectionPage() {
                   <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">Знайома <span className="italic font-normal text-gray-500">ситуація?</span></h2>
                   <div className="w-16 h-px bg-black mx-auto"></div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                   <div className="reveal flex flex-col p-6 border-l border-gray-200 hover:border-black transition-colors duration-500 group">
                       <span className="text-3xl font-serif mb-3 text-gray-300 group-hover:text-black transition-colors">I</span>
                       <h3 className="font-bold text-lg mb-2">Контент = стрес</h3>
@@ -260,6 +257,11 @@ export default function FreeLectionPage() {
                       <span className="text-3xl font-serif mb-3 text-gray-300 group-hover:text-black transition-colors">IV</span>
                       <h3 className="font-bold text-lg mb-2">Час в нікуди</h3>
                       <p className="text-xs text-gray-600 leading-loose">Ти намагаєшся зробити «ідеальний пост», витрачаючи години на правки, і все одно не задоволена результатом.</p>
+                  </div>
+                  <div className="reveal flex flex-col p-6 border-l border-gray-200 hover:border-black transition-colors duration-500 group delay-500">
+                      <span className="text-3xl font-serif mb-3 text-gray-300 group-hover:text-black transition-colors">V</span>
+                      <h3 className="font-bold text-lg mb-2">Блог не приносить продажі</h3>
+                      <p className="text-xs text-gray-600 leading-loose">Ти ведеш сторіз, публікуєш дописи, стараєшся бути активною, але клієнтів більше не стає. Люди дивляться контент, ставлять лайки, але не доходять до заявки чи покупки. Бо контент не будує довіру, не розкриває тебе як експерта і не підводить аудиторію до співпраці. У результаті блог забирає багато часу та енергії, але не приносить результату.</p>
                   </div>
               </div>
               <div className="mt-16 text-center reveal">
@@ -470,6 +472,19 @@ export default function FreeLectionPage() {
                           </div>
                       </div>
                   </div>
+                  <div className="reveal group bg-white p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-black">
+                      <div className="flex items-baseline gap-4">
+                          <span className="font-serif text-3xl italic text-gray-300 group-hover:text-black transition-colors">04.</span>
+                          <div>
+                              <h3 className="font-bold text-lg mb-2">Блог, який приносить клієнтів</h3>
+                              <ul className="text-xs text-gray-600 font-light list-disc list-inside space-y-1">
+                                  <li>Твій контент почне не просто набирати охоплення, а приводити людей, яким справді потрібні твої послуги чи продукти.</li>
+                                  <li>Ти зрозумієш, як через контент привертати нову аудиторію, прогрівати її до довіри та м’яко переводити в заявки й продажі.</li>
+                                  <li>У результаті блог стане інструментом росту доходу, а не ще одним пунктом у списку справ.</li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
               </div>
               <div className="mt-12 text-center reveal">
                   <button onClick={toggleModal} className="inline-block bg-transparent border border-black text-black px-10 py-3 hover:bg-black hover:text-white transition-all duration-300 uppercase tracking-widest text-[10px] font-bold mb-3">Отримати доступ до лекції</button>
@@ -544,12 +559,19 @@ export default function FreeLectionPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
               </button>
-              <div className="text-center mb-8">
+              <div className="text-center mb-6">
                   <p className="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">Access</p>
                   <h3 className="font-serif text-3xl font-bold text-black">Отримати лекцію</h3>
                   <div className="flex items-center justify-center gap-2 mt-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30] animate-pulse"></span>
                       <p className="text-[#FF3B30] text-[10px] font-extrabold uppercase tracking-widest">36/100 місць залишилось</p>
+                  </div>
+                  {/* Bouncing attention arrow */}
+                  <div className="flex flex-col items-center justify-center mt-5 mb-2 animate-bounce">
+                      <span className="text-[10px] uppercase tracking-wider text-black font-extrabold mb-1">Заповни анкету нижче</span>
+                      <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+                      </svg>
                   </div>
               </div>
 
