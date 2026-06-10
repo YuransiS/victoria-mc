@@ -135,6 +135,13 @@ export async function POST(req: Request) {
     const page_url = m.page_url || null;
     const visitor_uuid = m.visitor_uuid || null;
 
+    // Ensure currency is resolved and set in metadata
+    const meta = metadata || {};
+    const reqCurrency = lead.currency || meta.currency || null;
+    if (reqCurrency) {
+      meta.currency = reqCurrency;
+    }
+
     // 7. Создание нового лид-события/заказа (всегда новая строка!)
     const { data: order, error: orderError } = await supabaseAdmin
       .from('unified_orders')
@@ -161,7 +168,7 @@ export async function POST(req: Request) {
         page_path,
         page_url,
         visitor_uuid,
-        metadata: metadata || {},
+        metadata: meta,
         created_at: createdAtIso
       })
       .select('id')
