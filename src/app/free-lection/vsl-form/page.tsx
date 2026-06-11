@@ -17,7 +17,7 @@ interface FormData {
   target_sheet: string;
 }
 
-const REDIRECT_URL = "https://t.me/+_Ar-BcoAuAw2YmFi";
+const REDIRECT_URL = "https://t.me/+idsZRC5s1yo0YmUy";
 
 const names = ["Олена", "Марія", "Ірина", "Анастасія", "Тетяна", "Юлія", "Наталія", "Світлана", "Оксана", "Вікторія", "Дарина", "Анна", "Христина"];
 const actions = ["заповнила анкету", "забронювала місце", "щойно переглянула відео-урок", "хоче на курс"];
@@ -499,6 +499,48 @@ export default function StvoryuiPage() {
                 <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-medium live-counter-anim">Зараз заповнюють: {liveCount} людей</p>
               </div>
               <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-4">Заповнюй форму нижче</p>
+
+              {/* BONUSES */}
+              <div className="space-y-4 mb-10 mt-6">
+                <div className="flex items-center gap-2 px-1 justify-center">
+                  <span className="h-[1px] flex-grow bg-black/10"></span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-black whitespace-nowrap flex items-center gap-1.5">
+                    ✨ Твої бонуси за заповнення
+                  </span>
+                  <span className="h-[1px] flex-grow bg-black/10"></span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {/* BONUS 1 */}
+                  <div className="relative overflow-hidden p-5 rounded-2xl border border-gray-100 bg-gray-50/50 shadow-sm hover:shadow-md transition-all duration-300 group text-left">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-black text-white shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                        <span className="text-xl">🎁</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Чек-лист</span>
+                        <h4 className="text-xs md:text-sm font-bold text-black leading-snug">«50 тем для контенту»</h4>
+                        <p className="text-[10px] md:text-xs text-gray-500 leading-normal font-light">Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BONUS 2 */}
+                  <div className="relative overflow-hidden p-5 rounded-2xl border border-gray-100 bg-gray-50/50 shadow-sm hover:shadow-md transition-all duration-300 group text-left">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-black text-white shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                        <span className="text-xl">🔒</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Telegram-канал</span>
+                        <h4 className="text-xs md:text-sm font-bold text-black leading-snug">Закритий канал передзапису</h4>
+                        <p className="text-[10px] md:text-xs text-gray-500 leading-normal font-light">Доступ до закритого телеграм каналу передзапису з інсайдерською інформацією</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Bouncing attention arrow */}
               <div className="flex flex-col items-center justify-center animate-bounce">
                 <span className="text-[10px] uppercase tracking-wider text-black font-extrabold mb-1">Заповни анкету нижче</span>

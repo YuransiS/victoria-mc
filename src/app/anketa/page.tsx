@@ -59,7 +59,7 @@ export default function PreRegistrationAnketaPage() {
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        window.location.href = 'https://t.me/+_Ar-BcoAuAw2YmF';
+        window.location.href = 'https://t.me/+idsZRC5s1yo0YmUy';
       }, 2500);
       return () => clearTimeout(timer);
     }
@@ -280,7 +280,7 @@ export default function PreRegistrationAnketaPage() {
             <span className="h-[1px] flex-grow bg-[#ebd8b8]/20"></span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* BONUS 1 */}
             <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
               <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
@@ -307,6 +307,21 @@ export default function PreRegistrationAnketaPage() {
                   <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Найкраща ціна</span>
                   <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Максимальна знижка</h4>
                   <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання</p>
+                </div>
+              </div>
+            </div>
+
+            {/* BONUS 3 */}
+            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
+              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
+              <div className="flex items-start gap-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-xl">🔒</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Спільнота</span>
+                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Закритий канал</h4>
+                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Доступ до закритого телеграм каналу передзапису з інсайдерською інформацією</p>
                 </div>
               </div>
             </div>
@@ -546,7 +561,7 @@ export default function PreRegistrationAnketaPage() {
               
               <div className="pt-6">
                 <a 
-                  href="https://t.me/+_Ar-BcoAuAw2YmF"
+                  href="https://t.me/+idsZRC5s1yo0YmUy"
                   className="inline-block bg-[#5d5f2c] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:bg-[#484a22] transition-all hover:scale-[1.02] active:scale-[0.98] duration-300"
                 >
                   Перейти в Telegram-канал
