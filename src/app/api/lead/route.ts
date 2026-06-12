@@ -16,6 +16,18 @@ function cleanPhone(phone: string): string {
   return cleaned;
 }
 
+function formatCrmPhone(phone: string): string {
+  let cleaned = phone.replace(/\D/g, "");
+  if (cleaned.length === 9) {
+    cleaned = "380" + cleaned;
+  } else if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned ? `+${cleaned}` : phone;
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -86,6 +98,40 @@ export async function POST(req: Request) {
         }).catch(err => console.error('Telegram failed:', err))
       );
     }
+
+    // 1.5 BaseCRM Task (For VSL form and Anketa leads)
+    if (isVSL || isAnketa) {
+      const crmPhone = phone || '';
+      const formattedCrmPhone = formatCrmPhone(crmPhone);
+      const crmEmail = `noemail-${formattedCrmPhone.replace(/\D/g, '') || Math.random().toString(36).substring(2, 9)}@example.com`;
+      
+      const crmPayload = {
+        pipeline_id: 110,
+        dev_key: "DF5-6E",
+        name: name || 'Без імені',
+        email: crmEmail,
+        phone: formattedCrmPhone,
+        utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
+        utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
+        utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
+        utm_content: data.utm_content === '-' ? '' : (data.utm_content || '')
+      };
+
+      tasks.push(
+        fetch('https://prosales.base-crm.1-todo.com/api/client/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(crmPayload),
+        })
+        .then(async (res) => {
+          const text = await res.text();
+          console.log(`[BaseCRM] Lead sent. Status: ${res.status}, Response: ${text}`);
+          return text;
+        })
+        .catch(err => console.error('[BaseCRM] Failed to send lead:', err))
+      );
+    }
+
 
     // Determine target scripts and payloads
     const submissions: Array<{url: string, body: any}> = [];
