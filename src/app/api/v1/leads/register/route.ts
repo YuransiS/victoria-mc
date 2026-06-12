@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { statusMapper } from '@/lib/statusMapper';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { project_slug, api_key, lead, marketing, metadata } = body;
+
+    const isValidUuid = (uuid: string) => {
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
+    };
 
     // 1. Валидация базовых полей запроса
     if (!project_slug || !api_key || !lead) {
@@ -33,6 +38,51 @@ export async function POST(req: Request) {
 
     const customCreatedAt = lead?.created_at || metadata?.created_at || null;
     const createdAtIso = customCreatedAt ? new Date(customCreatedAt).toISOString() : new Date().toISOString();
+
+    // Intercept raw clicks ('Клик' or 'КликФормы') and insert directly into traffic_clicks
+    const leadStatus = lead.status;
+    if (leadStatus === 'Клик' || leadStatus === 'КликФормы') {
+      const m = marketing || {};
+      const utm_source = m.utm_source || null;
+      const utm_medium = m.utm_medium || null;
+      const utm_campaign = m.utm_campaign || null;
+      const utm_content = m.utm_content || null;
+      const utm_term = m.utm_term || null;
+      const page_path = m.page_path || null;
+      const page_url = m.page_url || null;
+      const rawVisitorUuid = m.visitor_uuid || m.visitor_id || m.visitorId || metadata?.visitor_uuid || metadata?.visitor_id || metadata?.visitorId || lead?.visitor_uuid || lead?.visitor_id || lead?.visitorId || null;
+      const visitor_uuid = rawVisitorUuid && isValidUuid(rawVisitorUuid) ? rawVisitorUuid : null;
+
+      const { data: clickData, error: clickError } = await supabaseAdmin
+        .from('traffic_clicks')
+        .insert({
+          project_id: projectId,
+          visitor_uuid,
+          status: leadStatus,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
+          page_path,
+          page_url,
+          metadata: metadata || {},
+          created_at: createdAtIso
+        })
+        .select('id')
+        .single();
+
+      if (clickError) {
+        throw new Error(`Failed to insert traffic click: ${clickError.message}`);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Click registered successfully.',
+        customer_id: null,
+        order_id: clickData.id
+      });
+    }
 
     // 3. Выделение и нормализация контактных данных лида
     const name = lead.name || null;
@@ -133,7 +183,8 @@ export async function POST(req: Request) {
     const user_agent = m.user_agent || null;
     const page_path = m.page_path || null;
     const page_url = m.page_url || null;
-    const visitor_uuid = m.visitor_uuid || null;
+    const rawVisitorUuid = m.visitor_uuid || m.visitor_id || m.visitorId || metadata?.visitor_uuid || metadata?.visitor_id || metadata?.visitorId || lead?.visitor_uuid || lead?.visitor_id || lead?.visitorId || null;
+    const visitor_uuid = rawVisitorUuid && isValidUuid(rawVisitorUuid) ? rawVisitorUuid : null;
 
     // Ensure currency is resolved and set in metadata
     const meta = metadata || {};
@@ -142,47 +193,94 @@ export async function POST(req: Request) {
       meta.currency = reqCurrency;
     }
 
-    // 7. Создание нового лид-события/заказа (всегда новая строка!)
-    const { data: order, error: orderError } = await supabaseAdmin
-      .from('unified_orders')
-      .insert({
-        customer_id: customerId,
-        project_id: projectId,
-        amount: lead.amount || 0.00,
-        status: lead.status || 'new',
-        order_id: lead.order_id || null,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        utm_term,
-        campaign_id,
-        adset_id,
-        ad_id,
-        fbclid,
-        gclid,
-        fbp,
-        fbc,
-        ip_address,
-        user_agent,
-        page_path,
-        page_url,
-        visitor_uuid,
-        metadata: meta,
-        created_at: createdAtIso
-      })
-      .select('id')
-      .single();
+    // 7. Создание или обновление лид-события/заказа
+    let orderIdToReturn = null;
+    let existingOrder = null;
 
-    if (orderError) {
-      throw new Error(`Failed to log order: ${orderError.message}`);
+    if (lead.order_id) {
+      const { data: ord, error: selectErr } = await supabaseAdmin
+        .from('unified_orders')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('order_id', lead.order_id)
+        .limit(1)
+        .maybeSingle();
+
+      if (!selectErr && ord) {
+        existingOrder = ord;
+      }
+    }
+
+    if (existingOrder) {
+      // Update existing order status, amount, and metadata
+      const { data: updatedOrder, error: orderError } = await supabaseAdmin
+        .from('unified_orders')
+        .update({
+          amount: lead.amount !== undefined ? lead.amount : undefined,
+          status: lead.status ? statusMapper.normalize(lead.status) : undefined,
+          utm_source: utm_source || undefined,
+          utm_medium: utm_medium || undefined,
+          utm_campaign: utm_campaign || undefined,
+          utm_content: utm_content || undefined,
+          utm_term: utm_term || undefined,
+          page_path: page_path || undefined,
+          page_url: page_url || undefined,
+          visitor_uuid: visitor_uuid || undefined,
+          metadata: meta
+        })
+        .eq('id', existingOrder.id)
+        .select('id')
+        .single();
+
+      if (orderError) {
+        throw new Error(`Failed to update order: ${orderError.message}`);
+      }
+      orderIdToReturn = updatedOrder.id;
+      console.log(`Successfully updated existing order ${lead.order_id} (UUID: ${orderIdToReturn})`);
+    } else {
+      // Insert new order
+      const { data: newOrder, error: orderError } = await supabaseAdmin
+        .from('unified_orders')
+        .insert({
+          customer_id: customerId,
+          project_id: projectId,
+          amount: lead.amount || 0.00,
+          status: statusMapper.normalize(lead.status),
+          order_id: lead.order_id || null,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
+          campaign_id,
+          adset_id,
+          ad_id,
+          fbclid,
+          gclid,
+          fbp,
+          fbc,
+          ip_address,
+          user_agent,
+          page_path,
+          page_url,
+          visitor_uuid,
+          metadata: meta,
+          created_at: createdAtIso
+        })
+        .select('id')
+        .single();
+
+      if (orderError) {
+        throw new Error(`Failed to log order: ${orderError.message}`);
+      }
+      orderIdToReturn = newOrder.id;
     }
 
     return NextResponse.json({
       success: true,
       message: 'Lead registered successfully.',
       customer_id: customerId,
-      order_id: order.id
+      order_id: orderIdToReturn
     });
 
   } catch (error: any) {
