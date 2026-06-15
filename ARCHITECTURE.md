@@ -14,6 +14,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   **Payment Gateway:** WayForPay
 *   **CRM & Legacy Sync:** Google Sheets (Google Apps Script API)
 *   **Notifications:** Telegram Bot API
+*   **Marketing Automation:** SendPulse Chatbot API (for subscriber funnel tracking)
 
 ---
 
@@ -36,12 +37,12 @@ This live document outlines the architecture, routing structure, components, dat
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 
 ### 🌐 API Endpoints (`src/app/api/`)
-*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Google Sheets CRM (Unified Sheets + Stvoryui), Telegram, and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching. Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing.
+*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Google Sheets CRM (Unified Sheets + Stvoryui), Telegram, and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching. Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
 *   `api/create-payment/` — Initiate checkout route. Registers pending payments in Google Sheets, starts Telegram payment alerts, and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
 *   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`) and Google Sheets CRM.
 *   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and Google Sheets when users reach thanks/fail landing pages or manually update states.
-*   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`).
-*   `api/video-progress/` — [NEW] Video watching progress tracking receiver. Logs played status, watch seconds, and updates lead status to `'полностью посмотрел'` once 20 minutes are reached.
+*   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`). Triggers SendPulse status `'1. Зайшов на сайт'` for VSL funnel if `sp_contact_id` is supplied.
+*   `api/video-progress/` — [NEW] Video watching progress tracking receiver. Logs played status, watch seconds, and updates lead status to `'полностью посмотрел'` once 20 minutes are reached. Triggers SendPulse status `'2. Подивився відео'` once the watch progress threshold (15 minutes) is met.
 *   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.
 *   `api/cron/vsl-report/` — Analytical cron route.
     *   **Daily:** Runs at 9:00 AM Kyiv time (`0 6 * * *` UTC) with 24-hour period.
@@ -126,3 +127,18 @@ sequenceDiagram
     API-->>Browser: Return signed WayForPay payment config
     Browser->>User: Redirect to WayForPay Checkout
 ```
+
+---
+
+## ✉️ SendPulse Chatbot Integration Workflow
+
+The VSL funnel tracks user interactions and updates contact variables in SendPulse in real time:
+
+1. **Link Parameter**: The Telegram Bot button should direct the user to the landing page with the parameter `?sp_contact_id={{contact_id}}`.
+2. **Client-side Capture**: The [Analytics.tsx](file:///c:/B&W%20Prod/B&W%20Prod/victoria-mc/src/components/Analytics.tsx) component parses this parameter and stores it in `localStorage`.
+3. **Funnel Status Mapping**:
+   * **State 1: `1. Зайшов на сайт`** — Set when the user lands on the page (handled via `/api/analytics/log`).
+   * **State 2: `2. Подивився відео`** — Set when the video progress reaches 15 minutes or more, or is marked as `'полностью посмотрел'` (handled via `/api/video-progress`).
+   * **State 3: `3. Заповнив анкету`** — Set when the user submits the questionnaire form (handled via `/api/lead`).
+4. **State Persistence**: The contact ID is stored in the lead's `raw_payload` as `sp_contact_id` along with `vsl_sendpulse_stage` (1, 2, or 3) to prevent duplicate API requests.
+5. **SendPulse API Helper**: The backend calls [sendpulse.ts](file:///c:/B&W%20Prod/B&W%20Prod/victoria-mc/src/lib/sendpulse.ts) to handle OAuth token caching and set the `vsl_status` variable.

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { updateSendPulseStatus } from '@/lib/sendpulse';
 
 const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { visitor_id, seconds_watched, current_time, played, status } = body;
+    const { visitor_id, seconds_watched, current_time, played, status, sp_contact_id } = body;
 
     if (!visitor_id) {
       return NextResponse.json({ success: false, error: 'Missing visitor_id' }, { status: 400 });
@@ -40,6 +41,27 @@ export async function POST(req: Request) {
       }
     }
 
+    // SendPulse Integration (State 2: Watched video)
+    const resolvedSpContactId = sp_contact_id || (lead?.raw_payload as any)?.sp_contact_id || null;
+    const currentSendPulseStage = (lead?.raw_payload as any)?.vsl_sendpulse_stage || 0;
+
+    const hasWatchedEnough = (seconds_watched && seconds_watched >= 900) || (current_time && current_time >= 900) || status === 'полностью посмотрел';
+
+    let nextSendPulseStage = currentSendPulseStage;
+    if (resolvedSpContactId) {
+      if (hasWatchedEnough && currentSendPulseStage < 2) {
+        nextSendPulseStage = 2;
+        updateSendPulseStatus(resolvedSpContactId, '2. Подивився відео').catch(err => 
+          console.error('[Video Progress SendPulse] Failed to update status:', err)
+        );
+      } else if (currentSendPulseStage < 1) {
+        nextSendPulseStage = 1;
+        updateSendPulseStatus(resolvedSpContactId, '1. Зайшов на сайт').catch(err =>
+          console.error('[Video Progress SendPulse] Failed to update status:', err)
+        );
+      }
+    }
+
     const videoProgressPayload = {
       seconds_watched: seconds_watched || 0,
       current_time: current_time || 0,
@@ -48,8 +70,17 @@ export async function POST(req: Request) {
     };
 
     const rawPayload = lead?.raw_payload && typeof lead.raw_payload === 'object'
-      ? { ...(lead.raw_payload as object), video_progress: videoProgressPayload }
-      : { video_progress: videoProgressPayload };
+      ? { 
+          ...(lead.raw_payload as object), 
+          sp_contact_id: resolvedSpContactId, 
+          vsl_sendpulse_stage: nextSendPulseStage, 
+          video_progress: videoProgressPayload 
+        }
+      : { 
+          sp_contact_id: resolvedSpContactId, 
+          vsl_sendpulse_stage: nextSendPulseStage, 
+          video_progress: videoProgressPayload 
+        };
 
     let dbResult;
     if (lead) {

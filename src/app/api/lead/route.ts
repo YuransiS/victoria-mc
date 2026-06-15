@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
+import { updateSendPulseStatus } from '@/lib/sendpulse';
 
 const GOOGLE_SCRIPT_URL_MAIN = process.env.GOOGLE_SCRIPT_URL;
 const GOOGLE_SCRIPT_URL_STVORYUI = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
@@ -31,7 +32,7 @@ function formatCrmPhone(phone: string): string {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, social, niche, instagram, purpose, difficulties, readiness } = data;
+    const { name, phone, social, niche, instagram, purpose, difficulties, readiness, sp_contact_id } = data;
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -132,6 +133,15 @@ export async function POST(req: Request) {
       );
     }
 
+
+    // SendPulse Task (State 3: Submitted form)
+    if (sp_contact_id) {
+      tasks.push(
+        updateSendPulseStatus(sp_contact_id, '3. Заповнив анкету').catch(err =>
+          console.error('[Lead API SendPulse] Failed to update status:', err)
+        )
+      );
+    }
 
     // Determine target scripts and payloads
     const submissions: Array<{url: string, body: any}> = [];
@@ -261,7 +271,7 @@ export async function POST(req: Request) {
       page_path: data.page_path || '',
       page_url: data.full_url || '',
       visitor_uuid: resolvedUuid,
-      raw_payload: data
+      raw_payload: { ...data, vsl_sendpulse_stage: sp_contact_id ? 3 : undefined }
     };
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);

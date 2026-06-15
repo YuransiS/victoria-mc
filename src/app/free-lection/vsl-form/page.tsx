@@ -58,11 +58,13 @@ export default function StvoryuiPage() {
         if (status === 'полностью посмотрел') {
           fullyWatchedRef.current = true;
         }
+        const spContactId = localStorage.getItem('sp_contact_id');
         await fetch('/api/video-progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             visitor_id: visitorId,
+            sp_contact_id: spContactId || undefined,
             seconds_watched: Math.round(watchedSecondsRef.current),
             current_time: playerRef.current && typeof playerRef.current.getCurrentTime === 'function' ? Math.round(playerRef.current.getCurrentTime()) : 0,
             played: playedRef.current,
@@ -380,6 +382,7 @@ export default function StvoryuiPage() {
     };
 
     try {
+      const spContactId = localStorage.getItem('sp_contact_id');
       const response = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -387,6 +390,7 @@ export default function StvoryuiPage() {
           ...data,
           phone: fullPhone,
           visitor_id: localStorage.getItem('visitor_id') || '',
+          sp_contact_id: spContactId || undefined,
           ...utms
         }),
       });

@@ -73,6 +73,13 @@ const AnalyticsInner = () => {
     const savedSocial = localStorage.getItem('lead_social');
     const uuid = localStorage.getItem('lead_uuid');
 
+    // 4.5 SendPulse Contact ID
+    const spContactIdParam = searchParams.get('sp_contact_id');
+    if (spContactIdParam) {
+      localStorage.setItem('sp_contact_id', spContactIdParam);
+    }
+    const spContactId = localStorage.getItem('sp_contact_id') || undefined;
+
     // 5. Log to Backend (Identified if data exists)
     fetch('/api/analytics/log', {
       method: 'POST',
@@ -84,6 +91,7 @@ const AnalyticsInner = () => {
         name: savedName,
         phone: savedPhone,
         social: savedSocial,
+        sp_contact_id: spContactId,
         utms: hasUtms ? utms : JSON.parse(localStorage.getItem('last_utms') || '{}')
       })
     }).catch(() => {});
