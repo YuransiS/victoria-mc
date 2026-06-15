@@ -48,8 +48,8 @@ export async function updateSendPulseStatus(contactId: string, status: string) {
       },
       body: JSON.stringify({
         contact_id: contactId,
-        name: 'vsl_status',
-        value: status
+        variable_name: 'vsl_status',
+        variable_value: status
       })
     });
 
