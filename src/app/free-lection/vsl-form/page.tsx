@@ -47,9 +47,12 @@ export default function StvoryuiPage() {
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
-    // 1. Get visitor ID
-    const visitorId = localStorage.getItem('visitor_id');
-    if (!visitorId) return;
+    // 1. Get visitor ID (or generate it immediately to prevent child-first mount race condition)
+    let visitorId = localStorage.getItem('visitor_id');
+    if (!visitorId) {
+      visitorId = crypto.randomUUID();
+      localStorage.setItem('visitor_id', visitorId);
+    }
 
     // Helper to send progress
     const sendProgress = async (forceStatus?: string) => {

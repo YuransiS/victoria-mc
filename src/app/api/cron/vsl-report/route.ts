@@ -173,6 +173,86 @@ export async function GET(req: Request) {
     }
     const conversionRate = vsl1Leads.length > 0 ? Math.round((step2CohortCount / vsl1Leads.length) * 100) : 0;
 
+    // VSL Form path attribution details
+    const vslFormHitsInPeriod = safeLeads.filter(l => l.page_path === '/free-lection/vsl-form');
+    const uniqueVslFormVisitors = Array.from(new Set(vslFormHitsInPeriod.map(l => l.visitor_uuid).filter(Boolean))) as string[];
+
+    const visitorHistories: Record<string, any[]> = {};
+    if (uniqueVslFormVisitors.length > 0) {
+      const { data: historyData } = await supabaseAdmin
+        .from('victoria_leads')
+        .select('visitor_uuid, page_path, created_at, utm_source, utm_medium, status')
+        .in('visitor_uuid', uniqueVslFormVisitors)
+        .order('created_at', { ascending: true });
+        
+      if (historyData) {
+        historyData.forEach(row => {
+          if (row.visitor_uuid) {
+            if (!visitorHistories[row.visitor_uuid]) {
+              visitorHistories[row.visitor_uuid] = [];
+            }
+            visitorHistories[row.visitor_uuid].push(row);
+          }
+        });
+      }
+    }
+
+    const utmSourceGroups: Record<string, Set<string>> = {};
+    const visitorFirstHitTime: Record<string, string> = {};
+    
+    vslFormHitsInPeriod.forEach(hit => {
+      const src = hit.utm_source || 'direct';
+      const uuid = hit.visitor_uuid;
+      if (uuid) {
+        if (!utmSourceGroups[src]) {
+          utmSourceGroups[src] = new Set();
+        }
+        utmSourceGroups[src].add(uuid);
+        
+        if (!visitorFirstHitTime[uuid] || new Date(hit.created_at) < new Date(visitorFirstHitTime[uuid])) {
+          visitorFirstHitTime[uuid] = hit.created_at;
+        }
+      }
+    });
+
+    const vslFormSourceStats: Record<string, {
+      total: number;
+      fromFreeLection: Record<string, number>;
+      fromOther: Record<string, number>;
+      directNew: number;
+    }> = {};
+
+    Object.entries(utmSourceGroups).forEach(([src, uuidsSet]) => {
+      vslFormSourceStats[src] = {
+        total: uuidsSet.size,
+        fromFreeLection: {},
+        fromOther: {},
+        directNew: 0
+      };
+      
+      uuidsSet.forEach(uuid => {
+        const fullHistory = visitorHistories[uuid] || [];
+        const firstHitTime = visitorFirstHitTime[uuid];
+        const priorHistory = fullHistory.filter(h => new Date(h.created_at) < new Date(firstHitTime));
+        
+        const freeLectionHit = priorHistory.find(h => h.page_path === '/free-lection');
+        if (freeLectionHit) {
+          const origSrc = freeLectionHit.utm_source || 'direct';
+          vslFormSourceStats[src].fromFreeLection[origSrc] = (vslFormSourceStats[src].fromFreeLection[origSrc] || 0) + 1;
+          return;
+        }
+        
+        const otherHit = priorHistory.find(h => ['/practicum', '/rozbir', '/anketa', '/price', '/'].includes(h.page_path || ''));
+        if (otherHit) {
+          const pageName = otherHit.page_path || '/';
+          vslFormSourceStats[src].fromOther[pageName] = (vslFormSourceStats[src].fromOther[pageName] || 0) + 1;
+          return;
+        }
+        
+        vslFormSourceStats[src].directNew++;
+      });
+    });
+
     // 2. Practicum Funnel
     const practicumClicks = safeLeads.filter(l => l.page_path === '/practicum' && l.status === 'Клик');
     const practicumLeads = safeLeads.filter(l => l.target_sheet === 'Практикум' && !['Клик', 'КликФормы'].includes(l.status || ''));
@@ -213,57 +293,89 @@ export async function GET(req: Request) {
     message += `📅 <b>Період:</b> <code>${formattedStart}</code> — <code>${formattedEnd}</code> (Київ)\n\n`;
 
     // 1. VSL
-    message += `🔥 <b>1. VSL ВОРОНКА (Лекція)</b>\n`;
-    message += `👤 <b>Реєстрацій (Етап 1):</b> <code>${vsl1Leads.length}</code>\n`;
-    message += `🎥 <b>Дійшли до форми (Етап 2):</b> <code>${vsl2Leads.length}</code>\n`;
-    message += `🔄 <b>Конверсія до форми:</b> <code>${conversionRate}%</code> (когорта: <code>${step2CohortCount}</code>)\n`;
-    message += `👀 <b>Перегляд відео:</b>\n`;
-    message += `  • Почали: <code>${vslPlay.length}</code>\n`;
-    message += `  • Додивились (20+ хв): <code>${vslWatched.length}</code>\n`;
-    message += `📈 <b>Трафік (Унікальні кліки):</b>\n`;
-    message += `  • Лендінг старту: <code>${vsl1Clicks.length}</code>\n`;
-    message += `  • Сторінка відео: <code>${vsl2Clicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело (Етап 1):</b> <code>${getBestSource(vsl1Leads)}</code>\n\n`;
+    if (vsl1Leads.length > 0 || vsl2Leads.length > 0 || vslPlay.length > 0 || vslWatched.length > 0 || vsl1Clicks.length > 0 || vsl2Clicks.length > 0) {
+      message += `🔥 <b>1. VSL ВОРОНКА (Лекція)</b>\n`;
+      message += `👤 <b>Реєстрацій (Етап 1):</b> <code>${vsl1Leads.length}</code>\n`;
+      message += `🎥 <b>Дійшли до форми (Етап 2):</b> <code>${vsl2Leads.length}</code>\n`;
+      message += `🔄 <b>Конверсія до форми:</b> <code>${conversionRate}%</code> (когорта: <code>${step2CohortCount}</code>)\n`;
+      message += `👀 <b>Перегляд відео:</b>\n`;
+      message += `  • Почали: <code>${vslPlay.length}</code>\n`;
+      message += `  • Додивились (20+ хв): <code>${vslWatched.length}</code>\n`;
+      message += `📈 <b>Трафік (Унікальні кліки):</b>\n`;
+      message += `  • Лендінг старту: <code>${vsl1Clicks.length}</code>\n`;
+      message += `  • Сторінка відео: <code>${vsl2Clicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело (Етап 1):</b> <code>${getBestSource(vsl1Leads)}</code>\n`;
+      message += `📊 <b>Джерела на VSL Form (Сторінка відео):</b>\n`;
+      if (Object.keys(vslFormSourceStats).length === 0) {
+        message += `  • немає даних\n\n`;
+      } else {
+        Object.entries(vslFormSourceStats).forEach(([src, stats]) => {
+          message += `  • <b>${src}</b>: <code>${stats.total}</code> унікальних\n`;
+          Object.entries(stats.fromFreeLection).forEach(([origSrc, count]) => {
+            message += `    ↳ з /free-lection (${origSrc}): <code>${count}</code>\n`;
+          });
+          Object.entries(stats.fromOther).forEach(([page, count]) => {
+            message += `    ↳ з іншої сторінки (${page}): <code>${count}</code>\n`;
+          });
+          if (stats.directNew > 0) {
+            message += `    ↳ вхід одразу на форму: <code>${stats.directNew}</code>\n`;
+          }
+        });
+        message += `\n`;
+      }
+    }
 
     // 2. Practicum
-    message += `🎓 <b>2. ПРАКТИКУМ</b>\n`;
-    message += `👤 <b>Всього заявок:</b> <code>${practicumLeads.length}</code>\n`;
-    message += `💰 <b>Оплачено:</b> <code>${practicumPaid.length}</code>\n`;
-    message += `💵 <b>Оплачена сума:</b> <code>${practicumRevenue} UAH</code>\n`;
-    message += `📈 <b>Трафік (Кліки):</b> <code>${practicumClicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(practicumLeads)}</code>\n\n`;
+    if (practicumLeads.length > 0 || practicumClicks.length > 0) {
+      message += `🎓 <b>2. ПРАКТИКУМ</b>\n`;
+      message += `👤 <b>Всього заявок:</b> <code>${practicumLeads.length}</code>\n`;
+      message += `💰 <b>Оплачено:</b> <code>${practicumPaid.length}</code>\n`;
+      message += `💵 <b>Оплачена сума:</b> <code>${practicumRevenue} UAH</code>\n`;
+      message += `📈 <b>Трафік (Кліки):</b> <code>${practicumClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(practicumLeads)}</code>\n\n`;
+    }
 
     // 3. Anketa
-    message += `📝 <b>3. АНКЕТА ПРЕДЗАПИСУ</b>\n`;
-    message += `👤 <b>Заповнено анкет:</b> <code>${anketaLeads.length}</code>\n`;
-    message += `📈 <b>Трафік (Кліки):</b> <code>${anketaClicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(anketaLeads)}</code>\n\n`;
+    if (anketaLeads.length > 0 || anketaClicks.length > 0) {
+      message += `📝 <b>3. АНКЕТА ПРЕДЗАПИСУ</b>\n`;
+      message += `👤 <b>Заповнено анкет:</b> <code>${anketaLeads.length}</code>\n`;
+      message += `📈 <b>Трафік (Кліки):</b> <code>${anketaClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(anketaLeads)}</code>\n\n`;
+    }
 
     // 4. Rozbir
-    message += `🔍 <b>4. РОЗБОРИ (Відеорозбір)</b>\n`;
-    message += `👤 <b>Всього заявок:</b> <code>${rozbirLeads.length}</code>\n`;
-    message += `💰 <b>Оплачено:</b> <code>${rozbirPaid.length}</code>\n`;
-    message += `💵 <b>Оплачена сума:</b> <code>${rozbirRevenue} UAH</code>\n`;
-    message += `📈 <b>Трафік (Кліки):</b> <code>${rozbirClicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(rozbirLeads)}</code>\n\n`;
+    if (rozbirLeads.length > 0 || rozbirClicks.length > 0) {
+      message += `🔍 <b>4. РОЗБОРИ (Відеорозбір)</b>\n`;
+      message += `👤 <b>Всього заявок:</b> <code>${rozbirLeads.length}</code>\n`;
+      message += `💰 <b>Оплачено:</b> <code>${rozbirPaid.length}</code>\n`;
+      message += `💵 <b>Оплачена сума:</b> <code>${rozbirRevenue} UAH</code>\n`;
+      message += `📈 <b>Трафік (Кліки):</b> <code>${rozbirClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(rozbirLeads)}</code>\n\n`;
+    }
 
     // 5. Booking
-    message += `💳 <b>5. БРОНЮВАННЯ / ЦІНИ</b>\n`;
-    message += `👤 <b>Всього заявок:</b> <code>${bookingLeads.length}</code>\n`;
-    message += `💰 <b>Оплачено:</b> <code>${bookingPaid.length}</code>\n`;
-    message += `💵 <b>Оплачена сума:</b> <code>${bookingRevenue} UAH</code>\n`;
-    message += `📈 <b>Трафік (Кліки):</b> <code>${bookingClicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(bookingLeads)}</code>\n\n`;
+    if (bookingLeads.length > 0 || bookingClicks.length > 0) {
+      message += `💳 <b>5. БРОНЮВАННЯ / ЦІНИ</b>\n`;
+      message += `👤 <b>Всього заявок:</b> <code>${bookingLeads.length}</code>\n`;
+      message += `💰 <b>Оплачено:</b> <code>${bookingPaid.length}</code>\n`;
+      message += `💵 <b>Оплачена сума:</b> <code>${bookingRevenue} UAH</code>\n`;
+      message += `📈 <b>Трафік (Кліки):</b> <code>${bookingClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(bookingLeads)}</code>\n\n`;
+    }
 
     // 6. Autoweb
-    message += `🌐 <b>6. АВТОВЕБ</b>\n`;
-    message += `👤 <b>Реєстрацій:</b> <code>${autowebLeads.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(autowebLeads)}</code>\n\n`;
+    if (autowebLeads.length > 0) {
+      message += `🌐 <b>6. АВТОВЕБ</b>\n`;
+      message += `👤 <b>Реєстрацій:</b> <code>${autowebLeads.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(autowebLeads)}</code>\n\n`;
+    }
 
     // 7. Core
-    message += `🏠 <b>7. ГОЛОВНА СТОРІНКА</b>\n`;
-    message += `📈 <b>Трафік (Кліки):</b> <code>${coreClicks.length}</code>\n`;
-    message += `🏷️ <b>Найкраще джерело (кліки):</b> <code>${getBestSource(coreClicks)}</code>\n`;
+    if (coreClicks.length > 0) {
+      message += `🏠 <b>7. ГОЛОВНА СТОРІНКА</b>\n`;
+      message += `📈 <b>Трафік (Кліки):</b> <code>${coreClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело (кліки):</b> <code>${getBestSource(coreClicks)}</code>\n`;
+    }
 
     // 3. Dispatch to Telegram Bot API
     const token = process.env.TELEGRAM_BOT_TOKEN;
