@@ -32,7 +32,13 @@ function formatCrmPhone(phone: string): string {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, social, niche, instagram, purpose, difficulties, readiness, sp_contact_id } = data;
+    const { name, phone, social, niche, instagram, purpose, difficulties, readiness, sp_contact_id, subscription_duration } = data;
+
+    const ukrainianMonths = [
+      'Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+      'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'
+    ];
+    const entryMonth = ukrainianMonths[new Date().getMonth()];
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -52,7 +58,8 @@ export async function POST(req: Request) {
     const isAnketa = data.target_sheet === 'Анкета передзапису';
     const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : (isAutoweb ? 'АВТОВЕБ' : (isAnketa ? 'АНКЕТА ПЕРЕДЗАПИСУ' : 'ЗАЯВКА')));
 
-    let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
+    let message = `🔥 <b>Новий лід: ${formTitle}</b>\n`;
+    message += `📅 <b>Місяць входу:</b> ${entryMonth}\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
     message += `📞 <b>Телефон:</b> ${phone || '-'}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;
@@ -74,6 +81,10 @@ export async function POST(req: Request) {
 
     if (readiness) {
       message += `⚡ <b>Готовність:</b> ${readiness}\n`;
+    }
+
+    if (subscription_duration) {
+      message += `📅 <b>Підписка:</b> ${subscription_duration}\n`;
     }
 
     message += `\n🌐 <b>Джерело:</b>\n`;
@@ -151,26 +162,26 @@ export async function POST(req: Request) {
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,
-          body: { ...data, ...utms, sheetName: 'VSL 1 етап', api_key: apiKey }
+          body: { ...data, ...utms, entry_month: entryMonth, sheetName: 'VSL 1 етап', api_key: apiKey }
         });
       }
       if (GOOGLE_SCRIPT_URL_MAIN) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_MAIN,
-          body: { ...data, ...utms, target_sheet: 'VSL 1 етап', sheet_id: '43961418', api_key: apiKey }
+          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'VSL 1 етап', sheet_id: '43961418', api_key: apiKey }
         });
       }
     } else if (data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2') {
       if (GOOGLE_SCRIPT_URL_STVORYUI) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_STVORYUI,
-          body: { ...data, ...utms, target_sheet: 'Ленд 2', api_key: apiKey }
+          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'Ленд 2', api_key: apiKey }
         });
       }
       if (GOOGLE_SCRIPT_URL_MAIN) {
         submissions.push({
           url: GOOGLE_SCRIPT_URL_MAIN,
-          body: { ...data, ...utms, target_sheet: 'VSL Форма', api_key: apiKey }
+          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'VSL Форма', api_key: apiKey }
         });
       }
     } else {
@@ -178,7 +189,7 @@ export async function POST(req: Request) {
       if (scriptUrl) {
         submissions.push({
           url: scriptUrl,
-          body: { ...data, ...utms, api_key: apiKey }
+          body: { ...data, ...utms, entry_month: entryMonth, api_key: apiKey }
         });
       }
     }
@@ -271,7 +282,7 @@ export async function POST(req: Request) {
       page_path: data.page_path || '',
       page_url: data.full_url || '',
       visitor_uuid: resolvedUuid,
-      raw_payload: { ...data, vsl_sendpulse_stage: sp_contact_id ? 3 : undefined }
+      raw_payload: { ...data, entry_month: entryMonth, vsl_sendpulse_stage: sp_contact_id ? 3 : undefined }
     };
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);

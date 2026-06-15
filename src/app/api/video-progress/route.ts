@@ -62,6 +62,12 @@ export async function POST(req: Request) {
       }
     }
 
+    const ukrainianMonths = [
+      'Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+      'Липень', 'Серпень', 'Вересень', 'Грудень', 'Жовтень', 'Листопад', 'Грудень'
+    ];
+    const entryMonth = ukrainianMonths[new Date().getMonth()];
+
     const videoProgressPayload = {
       seconds_watched: seconds_watched || 0,
       current_time: current_time || 0,
@@ -74,11 +80,13 @@ export async function POST(req: Request) {
           ...(lead.raw_payload as object), 
           sp_contact_id: resolvedSpContactId, 
           vsl_sendpulse_stage: nextSendPulseStage, 
+          entry_month: entryMonth,
           video_progress: videoProgressPayload 
         }
       : { 
           sp_contact_id: resolvedSpContactId, 
           vsl_sendpulse_stage: nextSendPulseStage, 
+          entry_month: entryMonth,
           video_progress: videoProgressPayload 
         };
 

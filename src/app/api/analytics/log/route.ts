@@ -17,6 +17,12 @@ export async function POST(req: Request) {
       );
     }
 
+    const ukrainianMonths = [
+      'Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+      'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'
+    ];
+    const entryMonth = ukrainianMonths[new Date().getMonth()];
+
     // 1. ПАРАЛЕЛЬНИЙ ЗАПИС ТЕЛЕМЕТРІЇ (Supabase)
     if (visitorId) {
       try {
@@ -33,7 +39,7 @@ export async function POST(req: Request) {
           utm_term: utms?.utm_term || '',
           page_path: path || '',
           page_url: body.fullUrl || '',
-          raw_payload: body,
+          raw_payload: { ...body, entry_month: entryMonth, vsl_sendpulse_stage: sp_contact_id ? 1 : undefined },
           is_free: true,
           amount: body.amount || 0
         });

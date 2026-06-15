@@ -12,6 +12,7 @@ interface QuestionnaireFormData {
   phone: string;
   instagram: string;
   purpose: string;
+  subscription_duration: string;
   difficulties: string;
   readiness: string;
   consent: boolean;
@@ -46,6 +47,7 @@ export default function PreRegistrationAnketaPage() {
       phone: '',
       instagram: '',
       purpose: '',
+      subscription_duration: '',
       difficulties: '',
       readiness: '',
       consent: false,
@@ -53,6 +55,7 @@ export default function PreRegistrationAnketaPage() {
   });
 
   const purposeValue = watch('purpose');
+  const subscriptionDurationValue = watch('subscription_duration');
   const readinessValue = watch('readiness');
   const consentValue = watch('consent');
 
@@ -83,7 +86,9 @@ export default function PreRegistrationAnketaPage() {
     setLoading(true);
 
     const params = new URLSearchParams(window.location.search);
-    const utms = {
+    const hasUrlUtms = params.get('utm_source') || params.get('utm_medium') || params.get('utm_campaign');
+    
+    let utms = {
       utm_source: params.get('utm_source') || 'direct',
       utm_medium: params.get('utm_medium') || '-',
       utm_campaign: params.get('utm_campaign') || '-',
@@ -91,12 +96,30 @@ export default function PreRegistrationAnketaPage() {
       utm_content: params.get('utm_content') || '-'
     };
 
+    if (!hasUrlUtms) {
+      try {
+        const savedUtms = JSON.parse(localStorage.getItem('last_utms') || localStorage.getItem('first_utms') || '{}');
+        if (savedUtms.utm_source || savedUtms.utm_medium || savedUtms.utm_campaign) {
+          utms = {
+            utm_source: savedUtms.utm_source || 'direct',
+            utm_medium: savedUtms.utm_medium || '-',
+            utm_campaign: savedUtms.utm_campaign || '-',
+            utm_term: savedUtms.utm_term || '-',
+            utm_content: savedUtms.utm_content || '-'
+          };
+        }
+      } catch (e) {
+        console.error('Failed to parse saved UTMs:', e);
+      }
+    }
+
     const payload = {
       name: data.name,
       phone: data.phone,
       social: data.telegram,
       instagram: data.instagram,
       purpose: data.purpose,
+      subscription_duration: data.subscription_duration,
       difficulties: data.difficulties,
       readiness: data.readiness,
       target_sheet: 'Анкета передзапису',
@@ -438,6 +461,49 @@ export default function PreRegistrationAnketaPage() {
                   })}
                 </div>
                 {errors.purpose && <span className="text-red-500/90 text-xs block font-manrope">{errors.purpose.message}</span>}
+              </div>
+
+              {/* Subscription Duration */}
+              <div id="form-group-subscription_duration" className="space-y-4 transition-all duration-300">
+                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Як давно підписана на мене?</label>
+                <div className="space-y-3">
+                  {[
+                    { id: 'under_month', label: 'до місяця' },
+                    { id: 'one_three_months', label: '1-3 місяці' },
+                    { id: 'over_six_months', label: 'більше 6 місяців' }
+                  ].map((option) => {
+                    const isSelected = subscriptionDurationValue === option.label;
+                    return (
+                      <label 
+                        key={option.id} 
+                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
+                          isSelected 
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                            : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
+                        }`}
+                      >
+                        <input 
+                          type="radio" 
+                          value={option.label}
+                          {...register('subscription_duration', { required: 'Оберіть один варіант' })}
+                          className="sr-only"
+                        />
+                        {/* Custom radio button design */}
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
+                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                        }`}>
+                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
+                            isSelected ? 'scale-100' : 'scale-0'
+                          }`} />
+                        </div>
+                        <span className={`text-xs md:text-sm transition-colors ${
+                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
+                        }`}>{option.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {errors.subscription_duration && <span className="text-red-500/90 text-xs block font-manrope">{errors.subscription_duration.message}</span>}
               </div>
 
               {/* Difficulties - ADAPTIVE EXPANDING SINGLE-LINE TEXTAREA */}

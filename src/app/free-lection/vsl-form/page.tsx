@@ -373,13 +373,32 @@ export default function StvoryuiPage() {
       fullPhone = phoneInputRef.current.value.trim();
     }
     
-    // Get UTMs
+    // Get UTMs from URL or fallback to localStorage
     const params = new URLSearchParams(window.location.search);
-    const utms = {
+    const hasUrlUtms = params.get('utm_source') || params.get('utm_medium') || params.get('utm_campaign');
+    
+    let utms = {
       utm_source: params.get('utm_source') || '',
       utm_medium: params.get('utm_medium') || '',
-      utm_campaign: params.get('utm_campaign') || ''
+      utm_campaign: params.get('utm_campaign') || '',
+      utm_term: params.get('utm_term') || '',
+      utm_content: params.get('utm_content') || ''
     };
+
+    if (!hasUrlUtms) {
+      try {
+        const savedUtms = JSON.parse(localStorage.getItem('last_utms') || localStorage.getItem('first_utms') || '{}');
+        utms = {
+          utm_source: savedUtms.utm_source || '',
+          utm_medium: savedUtms.utm_medium || '',
+          utm_campaign: savedUtms.utm_campaign || '',
+          utm_term: savedUtms.utm_term || '',
+          utm_content: savedUtms.utm_content || ''
+        };
+      } catch (e) {
+        console.error('Failed to parse saved UTMs:', e);
+      }
+    }
 
     try {
       const spContactId = localStorage.getItem('sp_contact_id');
