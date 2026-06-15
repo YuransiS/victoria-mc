@@ -76,7 +76,7 @@ async function runE2ETest() {
         purpose: 'для свого особистого-експертного блогу',
         subscription_duration: '1-3 місяці',
         difficulties: 'Автоматичне тестування інтеграції SendPulse',
-        readiness: 'говата на всі 100%',
+        readiness: 'готова на всі 100%',
         target_sheet: 'VSL Форма',
         visitor_id: visitorId,
         sp_contact_id: spContactId,
