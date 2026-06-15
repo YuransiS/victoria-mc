@@ -268,7 +268,7 @@ export async function GET(req: Request) {
     // 3. Dispatch to Telegram Bot API
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    const topicId = process.env.TOPIC_ID;
+    const topicId = process.env.REPORT_TOPIC_ID || '2518';
 
     if (token && chatId) {
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
