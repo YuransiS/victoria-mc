@@ -444,15 +444,37 @@ export default function RozbirPage() {
       {/* EXPERT SECTION */}
       <section className="py-24 px-6 bg-[#F9F9F9] relative border-t border-gray-200">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-12 text-center">
+          <div className="mb-12 text-center flex flex-col items-center">
             <span className="text-black text-[10px] uppercase tracking-[0.25em] font-bold block mb-4 border-b border-black pb-1 inline-block">Контент стає легким, коли є система</span>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-black mb-2">Привіт, я <span className="italic font-normal text-[#6B6B6B]">Віка</span></h2>
             <p className="text-gray-500 text-xs md:text-sm uppercase font-bold tracking-widest mt-2">— ЕКСПЕРТ З КОНТЕНТУ ТА ВІЗУАЛУ</p>
+            <a 
+              href="https://www.instagram.com/victoria_meshcheriakova?igsh=dW55YTltMTZ0Mmw1" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-black font-semibold mt-3 transition-colors uppercase tracking-wider"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              <span>@victoria_meshcheriakova</span>
+            </a>
           </div>
 
-          <div className="w-64 h-80 mx-auto overflow-hidden mb-12 relative shadow-xl">
+          <a 
+            href="https://www.instagram.com/victoria_meshcheriakova?igsh=dW55YTltMTZ0Mmw1" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block w-64 h-80 mx-auto overflow-hidden mb-12 relative shadow-xl hover:opacity-95 hover:scale-[1.01] transition-all group"
+          >
             <img src="/rozbir/vik.jpg" alt="Victoria Meshcheriakova" className="w-full h-full object-cover" />
-          </div>
+            <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 shadow-md flex items-center gap-1.5 rounded-sm opacity-80 group-hover:opacity-100 transition-opacity">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" className="text-black">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              <span className="text-[10px] font-bold text-black uppercase tracking-wider">Instagram</span>
+            </div>
+          </a>
 
           <div className="space-y-6 text-gray-800 w-full">
             <div className="bg-white p-6 md:p-8 shadow-sm border-l-4 border-black text-center">
