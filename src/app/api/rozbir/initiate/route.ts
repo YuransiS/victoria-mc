@@ -27,14 +27,59 @@ export async function POST(req: Request) {
     if (!WFP_SECRET_KEY || !WFP_MERCHANT_ACCOUNT) {
       return NextResponse.json({ error: 'WayForPay configuration missing' }, { status: 500 });
     }
-
     const orderReference = `ROZ_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const orderDate = Math.floor(Date.now() / 1000);
     const productName = "Персональний розбір";
     const productCount = "1";
     const amountStr = String(amount);
 
-    // 1. Log Lead to Google Sheets
+    // 1. Telegram Notification (Run first to capture tgMsgId for CRM updates)
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const topicId = process.env.TOPIC_ID;
+    let tgMsgId = null;
+    let tgPromise: Promise<any> = Promise.resolve();
+
+    if (token && chatId) {
+      const title = "⏳ <b>Очікується оплата (Персональний розбір)</b>";
+      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
+
+      const message = `${title}\n\n` +
+        `👤 <b>Клієнт:</b> ${name || '-'}\n` +
+        `📞 <b>Телефон:</b> ${phone || '-'}\n` +
+        `📱 <b>Social:</b> ${social || '-'}\n` +
+        (instagram ? `📸 <b>Instagram:</b> ${instagram}\n` : '') +
+        `💰 <b>Сума:</b> ${amount} UAH\n` +
+        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
+        utmInfo;
+
+      tgPromise = fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_thread_id: topicId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      })
+      .then(async (res) => {
+        const tgData = await res.json();
+        if (tgData.result?.message_id) {
+          tgMsgId = tgData.result.message_id;
+        }
+        return tgData;
+      })
+      .catch(err => {
+        console.error('Telegram rozbir failed:', err);
+        return null;
+      });
+
+      // Await Telegram to make sure tgMsgId is captured before logging to Sheets
+      await tgPromise;
+    }
+
+    // 2. Log Lead to Google Sheets
     let sheetsUuid = null;
     const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
     let sheetsPromise: Promise<any> = Promise.resolve();
@@ -56,6 +101,7 @@ export async function POST(req: Request) {
           utm_campaign: utm_campaign || '',
           utm_content: utm_content || '',
           utm_term: utm_term || '',
+          tg_msg_id: tgMsgId,
           api_key: SHEETS_API_KEY
         })
       }).then(async (res) => {
@@ -84,6 +130,7 @@ export async function POST(req: Request) {
         utm_campaign: utm_campaign || '',
         utm_content: utm_content || '',
         utm_term: utm_term || '',
+        tg_msg_id: tgMsgId,
         api_key: SHEETS_API_KEY
       };
 
@@ -94,7 +141,7 @@ export async function POST(req: Request) {
       }).catch(err => console.error('Stvoryui logging failed:', err));
     }
 
-    // 2. Supabase Integration & Lead Stitching
+    // 3. Supabase Integration & Lead Stitching
     const clientUuid = visitor_id || null;
     const phoneOrSocial = phone || social || '';
     const isPhone = phoneOrSocial && !phoneOrSocial.startsWith('@') && phoneOrSocial.replace(/\D/g, '').length >= 7;
@@ -152,7 +199,7 @@ export async function POST(req: Request) {
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
 
-    // 3. Generate WayForPay Signature
+    // 4. Generate WayForPay Signature
     const signatureData = [
       WFP_MERCHANT_ACCOUNT,
       WFP_MERCHANT_DOMAIN,
@@ -192,39 +239,8 @@ export async function POST(req: Request) {
       serviceUrl: `${currentDomain}/api/payment-callback`
     };
 
-    // 4. Telegram Notification
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    const topicId = process.env.TOPIC_ID;
-    let tgPromise: Promise<any> = Promise.resolve();
-
-    if (token && chatId) {
-      const title = "⏳ <b>Очікується оплата (Персональний розбір)</b>";
-      const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
-
-      const message = `${title}\n\n` +
-        `👤 <b>Клієнт:</b> ${name || '-'}\n` +
-        `📞 <b>Телефон:</b> ${phone || '-'}\n` +
-        `📱 <b>Social:</b> ${social || '-'}\n` +
-        (instagram ? `📸 <b>Instagram:</b> ${instagram}\n` : '') +
-        `💰 <b>Сума:</b> ${amount} UAH\n` +
-        `🆔 <b>ID:</b> <code>${orderReference}</code>` +
-        utmInfo;
-
-      tgPromise = fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_thread_id: topicId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      }).catch(err => console.error('Telegram rozbir failed:', err));
-    }
-
     // Parallel execution
-    const results = await Promise.allSettled([sheetsPromise, stvoryuiPromise, supabasePromise, tgPromise]);
+    const results = await Promise.allSettled([sheetsPromise, stvoryuiPromise, supabasePromise]);
 
     const supabaseResult = results[2];
     if (supabaseResult.status === 'rejected') {
@@ -238,7 +254,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ ...paymentData, uuid: sheetsUuid, visitor_uuid: resolvedUuid });
+    return NextResponse.json({ ...paymentData, uuid: sheetsUuid, visitor_uuid: resolvedUuid, tgMsgId });
 
   } catch (error) {
     console.error('Initiate Error:', error);

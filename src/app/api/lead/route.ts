@@ -58,8 +58,7 @@ export async function POST(req: Request) {
     const isAnketa = data.target_sheet === 'Анкета передзапису';
     const formTitle = isVSL ? 'АНКЕТА VSL (ФОРМА)' : (isVSL1 ? 'ЛЕКЦІЯ (VSL Воронка)' : (isAutoweb ? 'АВТОВЕБ' : (isAnketa ? 'АНКЕТА ПЕРЕДЗАПИСУ' : 'ЗАЯВКА')));
 
-    let message = `🔥 <b>Новий лід: ${formTitle}</b>\n`;
-    message += `📅 <b>Місяць входу:</b> ${entryMonth}\n\n`;
+    let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
     message += `📞 <b>Телефон:</b> ${phone || '-'}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;

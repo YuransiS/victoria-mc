@@ -203,8 +203,16 @@ export default function RozbirPage() {
       localStorage.setItem('lead_name', data.name);
       localStorage.setItem('lead_phone', fullPhone);
       localStorage.setItem('lead_social', data.social || '');
+      localStorage.setItem('lead_utm_source', utms.utm_source);
+      localStorage.setItem('lead_utm_medium', utms.utm_medium);
       if (paymentData.uuid) {
         localStorage.setItem('lead_uuid', paymentData.uuid);
+      }
+      if (paymentData.tgMsgId) {
+        localStorage.setItem('tg_msg_id_data', JSON.stringify({
+          id: paymentData.tgMsgId,
+          timestamp: Date.now()
+        }));
       }
 
       trackFBEvent('Lead', {

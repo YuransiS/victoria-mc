@@ -14,7 +14,7 @@ function ThanksContent() {
     setOrderId(ref);
 
     // Meta Pixel Tracking
-    const leadName = (localStorage.getItem('lead_name') || '').trim().toLowerCase();
+    const leadName = (localStorage.getItem('lead_name') || '').trim();
     const leadPhone = (localStorage.getItem('lead_phone') || '').replace(/\D/g, '');
     const savedPrice = localStorage.getItem('purchase_price') || '390';
 
@@ -25,8 +25,42 @@ function ThanksContent() {
       content_type: 'product',
       content_ids: ['diag_v_1'],
       external_id: ref,
-      // Advanced matching info can be passed if supported by the helper or window.fbq directly
     });
+
+    // Update Telegram Bot Status
+    let activeTgMsgId = null;
+    const tgDataRaw = localStorage.getItem('tg_msg_id_data');
+    if (tgDataRaw) {
+      try {
+        const tgData = JSON.parse(tgDataRaw);
+        if (Date.now() - tgData.timestamp < 24 * 60 * 60 * 1000) {
+          activeTgMsgId = tgData.id;
+        }
+      } catch (e) {}
+    }
+
+    if (ref) {
+      fetch('/api/leads', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "update_status",
+          order_id: ref,
+          customer_name: leadName || 'Клієнт',
+          customer_phone: leadPhone || '-',
+          tariff: "Персональний розбір",
+          amount: savedPrice,
+          currency: "UAH",
+          utm_source: localStorage.getItem('lead_utm_source') || '',
+          utm_medium: localStorage.getItem('lead_utm_medium') || '',
+          status: "APPROVED (Redirect)",
+          tg_msg_id: activeTgMsgId,
+          target_sheet: "Ленд 3"
+        }),
+      }).finally(() => {
+        localStorage.removeItem('tg_msg_id_data');
+      });
+    }
   }, [searchParams]);
 
   return (

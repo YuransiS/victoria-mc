@@ -62,7 +62,8 @@ export async function POST(request: Request) {
 
       const targetSheet = data.target_sheet || data.targetSheet || '';
       const isPracticum = targetSheet === "Практикум" || currency === "USD";
-      const label = isPracticum ? "Практикум" : "Бронь";
+      const isRozbir = targetSheet.includes("Ленд 3") || targetSheet.includes("Розбір") || (orderId && orderId.startsWith("ROZ"));
+      const label = isPracticum ? "Практикум" : (isRozbir ? "Розбір" : "Бронь");
 
       const statusTitle = isSuccess 
         ? `✅ <b>Оплата успішна! (${label})</b>` 
@@ -131,7 +132,8 @@ export async function POST(request: Request) {
       
       const targetSheet = data.target_sheet || data.targetSheet || resData.sheetName || '';
       const isPracticum = targetSheet === "Практикум" || data.currency === "USD" || resData.sheetName === "Практикум";
-      const label = isPracticum ? "Практикум" : "Бронь";
+      const isRozbir = targetSheet.includes("Ленд 3") || targetSheet.includes("Розбір") || (orderId && orderId.startsWith("ROZ"));
+      const label = isPracticum ? "Практикум" : (isRozbir ? "Розбір" : "Бронь");
       
       const statusTitle = isSuccess ? `✅ Оплата успішна! (${label})` : `❌ Оплата відхилена (${label})`;
 
