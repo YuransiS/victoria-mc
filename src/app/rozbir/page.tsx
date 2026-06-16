@@ -296,6 +296,21 @@ export default function RozbirPage() {
               </svg>
             </button>
           </div>
+
+          <div className="w-full max-w-[280px] mx-auto mt-4 text-center">
+            <p className="text-[11px] md:text-xs text-gray-500 font-medium leading-relaxed italic">
+              🎁 у подарунок отримаєш запис закритого ефіру по створенню карусельок, які приносять аудиторію і продажі
+            </p>
+          </div>
+
+          <div className="w-[95%] max-w-[400px] mt-8 mx-auto text-left bg-white/50 backdrop-blur-sm p-5 border border-gray-200/60 rounded-none shadow-sm">
+            <h3 className="font-serif text-sm md:text-base font-bold text-black mb-1.5 uppercase tracking-wider">
+              Для кого підійде цей розбір?
+            </h3>
+            <p className="font-sans text-xs md:text-sm text-gray-600 leading-relaxed">
+              Якщо ти вже ведеш блог або давно хочеш почати, але відчуваєш, що застрягла на одному місці.
+            </p>
+          </div>
         </div>
       </section>
 
