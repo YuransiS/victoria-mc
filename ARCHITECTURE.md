@@ -29,7 +29,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `practicum/` — Dedicated masterclass practicum page.
 *   `practicum/thanks/` — Thanks/success page for the practicum.
 *   `practicum/fail/` — Failure page for the practicum.
-*   `free-lection/` — VSL funnel start landing page. Supports `?uavlsab=160626` query parameter for A/B testing redirect to an alternative Telegram chatbot chain.
+*   `free-lection/` — VSL funnel start landing page. Supports `?uavslab=160626` query parameter for A/B testing redirect to an alternative Telegram chatbot chain.
 *   `free-lection/vsl-form/` — VSL Step 2 form questionnaire.
 *   `rozbir/` — Personal video breakdown offer page.
 *   `anketa/` — [NEW] Pre-registration Questionnaire Landing Page for lead capturing.
