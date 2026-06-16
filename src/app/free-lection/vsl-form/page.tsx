@@ -32,7 +32,7 @@ export default function StvoryuiPage() {
     show: false
   });
   const [timeLeft, setTimeLeft] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
 
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const itiRef = useRef<any>(null);
@@ -243,51 +243,7 @@ export default function StvoryuiPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Delayed form visibility check (15 minutes after play or page load fallback)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('showForm') === 'true' || params.get('qa') === 'true') {
-      setShowForm(true);
-      return;
-    }
-
-    const PAGE_LOAD_KEY = 'vsl_page_load_time';
-    if (!localStorage.getItem(PAGE_LOAD_KEY)) {
-      localStorage.setItem(PAGE_LOAD_KEY, Date.now().toString());
-    }
-
-    const checkPlayTimer = () => {
-      const playStartTime = localStorage.getItem('vsl_play_start_time');
-      if (playStartTime) {
-        const elapsed = Date.now() - parseInt(playStartTime, 10);
-        if (elapsed >= 15 * 60 * 1000) { // 15 minutes
-          setShowForm(true);
-          return true;
-        }
-      }
-
-      // Fallback: Check page load time
-      const pageLoadTime = localStorage.getItem(PAGE_LOAD_KEY);
-      if (pageLoadTime) {
-        const elapsed = Date.now() - parseInt(pageLoadTime, 10);
-        if (elapsed >= 15 * 60 * 1000) { // 15 minutes
-          setShowForm(true);
-          return true;
-        }
-      }
-      return false;
-    };
-
-    if (checkPlayTimer()) return;
-
-    const interval = setInterval(() => {
-      if (checkPlayTimer()) {
-        clearInterval(interval);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Form is shown immediately
 
   // Initialize intl-tel-input
   useEffect(() => {
@@ -363,6 +319,39 @@ export default function StvoryuiPage() {
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     };
   }, [showForm]);
+
+  const formInteractionTrackedRef = useRef(false);
+
+  const trackFormInteraction = async () => {
+    if (formInteractionTrackedRef.current) return;
+    formInteractionTrackedRef.current = true;
+
+    try {
+      const visitorId = localStorage.getItem('visitor_id');
+      if (!visitorId) return;
+
+      const currentTime = playerRef.current && typeof playerRef.current.getCurrentTime === 'function' 
+        ? Math.round(playerRef.current.getCurrentTime()) 
+        : 0;
+
+      const spContactId = localStorage.getItem('sp_contact_id');
+
+      await fetch('/api/video-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitor_id: visitorId,
+          sp_contact_id: spContactId || undefined,
+          seconds_watched: Math.round(watchedSecondsRef.current),
+          current_time: currentTime,
+          played: playedRef.current,
+          wants_to_fill: true
+        })
+      });
+    } catch (err) {
+      console.error('Failed to track form interaction:', err);
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
@@ -507,7 +496,7 @@ export default function StvoryuiPage() {
             </div>
 
             <div className="flex flex-col items-center gap-8 pt-4">
-              <a href="#anketa" className="inline-block bg-black text-white px-10 py-5 text-xs md:text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all shadow-xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
+              <a href="#anketa" onClick={trackFormInteraction} className="inline-block bg-black text-white px-10 py-5 text-xs md:text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all shadow-xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-8 h-8 text-gray-300 animate-bounce">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
               </svg>
@@ -576,7 +565,7 @@ export default function StvoryuiPage() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-10" noValidate>
+            <form onSubmit={handleSubmit(onSubmit)} onFocus={trackFormInteraction} className="space-y-10" noValidate>
               <input type="hidden" value="Ленд2" {...register('target_sheet')} />
               
               {/* Name */}
@@ -707,7 +696,7 @@ export default function StvoryuiPage() {
             </div>
 
             <div className="mt-20 text-center">
-              <a href="#anketa" className="inline-block bg-black text-white px-12 py-6 text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all shadow-2xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
+              <a href="#anketa" onClick={trackFormInteraction} className="inline-block bg-black text-white px-12 py-6 text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all shadow-2xl hover:-translate-y-1">АНКЕТА ПРЕДЗАПИСУ</a>
             </div>
           </div>
         </section>
@@ -800,9 +789,9 @@ export default function StvoryuiPage() {
       {showForm && (
         <>
           <div className="fixed bottom-0 left-0 w-full p-4 z-40 bg-gradient-to-t from-white via-white to-transparent pt-8 md:hidden">
-        <a href="#anketa" className="block w-full bg-black text-white text-center py-4 text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl">Заповнити анкету</a>
+        <a href="#anketa" onClick={trackFormInteraction} className="block w-full bg-black text-white text-center py-4 text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl">Заповнити анкету</a>
       </div>
-      <a href="#anketa" className="hidden md:flex fixed bottom-8 right-8 z-40 bg-black text-white w-auto px-8 py-4 items-center gap-3 shadow-2xl hover:bg-gray-800 transition-all rounded-sm group">
+      <a href="#anketa" onClick={trackFormInteraction} className="hidden md:flex fixed bottom-8 right-8 z-40 bg-black text-white w-auto px-8 py-4 items-center gap-3 shadow-2xl hover:bg-gray-800 transition-all rounded-sm group">
         <span className="text-xs font-bold uppercase tracking-[0.15em]">Заповнити анкету</span>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 group-hover:translate-x-1 transition-transform">
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />

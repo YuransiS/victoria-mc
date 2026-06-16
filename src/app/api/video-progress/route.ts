@@ -7,7 +7,7 @@ const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { visitor_id, seconds_watched, current_time, played, status, sp_contact_id } = body;
+    const { visitor_id, seconds_watched, current_time, played, status, sp_contact_id, wants_to_fill } = body;
 
     if (!visitor_id) {
       return NextResponse.json({ success: false, error: 'Missing visitor_id' }, { status: 400 });
@@ -32,11 +32,14 @@ export async function POST(req: Request) {
     // Determine new status
     let newStatus = currentStatus || 'Клик';
     const isPaymentStatus = currentStatus && ['Approved', 'Settled', 'Paid', 'Купив', 'Оплачено'].some(s => currentStatus.includes(s));
+    const isRegistered = currentStatus && currentStatus.includes('Зареєстровано');
 
-    if (!isPaymentStatus) {
+    if (!isPaymentStatus && !isRegistered) {
       if (status === 'полностью посмотрел') {
         newStatus = 'полностью посмотрел';
-      } else if (played && (!currentStatus || currentStatus === 'Клик' || currentStatus === 'КликФормы')) {
+      } else if (wants_to_fill && currentStatus !== 'полностью посмотрел') {
+        newStatus = 'КликФормы';
+      } else if (played && (!currentStatus || currentStatus === 'Клик')) {
         newStatus = 'Дивився відео';
       }
     }
@@ -75,19 +78,30 @@ export async function POST(req: Request) {
       last_updated: new Date().toISOString()
     };
 
+    const existingWantsToFill = (lead?.raw_payload as any)?.wants_to_fill || null;
+    const wantsToFillData = wants_to_fill
+      ? {
+          video_time: current_time || 0,
+          seconds_watched: seconds_watched || 0,
+          timestamp: new Date().toISOString()
+        }
+      : existingWantsToFill;
+
     const rawPayload = lead?.raw_payload && typeof lead.raw_payload === 'object'
       ? { 
           ...(lead.raw_payload as object), 
           sp_contact_id: resolvedSpContactId, 
           vsl_sendpulse_stage: nextSendPulseStage, 
           entry_month: entryMonth,
-          video_progress: videoProgressPayload 
+          video_progress: videoProgressPayload,
+          ...(wantsToFillData ? { wants_to_fill: wantsToFillData } : {})
         }
       : { 
           sp_contact_id: resolvedSpContactId, 
           vsl_sendpulse_stage: nextSendPulseStage, 
           entry_month: entryMonth,
-          video_progress: videoProgressPayload 
+          video_progress: videoProgressPayload,
+          ...(wantsToFillData ? { wants_to_fill: wantsToFillData } : {})
         };
 
     let dbResult;
