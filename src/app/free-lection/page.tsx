@@ -29,6 +29,12 @@ export default function FreeLectionPage() {
   useEffect(() => {
     trackFBEvent('PageView', {});
     
+    const params = new URLSearchParams(window.location.search);
+    const uavlsabParam = params.get('uavlsab');
+    if (uavlsabParam) {
+      localStorage.setItem('uavlsab', uavlsabParam);
+    }
+    
     const handleScroll = () => {
       setShowStickyFooter(window.scrollY > 400);
     };
@@ -106,6 +112,8 @@ export default function FreeLectionPage() {
     localStorage.setItem('lead_instagram', data.instagram || '');
 
     const params = new URLSearchParams(window.location.search);
+    const uavlsabVal = params.get('uavlsab') || localStorage.getItem('uavlsab') || '';
+
     const utms = {
       utm_source: params.get('utm_source') || '',
       utm_medium: params.get('utm_medium') || '',
@@ -121,6 +129,7 @@ export default function FreeLectionPage() {
       instagram: data.instagram,
       target_sheet: 'VSL Воронка (старт)',
       visitor_id: localStorage.getItem('visitor_id') || '',
+      uavlsab: uavlsabVal || undefined,
       ...utms
     };
 
@@ -140,7 +149,12 @@ export default function FreeLectionPage() {
       if (resData.uuid) {
         localStorage.setItem('lead_uuid', resData.uuid);
       }
-      window.location.href = BOT_REDIRECT_URL;
+      
+      if (uavlsabVal === '160626') {
+        window.location.href = 'https://t.me/victoriameshcheriakova_bot?start=6a319bcf0e2107e50808636b';
+      } else {
+        window.location.href = BOT_REDIRECT_URL;
+      }
     } catch (err) {
       console.error(err);
       alert("Помилка відправки. Спробуйте ще раз.");
