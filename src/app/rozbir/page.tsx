@@ -4,15 +4,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import Script from 'next/script';
 import { useForm } from 'react-hook-form';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ZoomIn, 
-  Fingerprint, 
-  Clock, 
-  Copy, 
-  ShieldCheck, 
-  X 
+import {
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  Fingerprint,
+  Clock,
+  Copy,
+  ShieldCheck,
+  X
 } from 'lucide-react';
 import { trackFBEvent } from '@/components/FacebookPixel';
 
@@ -78,7 +78,7 @@ export default function RozbirPage() {
     }, { threshold: 0.2 });
 
     if (heroRef.current) observer.observe(heroRef.current);
-    
+
     // Global persistence load
     const savedName = localStorage.getItem('lead_name');
     const savedPhone = localStorage.getItem('lead_phone');
@@ -102,7 +102,7 @@ export default function RozbirPage() {
           setCountryCode(data.country.toUpperCase());
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const openModal = () => {
@@ -226,7 +226,7 @@ export default function RozbirPage() {
 
   return (
     <div className="antialiased text-sm md:text-base pb-24 bg-[#F9F9F9] text-[#0F0F0F] font-sans">
-      <Script 
+      <Script
         id="widget-wfp-script"
         src="https://secure.wayforpay.com/server/pay-widget.js"
         strategy="afterInteractive"
@@ -247,7 +247,7 @@ export default function RozbirPage() {
       {/* HERO SECTION */}
       <section id="hero-section" ref={heroRef}
         className="relative min-h-[100dvh] flex flex-col justify-end md:justify-center pb-12 md:pb-8 pt-[15vh] md:pt-0 overflow-hidden bg-[#F9F9F9]">
-        
+
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#F9F9F9]">
           <img src="/rozbir/IMG_2527.jpg" alt="Victoria Meshcheriakova"
             className="w-full h-full object-cover object-center opacity-95" />
@@ -304,7 +304,7 @@ export default function RozbirPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">Ось як змінюється твій візуал і контент
-              <br/><span className="italic font-normal text-[#6B6B6B]">після розбору</span>
+              <br /><span className="italic font-normal text-[#6B6B6B]">після розбору</span>
             </h2>
             <div className="w-16 h-px bg-black mx-auto mt-6"></div>
           </div>
@@ -350,30 +350,30 @@ export default function RozbirPage() {
       <section className="py-24 px-6 bg-[#F9F9F9] relative">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">Чому твій контент і візуал <br/><span className="italic font-normal text-[#6B6B6B]">не працює і не продає?</span></h2>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">Чому твій контент і візуал <br /><span className="italic font-normal text-[#6B6B6B]">не працює і не продає?</span></h2>
             <div className="w-16 h-px bg-black mx-auto mt-6"></div>
             <p className="text-xs md:text-sm text-gray-500 uppercase tracking-[0.2em] font-bold mt-6">90% ЕКСПЕРТІВ РОБЛЯТЬ ОДНІ Й ТІ САМІ ПОМИЛКИ</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { 
-                icon: Fingerprint, 
-                prefix: 'Немає ', 
-                bold: 'відчуття "це я"', 
-                suffix: ': виглядаєш "як усі", що не дозволяє виділитися і запам\'ятатися.' 
+              {
+                icon: Fingerprint,
+                prefix: 'Немає ',
+                bold: 'відчуття "це я"',
+                suffix: ': виглядаєш "як усі", що не дозволяє виділитися і запам\'ятатися.'
               },
-              { 
-                icon: Clock, 
-                prefix: 'Витрачаєш години на ', 
-                bold: '"ідеальний пост"', 
-                suffix: ' — і все одно незадоволена. Або публікуєш хаотично, або не публікуєш взагалі.' 
+              {
+                icon: Clock,
+                prefix: 'Витрачаєш години на ',
+                bold: '"ідеальний пост"',
+                suffix: ' — і все одно незадоволена. Або публікуєш хаотично, або не публікуєш взагалі.'
               },
-              { 
-                icon: Copy, 
-                prefix: 'Працюєш то по шаблонах, то по трендам — ', 
-                bold: 'не розумієш як створювати контент', 
-                suffix: ', який продає.' 
+              {
+                icon: Copy,
+                prefix: 'Працюєш то по шаблонах, то по трендам — ',
+                bold: 'не розумієш як створювати контент',
+                suffix: ', який продає.'
               }
             ].map((item, idx) => (
               <div key={idx} className="flex flex-col p-6 border-l border-gray-200 hover:border-black transition-colors duration-500 group bg-white shadow-sm">
@@ -400,7 +400,7 @@ export default function RozbirPage() {
       <section className="py-24 px-6 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-serif text-3xl md:text-4xl text-center mb-6 font-bold">
-            Інші експерти <span className="italic font-normal text-[#6B6B6B]">приховують це</span>, <br/>бо заробляють на твоєму хаосі
+            Інші експерти <span className="italic font-normal text-[#6B6B6B]">приховують це</span>, <br />бо заробляють на твоєму хаосі
           </h2>
           <p className="text-base md:text-lg text-black text-center mb-12 font-bold uppercase tracking-widest">На розборі ти отримаєш:</p>
 
@@ -504,7 +504,7 @@ export default function RozbirPage() {
             <div className="relative z-10 flex flex-col items-center">
               <ShieldCheck className="w-10 h-10 stroke-[1.5] text-black mb-6" />
               <h3 className="font-serif text-3xl font-bold text-black mb-4 uppercase tracking-widest">
-                Гарантія <br/>
+                Гарантія <br />
                 <span className="italic font-normal text-[#6B6B6B] lowercase text-2xl">повернення</span>
               </h3>
               <p className="text-gray-600 text-sm md:text-base mb-10 font-light leading-relaxed">
@@ -534,7 +534,7 @@ export default function RozbirPage() {
 
       <footer className="bg-black text-white/40 py-12 text-center text-[10px] uppercase tracking-wider">
         <div className="container mx-auto px-4">
-          <p className="mb-4">Віка Мещерякова &copy; 2024</p>
+          <p className="mb-4">Віка Мещерякова &copy; 2026</p>
           {/* 
           <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 opacity-50">
             <a href="/privacy-policy" className="hover:text-white transition-colors">Політика конфіденційності</a>
@@ -560,14 +560,14 @@ export default function RozbirPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Ваше ім'я</label>
-              <input type="text" {...register('name', { 
+              <input type="text" {...register('name', {
                 required: true,
                 onChange: (e) => handleFieldChange('name', e.target.value)
               })} placeholder="Олена" className="w-full py-3 px-4" />
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Ваш Telegram</label>
-              <input type="text" {...register('social', { 
+              <input type="text" {...register('social', {
                 required: true,
                 onChange: (e) => handleFieldChange('social', e.target.value)
               })} placeholder="@username" className="w-full py-3 px-4" />

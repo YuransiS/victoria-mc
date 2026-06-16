@@ -117,12 +117,24 @@ export async function POST(req: Request) {
       const formattedCrmPhone = formatCrmPhone(crmPhone);
       const crmEmail = `noemail-${formattedCrmPhone.replace(/\D/g, '') || Math.random().toString(36).substring(2, 9)}@example.com`;
       
+      // Form comment string from questionnaire fields if they exist
+      const commentLines: string[] = [];
+      if (niche) commentLines.push(`Ніша: ${niche}`);
+      if (purpose) commentLines.push(`Мета: ${purpose}`);
+      if (difficulties) commentLines.push(`Складнощі: ${difficulties}`);
+      if (readiness) commentLines.push(`Готовність: ${readiness}`);
+      if (subscription_duration) commentLines.push(`Підписка: ${subscription_duration}`);
+      const crmComment = commentLines.join('\n');
+
       const crmPayload = {
         pipeline_id: 110,
         dev_key: "DF5-6E",
         name: name || 'Без імені',
         email: crmEmail,
         phone: formattedCrmPhone,
+        telegram: social || '',
+        instagram: instagram || '',
+        comment: crmComment || '',
         utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
         utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
         utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
