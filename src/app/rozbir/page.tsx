@@ -46,12 +46,20 @@ export default function RozbirPage() {
   const [phoneError, setPhoneError] = useState(false);
   const [phone, setPhone] = useState<string>('');
   const [countryCode, setCountryCode] = useState<string>('UA');
+  const [hasTelegram, setHasTelegram] = useState(true);
 
   const heroRef = useRef<HTMLElement>(null);
   const storytellingRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, setValue } = useForm<FormData>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
+
+  const formatTelegramUsername = (value: string): string => {
+    let cleaned = value.replace(/@/g, '');
+    cleaned = cleaned.replace(/[^a-zA-Z0-9_]/g, '');
+    cleaned = cleaned.substring(0, 30);
+    return `@${cleaned}`;
+  };
 
   useEffect(() => {
     // Initial Price
@@ -85,8 +93,20 @@ export default function RozbirPage() {
     const savedSocial = localStorage.getItem('lead_social');
 
     if (savedName) setValue('name', savedName);
-    if (savedSocial) setValue('social', savedSocial);
     if (savedPhone) setPhone(savedPhone);
+
+    if (savedSocial !== null) {
+      if (savedSocial === '') {
+        setHasTelegram(false);
+        setValue('social', '');
+      } else {
+        setHasTelegram(true);
+        setValue('social', savedSocial);
+      }
+    } else {
+      setHasTelegram(true);
+      setValue('social', '@');
+    }
 
     return () => {
       clearInterval(interval);
@@ -185,7 +205,7 @@ export default function RozbirPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.name,
-          social: data.social,
+          social: hasTelegram ? data.social : '',
           phone: fullPhone,
           amount: currentPriceObj.current,
           visitor_id: localStorage.getItem('visitor_id') || '',
@@ -202,7 +222,7 @@ export default function RozbirPage() {
       localStorage.setItem('purchase_price', String(currentPriceObj.current));
       localStorage.setItem('lead_name', data.name);
       localStorage.setItem('lead_phone', fullPhone);
-      localStorage.setItem('lead_social', data.social || '');
+      localStorage.setItem('lead_social', hasTelegram ? data.social : '');
       localStorage.setItem('lead_utm_source', utms.utm_source);
       localStorage.setItem('lead_utm_medium', utms.utm_medium);
       if (paymentData.uuid) {
@@ -620,11 +640,60 @@ export default function RozbirPage() {
               })} placeholder="Олена" className="w-full py-3 px-4" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Ваш Telegram</label>
-              <input type="text" {...register('social', {
-                required: true,
-                onChange: (e) => handleFieldChange('social', e.target.value)
-              })} placeholder="@username" className="w-full py-3 px-4" />
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500">Ваш Telegram</label>
+                {hasTelegram ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHasTelegram(false);
+                      setValue('social', '');
+                      localStorage.setItem('lead_social', '');
+                    }}
+                    className="text-[10px] text-gray-400 hover:text-black underline focus:outline-none"
+                  >
+                    Немає нікнейму
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHasTelegram(true);
+                      setValue('social', '@');
+                    }}
+                    className="text-[10px] text-black hover:underline focus:outline-none font-bold"
+                  >
+                    Вказати нікнейм
+                  </button>
+                )}
+              </div>
+              {hasTelegram ? (
+                <input
+                  type="text"
+                  {...register('social', {
+                    required: { value: true, message: 'Обов’язкове поле' },
+                    validate: (val) => {
+                      const cleaned = val.replace(/@/g, '');
+                      if (cleaned.length < 3) return 'Мінімум 3 символи';
+                      if (cleaned.length > 30) return 'Максимум 30 символів';
+                      if (!/^[a-zA-Z0-9_]+$/.test(cleaned)) return 'Тільки англійські літери, цифри та _';
+                      return true;
+                    },
+                    onChange: (e) => {
+                      const formatted = formatTelegramUsername(e.target.value);
+                      setValue('social', formatted);
+                      handleFieldChange('social', formatted);
+                    }
+                  })}
+                  placeholder="@username"
+                  className="w-full py-3 px-4"
+                />
+              ) : (
+                <div className="w-full py-3 px-4 bg-gray-50 border border-dashed border-gray-200 text-gray-400 text-xs rounded-none">
+                  Нікнейм не вказано (зв'язок по телефону)
+                </div>
+              )}
+              {errors.social && <p className="text-red-500 text-[10px] mt-1">{errors.social.message}</p>}
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Телефон</label>
