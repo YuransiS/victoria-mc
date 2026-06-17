@@ -561,6 +561,15 @@ export default function RozbirPage() {
               </button>
             </div>
           </div>
+
+          <div className="text-left bg-white/60 backdrop-blur-sm border border-gray-200/80 p-6 rounded-none max-w-md mx-auto mt-8 shadow-sm">
+            <p className="text-xs md:text-sm font-bold text-gray-900 leading-relaxed mb-3">
+              * Це не консультація і не готовий покроковий план
+            </p>
+            <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+              На розборі ми аналізуємо вашу поточну ситуацію, знаходимо основні точки росту та показуємо, що саме заважає отримувати кращий результат у блозі. Ви отримаєте розуміння, куди рухатись далі та на чому сфокусуватись у першу чергу.
+            </p>
+          </div>
         </div>
       </section>
 
