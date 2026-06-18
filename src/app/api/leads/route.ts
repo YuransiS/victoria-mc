@@ -18,6 +18,8 @@ export async function POST(request: Request) {
     const isStatusUpdate = data.action === "update_status";
 
     const orderIdVal = data.order_id || data.orderId;
+    let leadDbData: any = null;
+
     if (isStatusUpdate && orderIdVal) {
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const parsedStatus = isSuccess ? 'Approved' : (data.status || 'Declined');
@@ -35,32 +37,39 @@ export async function POST(request: Request) {
       } catch (err: any) {
         console.error('[CRM Status Sync] Supabase exception:', err.message || err);
       }
+
+      // Fetch the full lead record for Telegram formatting
+      try {
+        const { data: dbRecord, error: dbError } = await supabaseAdmin
+          .from('victoria_leads')
+          .select('*')
+          .eq('order_id', String(orderIdVal))
+          .maybeSingle();
+        if (!dbError && dbRecord) {
+          leadDbData = dbRecord;
+          console.log(`[CRM Status Sync] Found lead in Supabase: ${JSON.stringify(dbRecord)}`);
+        } else if (dbError) {
+          console.error('[CRM Status Sync] Supabase select error:', dbError);
+        } else {
+          console.log('[CRM Status Sync] No lead found in Supabase for order_id:', orderIdVal);
+        }
+      } catch (err: any) {
+        console.error('[CRM Status Sync] Supabase select exception:', err.message || err);
+      }
     }
 
-    // 1. CRITICAL: Immediate TG Update
-    if (isStatusUpdate && messageId && token && chatId) {
-      const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
-      const orderId = data.order_id || data.orderId;
-      
-      // Get name from request or try to extract from orderId, fallback to 'Клієнт'
-      let customerName = data.customer_name || 'Клієнт';
-      
+    // Message builder helper
+    const buildMessageText = (isSuccess: boolean, orderId: string, customData: any, resDataFallback?: any) => {
+      const dbName = leadDbData?.name || customData.customer_name || resDataFallback?.customerName || 'Клієнт';
+      let customerName = dbName;
       if (customerName === 'Клієнт' && orderId && orderId.includes('_')) {
         const parts = orderId.split('_');
         if (parts[0] !== 'VMC') customerName = parts[0]; 
       }
 
-      console.log(`DEBUG: Updating TG message ${messageId} in chat ${chatId}`);
+      const targetSheet = leadDbData?.target_sheet || customData.target_sheet || customData.targetSheet || resDataFallback?.sheetName || '';
+      const currency = customData.currency || (targetSheet === "Практикум" ? 'USD' : 'UAH');
       
-      const utmSource = data.utm_source || '';
-      const utmMedium = data.utm_medium || '';
-      const customerPhone = data.customer_phone || '-';
-      const tariff = data.tariff || '-';
-      const amount = data.amount || '-';
-      const currency = data.currency || 'USD';
-      const utmInfo = utmSource ? `\n\n🔍 <b>Джерело:</b> ${utmSource} / ${utmMedium || '-'}` : "";
-
-      const targetSheet = data.target_sheet || data.targetSheet || '';
       const isPracticum = targetSheet === "Практикум" || currency === "USD";
       const isRozbir = targetSheet.includes("Ленд 3") || targetSheet.includes("Розбір") || (orderId && orderId.startsWith("ROZ"));
       const label = isPracticum ? "Практикум" : (isRozbir ? "Розбір" : "Бронь");
@@ -69,13 +78,38 @@ export async function POST(request: Request) {
         ? `✅ <b>Оплата успішна! (${label})</b>` 
         : `❌ <b>Оплата відхилена (${label})</b>`;
 
-      const text = `${statusTitle}\n\n` +
+      const customerPhone = leadDbData?.phone || customData.customer_phone || resDataFallback?.customerPhone || '-';
+      const social = leadDbData?.social || customData.social || '';
+      const instagram = leadDbData?.instagram || customData.instagram || '';
+      const tariff = leadDbData?.raw_payload?.tariffName || customData.tariff || resDataFallback?.tariff || (isRozbir ? 'Персональний розбір' : '-');
+      const amount = leadDbData?.amount || customData.amount || resDataFallback?.amount || '-';
+
+      const utmSource = leadDbData?.utm_source || customData.utm_source || '';
+      const utmMedium = leadDbData?.utm_medium || customData.utm_medium || '';
+      const utmCampaign = leadDbData?.utm_campaign || customData.utm_campaign || '';
+
+      const utmInfo = utmSource 
+        ? `\n\n🌐 <b>Джерело:</b>\nSource: ${utmSource}\nMedium: ${utmMedium || '-'}\nCampaign: ${utmCampaign || '-'}`
+        : "";
+
+      return `${statusTitle}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName}\n` +
-        `📞 <b>Телефон:</b> <code>${customerPhone}</code>\n` +
-        `📦 <b>Тариф:</b> ${tariff}\n` +
+        `📞 <b>Телефон:</b> ${customerPhone}\n` +
+        (social ? `📱 <b>Social:</b> ${social}\n` : '') +
+        (instagram ? `📸 <b>Instagram:</b> ${instagram}\n` : '') +
+        (!isRozbir ? `📦 <b>Тариф:</b> ${tariff}\n` : '') +
         `💰 <b>Сума:</b> ${amount} ${currency}\n` +
         `🆔 <b>ID:</b> <code>${orderId}</code>` +
         utmInfo;
+    };
+
+    // 1. CRITICAL: Immediate TG Update
+    if (isStatusUpdate && messageId && token && chatId) {
+      const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
+      const orderId = data.order_id || data.orderId;
+      const text = buildMessageText(isSuccess, orderId, data);
+
+      console.log(`DEBUG: Updating TG message ${messageId} in chat ${chatId}`);
 
       try {
         const url = `https://api.telegram.org/bot${token}/editMessageText`;
@@ -123,31 +157,7 @@ export async function POST(request: Request) {
       // (This is a fallback for when browser didn't have the ID)
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
-      
-      let customerName = data.customer_name || resData.customerName || 'Клієнт';
-      if (customerName === 'Клієнт' && orderId && orderId.includes('_')) {
-        const parts = orderId.split('_');
-        if (parts[0] !== 'VMC') customerName = parts[0]; 
-      }
-      
-      const targetSheet = data.target_sheet || data.targetSheet || resData.sheetName || '';
-      const isPracticum = targetSheet === "Практикум" || data.currency === "USD" || resData.sheetName === "Практикум";
-      const isRozbir = targetSheet.includes("Ленд 3") || targetSheet.includes("Розбір") || (orderId && orderId.startsWith("ROZ"));
-      const label = isPracticum ? "Практикум" : (isRozbir ? "Розбір" : "Бронь");
-      
-      const statusTitle = isSuccess ? `✅ Оплата успішна! (${label})` : `❌ Оплата відхилена (${label})`;
-
-      const customerPhone = data.customer_phone || resData.customerPhone || '-';
-      const tariff = data.tariff || resData.tariff || '-';
-      const amount = data.amount || resData.amount || '-';
-      const currency = data.currency || (resData.sheetName === 'Практикум' ? 'USD' : 'UAH');
-
-      const text = `${statusTitle}\n\n` +
-        `👤 Клієнт: ${customerName}\n` +
-        `📞 Телефон: ${customerPhone}\n` +
-        `📦 Тариф: ${tariff}\n` +
-        `💰 Сума: ${amount} ${currency}\n` +
-        `🆔 ID: ${orderId}`;
+      const text = buildMessageText(isSuccess, orderId, data, resData);
 
       await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
         method: 'POST',
@@ -155,7 +165,8 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           chat_id: chatId,
           message_id: parseInt(resData.tg_msg_id),
-          text: text
+          text: text,
+          parse_mode: 'HTML'
         })
       }).catch(e => console.error('Fallback TG update failed:', e));
     }
