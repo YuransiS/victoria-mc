@@ -89,6 +89,8 @@ Table name: `victoria_leads`
 | `page_url` | `text` | `NULL` | Full page absolute URL |
 | `visitor_uuid`| `uuid` | `NULL` | Persistent device identifier for stitching |
 | `raw_payload` | `jsonb` | `NULL` | Original parsed request body |
+| `tg_msg_id`   | `text`  | `NULL` | Telegram bot notification message identifier for editing |
+
 
 ### 🔗 B&W Analytics Sync (Единая сквозная аналитика)
 Вся таблица `victoria_leads` находится под постоянным наблюдением авто-триггера **`trg_sync_victoria_lead`** на стороне Supabase. 

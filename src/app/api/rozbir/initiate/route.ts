@@ -2,6 +2,59 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
 
+function formatTelegramHandle(tg: string): string {
+  if (!tg) return '';
+  let username = tg.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('t.me/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `@${username}` : '';
+}
+
+function normalizeInstagramHandle(ig: string): string {
+  if (!ig) return '';
+  let username = ig.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('instagram.com/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `@${username}` : '';
+}
+
+function formatInstagramLink(ig: string): string {
+  const normalized = normalizeInstagramHandle(ig);
+  if (!normalized) return '';
+  const username = normalized.substring(1); // Remove the @
+  return `<a href="https://instagram.com/${username}">${normalized}</a>`;
+}
+
 const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
 const SHEETS_API_KEY = process.env.SHEETS_API_KEY;
 const WFP_SECRET_KEY = process.env.WFP_SECRET_KEY?.replace(/['"]/g, '').trim();
@@ -23,6 +76,9 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     const { name, phone, social, amount, utm_source, utm_medium, utm_campaign, utm_content, utm_term, visitor_id, instagram } = data;
+    const formattedSocial = formatTelegramHandle(social || '');
+    const dbInstagram = normalizeInstagramHandle(instagram || '');
+    const formattedInstagram = formatInstagramLink(dbInstagram);
 
     if (!WFP_SECRET_KEY || !WFP_MERCHANT_ACCOUNT) {
       return NextResponse.json({ error: 'WayForPay configuration missing' }, { status: 500 });
@@ -47,8 +103,8 @@ export async function POST(req: Request) {
       const message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${name || '-'}\n` +
         `📞 <b>Телефон:</b> ${phone || '-'}\n` +
-        `📱 <b>Social:</b> ${social || '-'}\n` +
-        (instagram ? `📸 <b>Instagram:</b> ${instagram}\n` : '') +
+        `📱 <b>Social:</b> ${formattedSocial || '-'}\n` +
+        (formattedInstagram ? `📸 <b>Instagram:</b> ${formattedInstagram}\n` : '') +
         `💰 <b>Сума:</b> ${amount} UAH\n` +
         `🆔 <b>ID:</b> <code>${orderReference}</code>` +
         utmInfo;
@@ -93,7 +149,7 @@ export async function POST(req: Request) {
           target_sheet: "Ленд 3",
           orderId: orderReference,
           name,
-          social,
+          social: formattedSocial,
           phone,
           amount,
           utm_source: utm_source || '',
@@ -120,7 +176,7 @@ export async function POST(req: Request) {
         date: new Date().toLocaleString("uk-UA", { timeZone: "Europe/Kiev" }),
         orderId: orderReference,
         name,
-        social,
+        social: formattedSocial,
         phone,
         amount,
         variant_name: `Price: ${amount} UAH`,
@@ -177,8 +233,8 @@ export async function POST(req: Request) {
     const dbPayload = {
       name: name || null,
       phone: normalizedPhone || null,
-      social: social || null,
-      instagram: instagram || null,
+      social: formattedSocial || null,
+      instagram: dbInstagram || null,
       niche: null,
       amount: Number(amount) || 0,
       status: '⏳ Очікується оплата',
@@ -194,7 +250,8 @@ export async function POST(req: Request) {
       page_path: "/rozbir",
       page_url: `${WFP_MERCHANT_DOMAIN}/rozbir`,
       visitor_uuid: resolvedUuid,
-      raw_payload: data
+      raw_payload: data,
+      tg_msg_id: tgMsgId ? String(tgMsgId) : null
     };
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);

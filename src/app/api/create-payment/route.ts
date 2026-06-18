@@ -13,6 +13,59 @@ function cleanPhone(phone: string): string {
   return cleaned;
 }
 
+function formatTelegramHandle(tg: string): string {
+  if (!tg) return '';
+  let username = tg.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('t.me/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `@${username}` : '';
+}
+
+function normalizeInstagramHandle(ig: string): string {
+  if (!ig) return '';
+  let username = ig.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('instagram.com/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `@${username}` : '';
+}
+
+function formatInstagramLink(ig: string): string {
+  const normalized = normalizeInstagramHandle(ig);
+  if (!normalized) return '';
+  const username = normalized.substring(1); // Remove the @
+  return `<a href="https://instagram.com/${username}">${normalized}</a>`;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -36,6 +89,9 @@ export async function POST(request: Request) {
       full_url,
       visitor_id
     } = body;
+    const formattedTelegram = formatTelegramHandle(telegram || '');
+    const dbInstagram = normalizeInstagramHandle(instagram || '');
+    const formattedInstagram = formatInstagramLink(dbInstagram);
 
     const host = request.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
@@ -117,11 +173,11 @@ export async function POST(request: Request) {
       let message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
         `📞 <b>Телефон:</b> ${customerPhone || '-'}\n`;
-      if (telegram) {
-        message += `📱 <b>Telegram:</b> ${telegram}\n`;
+      if (formattedTelegram) {
+        message += `📱 <b>Telegram:</b> ${formattedTelegram}\n`;
       }
-      if (instagram) {
-        message += `📸 <b>Instagram:</b> ${instagram}\n`;
+      if (formattedInstagram) {
+        message += `📸 <b>Instagram:</b> ${formattedInstagram}\n`;
       }
       message += `📦 <b>Тариф:</b> ${tariffName}\n` +
         `💰 <b>Сума:</b> ${amount} ${currency}\n` +
@@ -164,7 +220,7 @@ export async function POST(request: Request) {
           order_id: orderReference,
           name: customerName,
           phone: customerPhone,
-          telegram: telegram,
+          telegram: formattedTelegram,
           amount: amount,
           tariff: tariffName,
           status: "⏳ Очікується оплата",
@@ -231,8 +287,8 @@ export async function POST(request: Request) {
     const dbPayload = {
       name: customerName || null,
       phone: normalizedPhone || null,
-      social: telegram || null,
-      instagram: instagram || null,
+      social: formattedTelegram || null,
+      instagram: dbInstagram || null,
       niche: null,
       amount: Number(amount) || 0,
       status: '⏳ Очікується оплата',
@@ -248,7 +304,8 @@ export async function POST(request: Request) {
       page_path: pagePath,
       page_url: full_url || '',
       visitor_uuid: resolvedUuid,
-      raw_payload: body
+      raw_payload: body,
+      tg_msg_id: tgMsgId ? String(tgMsgId) : null
     };
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);

@@ -21,7 +21,8 @@ create table if not exists public.victoria_leads (
   page_path text,
   page_url text,
   visitor_uuid uuid,
-  raw_payload jsonb
+  raw_payload jsonb,
+  tg_msg_id text
 );
 
 -- Indexing for rapid queries, visitor search, and stitching

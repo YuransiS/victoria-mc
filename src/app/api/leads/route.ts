@@ -1,6 +1,52 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+function formatTelegramHandle(tg: string): string {
+  if (!tg) return '';
+  let username = tg.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('t.me/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `@${username}` : '';
+}
+
+function formatInstagramHandle(ig: string): string {
+  if (!ig) return '';
+  let username = ig.trim();
+  if (username.startsWith('http://') || username.startsWith('https://')) {
+    try {
+      const urlObj = new URL(username);
+      username = urlObj.pathname.replace(/^\//, '');
+    } catch (_) {
+      const parts = username.split('instagram.com/');
+      username = parts[parts.length - 1];
+    }
+  }
+  username = username.split('/')[0].split('?')[0];
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  username = username.trim();
+  if (username === '-' || username.toLowerCase() === 'none' || username.toLowerCase() === 'null') {
+    return '';
+  }
+  return username ? `<a href="https://instagram.com/${username}">@${username}</a>` : '';
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -79,8 +125,9 @@ export async function POST(request: Request) {
         : `❌ <b>Оплата відхилена (${label})</b>`;
 
       const customerPhone = leadDbData?.phone || customData.customer_phone || resDataFallback?.customerPhone || '-';
-      const social = leadDbData?.social || customData.social || '';
-      const instagram = leadDbData?.instagram || customData.instagram || '';
+      const rawSocial = leadDbData?.social || customData.social || resDataFallback?.telegram || '';
+      const social = formatTelegramHandle(rawSocial);
+      const instagram = formatInstagramHandle(leadDbData?.instagram || customData.instagram || '');
       const tariff = leadDbData?.raw_payload?.tariffName || customData.tariff || resDataFallback?.tariff || (isRozbir ? 'Персональний розбір' : '-');
       const amount = leadDbData?.amount || customData.amount || resDataFallback?.amount || '-';
 
@@ -104,18 +151,19 @@ export async function POST(request: Request) {
     };
 
     // 1. CRITICAL: Immediate TG Update
-    if (isStatusUpdate && messageId && token && chatId) {
+    const finalMessageId = messageId || leadDbData?.tg_msg_id;
+    if (isStatusUpdate && finalMessageId && token && chatId) {
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const orderId = data.order_id || data.orderId;
       const text = buildMessageText(isSuccess, orderId, data);
 
-      console.log(`DEBUG: Updating TG message ${messageId} in chat ${chatId}`);
+      console.log(`DEBUG: Updating TG message ${finalMessageId} in chat ${chatId}`);
 
       try {
         const url = `https://api.telegram.org/bot${token}/editMessageText`;
         const body = {
           chat_id: chatId,
-          message_id: parseInt(messageId.toString()),
+          message_id: parseInt(finalMessageId.toString()),
           text: text,
           parse_mode: 'HTML'
         };
