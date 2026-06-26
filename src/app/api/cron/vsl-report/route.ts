@@ -112,10 +112,10 @@ export async function GET(req: Request) {
         : new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
     }
 
-    // 2. Fetch all leads and clicks in this window
+    // 2. Fetch all leads and clicks in this window (selecting raw_payload for video/form telemetry)
     const { data: leads, error: fetchError } = await supabaseAdmin
       .from('victoria_leads')
-      .select('created_at, status, target_sheet, page_path, utm_source, utm_medium, amount, visitor_uuid, phone, name')
+      .select('created_at, status, target_sheet, page_path, utm_source, utm_medium, amount, visitor_uuid, phone, name, raw_payload')
       .gte('created_at', startTime.toISOString())
       .lte('created_at', endTime.toISOString());
 
@@ -128,7 +128,7 @@ export async function GET(req: Request) {
 
     // --- AGGREGATIONS ---
 
-    // 1. VSL Funnel (Free Lection)
+    // 1. VSL Funnel (Free Lection) - detailed visitor tracking & cohort analysis
     const vsl1Clicks = safeLeads.filter(l => l.page_path === '/free-lection' && l.status === 'Клик');
     const vsl2Clicks = safeLeads.filter(l => l.page_path === '/free-lection/vsl-form' && l.status === 'Клик');
     const vsl1Leads = safeLeads.filter(l => 
@@ -139,8 +139,117 @@ export async function GET(req: Request) {
       ['VSL Форма', 'Ленд 2', 'Ленд2'].includes(l.target_sheet || '') &&
       l.status === 'Зареєстровано'
     );
-    const vslPlay = safeLeads.filter(l => l.page_path === '/free-lection/vsl-form' && l.status === 'Дивився відео');
-    const vslWatched = safeLeads.filter(l => l.page_path === '/free-lection/vsl-form' && l.status === 'полностью посмотрел');
+
+    const vslVisitorGroups: Record<string, any[]> = {};
+    safeLeads.forEach(lead => {
+      const uuid = lead.visitor_uuid;
+      if (!uuid) return;
+      const path = lead.page_path || '';
+      const targetSheet = lead.target_sheet || '';
+      const isVslPath = path.startsWith('/free-lection');
+      const isVslSheet = ['VSL 1 етап', 'Ленд 1', 'VSL Воронка (старт)', 'VSL Форма', 'Ленд 2', 'Ленд2'].includes(targetSheet);
+      
+      if (isVslPath || isVslSheet) {
+        if (!vslVisitorGroups[uuid]) {
+          vslVisitorGroups[uuid] = [];
+        }
+        vslVisitorGroups[uuid].push(lead);
+      }
+    });
+
+    let totalLandedStart = 0;
+    let totalLandedVideo = 0;
+    let totalPressedPlay = 0;
+    let totalWatchedEnd = 0;
+    let watchDurations: number[] = [];
+    let wantsToFillTimes: number[] = [];
+    let totalWantsToFill = 0;
+    let totalRegistered = 0;
+
+    const fillBuckets = {
+      '0-5': 0,
+      '5-10': 0,
+      '10-15': 0,
+      '15-20': 0,
+      '20+': 0
+    };
+
+    Object.entries(vslVisitorGroups).forEach(([uuid, rows]) => {
+      let landedStart = false;
+      let landedVideo = false;
+      let pressedPlay = false;
+      let watchedEnd = false;
+      let maxSecondsWatched = 0;
+      let registered = false;
+      let fillTime: number | null = null;
+      let clickedForm = false;
+
+      rows.forEach(row => {
+        const path = row.page_path || '';
+        const status = row.status || '';
+        const targetSheet = row.target_sheet || '';
+
+        if (path === '/free-lection') landedStart = true;
+        if (path === '/free-lection/vsl-form') landedVideo = true;
+
+        if (status === 'Дивився відео' || status === 'полностью посмотрел' || status === 'КликФормы') {
+          pressedPlay = true;
+        }
+        const prog = row.raw_payload?.video_progress;
+        if (prog?.played) {
+          pressedPlay = true;
+        }
+        const secWatched = prog?.seconds_watched || 0;
+        if (secWatched > maxSecondsWatched) {
+          maxSecondsWatched = secWatched;
+        }
+        const curTime = prog?.current_time || 0;
+        if (status === 'полностью посмотрел' || curTime >= 1200) {
+          watchedEnd = true;
+        }
+
+        if (status === 'КликФормы' || row.raw_payload?.wants_to_fill !== undefined) {
+          clickedForm = true;
+        }
+        if (row.raw_payload?.wants_to_fill?.video_time !== undefined) {
+          fillTime = row.raw_payload.wants_to_fill.video_time;
+        }
+
+        if (status === 'Зареєстровано' && ['VSL Форма', 'Ленд 2', 'Ленд2'].includes(targetSheet)) {
+          registered = true;
+        }
+      });
+
+      if (landedStart) totalLandedStart++;
+      if (landedVideo) totalLandedVideo++;
+      if (pressedPlay) {
+        totalPressedPlay++;
+        watchDurations.push(maxSecondsWatched);
+      }
+      if (watchedEnd) totalWatchedEnd++;
+      if (clickedForm) {
+        totalWantsToFill++;
+        if (fillTime !== null) {
+          wantsToFillTimes.push(fillTime);
+          const minutes = fillTime / 60;
+          if (minutes < 5) fillBuckets['0-5']++;
+          else if (minutes < 10) fillBuckets['5-10']++;
+          else if (minutes < 15) fillBuckets['10-15']++;
+          else if (minutes < 20) fillBuckets['15-20']++;
+          else fillBuckets['20+']++;
+        }
+      }
+      if (registered) {
+        totalRegistered++;
+      }
+    });
+
+    const avgWatchSeconds = watchDurations.length > 0
+      ? Math.round(watchDurations.reduce((a, b) => a + b, 0) / watchDurations.length)
+      : 0;
+    const avgWatchMinutes = Math.floor(avgWatchSeconds / 60);
+    const avgWatchSecRest = avgWatchSeconds % 60;
+
 
     // VSL Cohort conversion
     let step2CohortCount = 0;
@@ -293,17 +402,24 @@ export async function GET(req: Request) {
     message += `📅 <b>Період:</b> <code>${formattedStart}</code> — <code>${formattedEnd}</code> (Київ)\n\n`;
 
     // 1. VSL
-    if (vsl1Leads.length > 0 || vsl2Leads.length > 0 || vslPlay.length > 0 || vslWatched.length > 0 || vsl1Clicks.length > 0 || vsl2Clicks.length > 0) {
+    if (vsl1Leads.length > 0 || vsl2Leads.length > 0 || totalLandedStart > 0 || totalLandedVideo > 0 || totalPressedPlay > 0) {
       message += `🔥 <b>1. VSL ВОРОНКА (Лекція)</b>\n`;
+      message += `🌐 <b>Перейшли на сайт (унікальні):</b>\n`;
+      message += `  • Старт воронки: <code>${totalLandedStart}</code>\n`;
+      message += `  • Сторінка відео: <code>${totalLandedVideo}</code>\n`;
+      message += `🎥 <b>Натиснули дивитися:</b> <code>${totalPressedPlay}</code>\n`;
+      message += `🏁 <b>Додивилися до кінця (20+ хв):</b> <code>${totalWatchedEnd}</code>\n`;
+      message += `⏳ <b>Сер. тривалість перегляду:</b> <code>${avgWatchMinutes} хв ${avgWatchSecRest} сек</code>\n`;
+      message += `📝 <b>Клікнули на анкету:</b> <code>${totalWantsToFill}</code>\n`;
+      message += `🕒 <b>Момент кліку на анкету:</b>\n`;
+      message += `  • 0-5 хв: <code>${fillBuckets['0-5']}</code>\n`;
+      message += `  • 5-10 хв: <code>${fillBuckets['5-10']}</code>\n`;
+      message += `  • 10-15 хв: <code>${fillBuckets['10-15']}</code>\n`;
+      message += `  • 15-20 хв: <code>${fillBuckets['15-20']}</code>\n`;
+      message += `  • 20+ хв: <code>${fillBuckets['20+']}</code>\n`;
+      message += `👤 <b>Успішно відправили анкету:</b> <code>${vsl2Leads.length}</code>\n`;
       message += `👤 <b>Реєстрацій (Етап 1):</b> <code>${vsl1Leads.length}</code>\n`;
-      message += `🎥 <b>Дійшли до форми (Етап 2):</b> <code>${vsl2Leads.length}</code>\n`;
       message += `🔄 <b>Конверсія до форми:</b> <code>${conversionRate}%</code> (когорта: <code>${step2CohortCount}</code>)\n`;
-      message += `👀 <b>Перегляд відео:</b>\n`;
-      message += `  • Почали: <code>${vslPlay.length}</code>\n`;
-      message += `  • Додивились (20+ хв): <code>${vslWatched.length}</code>\n`;
-      message += `📈 <b>Трафік (Унікальні кліки):</b>\n`;
-      message += `  • Лендінг старту: <code>${vsl1Clicks.length}</code>\n`;
-      message += `  • Сторінка відео: <code>${vsl2Clicks.length}</code>\n`;
       message += `🏷️ <b>Найкраще джерело (Етап 1):</b> <code>${getBestSource(vsl1Leads)}</code>\n`;
       message += `📊 <b>Джерела на VSL Form (Сторінка відео):</b>\n`;
       if (Object.keys(vslFormSourceStats).length === 0) {
@@ -324,6 +440,7 @@ export async function GET(req: Request) {
         message += `\n`;
       }
     }
+
 
     // 2. Practicum
     if (practicumLeads.length > 0 || practicumClicks.length > 0) {
@@ -409,9 +526,15 @@ export async function GET(req: Request) {
       stats: {
         vsl1LeadsCount: vsl1Leads.length,
         vsl2LeadsCount: vsl2Leads.length,
-        vslPlayCount: vslPlay.length,
-        vslWatchedCount: vslWatched.length,
+        vslPlayCount: totalPressedPlay,
+        vslWatchedCount: totalWatchedEnd,
         vslCohortConversion: conversionRate,
+        vslLandedStart: totalLandedStart,
+        vslLandedVideo: totalLandedVideo,
+        vslAvgWatchSeconds: avgWatchSeconds,
+        vslWantsToFill: totalWantsToFill,
+        vslFillBuckets: fillBuckets,
+
         practicumLeadsCount: practicumLeads.length,
         practicumPaidCount: practicumPaid.length,
         practicumRevenue,

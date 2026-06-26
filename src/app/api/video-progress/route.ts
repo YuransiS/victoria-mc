@@ -132,43 +132,7 @@ export async function POST(req: Request) {
       console.error('[Video Progress] Supabase save error:', dbResult.error);
     }
 
-    // 2. If status upgraded to 'полностью посмотрел' and it is a new milestone transition
-    const isNewMilestone = status === 'полностью посмотрел' && currentStatus !== 'полностью посмотрел';
-
-    if (isNewMilestone) {
-      const token = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
-      const topicId = process.env.TOPIC_ID;
-
-      if (token && chatId) {
-        let message = `🎥 <b>Відео переглянуто повністю! (> 20 хв)</b>\n\n`;
-        message += `👤 <b>Ім'я:</b> ${lead?.name || 'Анонім (до заповнення анкети)'}\n`;
-        message += `📞 <b>Телефон:</b> <code>${lead?.phone || '-'}</code>\n`;
-        message += `📱 <b>Social/Telegram:</b> ${lead?.social || '-'}\n`;
-        if (lead?.instagram) {
-          message += `📸 <b>Instagram:</b> ${lead.instagram}\n`;
-        }
-        if (lead?.niche) {
-          message += `💼 <b>Ніша:</b> ${lead.niche}\n`;
-        }
-        
-        message += `\n🌐 <b>Джерело:</b>\n`;
-        message += `Source: ${lead?.utm_source || 'direct'}\n`;
-        message += `Medium: ${lead?.utm_medium || '-'}\n`;
-        message += `Campaign: ${lead?.utm_campaign || '-'}\n`;
-
-        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            message_thread_id: topicId,
-            text: message,
-            parse_mode: 'HTML',
-          }),
-        }).catch(err => console.error('[Video Progress] Telegram notification failed:', err));
-      }
-    }
+    // 2. Real-time Telegram alerts on video completion have been removed as requested (metrics are aggregated in the daily/weekly cron report).
 
     // 3. Sync to Google Sheets
     if (GOOGLE_SCRIPT_URL) {
