@@ -28,7 +28,7 @@ export function Block6Registration() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div>
-          <h2 className={styles.sectionTitle} style={{ fontFamily: "var(--font-inter)", fontWeight: 900, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", textAlign: "center", color: "#fff500", margin: "0 0 1rem 0" }}>
+          <h2 className={styles.sectionTitle} style={{ fontFamily: "var(--font-inter)", fontWeight: 900, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", textAlign: "center", color: "var(--accent-color)", margin: "0 0 1rem 0" }}>
             РЕЄСТРУЙСЯ НА МАЙСТЕР-КЛАС ТА ВИХОДЬ ІЗ ХАОСУ
           </h2>
 

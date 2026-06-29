@@ -43,7 +43,7 @@
   font-family: var(--font-inter) !important;
   font-weight: 900 !important;
   font-size: 2rem;
-  color: #fff500 !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   margin-bottom: 0.5rem;
   line-height: 1.2;
@@ -66,12 +66,12 @@
 }
 
 .mainText b {
-  color: #fff500 !important;
+  color: var(--accent-color) !important;
 }
 
 .ctaButton {
-  background: #fff500 !important;
-  color: #121212 !important;
+  background: var(--accent-color) !important;
+  color: var(--accent-text-color) !important;
   font-family: var(--font-inter) !important;
   font-weight: 800 !important;
   font-size: 1rem;
@@ -87,7 +87,7 @@
 
 .ctaButton:hover {
   background-color: #ffffff !important;
-  color: #000000 !important;
+  color: var(--accent-color) !important;
   transform: translateY(1px) translateX(1px) !important;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.25) !important;
 }

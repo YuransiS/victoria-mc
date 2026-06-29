@@ -23,7 +23,7 @@ const OFFERS = {
 
 export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
-  const [formattedDate, setFormattedDate] = useState("");
+  const [formattedDate, setFormattedDate] = useState("02.07");
   const [variant, setVariant] = useState<1 | 2 | 3>(1);
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
 
@@ -31,14 +31,6 @@ export function Block1Hero() {
     const handleOpenModal = () => setIsRegModalOpen(true);
     window.addEventListener("open-registration-modal", handleOpenModal);
     return () => window.removeEventListener("open-registration-modal", handleOpenModal);
-  }, []);
-
-  useEffect(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const d = String(tomorrow.getDate()).padStart(2, '0');
-    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    setFormattedDate(`${d}.${m}`);
   }, []);
 
   useEffect(() => {
@@ -72,6 +64,22 @@ export function Block1Hero() {
     const detected = getOfferVal();
     setVariant(detected);
     localStorage.setItem("current_offer_variant", `offer${detected}`);
+
+    // Dynamically set CSS variables for the active variant theme
+    const root = document.documentElement;
+    if (detected === 2) {
+      root.style.setProperty("--accent-color", "#ff3b30");
+      root.style.setProperty("--accent-text-color", "#ffffff");
+      root.style.setProperty("--accent-color-rgb", "255, 59, 48");
+    } else if (detected === 3) {
+      root.style.setProperty("--accent-color", "#f7a2e7");
+      root.style.setProperty("--accent-text-color", "#000000");
+      root.style.setProperty("--accent-color-rgb", "247, 162, 231");
+    } else {
+      root.style.setProperty("--accent-color", "#fff500");
+      root.style.setProperty("--accent-text-color", "#000000");
+      root.style.setProperty("--accent-color-rgb", "255, 245, 0");
+    }
   }, []);
 
   return (

@@ -35,6 +35,11 @@
   --admin-card-hover: rgba(255, 255, 255, 0.02);
   --admin-active-bg: rgba(255, 255, 255, 0.06);
   --admin-input-bg: rgba(255, 255, 255, 0.02);
+
+  /* Page Accent Theme variables */
+  --accent-color: #fff500;
+  --accent-text-color: #000000;
+  --accent-color-rgb: 255, 245, 0;
 }
 
 .admin-theme-dark,

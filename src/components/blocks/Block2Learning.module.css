@@ -82,7 +82,7 @@
 }
 
 .accordionItemActive .itemTitle {
-  color: #fff500;
+  color: var(--accent-color);
 }
 
 .chevron {
@@ -93,7 +93,7 @@
 
 .accordionItemActive .chevron {
   transform: rotate(180deg);
-  color: #fff500;
+  color: var(--accent-color);
 }
 
 .accordionContent {
@@ -120,7 +120,7 @@
 
 .pointItem::before {
   content: "•";
-  color: #fff500;
+  color: var(--accent-color);
   font-size: 1.5rem;
   position: absolute;
   left: 0;
@@ -145,9 +145,9 @@
   align-items: center !important;
   justify-content: center !important;
   padding: 1rem 2.5rem !important;
-  background: #fff500 !important;
-  background-color: #fff500 !important;
-  color: #000000 !important;
+  background: var(--accent-color) !important;
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text-color) !important;
   border-radius: 0px !important;
   font-family: var(--font-inter) !important;
   font-weight: 800 !important;
@@ -163,7 +163,7 @@
 .mainPageButton.mainPageButton:hover {
   background: #ffffff !important;
   background-color: #ffffff !important;
-  color: #000000 !important;
+  color: var(--accent-color) !important;
   transform: translateY(1px) translateX(1px) !important;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.25) !important;
 }

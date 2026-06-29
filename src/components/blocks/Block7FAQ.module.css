@@ -14,7 +14,7 @@
   font-family: var(--font-inter) !important;
   font-weight: 900 !important;
   font-size: clamp(2rem, 5vw, 3rem) !important;
-  color: #fff500 !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   margin-bottom: 0.5rem;
 }
@@ -41,7 +41,7 @@
   font-family: var(--font-inter) !important;
   font-weight: 800 !important;
   font-size: clamp(1.15rem, 2.5vw, 1.4rem) !important;
-  color: #fff500 !important;
+  color: var(--accent-color) !important;
   line-height: 1.4;
   text-transform: uppercase !important;
 }
