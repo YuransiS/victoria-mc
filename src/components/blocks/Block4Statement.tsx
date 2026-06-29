@@ -5,24 +5,30 @@ export function Block4Statement() {
   return (
     <section className={styles.section}>
       <div className={styles.statementBlock}>
-        <h2 className={styles.statementTitle}>ЧОМУ ЦЕ ВАЖЛИВО САМЕ ЗАРАЗ?</h2>
+        <h2 className={styles.statementTitle}>ЧОМУ ВАРТО БУТИ НА ЦЬОМУ МАЙСТЕР-КЛАСІ?</h2>
         
         <div className={styles.pointsGrid}>
           <div className={styles.point}>
             <p className={styles.pointText}>
-              <strong>Алгоритми не люблять хаос.</strong> Коли контент зрозумілий - Instagram сам просуває тебе на потрібну аудиторію.
+              <strong>Контент у 2026 році працює вже за іншими правилами.</strong> Те, що давало охоплення та продажі ще рік тому, сьогодні поступово перестає працювати. На майстер-класі розберемо, на що зараз варто робити ставку.
             </p>
           </div>
           
           <div className={styles.point}>
             <p className={styles.pointText}>
-              <strong>Ринок перенасичений.</strong> Люди втомилися від «успішного успіху» та офіційності. Зараз купують у живих, автентичних людей, чий контент має структуру.
+              <strong>Конкуренція росте щодня.</strong> Виграють не ті, кто публікує більше, а ті, хто має зрозумілу систему, власний стиль і вміє викликати довіру через контент.
             </p>
           </div>
           
           <div className={styles.point}>
             <p className={styles.pointText}>
-              <strong>Instagram - це твій актив.</strong> Він має приносити прибуток, а не забирати енергію. Система звільняє час для життя.
+              <strong>Блог має приносити прибуток, а не забирати час.</strong> Покажу, як створювати контент швидше, без хаосу та постійних пошуків ідей, щоб він працював на залучення аудиторії й продажі.
+            </p>
+          </div>
+
+          <div className={styles.point}>
+            <p className={styles.pointText}>
+              <strong>Літо - найкращий час для росту.</strong> Поки більшість відкладає розвиток "на потім", можна зайняти свою нішу, посилити позиціонування та підготувати блог до нового сезону.
             </p>
           </div>
         </div>

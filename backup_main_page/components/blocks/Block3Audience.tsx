@@ -35,7 +35,7 @@ export function Block3Audience() {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className={styles.sectionTitle}>Цей майстер-клас для тебе, якщо:</h2>
+        <h2 className={styles.sectionTitle}>Цей майстер-клас тобі необхідний, якщо:</h2>
       </motion.div>
       <motion.div 
         className={styles.listGrid}
@@ -45,19 +45,19 @@ export function Block3Audience() {
         viewport={{ once: true, margin: "-100px" }}
       >
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Ти ведеш блог, але не розумієш, чому він не приносить стабільних заявок та продажів. Хочеш зрозуміти, що саме зараз гальмує твій ріст і що варто змінити.</p>
+          <p className={styles.listItemText}>Витрачаєш 4 години на Instagram, а результат - 0. Втомилася від хаотичних думок «що постити сьогодні» і хочеш мати готовий покроковий протокол дій.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Тобі набридло постійно шукати нові ідеї. Хочеш вибудувати систему контенту, щоб знати, що публікувати, без хаосу та вигорання.</p>
+          <p className={styles.listItemText}>Твій блог виглядає «дешевше», ніж твоя експертність. Хочеш обґрунтовано підняти чек на послуги через професійну візуальну упаковку.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Ти відчуваєш, що твоя експертність сильніша, ніж те, як вона виглядає у блозі. Хочеш, щоб контент викликав довіру, а не просто набирав перегляди.</p>
+          <p className={styles.listItemText}>Боїшся бути «душним експертом». Твій блог схожий на Вікіпедію: багато користі, але не видно людини. Не знаєш, як показувати справжню себе і мати продажі.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
           <p className={styles.listItemText}>Ти в обмежених ресурсах (мама, емігрант, найм). Маєш лише 30 хвилин вільного часу і хочеш, щоб контент став простою звичкою, як пити вітаміни.</p>
         </motion.div>
         <motion.div className={styles.listItemAlt} variants={itemVariants}>
-          <p className={styles.listItemText}>Витрачаєш 4 години на Instagram, а результат - 0. Втомилася від хаотичних думок «що постити сьогодні» і хочеш мати готовий покроковий протокол дій.</p>
+          <p className={styles.listItemText}>Ти - SMM-ник, який взуває клієнтів, але «босий» сам. Хочеш нарешті вийти з тіні та побудувати власний сильний бренд, що приносить замовлення.</p>
         </motion.div>
       </motion.div>
       <motion.div 

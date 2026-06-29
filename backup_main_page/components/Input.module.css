@@ -1,0 +1,119 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.35rem; /* Compressed from 0.5rem */
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-manrope);
+  font-size: 0.6rem; /* Smaller labels */
+  color: #7a7a7a;
+  margin-bottom: 0.15rem; /* Tighter spacing */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.5rem !important; /* Slightly sharper corners for compact look */
+  color: #ffffff !important;
+  font-family: var(--font-manrope);
+  font-size: 0.875rem !important; /* Smaller text task */
+  padding: 0.75rem 1rem !important; /* Major reduction from 1.15rem */
+  transition: all 0.25s ease;
+  width: 100%;
+}
+
+:global(.iti) .input {
+  padding-left: 85px !important; /* Adjust based on dial code size */
+}
+
+.input:focus {
+  border: 1px solid rgba(217, 184, 151, 0.5) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 0 0 4px rgba(217, 184, 151, 0.1) !important;
+  outline: none;
+}
+
+.inputError {
+  border: 1px solid #ff4d4d !important;
+}
+
+.errorMessage {
+  font-family: var(--font-manrope);
+  color: #ff4d4d;
+  font-size: 0.65rem;
+  margin-top: 0.15rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
+.hintMessage {
+  font-family: var(--font-manrope);
+  color: rgba(217, 184, 151, 0.7);
+  font-size: 0.65rem;
+  margin-top: 0.2rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
+:global(.iti) {
+  width: 100%;
+}
+
+:global(.iti__country-list) {
+  background-color: #1e1e1c !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  z-index: 100 !important;
+}
+
+:global(.iti__country) {
+  padding: 8px 12px !important;
+  transition: background 0.2s ease !important;
+}
+
+:global(.iti__country:hover) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+:global(.iti__country.iti__active) {
+  background-color: rgba(217, 184, 151, 0.2) !important;
+}
+
+:global(.iti__selected-flag) {
+  background-color: transparent !important;
+}
+
+:global(.iti__divider) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+@media (max-width: 480px) {
+  .input {
+    padding: 0.65rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+  .label {
+    font-size: 0.55rem;
+    margin-left: 0.4rem;
+    margin-bottom: 0.1rem;
+  }
+  .wrapper {
+    margin-bottom: 0.25rem;
+  }
+  .hintMessage, .errorMessage {
+    font-size: 0.6rem;
+    margin-top: 0.1rem;
+    margin-left: 0.4rem;
+  }
+}

@@ -1,0 +1,122 @@
+.section {
+  padding: 80px 20px;
+  background-color: #000;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.formatBox {
+  background: linear-gradient(180deg, #111 0%, #000 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 40px;
+  padding: 60px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.label {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(209, 184, 151, 0.1);
+  border: 1px solid #d1b897;
+  color: #d1b897;
+  border-radius: 100px;
+  font-family: var(--font-manrope);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-family: var(--font-newsreader);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #fff;
+  margin-bottom: 60px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 30px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(209, 184, 151, 0.2);
+}
+
+.bonusCard {
+  background: rgba(209, 184, 151, 0.05);
+  border: 1px solid rgba(209, 184, 151, 0.3);
+  position: relative;
+}
+
+.bonusCard::before {
+  content: "БОНУС";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #d1b897;
+  letter-spacing: 0.1em;
+  background: rgba(209, 184, 151, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.bonusCard h3 {
+  color: #d1b897;
+}
+
+.icon {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  font-family: var(--font-manrope);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-family: var(--font-manrope);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.platform {
+  font-family: var(--font-manrope);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.05em;
+}
+
+.platform b {
+  color: #d1b897;
+}
+
+@media (max-width: 768px) {
+  .formatBox {
+    padding: 40px 20px;
+  }
+}
