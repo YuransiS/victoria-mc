@@ -61,6 +61,7 @@ export function Block3Audience() {
         </motion.div>
       </motion.div>
       <motion.div 
+        className="hidden-mobile"
         style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }}
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}

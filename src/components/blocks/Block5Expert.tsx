@@ -105,6 +105,7 @@ export function Block5Expert() {
             </a>
           </motion.div>
           <motion.div 
+            className="hidden-mobile"
             style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-start", width: "100%" }}
             variants={itemVariants}
           >

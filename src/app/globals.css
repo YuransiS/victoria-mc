@@ -332,4 +332,10 @@ body {
 .react-phone-input-light .PhoneInputCountrySelect {
   background-color: #ffffff;
   color: #000000;
+}
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
 }

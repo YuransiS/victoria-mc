@@ -147,6 +147,7 @@ export function Block2Learning() {
         </div>
         
         <motion.div 
+          className="hidden-mobile"
           style={{ marginTop: "3.5rem", display: "flex", justifyContent: "center" }}
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
