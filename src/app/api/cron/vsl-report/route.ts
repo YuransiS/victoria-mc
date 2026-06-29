@@ -393,6 +393,38 @@ export async function GET(req: Request) {
     // 7. Core Landing Page
     const coreClicks = safeLeads.filter(l => l.page_path === '/' && l.status === 'Клик');
 
+    // Offer variants performance tracking
+    const getOfferVariant = (lead: any, isClick: boolean = false): 'offer1' | 'offer2' | 'offer3' | 'unknown' => {
+      const rawVar = lead.raw_payload?.offer_variant;
+      if (rawVar === 'offer1' || rawVar === 'offer2' || rawVar === 'offer3') return rawVar;
+      
+      const content = (lead.utm_content || '').toLowerCase();
+      if (content.includes('offer3') || content.includes('v3')) return 'offer3';
+      if (content.includes('offer2') || content.includes('v2')) return 'offer2';
+      if (content.includes('offer1') || content.includes('v1')) return 'offer1';
+      
+      if (isClick && lead.page_path === '/') return 'offer1';
+      if (!isClick && ['Автовеб', 'Masterclass_Leads'].includes(lead.target_sheet || '')) return 'offer1';
+      return 'unknown';
+    };
+
+    const offerStats = {
+      offer1: { clicks: 0, leads: 0 },
+      offer2: { clicks: 0, leads: 0 },
+      offer3: { clicks: 0, leads: 0 },
+      unknown: { clicks: 0, leads: 0 }
+    };
+
+    coreClicks.forEach(c => {
+      const v = getOfferVariant(c, true);
+      offerStats[v].clicks++;
+    });
+
+    autowebLeads.forEach(l => {
+      const v = getOfferVariant(l, false);
+      offerStats[v].leads++;
+    });
+
     // --- TELEGRAM MESSAGE BUILDER ---
 
     const formattedStart = formatKyivTime(startTime);
@@ -480,18 +512,29 @@ export async function GET(req: Request) {
       message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(bookingLeads)}</code>\n\n`;
     }
 
-    // 6. Autoweb
-    if (autowebLeads.length > 0) {
-      message += `🌐 <b>6. АВТОВЕБ</b>\n`;
+    // 6. Masterclass (Майстер-клас)
+    if (autowebLeads.length > 0 || coreClicks.length > 0) {
+      message += `🎓 <b>6. МАЙСТЕР-КЛАС</b>\n`;
       message += `👤 <b>Реєстрацій:</b> <code>${autowebLeads.length}</code>\n`;
-      message += `🏷️ <b>Найкраще джерело:</b> <code>${getBestSource(autowebLeads)}</code>\n\n`;
-    }
-
-    // 7. Core
-    if (coreClicks.length > 0) {
-      message += `🏠 <b>7. ГОЛОВНА СТОРІНКА</b>\n`;
       message += `📈 <b>Трафік (Кліки):</b> <code>${coreClicks.length}</code>\n`;
-      message += `🏷️ <b>Найкраще джерело (кліки):</b> <code>${getBestSource(coreClicks)}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело (реєстрації):</b> <code>${getBestSource(autowebLeads)}</code>\n`;
+      
+      message += `📊 <b>Ефективність офферів (Кліки → Реєстрації):</b>\n`;
+      const offerNames = {
+        offer1: "Оффер 1 (Знати що постити)",
+        offer2: "Оффер 2 (Блог приносив заявки)",
+        offer3: "Оффер 3 (Перестати вести навмання)",
+        unknown: "Інші / Невизначено"
+      };
+
+      Object.entries(offerStats).forEach(([key, stats]) => {
+        if (stats.clicks > 0 || stats.leads > 0) {
+          const conv = stats.clicks > 0 ? Math.round((stats.leads / stats.clicks) * 100) : 0;
+          message += `  • ${offerNames[key as keyof typeof offerNames]}:\n`;
+          message += `    кліки: <code>${stats.clicks}</code> | рег: <code>${stats.leads}</code> | конв: <code>${conv}%</code>\n`;
+        }
+      });
+      message += `\n`;
     }
 
     // 3. Dispatch to Telegram Bot API
@@ -546,7 +589,8 @@ export async function GET(req: Request) {
         bookingPaidCount: bookingPaid.length,
         bookingRevenue,
         autowebLeadsCount: autowebLeads.length,
-        coreClicksCount: coreClicks.length
+        coreClicksCount: coreClicks.length,
+        offerStats
       }
     });
 

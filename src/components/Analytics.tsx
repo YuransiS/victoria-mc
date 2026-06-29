@@ -43,6 +43,27 @@ const AnalyticsInner = () => {
       }
     });
 
+    const offerParam = searchParams.get('offer');
+    const vParam = searchParams.get('v');
+    const checkOffer = (val: string | null) => {
+      if (!val) return null;
+      const clean = val.toLowerCase().trim();
+      if (clean.includes("3") || clean === "v3" || clean === "offer3") return "offer3";
+      if (clean.includes("2") || clean === "v2" || clean === "offer2") return "offer2";
+      if (clean.includes("1") || clean === "v1" || clean === "offer1") return "offer1";
+      return null;
+    };
+    const detectedOffer = checkOffer(offerParam) || checkOffer(vParam);
+    if (detectedOffer) {
+      const currentContent = utms.utm_content || searchParams.get('utm_content') || '';
+      if (!currentContent) {
+        utms.utm_content = detectedOffer;
+      } else if (!currentContent.includes(detectedOffer)) {
+        utms.utm_content = `${currentContent}_${detectedOffer}`;
+      }
+      hasUtms = true;
+    }
+
     if (hasUtms) {
       localStorage.setItem('last_utms', JSON.stringify(utms));
       
