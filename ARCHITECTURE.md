@@ -22,7 +22,7 @@ This live document outlines the architecture, routing structure, components, dat
 
 ### 🛣️ App Router Routes (`src/app/`)
 *   `layout.tsx` — Root layout initialized with global styles, fonts, and the visitor analytics logger.
-*   `page.tsx` — Core landing page.
+*   `page.tsx` — Core landing page. Now supports dynamic headline testing via `?offer=1/2/3`, `?v=1/2/3`, or `utm_content` values, defaulting to Variant 1 (completely removing the old "ВІД ХАОСУ ДО СИСТЕМИ" version). Stitches selection into lead analytics.
 *   `price/` — Price selection and package landing page.
 *   `price/thanks/` — Thanks/success confirmation page after checkout.
 *   `price/fail/` — Payment failure handling page.

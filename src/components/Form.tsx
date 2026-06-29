@@ -121,11 +121,23 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
+    const detectedOffer = typeof window !== "undefined" ? (localStorage.getItem("current_offer_variant") || "") : "";
+    
+    let rawUtmContent = searchParams.get("utm_content") || "none";
+    let finalUtmContent = rawUtmContent;
+    if (detectedOffer) {
+      if (rawUtmContent === "none" || !rawUtmContent) {
+        finalUtmContent = detectedOffer;
+      } else if (!rawUtmContent.includes(detectedOffer)) {
+        finalUtmContent = `${rawUtmContent}_${detectedOffer}`;
+      }
+    }
+
     const utmData = {
       utm_source: searchParams.get("utm_source") || "direct",
       utm_medium: searchParams.get("utm_medium") || "none",
       utm_campaign: searchParams.get("utm_campaign") || "none",
-      utm_content: searchParams.get("utm_content") || "none",
+      utm_content: finalUtmContent,
       utm_term: searchParams.get("utm_term") || "none",
       full_url: window.location.href
     };
@@ -147,9 +159,10 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       social: sanitizedSocial,
       instagram: formData.instagram,
       ...utmData,
-      visitor_id: localStorage.getItem('visitor_id') || '',
+      visitor_id: (typeof window !== "undefined" && localStorage.getItem('visitor_id')) || '',
       target_sheet: "Автовеб",
-      sheet_id: "726331330"
+      sheet_id: "726331330",
+      offer_variant: detectedOffer || undefined
     };
 
     try {

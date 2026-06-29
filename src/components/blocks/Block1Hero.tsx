@@ -6,9 +6,25 @@ import styles from "./Block1Hero.module.css";
 import { Form } from "@/components/Form";
 import { motion } from "framer-motion";
 
+const OFFERS = {
+  1: {
+    title: "Як знати що постити, виглядати у своєму стилі і отримувати заявки на послуги, інфопродукти",
+    subtitle: "Покажу свою систему - як витрачати на контент 2–3 години на тиждень, не думати що постити і отримувати клієнтів з блогу вже цим літом"
+  },
+  2: {
+    title: "Як зробити так, щоб блог приносив заявки та продажі вже цим літом",
+    subtitle: "Зсередини покажу свою систему, як робити продаючий контент за 30хв на день"
+  },
+  3: {
+    title: "Як перестати вести блог навмання та перетворити контент на джерело клієнтів",
+    subtitle: "Розповім, як знайти власний стиль, більше не думати щодня про контент і побудувати систему, яка працює на заявки та продажі навіть влітку"
+  }
+};
+
 export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
   const [formattedDate, setFormattedDate] = useState("");
+  const [variant, setVariant] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     const tomorrow = new Date();
@@ -24,6 +40,31 @@ export function Block1Hero() {
     };
     window.addEventListener('new_registration', handleNewRegistration);
     return () => window.removeEventListener('new_registration', handleNewRegistration);
+  }, []);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    const getOfferVal = () => {
+      const offerParam = searchParams.get("offer");
+      const vParam = searchParams.get("v");
+      const utmContent = searchParams.get("utm_content");
+
+      const check = (val: string | null) => {
+        if (!val) return null;
+        const clean = val.toLowerCase().trim();
+        if (clean.includes("3") || clean === "v3" || clean === "offer3") return 3;
+        if (clean.includes("2") || clean === "v2" || clean === "offer2") return 2;
+        if (clean.includes("1") || clean === "v1" || clean === "offer1") return 1;
+        return null;
+      };
+
+      return check(offerParam) || check(vParam) || check(utmContent) || 1;
+    };
+
+    const detected = getOfferVal();
+    setVariant(detected);
+    localStorage.setItem("current_offer_variant", `offer${detected}`);
   }, []);
 
   return (
@@ -61,12 +102,12 @@ export function Block1Hero() {
             </motion.div>
 
             <motion.h1
-              className={styles.title}
+              className={`${styles.title} ${styles.longTitle}`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             >
-              ВІД ХАОСУ<br />ДО СИСТЕМИ
+              {OFFERS[variant].title}
             </motion.h1>
 
             <motion.div
@@ -75,8 +116,11 @@ export function Block1Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
             >
-              <p className={styles.subtitle}>Від хаосу до системи: як побудувати блог, який працює на вас - відображає ваші цінності, викликає довіру та приводить клієнтів</p>
+              <p className={`${styles.subtitle} ${styles.longSubtitle}`}>
+                {OFFERS[variant].subtitle}
+              </p>
             </motion.div>
+
 
           </div>
 
