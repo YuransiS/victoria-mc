@@ -447,21 +447,8 @@
   -webkit-box-decoration-break: clone;
   border-radius: 4px;
   filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.2)) !important;
-}
-
-.var1 .highlightSpan {
-  background-color: #fff500 !important;
-  color: #000000 !important;
-}
-
-.var2 .highlightSpan {
-  background-color: #ff3b30 !important;
-  color: #ffffff !important;
-}
-
-.var3 .highlightSpan {
-  background-color: #f7a2e7 !important;
-  color: #000000 !important;
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text-color) !important;
 }
 
 .longSubtitle {

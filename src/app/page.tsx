@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./page.module.css";
 import { Block1Hero } from "@/components/blocks/Block1Hero";
-import { Block1Features } from "@/components/blocks/Block1Features";
 import { Block3Audience } from "@/components/blocks/Block3Audience";
 import { Block2Learning } from "@/components/blocks/Block2Learning";
 import { Block5Expert } from "@/components/blocks/Block5Expert";
@@ -23,7 +22,6 @@ export default function Home() {
       <StickyMobileCTA />
       <Block1Hero />
 
-      <Block1Features />
       <Block3Audience />
       <Block2Learning />
       <Block5Expert />
