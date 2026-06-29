@@ -5,11 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function StickyMobileCTA() {
   const [isVisible, setIsVisible] = useState(false);
+  const [variant, setVariant] = useState(1);
 
   useEffect(() => {
+    // Detect active offer variant
+    const currentOffer = localStorage.getItem("current_offer_variant") || "";
+    if (currentOffer === "offer2") {
+      setVariant(2);
+    } else if (currentOffer === "offer3") {
+      setVariant(3);
+    }
+
     const handleScroll = () => {
-      // Show it only after scrolling down a bit (past the initial hero form)
-      // The hero form is at the top, so we don't need the sticky button immediately
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
       if (scrollPosition > windowHeight * 0.8) {
@@ -25,22 +32,16 @@ export function StickyMobileCTA() {
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const heroForm = document.getElementById('registration-form');
-    if (heroForm) {
-      heroForm.scrollIntoView({ behavior: 'smooth' });
-      // Optionally focus input after scroll
-      setTimeout(() => {
-        const nameInput = heroForm.querySelector('input[name="name"]') as HTMLInputElement;
-        if (nameInput) nameInput.focus();
-      }, 500);
-    }
+    window.dispatchEvent(new CustomEvent("open-registration-modal"));
   };
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div 
-          className={styles.stickyWrapper}
+          className={`${styles.stickyWrapper} ${
+            variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
+          }`}
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}

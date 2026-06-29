@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./Block1Hero.module.css";
 import { Form } from "@/components/Form";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const OFFERS = {
   1: {
@@ -25,6 +25,13 @@ export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
   const [formattedDate, setFormattedDate] = useState("");
   const [variant, setVariant] = useState<1 | 2 | 3>(1);
+  const [isRegModalOpen, setIsRegModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenModal = () => setIsRegModalOpen(true);
+    window.addEventListener("open-registration-modal", handleOpenModal);
+    return () => window.removeEventListener("open-registration-modal", handleOpenModal);
+  }, []);
 
   useEffect(() => {
     const tomorrow = new Date();
@@ -68,7 +75,7 @@ export function Block1Hero() {
   }, []);
 
   return (
-    <section className={styles.hero}>
+    <section className={`${styles.hero} ${variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3}`}>
       {/* BACKGROUND LAYER */}
       <motion.div
         className={styles.background}
@@ -132,6 +139,16 @@ export function Block1Hero() {
             >
               приходь на безкоштовний майстер-клас, щоб дізнатись що зараз дійсно працює
             </motion.div>
+
+            {/* Mobile CTA Button (opens modal) */}
+            <div className={styles.mobileHeroCta}>
+              <button 
+                className={styles.mainPageButton} 
+                onClick={() => setIsRegModalOpen(true)}
+              >
+                ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО
+              </button>
+            </div>
           </div>
 
           {/* REGISTRATION FORM COMPACT */}
@@ -155,16 +172,40 @@ export function Block1Hero() {
                 <img src="https://i.pravatar.cc/100?img=12" alt="Participant" />
                 <img src="https://i.pravatar.cc/100?img=26" alt="Participant" />
               </div>
-              <div className={styles.proofText}>
-                <span>🔥 <b>{regCount}</b> людей вже зареєструвалися</span>
-                <span className={styles.limited}>Кількість місць обмежена</span>
-              </div>
             </div>
           </motion.div>
 
 
         </div>
       </div>
+
+      {/* Mobile Registration Modal */}
+      <AnimatePresence>
+        {isRegModalOpen && (
+          <motion.div 
+            className={styles.modalOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsRegModalOpen(false)}
+          >
+            <motion.div 
+              className={styles.modalContent}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              transition={{ duration: 0.3 }}
+            >
+              <button className={styles.modalCloseBtn} onClick={() => setIsRegModalOpen(false)}>×</button>
+              <div className={styles.priceTag} style={{ marginBottom: "1.5rem", width: "100%", textAlign: "center" }}>
+                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
+              </div>
+              <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" buttonClassName={styles.mainPageButton} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

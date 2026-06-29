@@ -21,13 +21,13 @@
 
 .stickyButton {
   width: 100%;
-  background: #d1b897;
+  background: #fff500;
   color: #121212;
-  font-family: var(--font-manrope);
+  font-family: var(--font-inter) !important;
   font-weight: 800;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1.5px solid #000000;
+  border-radius: 0px !important;
   padding: 1rem 0;
   cursor: pointer;
   text-transform: uppercase;
@@ -35,8 +35,24 @@
   text-align: center;
   text-decoration: none;
   display: block;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.25) !important;
 }
 
 .stickyButton:active {
   transform: scale(0.98);
+}
+
+.var1 .stickyButton {
+  background-color: #fff500 !important;
+  color: #000000 !important;
+}
+
+.var2 .stickyButton {
+  background-color: #ff3b30 !important;
+  color: #ffffff !important;
+}
+
+.var3 .stickyButton {
+  background-color: #f7a2e7 !important;
+  color: #000000 !important;
 }

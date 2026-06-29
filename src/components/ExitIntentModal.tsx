@@ -71,7 +71,13 @@ export function ExitIntentModal() {
   return (
     <AnimatePresence>
       {isVisible && (
-        <div className={styles.overlay} onClick={() => setIsVisible(false)}>
+        <motion.div 
+          className={styles.overlay} 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsVisible(false)}
+        >
           <motion.div
             className={styles.modal}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -90,7 +96,7 @@ export function ExitIntentModal() {
               </button>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

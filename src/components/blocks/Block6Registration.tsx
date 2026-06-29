@@ -31,10 +31,7 @@ export function Block6Registration() {
           <h2 className={styles.sectionTitle} style={{ fontFamily: "var(--font-inter)", fontWeight: 900, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", textAlign: "center", color: "#fff500", margin: "0 0 1rem 0" }}>
             РЕЄСТРУЙСЯ НА МАЙСТЕР-КЛАС ТА ВИХОДЬ ІЗ ХАОСУ
           </h2>
-          <p style={{ textAlign: "center", color: "rgba(255, 255, 255, 0.8)", lineHeight: 1.6, margin: 0 }}>
-            Отримуй готову структуру блогу на 6 місяців відразу після реєстрації.<br />
-            <strong style={{ color: "#fff500" }}>Кількість безкоштовних місць обмежена.</strong>
-          </p>
+
         </div>
         <Form buttonClassName={styles.mainPageButton} />
       </motion.div>

@@ -22,6 +22,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
+  const [redirectUrl, setRedirectUrl] = useState("https://t.me/+oLZTxHGFnJA4ZGMy");
 
   useEffect(() => {
     // Fetch user's country code via Edge API
@@ -48,6 +49,14 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     } else if (savedSocial) {
       setFormData(prev => ({ ...prev, social: savedSocial }));
       setContactMethod("telegram");
+    }
+
+    // Set redirect channel link based on current offer variant
+    const currentOffer = localStorage.getItem("current_offer_variant") || "";
+    if (currentOffer === "offer2") {
+      setRedirectUrl("https://t.me/+TbJDFpKxhog5NzAy");
+    } else if (currentOffer === "offer3") {
+      setRedirectUrl("https://t.me/+EzXVhYffIA5kYTIy");
     }
 
     // Randomly fluctuate active users count to look "live"
@@ -188,7 +197,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     setStatus("redirecting");
 
     setTimeout(() => {
-      window.location.href = TELEGRAM_LINK;
+      window.location.href = redirectUrl;
     }, 1500);
   };
 
@@ -362,7 +371,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         </Button>
 
         <p className={styles.bonusText}>
-          <strong>Бонус:</strong> 50 тем для контенту (отримаєш відразу після реєстрації)
+          <strong>Бонус:</strong> Відео &quot;як я створюю контент за 30хв на день&quot; (отримаєш відразу після реєстрації)
         </p>
       </form>
 
@@ -377,7 +386,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
               <h3>Дякуємо за реєстрацію!</h3>
               <p>Зараз ви будете перенаправлені до Telegram каналу...</p>
               <div className={styles.loader}></div>
-              <a href={TELEGRAM_LINK} className={styles.manualLink}>
+              <a href={redirectUrl} className={styles.manualLink}>
                 Не перенаправило? Натисніть сюди
               </a>
             </div>

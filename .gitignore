@@ -44,3 +44,5 @@ next-env.d.ts
 temp.txt
 repo_payload.json
 /scratch/
+/.agents/
+.pdf
