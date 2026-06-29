@@ -90,7 +90,7 @@ export function ExitIntentModal() {
             <div className={styles.content}>
               <h2 className={styles.title}>ЗАЧЕКАЙТЕ! 🛑</h2>
               <p className={styles.subtitle}>Ви точно хочете пропустити це?</p>
-              <p className={styles.mainText}>На майстер-клас залишилося лише <b>3 місця</b> з крутим бонусом: 50 тем для контенту</p>
+              <p className={styles.mainText}>На майстер-клас залишилося лише <b>3 місця</b> з крутим бонусом: відео &quot;як я створюю контент за 30хв на день&quot;</p>
               <button className={styles.ctaButton} onClick={scrollToHero}>
                 ЗАБРАТИ СВІЙ БОНУС
               </button>
