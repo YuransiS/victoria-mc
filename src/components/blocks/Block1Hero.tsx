@@ -105,15 +105,16 @@ export function Block1Hero() {
         {/* MAIN STACKED CONTENT */}
         <div className={styles.content}>
 
+          <motion.div
+            className={styles.topRow}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          >
+            <span>{formattedDate || "..."} 19:00 ЗА КИЄВОМ</span>
+          </motion.div>
+
           <div className={styles.textContent}>
-            <motion.div
-              className={styles.topRow}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            >
-              <span>{formattedDate || "..."} 19:00 ЗА КИЄВОМ</span>
-            </motion.div>
 
             <motion.h1
               className={`${styles.title} ${styles.longTitle} ${

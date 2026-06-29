@@ -21,8 +21,8 @@
 
 .stickyButton {
   width: 100%;
-  background: #fff500;
-  color: #121212;
+  background: var(--accent-color);
+  color: var(--accent-text-color);
   font-family: var(--font-inter) !important;
   font-weight: 800;
   font-size: 0.9rem;
@@ -40,19 +40,4 @@
 
 .stickyButton:active {
   transform: scale(0.98);
-}
-
-.var1 .stickyButton {
-  background-color: #fff500 !important;
-  color: #000000 !important;
-}
-
-.var2 .stickyButton {
-  background-color: #ff3b30 !important;
-  color: #ffffff !important;
-}
-
-.var3 .stickyButton {
-  background-color: #f7a2e7 !important;
-  color: #000000 !important;
 }
