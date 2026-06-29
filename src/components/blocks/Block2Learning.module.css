@@ -16,11 +16,12 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-newsreader);
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: #d1b897;
+  font-family: var(--font-inter) !important;
+  font-weight: 900 !important;
+  font-size: clamp(1.8rem, 4.5vw, 2.75rem);
+  color: #fff500 !important;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em;
   margin-bottom: 1rem;
 }
 
@@ -31,17 +32,17 @@
 }
 
 .accordionItem {
-  background: rgba(25, 25, 25, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: #1a1a1c;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .accordionItemActive {
-  background: rgba(35, 35, 33, 0.8);
-  border-color: rgba(209, 184, 151, 0.3);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: #1a1a1c;
+  border-color: #fff500;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
 }
 
 .accordionHeader {
@@ -58,17 +59,17 @@
 }
 
 .numberBox {
-  font-family: var(--font-newsreader);
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-family: var(--font-inter);
+  font-size: 1.15rem;
+  font-weight: 800;
   color: #121212;
-  background: #d1b897;
+  background: #fff500;
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 0px;
   flex-shrink: 0;
 }
 
@@ -81,7 +82,7 @@
 }
 
 .accordionItemActive .itemTitle {
-  color: #d1b897;
+  color: #fff500;
 }
 
 .chevron {
@@ -92,7 +93,7 @@
 
 .accordionItemActive .chevron {
   transform: rotate(180deg);
-  color: #d1b897;
+  color: #fff500;
 }
 
 .accordionContent {
@@ -119,7 +120,7 @@
 
 .pointItem::before {
   content: "•";
-  color: #d1b897;
+  color: #fff500;
   font-size: 1.5rem;
   position: absolute;
   left: 0;
@@ -137,4 +138,32 @@
   .accordionContent {
     padding: 0 1rem 1.25rem;
   }
+}
+
+.mainPageButton.mainPageButton {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem 2.5rem !important;
+  background: #fff500 !important;
+  background-color: #fff500 !important;
+  color: #000000 !important;
+  border-radius: 0px !important;
+  font-family: var(--font-inter) !important;
+  font-weight: 800 !important;
+  font-size: clamp(0.75rem, 2.5vw, 1rem) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.25) !important;
+  border: 1.5px solid #000000 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.mainPageButton.mainPageButton:hover {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transform: translateY(1px) translateX(1px) !important;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.25) !important;
 }

@@ -216,15 +216,15 @@
   gap: 0.25rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
-  border-left: 2px solid #d1b897;
-  border-radius: 4px;
+  border-left: 2px solid #fff500;
+  border-radius: 0px;
 }
 
 .featureLabel {
   font-family: var(--font-manrope);
   font-size: 0.85rem;
   font-weight: 800;
-  color: #d1b897;
+  color: #fff500;
   text-transform: uppercase;
 }
 
@@ -251,7 +251,7 @@
 .bonusText {
   font-family: var(--font-manrope);
   font-size: 0.75rem;
-  color: #d1b897;
+  color: #fff500;
   font-weight: 600;
   text-align: center;
   margin-top: 0.5rem;
@@ -323,9 +323,10 @@
   gap: 0.5rem;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-left: 3px solid #d1b897;
-  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  border-left: 4px solid #fff500 !important;
+  border-radius: 0px !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
 }
 
 @media (max-width: 480px) {
@@ -401,18 +402,123 @@
   }
 }
 
+.topRow {
+  display: inline-flex !important;
+  align-self: center !important;
+  background-color: #fff500 !important;
+  color: #000000 !important;
+  padding: 0.35rem 0.8rem !important;
+  font-family: var(--font-manrope) !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 4px !important;
+  margin-bottom: 0.8rem !important;
+  opacity: 1 !important;
+  width: fit-content !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+  transform: rotate(-1deg) !important;
+}
+
 .longTitle {
-  font-size: clamp(1.4rem, 5vw, 2.3rem) !important;
-  line-height: 1.15 !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
+  font-family: var(--font-inter) !important;
+  font-size: clamp(1.3rem, 4.5vw, 2.5rem) !important;
+  line-height: 1.45 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.01em !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  margin: 0.8rem auto !important;
+  max-width: 680px;
+  transform: rotate(-2.6deg) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  align-self: center !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.highlightSpan {
+  padding: 0.2rem 0.6rem !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  border-radius: 4px;
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.2)) !important;
+}
+
+.var1 .highlightSpan {
+  background-color: #fff500 !important;
+  color: #000000 !important;
+}
+
+.var2 .highlightSpan {
+  background-color: #ff3b30 !important;
+  color: #ffffff !important;
+}
+
+.var3 .highlightSpan {
+  background-color: #f7a2e7 !important;
+  color: #000000 !important;
 }
 
 .longSubtitle {
-  font-size: clamp(0.8rem, 1.8vw, 1.0rem) !important;
+  display: inline-block !important;
+  background-color: #1a1a1c !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  padding: 0.8rem 1.4rem !important;
+  border-radius: 0px !important;
+  color: #ffffff !important;
   text-transform: none !important;
   font-weight: 500 !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  letter-spacing: normal !important;
   line-height: 1.45 !important;
+  max-width: 580px !important;
+  margin: -1.2rem auto 0.6rem !important;
+  letter-spacing: normal !important;
+  transform: rotate(0.8deg) !important;
+  position: relative !important;
+  z-index: 20 !important;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3) !important;
+}
+
+.callout {
+  font-family: var(--font-manrope);
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  font-weight: 800;
+  color: #fff500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  max-width: 500px;
+  margin: 0.8rem auto 0;
+  line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  transform: rotate(-0.5deg);
+}
+
+.mainPageButton.mainPageButton {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem 2.5rem !important;
+  background: #fff500 !important;
+  background-color: #fff500 !important;
+  color: #000000 !important;
+  border-radius: 0px !important;
+  font-family: var(--font-inter) !important;
+  font-weight: 800 !important;
+  font-size: clamp(0.75rem, 2.5vw, 1rem) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.25) !important;
+  border: 1.5px solid #000000 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.mainPageButton.mainPageButton:hover {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transform: translateY(1px) translateX(1px) !important;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.25) !important;
 }

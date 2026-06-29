@@ -94,20 +94,23 @@ export function Block1Hero() {
             <motion.div
               className={styles.topRow}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 0.8, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              <span>{formattedDate || "..."}</span>
-              <span>19:00 ЗА КИЄВОМ</span>
+              <span>{formattedDate || "..."} 19:00 ЗА КИЄВОМ</span>
             </motion.div>
 
             <motion.h1
-              className={`${styles.title} ${styles.longTitle}`}
+              className={`${styles.title} ${styles.longTitle} ${
+                variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
+              }`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             >
-              {OFFERS[variant].title}
+              <span className={styles.highlightSpan}>
+                {OFFERS[variant].title}
+              </span>
             </motion.h1>
 
             <motion.div
@@ -121,7 +124,14 @@ export function Block1Hero() {
               </p>
             </motion.div>
 
-
+            <motion.div
+              className={styles.callout}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 0.9, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+            >
+              приходь на безкоштовний майстер-клас, щоб дізнатись що зараз дійсно працює
+            </motion.div>
           </div>
 
           {/* REGISTRATION FORM COMPACT */}
@@ -136,7 +146,7 @@ export function Block1Hero() {
               <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
             </div>
 
-            <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" />
+            <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" buttonClassName={styles.mainPageButton} />
 
             <div className={styles.socialProof}>
               <div className={styles.avatars}>

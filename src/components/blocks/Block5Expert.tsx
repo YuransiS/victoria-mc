@@ -110,7 +110,7 @@ export function Block5Expert() {
             variants={itemVariants}
           >
             <a href="#register" style={{ width: "100%" }}>
-              <Button variant="primary" style={{ width: "100%" }}>ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
+              <Button variant="primary" className={styles.mainPageButton} style={{ width: "100%" }}>ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
             </a>
           </motion.div>
         </motion.div>

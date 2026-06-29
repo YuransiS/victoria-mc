@@ -155,7 +155,7 @@ export function Block2Learning() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <a href="#register">
-            <Button variant="primary">ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
+            <Button variant="primary" className={styles.mainPageButton}>ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ</Button>
           </a>
         </motion.div>
       </div>

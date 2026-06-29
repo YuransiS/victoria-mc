@@ -11,15 +11,16 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-newsreader);
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
-  letter-spacing: -0.02em;
-  color: var(--primary);
+  font-family: var(--font-inter) !important;
+  font-weight: 900 !important;
+  font-size: clamp(2rem, 5vw, 3rem) !important;
+  color: #fff500 !important;
+  text-transform: uppercase !important;
   margin-bottom: 0.5rem;
 }
 
 .sectionSubtitle {
-  color: var(--on-surface-variant);
+  color: rgba(255, 255, 255, 0.6) !important;
   font-family: var(--font-manrope);
   font-size: 1.125rem;
 }
@@ -37,17 +38,19 @@
 }
 
 .faqQ {
-  font-family: var(--font-newsreader);
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  color: var(--primary);
+  font-family: var(--font-inter) !important;
+  font-weight: 800 !important;
+  font-size: clamp(1.15rem, 2.5vw, 1.4rem) !important;
+  color: #fff500 !important;
   line-height: 1.4;
+  text-transform: uppercase !important;
 }
 
 .faqA {
   font-family: var(--font-manrope);
   font-size: 1.0625rem;
-  color: var(--on-surface-variant);
+  color: rgba(255, 255, 255, 0.85) !important;
   line-height: 1.6;
   padding-left: 1.5rem;
-  border-left: 2px solid var(--outline-variant);
+  border-left: 3px solid rgba(255, 255, 255, 0.15) !important;
 }

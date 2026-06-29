@@ -12,9 +12,10 @@ const TELEGRAM_LINK = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
 interface FormProps {
   buttonText?: string;
+  buttonClassName?: string;
 }
 
-export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ" }) => {
+export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ", buttonClassName }) => {
   const [formData, setFormData] = useState({ name: "", phone: "", social: "", instagram: "" });
   const [errors, setErrors] = useState({ name: "", phone: "", social: "", instagram: "" });
   const [contactMethod, setContactMethod] = useState<"phone" | "telegram" | null>(null);
@@ -351,7 +352,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
         <Button
           type="submit"
           variant="primary"
-          className={styles.submitBtn}
+          className={`${styles.submitBtn} ${buttonClassName || ""}`}
           disabled={status !== "idle"}
           style={{ width: "100%" }}
         >

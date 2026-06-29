@@ -2,13 +2,13 @@
   padding: 8rem 1.5rem;
   display: flex;
   justify-content: center;
-  background-color: var(--surface-container-low);
+  background-color: #121212 !important;
 }
 
 .statementBlock {
   max-width: 1000px;
   width: 100%;
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid #fff500;
   padding-left: 2rem;
 }
 
@@ -19,13 +19,14 @@
 }
 
 .statementTitle {
-  font-family: var(--font-newsreader);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-family: var(--font-inter) !important;
+  font-weight: 900 !important;
+  font-size: clamp(1.8rem, 4.5vw, 2.75rem) !important;
   text-transform: uppercase;
-  color: var(--primary);
+  color: #fff500;
   margin-bottom: 2rem;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .pointsGrid {
@@ -50,12 +51,12 @@
 .pointText {
   font-family: var(--font-manrope);
   font-size: 1.1rem;
-  color: var(--on-surface);
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.6;
 }
 
 .pointText strong {
-  color: var(--primary);
+  color: #fff500;
   display: block;
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
