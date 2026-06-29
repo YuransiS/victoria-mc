@@ -19,7 +19,7 @@
   font-family: var(--font-inter) !important;
   font-weight: 900 !important;
   font-size: clamp(1.8rem, 4.5vw, 2.75rem);
-  color: #fff500 !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   margin-bottom: 1rem;
@@ -41,7 +41,7 @@
 
 .accordionItemActive {
   background: #1a1a1c;
-  border-color: #fff500;
+  border-color: var(--accent-color);
   box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
 }
 
@@ -62,8 +62,8 @@
   font-family: var(--font-inter);
   font-size: 1.15rem;
   font-weight: 800;
-  color: #121212;
-  background: #fff500;
+  color: var(--accent-text-color);
+  background: var(--accent-color);
   width: 36px;
   height: 36px;
   display: flex;
