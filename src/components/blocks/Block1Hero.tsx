@@ -43,7 +43,7 @@ export function Block1Hero() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    
+
     const getOfferVal = () => {
       const offerParam = searchParams.get("offer");
       const vParam = searchParams.get("v");
@@ -108,9 +108,8 @@ export function Block1Hero() {
           <div className={styles.textContent}>
 
             <motion.h1
-              className={`${styles.title} ${styles.longTitle} ${
-                variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
-              }`}
+              className={`${styles.title} ${styles.longTitle} ${variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
+                }`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -142,8 +141,8 @@ export function Block1Hero() {
 
             {/* Mobile CTA Button (opens modal) */}
             <div className={styles.mobileHeroCta}>
-              <button 
-                className={styles.mainPageButton} 
+              <button
+                className={styles.mainPageButton}
                 onClick={() => setIsRegModalOpen(true)}
               >
                 ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО
@@ -182,14 +181,14 @@ export function Block1Hero() {
       {/* Mobile Registration Modal */}
       <AnimatePresence>
         {isRegModalOpen && (
-          <motion.div 
+          <motion.div
             className={styles.modalOverlay}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsRegModalOpen(false)}
           >
-            <motion.div 
+            <motion.div
               className={styles.modalContent}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
