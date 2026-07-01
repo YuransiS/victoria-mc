@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { trackFBEvent } from '@/components/FacebookPixel';
+import { useSearchParams } from 'next/navigation';
 
 interface QuestionnaireFormData {
   name: string;
@@ -36,6 +37,26 @@ const DecorativeLines = () => (
 );
 
 export default function PreRegistrationAnketaPage() {
+  return (
+    <Suspense fallback={
+      <div className="antialiased text-[#1a1c1c] min-h-screen relative font-manrope bg-[#b5a78c] bg-[url('/subtle_paper.png')] bg-repeat flex items-center justify-center">
+        <div className="absolute inset-0 z-0 bg-[url('/anketa_bg_dark.png')] bg-cover bg-center opacity-90" />
+        <div className="relative z-10 text-center space-y-4">
+          <div className="animate-spin h-8 w-8 text-[#ebd8b8] mx-auto border-4 border-t-transparent border-[#ebd8b8] rounded-full"></div>
+          <p className="text-[#ebd8b8] text-sm uppercase tracking-widest font-bold">Завантаження...</p>
+        </div>
+      </div>
+    }>
+      <AnketaFormContent />
+    </Suspense>
+  );
+}
+
+function AnketaFormContent() {
+  const searchParams = useSearchParams();
+  const rawV = searchParams.get('v') || '1';
+  const version = rawV.trim() === '2' ? '2' : '1';
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [countryCode, setCountryCode] = useState<string>('UA');
@@ -126,6 +147,7 @@ export default function PreRegistrationAnketaPage() {
       visitor_id: localStorage.getItem('visitor_id') || '',
       page_path: '/anketa',
       full_url: window.location.href,
+      anketa_version: version,
       ...utms
     };
 
@@ -304,50 +326,59 @@ export default function PreRegistrationAnketaPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* BONUS 1 */}
-            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
-              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
-              <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
-                  <span className="text-xl">🎁</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Чек-лист</span>
-                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">«50 тем для контенту»</h4>
-                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів</p>
+            {(version === '2' ? [
+              {
+                type: 'Консультація',
+                title: 'Консультація з командою',
+                desc: 'Де ми розберемо твій блог та ситуацію і підкажемо рішення',
+                icon: '💬'
+              },
+              {
+                type: 'Найкраща ціна',
+                title: 'Максимальна знижка',
+                desc: 'Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання',
+                icon: '🔥'
+              },
+              {
+                type: 'Інструкція',
+                title: '«Структура прогріву»',
+                desc: 'Детальна інструкція, де я зібрала головні фішки прогріву, щоб аудиторія після вашого контенту сама захотіла у вас купити продукт або послугу',
+                icon: '📝'
+              }
+            ] : [
+              {
+                type: 'Чек-лист',
+                title: '«50 тем для контенту»',
+                desc: 'Готові ідеї, які залучать цільову аудиторію та спростять створення сторіз та дописів',
+                icon: '🎁'
+              },
+              {
+                type: 'Найкраща ціна',
+                title: 'Максимальна знижка',
+                desc: 'Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання',
+                icon: '🔥'
+              },
+              {
+                type: 'Спільнота',
+                title: 'Закритий канал',
+                desc: 'Доступ до закритого телеграм каналу передзапису з інсайдерською інформацією',
+                icon: '🔒'
+              }
+            ]).map((bonus, idx) => (
+              <div key={idx} className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
+                <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
+                <div className="flex items-start gap-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                    <span className="text-xl">{bonus.icon}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">{bonus.type}</span>
+                    <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">{bonus.title}</h4>
+                    <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">{bonus.desc}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* BONUS 2 */}
-            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
-              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
-              <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
-                  <span className="text-xl">🔥</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Найкраща ціна</span>
-                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Максимальна знижка</h4>
-                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Гарантоване закріплення найвигідніших спец-умов та ранній доступ до навчання</p>
-                </div>
-              </div>
-            </div>
-
-            {/* BONUS 3 */}
-            <div className="relative overflow-hidden p-5 rounded-2xl border border-[#5d5f2c]/25 bg-gradient-to-br from-[#e6e1d4]/95 to-[#d6cfbe]/90 shadow-[0_10px_25px_rgba(93,95,44,0.04)] hover:shadow-[0_12px_30px_rgba(93,95,44,0.06)] hover:border-[#5d5f2c]/50 transition-all duration-300 group">
-              <div className="absolute top-[-15px] right-[-15px] w-12 h-12 rounded-full bg-[#5d5f2c]/5 blur-lg group-hover:bg-[#5d5f2c]/10 transition-colors" />
-              <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5d5f2c] text-[#faf8f2] shadow-[0_8px_20px_rgba(93,95,44,0.25)] shrink-0 transform group-hover:scale-105 transition-transform duration-300">
-                  <span className="text-xl">🔒</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#5d5f2c]/85">Спільнота</span>
-                  <h4 className="text-xs md:text-sm font-bold text-[#1a1c1c] leading-snug">Закритий канал</h4>
-                  <p className="text-[10px] text-[#1a1c1c]/70 leading-normal font-light">Доступ до закритого телеграм каналу передзапису з інсайдерською інформацією</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -622,7 +653,7 @@ export default function PreRegistrationAnketaPage() {
               </div>
               <h3 className="font-serif text-3xl font-bold text-[#1a1c1c] tracking-tight">Дякуємо!</h3>
               <p className="text-xs md:text-sm text-[#1a1c1c]/70 leading-relaxed max-w-sm mx-auto font-light">
-                Твою анкету успішно надіслано! Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>«50 тем для контенту»</strong> та додаткові бонуси🤍
+                Твою анкету успішно надіслано! Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>{version === '2' ? '«Структура прогріву»' : '«50 тем для контенту»'}</strong> та додаткові бонуси🤍
               </p>
               
               <div className="pt-6">

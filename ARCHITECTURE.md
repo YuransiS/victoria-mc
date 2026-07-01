@@ -32,7 +32,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `free-lection/` — VSL funnel start landing page. Supports `?uavslab=160626` query parameter for A/B testing redirect to an alternative Telegram chatbot chain.
 *   `free-lection/vsl-form/` — VSL Step 2 form questionnaire.
 *   `rozbir/` — Personal video breakdown offer page.
-*   `anketa/` — [NEW] Pre-registration Questionnaire Landing Page for lead capturing.
+*   `anketa/` — Pre-registration Questionnaire Landing Page for lead capturing. Supports `?v=2` query parameter for A/B testing a different bonus structure (Consultation, Maximum Discount, Warming-up Structure) instead of the default layout.
 *   `checkout/` — Dynamic checkout client page.
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 
