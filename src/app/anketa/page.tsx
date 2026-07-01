@@ -91,7 +91,7 @@ function AnketaFormContent() {
 
   useEffect(() => {
     trackFBEvent('PageView', {});
-    
+
     // Resolve user country on mount using Vercel Geo Endpoint
     fetch('/api/country')
       .then(res => res.json())
@@ -100,7 +100,7 @@ function AnketaFormContent() {
           setCountryCode(data.country.toUpperCase());
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const onSubmit = async (data: QuestionnaireFormData) => {
@@ -108,7 +108,7 @@ function AnketaFormContent() {
 
     const params = new URLSearchParams(window.location.search);
     const hasUrlUtms = params.get('utm_source') || params.get('utm_medium') || params.get('utm_campaign');
-    
+
     let utms = {
       utm_source: params.get('utm_source') || 'direct',
       utm_medium: params.get('utm_medium') || '-',
@@ -191,7 +191,7 @@ function AnketaFormContent() {
       if (targetElement) {
         // Scroll smoothly to the invalid element
         targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
+
         // Add shake animation
         targetElement.classList.add('animate-shake');
         setTimeout(() => {
@@ -288,7 +288,7 @@ function AnketaFormContent() {
 
       {/* BACKGROUND - SCROLLABLE ON MOBILE, FIXED ON DESKTOP */}
       <div className="absolute md:fixed inset-0 z-0 bg-[#b5a78c] bg-[url('/subtle_paper.png')] bg-repeat">
-        <div 
+        <div
           className="absolute inset-0 bg-[url('/anketa_bg_dark.png')] bg-cover bg-center opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
@@ -389,14 +389,14 @@ function AnketaFormContent() {
 
           {!success ? (
             <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-              
+
               {/* Name */}
               <div id="form-group-name" className="space-y-2 transition-all duration-300">
                 <label className="text-xs font-bold text-[#5d5f2c] uppercase tracking-wider block font-manrope">Твоє ім'я</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   {...register('name', { required: 'Введіть ваше ім’я', minLength: { value: 2, message: 'Мінімум 2 літери' } })}
-                  placeholder="Введіть ім'я" 
+                  placeholder="Введіть ім'я"
                   className={`w-full bg-white rounded-xl border ${errors.name ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c] focus:ring-1 focus:ring-[#5d5f2c]'} px-4 py-3.5 text-base focus:outline-none transition-all text-[#1a1c1c] shadow-sm`}
                 />
                 {errors.name && <span className="text-red-500/90 text-xs mt-0.5 block font-manrope">{errors.name.message}</span>}
@@ -405,10 +405,10 @@ function AnketaFormContent() {
               {/* Telegram */}
               <div id="form-group-telegram" className="space-y-2 transition-all duration-300">
                 <label className="text-xs font-bold text-[#5d5f2c] uppercase tracking-wider block font-manrope">Твій нік у telegram (@нікнейм)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   {...register('telegram', { required: 'Введіть Telegram нікнейм', minLength: { value: 3, message: 'Мінімум 3 символи' } })}
-                  placeholder="@username" 
+                  placeholder="@username"
                   className={`w-full bg-white rounded-xl border ${errors.telegram ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c] focus:ring-1 focus:ring-[#5d5f2c]'} px-4 py-3.5 text-base focus:outline-none transition-all text-[#1a1c1c] shadow-sm`}
                 />
                 {errors.telegram && <span className="text-red-500/90 text-xs mt-0.5 block font-manrope">{errors.telegram.message}</span>}
@@ -442,10 +442,10 @@ function AnketaFormContent() {
               {/* Instagram */}
               <div id="form-group-instagram" className="space-y-2 transition-all duration-300">
                 <label className="text-xs font-bold text-[#5d5f2c] uppercase tracking-wider block font-manrope">Твій інстаграм (посилання чи нікнейм)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   {...register('instagram', { required: 'Введіть Instagram нікнейм або лінк' })}
-                  placeholder="Введіть нікнейм або лінк" 
+                  placeholder="Введіть нікнейм або лінк"
                   className={`w-full bg-white rounded-xl border ${errors.instagram ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c] focus:ring-1 focus:ring-[#5d5f2c]'} px-4 py-3.5 text-base focus:outline-none transition-all text-[#1a1c1c] shadow-sm`}
                 />
                 {errors.instagram && <span className="text-red-500/90 text-xs mt-0.5 block font-manrope">{errors.instagram.message}</span>}
@@ -462,31 +462,27 @@ function AnketaFormContent() {
                   ].map((option) => {
                     const isSelected = purposeValue === option.label;
                     return (
-                      <label 
-                        key={option.id} 
-                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
-                          isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
                             : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
-                        }`}
+                          }`}
                       >
-                        <input 
-                          type="radio" 
+                        <input
+                          type="radio"
                           value={option.label}
                           {...register('purpose', { required: 'Оберіть один варіант' })}
                           className="sr-only"
                         />
                         {/* Custom radio button design */}
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
-                        }`}>
-                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
-                            isSelected ? 'scale-100' : 'scale-0'
-                          }`} />
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                          }`}>
+                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${isSelected ? 'scale-100' : 'scale-0'
+                            }`} />
                         </div>
-                        <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
-                        }`}>{option.label}</span>
+                        <span className={`text-xs md:text-sm transition-colors ${isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
+                          }`}>{option.label}</span>
                       </label>
                     );
                   })}
@@ -505,31 +501,27 @@ function AnketaFormContent() {
                   ].map((option) => {
                     const isSelected = subscriptionDurationValue === option.label;
                     return (
-                      <label 
-                        key={option.id} 
-                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
-                          isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
                             : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
-                        }`}
+                          }`}
                       >
-                        <input 
-                          type="radio" 
+                        <input
+                          type="radio"
                           value={option.label}
                           {...register('subscription_duration', { required: 'Оберіть один варіант' })}
                           className="sr-only"
                         />
                         {/* Custom radio button design */}
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
-                        }`}>
-                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
-                            isSelected ? 'scale-100' : 'scale-0'
-                          }`} />
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                          }`}>
+                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${isSelected ? 'scale-100' : 'scale-0'
+                            }`} />
                         </div>
-                        <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
-                        }`}>{option.label}</span>
+                        <span className={`text-xs md:text-sm transition-colors ${isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
+                          }`}>{option.label}</span>
                       </label>
                     );
                   })}
@@ -540,9 +532,9 @@ function AnketaFormContent() {
               {/* Difficulties - ADAPTIVE EXPANDING SINGLE-LINE TEXTAREA */}
               <div id="form-group-difficulties" className="space-y-2 transition-all duration-300">
                 <label className="text-xs font-bold text-[#5d5f2c] uppercase tracking-wider block font-manrope">Які зараз складнощі з блогом?</label>
-                <textarea 
+                <textarea
                   {...register('difficulties', { required: 'Будь ласка, опишіть ваші складнощі' })}
-                  placeholder="Опишіть ваші складнощі..." 
+                  placeholder="Опишіть ваші складнощі..."
                   rows={2}
                   onInput={(e) => {
                     const target = e.target as HTMLTextAreaElement;
@@ -556,7 +548,7 @@ function AnketaFormContent() {
 
               {/* Readiness */}
               <div id="form-group-readiness" className="space-y-4 transition-all duration-300">
-                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до работы над контентом та візуалом?</label>
+                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до работи над контентом та візуалом?</label>
                 <div className="space-y-3">
                   {[
                     { id: 'not_ready', label: 'не дуже готова, просто цікаво дізнатись деталі' },
@@ -565,31 +557,27 @@ function AnketaFormContent() {
                   ].map((option) => {
                     const isSelected = readinessValue === option.label;
                     return (
-                      <label 
-                        key={option.id} 
-                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${
-                          isSelected 
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]' 
+                      <label
+                        key={option.id}
+                        className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
+                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
                             : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
-                        }`}
+                          }`}
                       >
-                        <input 
-                          type="radio" 
+                        <input
+                          type="radio"
                           value={option.label}
                           {...register('readiness', { required: 'Оберіть один варіант' })}
                           className="sr-only"
                         />
                         {/* Custom radio button design */}
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
-                        }`}>
-                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${
-                            isSelected ? 'scale-100' : 'scale-0'
-                          }`} />
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${isSelected ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                          }`}>
+                          <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform duration-300 ${isSelected ? 'scale-100' : 'scale-0'
+                            }`} />
                         </div>
-                        <span className={`text-xs md:text-sm transition-colors ${
-                          isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
-                        }`}>{option.label}</span>
+                        <span className={`text-xs md:text-sm transition-colors ${isSelected ? 'text-[#1a1c1c] font-semibold' : 'text-[#1a1c1c]/70'
+                          }`}>{option.label}</span>
                       </label>
                     );
                   })}
@@ -600,15 +588,14 @@ function AnketaFormContent() {
               {/* Consent */}
               <div id="form-group-consent" className="space-y-2 transition-all duration-300">
                 <label className="flex items-start gap-4 cursor-pointer group select-none">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     {...register('consent', { required: 'Для відправки необхідно дати згоду на обробку данных' })}
                     className="sr-only"
                   />
                   {/* Custom checkbox design */}
-                  <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                    consentValue ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
-                  }`}>
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${consentValue ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                    }`}>
                     <svg className={`w-3.5 h-3.5 text-white transition-transform duration-300 ${consentValue ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
@@ -622,8 +609,8 @@ function AnketaFormContent() {
 
               {/* Submit */}
               <div className="space-y-4">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className="w-full bg-[#5d5f2c] text-white py-5 rounded-xl text-xs md:text-sm font-bold uppercase tracking-[0.25em] hover:bg-[#484a22] transition-all shadow-[0_10px_30px_rgba(93,95,44,0.15)] hover:shadow-[0_15px_35px_rgba(93,95,44,0.25)] transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-3 disabled:bg-gray-400 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
                 >
@@ -655,9 +642,9 @@ function AnketaFormContent() {
               <p className="text-xs md:text-sm text-[#1a1c1c]/70 leading-relaxed max-w-sm mx-auto font-light">
                 Твою анкету успішно надіслано! Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>{version === '2' ? '«Структура прогріву»' : '«50 тем для контенту»'}</strong> та додаткові бонуси🤍
               </p>
-              
+
               <div className="pt-6">
-                <a 
+                <a
                   href="https://t.me/+idsZRC5s1yo0YmUy"
                   className="inline-block bg-[#5d5f2c] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:bg-[#484a22] transition-all hover:scale-[1.02] active:scale-[0.98] duration-300"
                 >
