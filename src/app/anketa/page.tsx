@@ -209,6 +209,10 @@ function AnketaFormContent() {
         .font-manrope { font-family: 'Manrope', sans-serif; }
         .font-serif { font-family: 'Playfair Display', serif; }
 
+        input, textarea, select, button {
+          font-family: 'Manrope', sans-serif;
+        }
+
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-15px) rotate(3deg); }
@@ -541,7 +545,7 @@ function AnketaFormContent() {
                     target.style.height = 'auto';
                     target.style.height = `${target.scrollHeight}px`;
                   }}
-                  className={`w-full bg-white rounded-xl border ${errors.difficulties ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c] focus:ring-1 focus:ring-[#5d5f2c]'} px-4 py-3 text-base focus:outline-none transition-all text-[#1a1c1c] shadow-sm min-h-[80px] overflow-hidden resize-none`}
+                  className={`w-full bg-white rounded-xl border ${errors.difficulties ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#5d5f2c]/20 focus:border-[#5d5f2c] focus:ring-1 focus:ring-[#5d5f2c]'} px-4 py-3 text-base focus:outline-none transition-all text-[#1a1c1c] shadow-sm min-h-[80px] overflow-hidden resize-none font-manrope`}
                 />
                 {errors.difficulties && <span className="text-red-500/90 text-xs mt-0.5 block font-manrope">{errors.difficulties.message}</span>}
               </div>
