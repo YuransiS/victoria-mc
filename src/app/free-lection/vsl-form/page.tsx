@@ -251,9 +251,9 @@ export default function StvoryuiPage() {
       itiRef.current = intlTelInput(phoneInputRef.current, {
         initialCountry: "auto",
         geoIpLookup: (callback: (countryCode: string) => void) => {
-          fetch("https://ipapi.co/json")
+          fetch("/api/country")
             .then((res) => res.json())
-            .then((data) => callback(data.country_code?.toLowerCase() || "ua"))
+            .then((data) => callback(data.country?.toLowerCase() || "ua"))
             .catch(() => callback("ua"));
         },
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/26.9.2/js/utils.js",
@@ -359,6 +359,11 @@ export default function StvoryuiPage() {
     // Get full phone number (E.164) or fallback to raw input value
     let fullPhone = '';
     if (itiRef.current) {
+      if (!itiRef.current.isValidNumber()) {
+        alert("Будь ласка, введіть коректний номер телефону");
+        setLoading(false);
+        return;
+      }
       fullPhone = itiRef.current.getNumber();
     }
     if (!fullPhone && phoneInputRef.current) {
