@@ -118,6 +118,7 @@ export async function POST(req: Request) {
       
       // Form comment string from questionnaire fields if they exist
       const commentLines: string[] = [];
+      commentLines.push(`Форма: ${formTitle}`);
       if (niche) commentLines.push(`Ніша: ${niche}`);
       if (purpose) commentLines.push(`Мета: ${purpose}`);
       if (difficulties) commentLines.push(`Складнощі: ${difficulties}`);
