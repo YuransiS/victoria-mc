@@ -469,8 +469,8 @@ function AnketaFormContent() {
                       <label
                         key={option.id}
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
-                            : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
+                          ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
+                          : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
                           }`}
                       >
                         <input
@@ -508,8 +508,8 @@ function AnketaFormContent() {
                       <label
                         key={option.id}
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
-                            : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
+                          ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
+                          : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
                           }`}
                       >
                         <input
@@ -552,7 +552,7 @@ function AnketaFormContent() {
 
               {/* Readiness */}
               <div id="form-group-readiness" className="space-y-4 transition-all duration-300">
-                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до работи над контентом та візуалом?</label>
+                <label className="text-sm font-bold text-[#1a1c1c] block font-manrope">Наскільки ти готова до роботи над контентом та візуалом?</label>
                 <div className="space-y-3">
                   {[
                     { id: 'not_ready', label: 'не дуже готова, просто цікаво дізнатись деталі' },
@@ -564,8 +564,8 @@ function AnketaFormContent() {
                       <label
                         key={option.id}
                         className={`flex items-center gap-4 cursor-pointer p-4 rounded-xl border transition-all duration-300 select-none group ${isSelected
-                            ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
-                            : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
+                          ? 'border-[#5d5f2c] bg-[#5d5f2c]/10 shadow-[0_4px_20px_rgba(93,95,44,0.04)]'
+                          : 'border-[#5d5f2c]/15 bg-white hover:bg-white/90 hover:border-[#5d5f2c]/40'
                           }`}
                       >
                         <input
