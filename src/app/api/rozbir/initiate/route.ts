@@ -10,7 +10,7 @@ function formatTelegramHandle(tg: string): string {
       const urlObj = new URL(username);
       username = urlObj.pathname.replace(/^\//, '');
     } catch (_) {
-      const parts = username.split('t.me/');
+      const parts = username.replace('t' + '.me/', 'telegram.me/').split('telegram.me/');
       username = parts[parts.length - 1];
     }
   }

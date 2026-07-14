@@ -13,7 +13,7 @@ interface FormData {
     instagram: string;
 }
 
-const BOT_REDIRECT_URL = 'https://t.me/victoriameshcheriakova_bot?start=6a2289635b7cd51e330436df';
+const BOT_REDIRECT_URL = 'https://telegram.me/victoriameshcheriakova_bot?start=6a2289635b7cd51e330436df';
 
 export default function FreeLectionPage() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -151,7 +151,7 @@ export default function FreeLectionPage() {
             }
 
             if (uavslabVal === '160626') {
-                window.location.href = 'https://t.me/victoriameshcheriakova_bot?start=6a319bcf0e2107e50808636b';
+                window.location.href = 'https://telegram.me/victoriameshcheriakova_bot?start=6a319bcf0e2107e50808636b';
             } else {
                 window.location.href = BOT_REDIRECT_URL;
             }

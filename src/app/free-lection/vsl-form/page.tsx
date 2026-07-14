@@ -17,7 +17,7 @@ interface FormData {
   target_sheet: string;
 }
 
-const REDIRECT_URL = "https://t.me/+idsZRC5s1yo0YmUy";
+const REDIRECT_URL = "https://telegram.me/+idsZRC5s1yo0YmUy";
 
 const names = ["Олена", "Марія", "Ірина", "Анастасія", "Тетяна", "Юлія", "Наталія", "Світлана", "Оксана", "Вікторія", "Дарина", "Анна", "Христина"];
 const actions = ["заповнила анкету", "забронювала місце", "щойно переглянула відео-урок", "хоче на курс"];

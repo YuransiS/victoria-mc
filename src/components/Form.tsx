@@ -8,7 +8,7 @@ import { trackFBEvent } from "./FacebookPixel";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 
-const TELEGRAM_LINK = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
+const TELEGRAM_LINK = "https://telegram.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
 interface FormProps {
   buttonText?: string;
@@ -22,7 +22,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
-  const [redirectUrl, setRedirectUrl] = useState("https://t.me/+oLZTxHGFnJA4ZGMy");
+  const [redirectUrl, setRedirectUrl] = useState("https://telegram.me/+oLZTxHGFnJA4ZGMy");
 
   useEffect(() => {
     // Fetch user's country code via Edge API
@@ -54,9 +54,9 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
     // Set redirect channel link based on current offer variant
     const currentOffer = localStorage.getItem("current_offer_variant") || "";
     if (currentOffer === "offer2") {
-      setRedirectUrl("https://t.me/+TbJDFpKxhog5NzAy");
+      setRedirectUrl("https://telegram.me/+TbJDFpKxhog5NzAy");
     } else if (currentOffer === "offer3") {
-      setRedirectUrl("https://t.me/+EzXVhYffIA5kYTIy");
+      setRedirectUrl("https://telegram.me/+EzXVhYffIA5kYTIy");
     }
 
     // Randomly fluctuate active users count to look "live"

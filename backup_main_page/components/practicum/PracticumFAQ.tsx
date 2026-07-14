@@ -21,7 +21,7 @@ export function PracticumFAQ() {
           </p>
           
           <a 
-            href="https://t.me/vika_cooperation" 
+            href="https://telegram.me/vika_cooperation" 
             target="_blank" 
             rel="noopener noreferrer"
             className={styles.contactBtn}

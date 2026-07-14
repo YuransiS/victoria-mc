@@ -792,7 +792,7 @@ function InfoRow({
   };
 
   const tgLink = isTelegram && value && value !== 'вЂ”' 
-    ? `https://t.me/${value.toString().replace('@', '').trim()}` 
+    ? `https://telegram.me/${value.toString().replace('@', '').trim()}` 
     : null;
 
   return (

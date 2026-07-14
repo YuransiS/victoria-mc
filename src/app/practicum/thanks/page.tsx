@@ -75,7 +75,7 @@ export default function PracticumThanksPage() {
           localStorage.removeItem('tg_msg_id_data');
           // Auto-redirect to Telegram after a short delay
           setTimeout(() => {
-            window.location.href = "https://t.me/+HQF8RU3-T2UyYjU0";
+            window.location.href = "https://telegram.me/+HQF8RU3-T2UyYjU0";
           }, 2000);
         });
       }
@@ -105,7 +105,7 @@ export default function PracticumThanksPage() {
 
           <div className="space-y-4">
             <Link 
-              href="https://t.me/+HQF8RU3-T2UyYjU0" 
+              href="https://telegram.me/+HQF8RU3-T2UyYjU0" 
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
               ПЕРЕЙТИ В TELEGRAM ЗАРАЗ

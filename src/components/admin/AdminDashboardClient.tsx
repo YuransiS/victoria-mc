@@ -1369,7 +1369,7 @@ function InfoRow({ icon, label, value, color = "text-admin-text-muted", isCopyab
       setTimeout(() => setCopied(false), 2000);
     }
   };
-  const tgLink = isTelegram && value && value !== '—' ? `https://t.me/${value.toString().replace('@', '').trim()}` : null;
+  const tgLink = isTelegram && value && value !== '—' ? `https://telegram.me/${value.toString().replace('@', '').trim()}` : null;
   return (
     <div className="flex items-center gap-3 group/info">
       <div className="text-admin-text-dim">{icon}</div>

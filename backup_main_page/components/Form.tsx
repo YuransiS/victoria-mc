@@ -8,7 +8,7 @@ import { trackFBEvent } from "./FacebookPixel";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 
-const TELEGRAM_LINK = "https://t.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
+const TELEGRAM_LINK = "https://telegram.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
 interface FormProps {
   buttonText?: string;

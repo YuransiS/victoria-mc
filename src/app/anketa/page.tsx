@@ -83,7 +83,7 @@ function AnketaFormContent() {
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        window.location.href = 'https://t.me/+idsZRC5s1yo0YmUy';
+        window.location.href = 'https://telegram.me/+idsZRC5s1yo0YmUy';
       }, 2500);
       return () => clearTimeout(timer);
     }
@@ -649,7 +649,7 @@ function AnketaFormContent() {
 
               <div className="pt-6">
                 <a
-                  href="https://t.me/+idsZRC5s1yo0YmUy"
+                  href="https://telegram.me/+idsZRC5s1yo0YmUy"
                   className="inline-block bg-[#5d5f2c] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:bg-[#484a22] transition-all hover:scale-[1.02] active:scale-[0.98] duration-300"
                 >
                   Перейти в Telegram-канал
