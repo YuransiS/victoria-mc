@@ -29,11 +29,11 @@ export function Block6Registration() {
       >
         <div>
           <h2 className={styles.sectionTitle} style={{ fontFamily: "var(--font-inter)", fontWeight: 900, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", textAlign: "center", color: "var(--accent-color)", margin: "0 0 1rem 0" }}>
-            РЕЄСТРУЙСЯ НА МАЙСТЕР-КЛАС ТА ВИХОДЬ ІЗ ХАОСУ
+            ОПЛАТИ УЧАСТЬ У МАЙСТЕР-КЛАСІ ТА ВИЙДИ ІЗ ХАОСУ
           </h2>
 
         </div>
-        <Form buttonClassName={styles.mainPageButton} />
+        <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
       </motion.div>
     </section>
   );

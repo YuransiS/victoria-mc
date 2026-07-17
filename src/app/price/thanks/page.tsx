@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ import { trackFBEvent } from "@/components/FacebookPixel";
 
 export default function ThanksPage() {
   const router = useRouter();
+  const [isMasterclass, setIsMasterclass] = useState(false);
+  const [tgLink, setTgLink] = useState("https://telegram.me/vika_cooperation");
 
   useEffect(() => {
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
@@ -36,6 +38,17 @@ export default function ThanksPage() {
     const activeOrderId = urlOrderId || sessionOrderId;
     if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
+    const tariff = localStorage.getItem('lead_tariff') || 'Бронювання';
+    if (tariff === "Майстер-клас 23.07") {
+      setIsMasterclass(true);
+      const savedLink = localStorage.getItem('masterclass_tg_link');
+      if (savedLink) {
+        setTgLink(savedLink);
+      } else {
+        setTgLink("https://telegram.me/+oLZTxHGFnJA4ZGMy");
+      }
+    }
+
     if (activeOrderId) {
       const transactionStatus = searchParams.get('transactionStatus');
       
@@ -43,7 +56,6 @@ export default function ThanksPage() {
         // Track Purchase
         const amount = parseFloat(localStorage.getItem('lead_amount') || '0');
         const currency = localStorage.getItem('lead_currency') || 'UAH';
-        const tariff = localStorage.getItem('lead_tariff') || 'Бронювання';
         
         if (amount > 0) {
           trackFBEvent("Purchase", {
@@ -54,6 +66,8 @@ export default function ThanksPage() {
           });
         }
 
+        const targetSheet = tariff === "Майстер-клас 23.07" ? "Автовеб" : "Бронювання";
+
         fetch('/api/leads', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -62,14 +76,14 @@ export default function ThanksPage() {
             order_id: activeOrderId,
             customer_name: localStorage.getItem('lead_name') || 'Клієнт',
             customer_phone: localStorage.getItem('lead_phone') || '-',
-            tariff: localStorage.getItem('lead_tariff') || '-',
+            tariff: tariff,
             amount: localStorage.getItem('lead_amount') || '-',
             currency: localStorage.getItem('lead_currency') || 'UAH',
             utm_source: localStorage.getItem('lead_utm_source') || '',
             utm_medium: localStorage.getItem('lead_utm_medium') || '',
             status: "APPROVED (Redirect)",
             tg_msg_id: activeTgMsgId,
-            target_sheet: "Бронювання"
+            target_sheet: targetSheet
           }),
         }).finally(() => {
           localStorage.removeItem('tg_msg_id_data');
@@ -95,16 +109,25 @@ export default function ThanksPage() {
           </h1>
           
           <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
-            Ваша бронь успішно зафіксована.<br/>
-            Напишіть нам у Telegram для отримання подальших інструкцій.
+            {isMasterclass ? (
+              <>
+                Ваш квиток на майстер-клас успішно оплачено!<br/>
+                Приєднайтеся до закритого Telegram-каналу, де будуть усі матеріали та посилання на трансляцію.
+              </>
+            ) : (
+              <>
+                Ваша бронь успішно зафіксована.<br/>
+                Напишіть нам у Telegram для отримання подальших інструкцій.
+              </>
+            )}
           </p>
 
           <div className="space-y-4">
             <Link 
-              href="https://telegram.me/vika_cooperation" 
+              href={tgLink} 
               className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
             >
-              НАПИСАТИ В TELEGRAM
+              {isMasterclass ? "ПРИЄДНАТИСЯ ДО TELEGRAM" : "НАПИСАТИ В TELEGRAM"}
             </Link>
           </div>
         </motion.div>

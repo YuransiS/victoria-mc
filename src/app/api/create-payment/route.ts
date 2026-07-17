@@ -167,7 +167,12 @@ export async function POST(request: Request) {
 
     if (token && chatId) {
       const isPracticum = targetSheet === "Практикум";
-      const title = isPracticum ? "⏳ <b>Очікується оплата (Практикум)</b>" : "⏳ <b>Очікується оплата (Бронь)</b>";
+      const isMasterclass = targetSheet === "Автовеб";
+      const title = isPracticum 
+        ? "⏳ <b>Очікується оплата (Практикум)</b>" 
+        : isMasterclass 
+        ? "⏳ <b>Очікується оплата (Майстер-клас)</b>" 
+        : "⏳ <b>Очікується оплата (Бронь)</b>";
       const utmInfo = utm_source ? `\n\n🔍 <b>Джерело:</b> ${utm_source} / ${utm_medium || '-'}` : "";
 
       let message = `${title}\n\n` +

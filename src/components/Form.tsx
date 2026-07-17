@@ -15,7 +15,7 @@ interface FormProps {
   buttonClassName?: string;
 }
 
-export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВАТИСЯ ЗАРАЗ", buttonClassName }) => {
+export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧАСТЬ", buttonClassName }) => {
   const [formData, setFormData] = useState({ name: "", phone: "", social: "", instagram: "" });
   const [errors, setErrors] = useState({ name: "", phone: "", social: "", instagram: "" });
   const [contactMethod, setContactMethod] = useState<"phone" | "telegram" | null>(null);
@@ -152,53 +152,128 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
       full_url: window.location.href
     };
 
-    // Track Lead
-    trackFBEvent("Lead", {
-      content_name: "Masterclass Registration",
-      value: 0,
-      currency: "UAH",
-      ...utmData
-    });
-
     const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
     const sanitizedSocial = contactMethod === "telegram" ? (formData.social.startsWith("@") ? formData.social : `@${formData.social}`) : "";
 
-    const payload = {
-      name: formData.name,
-      phone: sanitizedPhone,
-      social: sanitizedSocial,
+    // Parse price param p
+    const pParam = searchParams.get("p");
+    const price = pParam === "49" ? 49 : pParam === "89" ? 89 : 149;
+
+    // Save TG link to local storage for Thanks page redirect
+    localStorage.setItem('masterclass_tg_link', redirectUrl);
+
+    const data = {
+      customerName: formData.name,
+      customerEmail: sanitizedSocial ? `${sanitizedSocial.replace("@", "")}@telegram.com` : "phone-client@telegram.com", // Fallback
+      customerPhone: sanitizedPhone,
+      telegram: sanitizedSocial,
       instagram: formData.instagram,
-      ...utmData,
-      visitor_id: (typeof window !== "undefined" && localStorage.getItem('visitor_id')) || '',
-      target_sheet: "Автовеб",
-      sheet_id: "726331330",
-      offer_variant: detectedOffer || undefined
+      amount: price,
+      tariffName: "Майстер-клас 23.07"
     };
 
     try {
-      const res = await fetch('/api/lead', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          ...utmData,
+          visitor_id: localStorage.getItem('visitor_id') || '',
+          currency: "UAH",
+          amount: price,
+          targetSheet: "Автовеб",
+          successUrl: `/price/thanks`,
+          failUrl: `/price/fail`
+        })
       });
-      const resData = await res.json();
-      if (resData.uuid) {
-        localStorage.setItem('lead_uuid', resData.uuid);
+
+      const paymentData = await response.json();
+
+      if (paymentData.error) {
+        alert("Помилка при створенні платежу. Спробуйте пізніше.");
+        setStatus("idle");
+        return;
       }
-      // Also ensure fields are saved
+
+      // Save user identification for cross-page persistence
       localStorage.setItem('lead_name', formData.name);
       localStorage.setItem('lead_phone', sanitizedPhone);
       localStorage.setItem('lead_social', sanitizedSocial);
       localStorage.setItem('lead_instagram', formData.instagram);
+
+      // Save TG Message ID to local storage for Thanks page
+      if (paymentData.tgMsgId) {
+        console.log('DEBUG: Storing TG Msg ID from Main Form:', paymentData.tgMsgId);
+        const tgData = {
+          id: paymentData.tgMsgId.toString(),
+          timestamp: Date.now()
+        };
+        localStorage.setItem('tg_msg_id_data', JSON.stringify(tgData));
+      }
+
+      if (paymentData.uuid) {
+        localStorage.setItem('lead_uuid', paymentData.uuid);
+      }
+
+      // Save UTMs to localStorage for the final TG update
+      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+
+      // Save Tariff and Amount for the final TG update
+      localStorage.setItem('lead_tariff', "Майстер-клас 23.07");
+      localStorage.setItem('lead_amount', price.toString());
+      localStorage.setItem('lead_currency', "UAH");
+
+      // Track Lead / InitiateCheckout to Facebook
+      trackFBEvent("Lead", {
+        content_name: "Майстер-клас 23.07",
+        value: price,
+        currency: "UAH",
+        ...utmData
+      });
+
+      // Set flags for Thanks page logic
+      sessionStorage.setItem('paymentAttempted', 'true');
+      sessionStorage.setItem('lastOrderId', paymentData.orderReference);
+
+      setStatus("redirecting");
+
+      // Prepare WayForPay Form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://secure.wayforpay.com/pay';
+      form.acceptCharset = 'utf-8';
+
+      Object.entries(paymentData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          (value as any[]).forEach((val) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = `${key}[]`;
+            input.value = val.toString();
+            form.appendChild(input);
+          });
+        } else if (value !== undefined && value !== null) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value.toString();
+          form.appendChild(input);
+        }
+      });
+
+      document.body.appendChild(form);
+      
+      // Give Meta Pixel and localStorage time to finalize before navigation
+      setTimeout(() => {
+        form.submit();
+      }, 800);
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("Payment error:", error);
+      alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
+      setStatus("idle");
     }
-
-    setStatus("redirecting");
-
-    setTimeout(() => {
-      window.location.href = redirectUrl;
-    }, 1500);
   };
 
   return (
@@ -383,12 +458,9 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ЗАРЕЄСТРУВА
             className={styles.redirectOverlay}
           >
             <div className={styles.redirectBox}>
-              <h3>Дякуємо за реєстрацію!</h3>
-              <p>Зараз ви будете перенаправлені до Telegram каналу...</p>
+              <h3>Дякуємо! Заявку створено</h3>
+              <p>Зараз ви будете перенаправлені на сторінку оплати...</p>
               <div className={styles.loader}></div>
-              <a href={redirectUrl} className={styles.manualLink}>
-                Не перенаправило? Натисніть сюди
-              </a>
             </div>
           </motion.div>
         )}

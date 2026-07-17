@@ -118,7 +118,14 @@ export async function POST(request: Request) {
       
       const isPracticum = targetSheet === "Практикум" || currency === "USD";
       const isRozbir = targetSheet.includes("Ленд 3") || targetSheet.includes("Розбір") || (orderId && orderId.startsWith("ROZ"));
-      const label = isPracticum ? "Практикум" : (isRozbir ? "Розбір" : "Бронь");
+      const isMasterclass = targetSheet === "Автовеб";
+      const label = isPracticum 
+        ? "Практикум" 
+        : isRozbir 
+        ? "Розбір" 
+        : isMasterclass 
+        ? "Майстер-клас" 
+        : "Бронь";
 
       const statusTitle = isSuccess 
         ? `✅ <b>Оплата успішна! (${label})</b>` 

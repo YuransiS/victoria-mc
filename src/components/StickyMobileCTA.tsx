@@ -48,7 +48,7 @@ export function StickyMobileCTA() {
           transition={{ duration: 0.3 }}
         >
           <a href="#registration-form" className={styles.stickyButton} onClick={handleClick}>
-            ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО
+            ОПЛАТИТИ УЧАСТЬ
           </a>
         </motion.div>
       )}

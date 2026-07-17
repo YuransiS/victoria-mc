@@ -23,9 +23,10 @@ const OFFERS = {
 
 export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
-  const [formattedDate, setFormattedDate] = useState("07.07");
+  const [formattedDate, setFormattedDate] = useState("23.07");
   const [variant, setVariant] = useState<1 | 2 | 3>(1);
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
+  const [price, setPrice] = useState(149);
 
   useEffect(() => {
     const handleOpenModal = () => setIsRegModalOpen(true);
@@ -65,6 +66,12 @@ export function Block1Hero() {
     setVariant(detected);
     localStorage.setItem("current_offer_variant", `offer${detected}`);
 
+    // Parse price param p
+    const pParam = searchParams.get("p");
+    if (pParam === "49") setPrice(49);
+    else if (pParam === "89") setPrice(89);
+    else if (pParam === "149") setPrice(149);
+
     // Dynamically set CSS variables for the active variant theme
     const root = document.documentElement;
     // Set all variants to use the yellow accent color theme
@@ -102,7 +109,7 @@ export function Block1Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            <span>{formattedDate || "..."} 19:00 ЗА КИЄВОМ</span>
+            <span>{formattedDate || "... "} в 19:00 ЗА КИЄВОМ</span>
           </motion.div>
 
           <div className={styles.textContent}>
@@ -136,7 +143,7 @@ export function Block1Hero() {
               animate={{ opacity: 0.9, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
             >
-              приходь на безкоштовний майстер-клас, щоб дізнатись що зараз дійсно працює
+              приходь на майстер-клас, щоб дізнатись що зараз дійсно працює
             </motion.div>
 
             {/* Mobile CTA Button (opens modal) */}
@@ -145,7 +152,7 @@ export function Block1Hero() {
                 className={styles.mainPageButton}
                 onClick={() => setIsRegModalOpen(true)}
               >
-                ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО
+                ОПЛАТИТИ УЧАСТЬ
               </button>
             </div>
           </div>
@@ -159,10 +166,10 @@ export function Block1Hero() {
             transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
           >
             <div className={styles.priceTag}>
-              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
+              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>{price} грн</b></span>
             </div>
 
-            <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" buttonClassName={styles.mainPageButton} />
+            <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
 
             <div className={styles.socialProof}>
               <div className={styles.avatars}>
@@ -198,9 +205,9 @@ export function Block1Hero() {
             >
               <button className={styles.modalCloseBtn} onClick={() => setIsRegModalOpen(false)}>×</button>
               <div className={styles.priceTag} style={{ marginBottom: "1.5rem", width: "100%", textAlign: "center" }}>
-                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>БЕЗКОШТОВНО</b></span>
+                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>{price} грн</b></span>
               </div>
-              <Form buttonText="ЗАРЕЄСТРУВАТИСЯ БЕЗКОШТОВНО" buttonClassName={styles.mainPageButton} />
+              <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
             </motion.div>
           </motion.div>
         )}
