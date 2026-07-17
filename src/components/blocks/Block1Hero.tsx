@@ -166,7 +166,7 @@ export function Block1Hero() {
             transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
           >
             <div className={styles.priceTag}>
-              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>{price} грн</b></span>
+              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>449 грн</span> <b>{price} грн</b></span>
             </div>
 
             <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
@@ -205,7 +205,7 @@ export function Block1Hero() {
             >
               <button className={styles.modalCloseBtn} onClick={() => setIsRegModalOpen(false)}>×</button>
               <div className={styles.priceTag} style={{ marginBottom: "1.5rem", width: "100%", textAlign: "center" }}>
-                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>1500 грн</span> <b>{price} грн</b></span>
+                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>449 грн</span> <b>{price} грн</b></span>
               </div>
               <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
             </motion.div>
