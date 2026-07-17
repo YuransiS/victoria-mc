@@ -28,6 +28,8 @@ export function Block1Hero() {
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
   const [price, setPrice] = useState(149);
 
+  const discountPercent = price === 49 ? 89 : price === 89 ? 80 : 67;
+
   useEffect(() => {
     const handleOpenModal = () => setIsRegModalOpen(true);
     window.addEventListener("open-registration-modal", handleOpenModal);
@@ -148,6 +150,16 @@ export function Block1Hero() {
 
             {/* Mobile CTA Button (opens modal) */}
             <div className={styles.mobileHeroCta}>
+              <div className={styles.priceContainer}>
+                <div className={styles.priceLabel}>ВАРТІСТЬ УЧАСТІ:</div>
+                <div className={styles.priceRow}>
+                  <span className={styles.oldPrice}>449 грн</span>
+                  <span className={styles.discountBadge}>-{discountPercent}%</span>
+                  <span className={styles.newPrice}>
+                    {price} <span className={styles.currency}>грн</span>
+                  </span>
+                </div>
+              </div>
               <button
                 className={styles.mainPageButton}
                 onClick={() => setIsRegModalOpen(true)}
@@ -165,8 +177,15 @@ export function Block1Hero() {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
           >
-            <div className={styles.priceTag}>
-              <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>449 грн</span> <b>{price} грн</b></span>
+            <div className={styles.priceContainer}>
+              <div className={styles.priceLabel}>ВАРТІСТЬ УЧАСТІ:</div>
+              <div className={styles.priceRow}>
+                <span className={styles.oldPrice}>449 грн</span>
+                <span className={styles.discountBadge}>-{discountPercent}%</span>
+                <span className={styles.newPrice}>
+                  {price} <span className={styles.currency}>грн</span>
+                </span>
+              </div>
             </div>
 
             <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
@@ -204,8 +223,15 @@ export function Block1Hero() {
               transition={{ duration: 0.3 }}
             >
               <button className={styles.modalCloseBtn} onClick={() => setIsRegModalOpen(false)}>×</button>
-              <div className={styles.priceTag} style={{ marginBottom: "1.5rem", width: "100%", textAlign: "center" }}>
-                <span>ВАРТІСТЬ УЧАСТІ: <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '0.4rem' }}>449 грн</span> <b>{price} грн</b></span>
+              <div className={styles.priceContainer}>
+                <div className={styles.priceLabel}>ВАРТІСТЬ УЧАСТІ:</div>
+                <div className={styles.priceRow}>
+                  <span className={styles.oldPrice}>449 грн</span>
+                  <span className={styles.discountBadge}>-{discountPercent}%</span>
+                  <span className={styles.newPrice}>
+                    {price} <span className={styles.currency}>грн</span>
+                  </span>
+                </div>
               </div>
               <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
             </motion.div>
