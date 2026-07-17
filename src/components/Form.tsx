@@ -22,7 +22,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
-  const [redirectUrl, setRedirectUrl] = useState("https://telegram.me/+oLZTxHGFnJA4ZGMy");
+  const [redirectUrl, setRedirectUrl] = useState("https://t.me/+sWnkQ4VJeYg3MWVi");
 
   useEffect(() => {
     // Fetch user's country code via Edge API
@@ -51,12 +51,15 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       setContactMethod("telegram");
     }
 
-    // Set redirect channel link based on current offer variant
-    const currentOffer = localStorage.getItem("current_offer_variant") || "";
-    if (currentOffer === "offer2") {
-      setRedirectUrl("https://telegram.me/+TbJDFpKxhog5NzAy");
-    } else if (currentOffer === "offer3") {
-      setRedirectUrl("https://telegram.me/+EzXVhYffIA5kYTIy");
+    // Set redirect channel link based on price param p
+    const searchParams = new URLSearchParams(window.location.search);
+    const pParam = searchParams.get("p");
+    if (pParam === "49") {
+      setRedirectUrl("https://t.me/+EGfXzTnUIaswNjBi");
+    } else if (pParam === "89") {
+      setRedirectUrl("https://t.me/+uG-vwvLZRnBhZGEy");
+    } else {
+      setRedirectUrl("https://t.me/+sWnkQ4VJeYg3MWVi");
     }
 
     // Randomly fluctuate active users count to look "live"
@@ -159,8 +162,16 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
     const pParam = searchParams.get("p");
     const price = pParam === "49" ? 49 : pParam === "89" ? 89 : 149;
 
+    // Determine redirect link based on price
+    let finalTgLink = "https://t.me/+sWnkQ4VJeYg3MWVi";
+    if (price === 49) {
+      finalTgLink = "https://t.me/+EGfXzTnUIaswNjBi";
+    } else if (price === 89) {
+      finalTgLink = "https://t.me/+uG-vwvLZRnBhZGEy";
+    }
+
     // Save TG link to local storage for Thanks page redirect
-    localStorage.setItem('masterclass_tg_link', redirectUrl);
+    localStorage.setItem('masterclass_tg_link', finalTgLink);
 
     const data = {
       customerName: formData.name,

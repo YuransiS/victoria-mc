@@ -45,7 +45,7 @@ export default function ThanksPage() {
       if (savedLink) {
         setTgLink(savedLink);
       } else {
-        setTgLink("https://telegram.me/+oLZTxHGFnJA4ZGMy");
+        setTgLink("https://t.me/+sWnkQ4VJeYg3MWVi");
       }
     }
 
