@@ -15,6 +15,7 @@ export function Block6Registration() {
     if (pParam === "49") setPrice(49);
     else if (pParam === "89") setPrice(89);
     else if (pParam === "149") setPrice(149);
+    else setPrice(149);
   }, []);
 
   const discountPercent = price === 49 ? 89 : price === 89 ? 80 : 67;

@@ -754,3 +754,22 @@
   padding: 0 !important;
   border-radius: 0px !important;
 }
+
+.topRecordingBanner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 245, 0, 0.08);
+  border: 1px solid rgba(255, 245, 0, 0.3);
+  padding: 0.6rem 1.2rem;
+  color: #fff500;
+  font-family: var(--font-manrope);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 auto 1.5rem;
+  align-self: center;
+  width: fit-content;
+  box-shadow: 0 4px 20px rgba(255, 245, 0, 0.05);
+}

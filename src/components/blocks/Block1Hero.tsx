@@ -73,6 +73,7 @@ export function Block1Hero() {
     if (pParam === "49") setPrice(49);
     else if (pParam === "89") setPrice(89);
     else if (pParam === "149") setPrice(149);
+    else setPrice(149);
 
     // Dynamically set CSS variables for the active variant theme
     const root = document.documentElement;
@@ -112,6 +113,15 @@ export function Block1Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
             <span>{formattedDate || "... "} в 19:00 ЗА КИЄВОМ</span>
+          </motion.div>
+
+          <motion.div
+            className={styles.topRecordingBanner}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          >
+            <span>🔥 УСІ УЧАСНИКИ ОТРИМАЮТЬ ЗАПИС МАЙСТЕР-КЛАСУ НА 7 ДНІВ</span>
           </motion.div>
 
           <div className={styles.textContent}>

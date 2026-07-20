@@ -55,6 +55,10 @@ This live document outlines the architecture, routing structure, components, dat
 *   `Analytics.tsx` — Client-side React tracking component. Generates a secure `visitor_id`, extracts UTM parameters, and logs telemetric sessions on load.
 *   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay. Uses `react-phone-number-input` for exact international numbers with Edge CDN geo-detection.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
+*   `blocks/BlockCases.tsx` — Before-and-after student visual cases grid.
+*   `blocks/BlockReviews.tsx` — Student reviews grid with interactive lightbox.
+*   `blocks/BlockBonusTimer.tsx` — Active bonuses showcase with persistent 10-minute countdown timer.
+*   `blocks/BlockGuarantee.tsx` — Dynamic pricing details copy, money-back guarantee, and doubts resolution.
 
 ### 🧪 QA Regression Tests (`tests/`)
 *   `tests/test_all_landings.js` — Universal E2E test script simulating page views and form submissions across all 6 landing pages.

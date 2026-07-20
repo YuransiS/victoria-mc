@@ -58,6 +58,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       setRedirectUrl("https://t.me/+EGfXzTnUIaswNjBi");
     } else if (pParam === "89") {
       setRedirectUrl("https://t.me/+uG-vwvLZRnBhZGEy");
+    } else if (pParam === "149") {
+      setRedirectUrl("https://t.me/+_pgcHXiED7Q0M2Zi");
     } else {
       setRedirectUrl("https://t.me/+sWnkQ4VJeYg3MWVi");
     }
@@ -168,6 +170,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       finalTgLink = "https://t.me/+EGfXzTnUIaswNjBi";
     } else if (price === 89) {
       finalTgLink = "https://t.me/+uG-vwvLZRnBhZGEy";
+    } else if (pParam === "149") {
+      finalTgLink = "https://t.me/+_pgcHXiED7Q0M2Zi";
     }
 
     // Save TG link to local storage for Thanks page redirect
