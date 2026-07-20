@@ -4,37 +4,16 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./SharedBlocks.module.css";
 import { Gift, Clock } from "lucide-react";
+import { getDynamicPriceState } from "@/lib/dynamicPrice";
 
 export function BlockBonusTimer() {
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default in seconds
+  const [timeLeft, setTimeLeft] = useState(600);
 
   useEffect(() => {
-    // Check if expiry is saved in localStorage
-    const now = Date.now();
-    const savedExpiry = localStorage.getItem("bonus_timer_expiry");
-    
-    let targetTime = now + 600 * 1000; // 10 minutes from now
-    
-    if (savedExpiry) {
-      const expiryNum = parseInt(savedExpiry, 10);
-      if (expiryNum > now) {
-        targetTime = expiryNum;
-      } else {
-        // If expired, we can keep it at 0 or reset for a new session or keep it at 0 to create genuine urgency
-        // Let's reset the timer to keep it alive for new page sessions, or leave it at 0.
-        // Valera said "бонуси зникнуть через 10хв - таймер". Standard practice is to restart it when expired or leave at 0.
-        // Let's restart it so they always see a countdown if they return later, but keep it persistent during active session.
-        targetTime = now + 600 * 1000;
-        localStorage.setItem("bonus_timer_expiry", targetTime.toString());
-      }
-    } else {
-      localStorage.setItem("bonus_timer_expiry", targetTime.toString());
-    }
-
     const updateTimer = () => {
-      const currentTime = Date.now();
-      const difference = Math.max(0, Math.floor((targetTime - currentTime) / 1000));
-      setTimeLeft(difference);
+      const state = getDynamicPriceState();
+      // Ensure the bonus timer shows the active phase countdown time
+      setTimeLeft(state.timeLeft);
     };
 
     updateTimer();
@@ -51,6 +30,34 @@ export function BlockBonusTimer() {
 
   return (
     <section className={styles.section} style={{ paddingBottom: "2rem" }}>
+      {/* 7-DAY RECORDING HIGHLIGHT BANNER */}
+      <motion.div
+        style={{
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto 2.5rem",
+          background: "rgba(255, 245, 0, 0.08)",
+          border: "1.5px solid var(--accent-color)",
+          padding: "1rem 1.5rem",
+          textAlign: "center",
+          boxShadow: "0 4px 20px rgba(255, 245, 0, 0.05)"
+        }}
+        initial={{ opacity: 0, y: 15 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <span style={{
+          fontFamily: "var(--font-manrope)",
+          fontSize: "0.85rem",
+          fontWeight: 800,
+          color: "#ffffff",
+          letterSpacing: "0.05em"
+        }}>
+          🔥 УСІ УЧАСНИКИ ОТРИМАЮТЬ ЗАПИС МАЙСТЕР-КЛАСУ НА 7 ДНІВ
+        </span>
+      </motion.div>
+
       <motion.div 
         className={styles.sectionHeader}
         style={{ width: "100%", maxWidth: "800px", margin: "0 auto", textAlign: "center" }}

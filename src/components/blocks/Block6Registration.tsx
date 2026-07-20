@@ -5,20 +5,33 @@ import styles from "./SharedBlocks.module.css";
 import heroStyles from "./Block1Hero.module.css";
 import { Form } from "@/components/Form";
 import { motion } from "framer-motion";
+import { getDynamicPriceState } from "@/lib/dynamicPrice";
 
 export function Block6Registration() {
   const [price, setPrice] = useState(149);
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const pParam = searchParams.get("p");
-    if (pParam === "49") setPrice(49);
-    else if (pParam === "89") setPrice(89);
-    else if (pParam === "149") setPrice(149);
-    else setPrice(149);
-  }, []);
+  const [nextPrice, setNextPrice] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   const discountPercent = price === 49 ? 89 : price === 89 ? 80 : 67;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    const updatePricing = () => {
+      const state = getDynamicPriceState();
+      setPrice(state.price);
+      setNextPrice(state.nextPrice);
+      setTimeLeft(state.timeLeft);
+    };
+
+    updatePricing();
+    const interval = setInterval(updatePricing, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section id="register" className={`${styles.section}`}>
@@ -56,6 +69,20 @@ export function Block6Registration() {
               {price} <span className={heroStyles.currency}>грн</span>
             </span>
           </div>
+          {nextPrice && timeLeft > 0 && (
+            <div style={{
+              fontSize: "0.7rem",
+              color: "var(--accent-color)",
+              fontWeight: 700,
+              marginTop: "0.4rem",
+              fontFamily: "var(--font-manrope)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              textAlign: "center"
+            }}>
+              ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+            </div>
+          )}
         </div>
 
         <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />

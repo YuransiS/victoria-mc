@@ -5,16 +5,20 @@ import { motion } from "framer-motion";
 import styles from "./SharedBlocks.module.css";
 import { ShieldCheck, HelpCircle } from "lucide-react";
 
+import { getDynamicPriceState } from "@/lib/dynamicPrice";
+
 export function BlockGuarantee() {
   const [price, setPrice] = useState(149);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const pParam = searchParams.get("p");
-    if (pParam === "49") setPrice(49);
-    else if (pParam === "89") setPrice(89);
-    else if (pParam === "149") setPrice(149);
-    else setPrice(149);
+    const updatePricing = () => {
+      const state = getDynamicPriceState();
+      setPrice(state.price);
+    };
+
+    updatePricing();
+    const interval = setInterval(updatePricing, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

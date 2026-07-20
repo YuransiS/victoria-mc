@@ -7,6 +7,7 @@ import { Button } from "./Button";
 import { trackFBEvent } from "./FacebookPixel";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import { getDynamicPriceState } from "@/lib/dynamicPrice";
 
 const TELEGRAM_LINK = "https://telegram.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
@@ -160,9 +161,9 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
     const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
     const sanitizedSocial = contactMethod === "telegram" ? (formData.social.startsWith("@") ? formData.social : `@${formData.social}`) : "";
 
-    // Parse price param p
+    // Parse price dynamically
+    const { price } = getDynamicPriceState();
     const pParam = searchParams.get("p");
-    const price = pParam === "49" ? 49 : pParam === "89" ? 89 : 149;
 
     // Determine redirect link based on price
     let finalTgLink = "https://t.me/+sWnkQ4VJeYg3MWVi";
@@ -170,8 +171,14 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       finalTgLink = "https://t.me/+EGfXzTnUIaswNjBi";
     } else if (price === 89) {
       finalTgLink = "https://t.me/+uG-vwvLZRnBhZGEy";
-    } else if (pParam === "149") {
-      finalTgLink = "https://t.me/+_pgcHXiED7Q0M2Zi";
+    } else if (price === 149) {
+      if (pParam === "149") {
+        finalTgLink = "https://t.me/+_pgcHXiED7Q0M2Zi";
+      } else {
+        finalTgLink = pParam === "49" ? "https://t.me/+_pgcHXiED7Q0M2Zi" : "https://t.me/+sWnkQ4VJeYg3MWVi";
+      }
+    } else if (price === 249) {
+      finalTgLink = "https://t.me/+sWnkQ4VJeYg3MWVi";
     }
 
     // Save TG link to local storage for Thanks page redirect

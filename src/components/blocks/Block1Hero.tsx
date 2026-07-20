@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "./Block1Hero.module.css";
 import { Form } from "@/components/Form";
 import { motion, AnimatePresence } from "framer-motion";
+import { getDynamicPriceState } from "@/lib/dynamicPrice";
 
 const OFFERS = {
   1: {
@@ -27,8 +28,16 @@ export function Block1Hero() {
   const [variant, setVariant] = useState<1 | 2 | 3>(1);
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
   const [price, setPrice] = useState(149);
+  const [nextPrice, setNextPrice] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   const discountPercent = price === 49 ? 89 : price === 89 ? 80 : 67;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     const handleOpenModal = () => setIsRegModalOpen(true);
@@ -68,19 +77,23 @@ export function Block1Hero() {
     setVariant(detected);
     localStorage.setItem("current_offer_variant", `offer${detected}`);
 
-    // Parse price param p
-    const pParam = searchParams.get("p");
-    if (pParam === "49") setPrice(49);
-    else if (pParam === "89") setPrice(89);
-    else if (pParam === "149") setPrice(149);
-    else setPrice(149);
-
     // Dynamically set CSS variables for the active variant theme
     const root = document.documentElement;
     // Set all variants to use the yellow accent color theme
     root.style.setProperty("--accent-color", "#fff500");
     root.style.setProperty("--accent-text-color", "#000000");
     root.style.setProperty("--accent-color-rgb", "255, 245, 0");
+
+    const updatePricing = () => {
+      const state = getDynamicPriceState();
+      setPrice(state.price);
+      setNextPrice(state.nextPrice);
+      setTimeLeft(state.timeLeft);
+    };
+
+    updatePricing();
+    const interval = setInterval(updatePricing, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -115,14 +128,7 @@ export function Block1Hero() {
             <span>{formattedDate || "... "} в 19:00 ЗА КИЄВОМ</span>
           </motion.div>
 
-          <motion.div
-            className={styles.topRecordingBanner}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-          >
-            <span>🔥 УСІ УЧАСНИКИ ОТРИМАЮТЬ ЗАПИС МАЙСТЕР-КЛАСУ НА 7 ДНІВ</span>
-          </motion.div>
+
 
           <div className={styles.textContent}>
 
@@ -169,6 +175,20 @@ export function Block1Hero() {
                     {price} <span className={styles.currency}>грн</span>
                   </span>
                 </div>
+                {nextPrice && timeLeft > 0 && (
+                  <div style={{
+                    fontSize: "0.7rem",
+                    color: "var(--accent-color)",
+                    fontWeight: 700,
+                    marginTop: "0.4rem",
+                    fontFamily: "var(--font-manrope)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    textAlign: "center"
+                  }}>
+                    ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                  </div>
+                )}
               </div>
               <button
                 className={styles.mainPageButton}
@@ -196,6 +216,20 @@ export function Block1Hero() {
                   {price} <span className={styles.currency}>грн</span>
                 </span>
               </div>
+              {nextPrice && timeLeft > 0 && (
+                <div style={{
+                  fontSize: "0.7rem",
+                  color: "var(--accent-color)",
+                  fontWeight: 700,
+                  marginTop: "0.4rem",
+                  fontFamily: "var(--font-manrope)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  textAlign: "center"
+                }}>
+                  ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                </div>
+              )}
             </div>
 
             <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
@@ -242,6 +276,20 @@ export function Block1Hero() {
                     {price} <span className={styles.currency}>грн</span>
                   </span>
                 </div>
+                {nextPrice && timeLeft > 0 && (
+                  <div style={{
+                    fontSize: "0.7rem",
+                    color: "var(--accent-color)",
+                    fontWeight: 700,
+                    marginTop: "0.4rem",
+                    fontFamily: "var(--font-manrope)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    textAlign: "center"
+                  }}>
+                    ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                  </div>
+                )}
               </div>
               <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
             </motion.div>

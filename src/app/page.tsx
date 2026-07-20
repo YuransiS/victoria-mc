@@ -25,6 +25,7 @@ export default function Home() {
       <ExitIntentModal />
       <StickyMobileCTA />
       <Block1Hero />
+      <BlockBonusTimer />
 
       <Block3Audience />
       <Block2Learning />
@@ -32,7 +33,6 @@ export default function Home() {
       <BlockCases />
       <BlockReviews />
       <Block4Statement />
-      <BlockBonusTimer />
       <BlockGuarantee />
       <Block6Registration />
       <Block7FAQ />
