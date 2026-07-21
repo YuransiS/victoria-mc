@@ -24,24 +24,20 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
   const [redirectUrl, setRedirectUrl] = useState("https://t.me/+sWnkQ4VJeYg3MWVi");
+  const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("⏳ Створюємо безпечне з'єднання...");
 
   useEffect(() => {
-    if (status === "redirecting") {
-      const t1 = setTimeout(() => {
-        setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
-      }, 650);
-      const t2 = setTimeout(() => {
-        setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
-      }, 1350);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    } else {
+    if (progress === 0) {
       setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    } else if (progress < 40) {
+      setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    } else if (progress < 90) {
+      setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
+    } else {
+      setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
     }
-  }, [status]);
+  }, [progress]);
 
   useEffect(() => {
     // Fetch user's country code via Edge API
@@ -151,7 +147,17 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
     e.preventDefault();
     if (!validate()) return;
 
-    setStatus("loading");
+    setStatus("redirecting");
+    setProgress(0);
+
+    const intervalId = setInterval(() => {
+      setProgress((prev) => {
+        if (prev < 50) return prev + 6;
+        if (prev < 80) return prev + 3;
+        if (prev < 90) return prev + 0.8;
+        return prev;
+      });
+    }, 100);
 
     // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
@@ -231,6 +237,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       const paymentData = await response.json();
 
       if (paymentData.error) {
+        clearInterval(intervalId);
         alert("Помилка при створенні платежу. Спробуйте пізніше.");
         setStatus("idle");
         return;
@@ -277,7 +284,9 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       sessionStorage.setItem('paymentAttempted', 'true');
       sessionStorage.setItem('lastOrderId', paymentData.orderReference);
 
-      setStatus("redirecting");
+      // Complete progress bar to 100%
+      clearInterval(intervalId);
+      setProgress(100);
 
       // Prepare WayForPay Form
       const form = document.createElement('form');
@@ -305,11 +314,12 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
 
       document.body.appendChild(form);
       
-      // Give Meta Pixel and localStorage time to finalize before navigation
+      // Give progress bar 350ms to finish animating to 100%
       setTimeout(() => {
         form.submit();
-      }, 2000);
+      }, 350);
     } catch (error) {
+      clearInterval(intervalId);
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
       setStatus("idle");
@@ -511,8 +521,8 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
                 <motion.div
                   className={styles.progressBarFill}
                   initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 2.0, ease: "linear" }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: progress === 100 ? 0.35 : 0.1, ease: "easeOut" }}
                 />
               </div>
               

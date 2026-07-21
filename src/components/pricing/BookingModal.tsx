@@ -42,24 +42,20 @@ export const BookingModal = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("⏳ Створюємо безпечне з'єднання...");
 
   useEffect(() => {
-    if (isSubmitting) {
-      const t1 = setTimeout(() => {
-        setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
-      }, 650);
-      const t2 = setTimeout(() => {
-        setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
-      }, 1350);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    } else {
+    if (progress === 0) {
       setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    } else if (progress < 40) {
+      setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    } else if (progress < 90) {
+      setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
+    } else {
+      setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
     }
-  }, [isSubmitting]);
+  }, [progress]);
 
   const [isTestMode, setIsTestMode] = useState(false);
   const [countryCode, setCountryCode] = useState<string>("UA");
@@ -206,6 +202,16 @@ export const BookingModal = ({
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setProgress(0);
+
+    const intervalId = setInterval(() => {
+      setProgress((prev) => {
+        if (prev < 50) return prev + 6;
+        if (prev < 80) return prev + 3;
+        if (prev < 90) return prev + 0.8;
+        return prev;
+      });
+    }, 100);
 
     const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
     const resolvedTelegram = contactMethod === "telegram" ? (formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`) : "";
@@ -258,6 +264,7 @@ export const BookingModal = ({
       const paymentData = await response.json();
 
       if (paymentData.error) {
+        clearInterval(intervalId);
         alert("Помилка при створенні платежу. Спробуйте пізніше.");
         setIsSubmitting(false);
         return;
@@ -303,6 +310,10 @@ export const BookingModal = ({
       sessionStorage.setItem('paymentAttempted', 'true');
       sessionStorage.setItem('lastOrderId', paymentData.orderReference);
 
+      // Complete progress bar to 100%
+      clearInterval(intervalId);
+      setProgress(100);
+
       // 3. Prepare WayForPay Form
       const form = document.createElement('form');
       form.method = 'POST';
@@ -329,11 +340,12 @@ export const BookingModal = ({
 
       document.body.appendChild(form);
       
-      // Give Meta Pixel and localStorage time to finalize before navigation
+      // Give progress bar 350ms to finish animating to 100%
       setTimeout(() => {
         form.submit();
-      }, 2000);
+      }, 350);
     } catch (error) {
+      clearInterval(intervalId);
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
       setIsSubmitting(false);
@@ -606,8 +618,8 @@ export const BookingModal = ({
                         <motion.div
                           className="h-full bg-gradient-to-r from-[#a8947a] to-[#d1b897] rounded-full"
                           initial={{ width: "0%" }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 2.0, ease: "linear" }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: progress === 100 ? 0.35 : 0.1, ease: "easeOut" }}
                         />
                       </div>
                       
