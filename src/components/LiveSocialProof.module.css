@@ -22,7 +22,8 @@
   .toast {
     left: 1rem;
     right: 1rem;
-    bottom: 5.5rem; /* Lifted to avoid sticky mobile CTA */
+    top: 1.5rem;
+    bottom: auto !important;
     max-width: calc(100vw - 2rem);
     justify-content: center;
   }

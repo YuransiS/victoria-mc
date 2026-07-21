@@ -69,22 +69,21 @@ export function Block6Registration() {
               {price} <span className={heroStyles.currency}>грн</span>
             </span>
           </div>
-          {nextPrice && timeLeft > 0 && (
-            <div style={{
-              fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)",
-              color: "var(--accent-color)",
-              fontWeight: 800,
-              marginTop: "0.35rem",
-              fontFamily: "var(--font-manrope)",
-              textTransform: "uppercase",
-              letterSpacing: "0.03em",
-              textAlign: "center",
-              whiteSpace: "nowrap"
-            }}>
-              ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
-            </div>
-          )}
         </div>
+        {nextPrice && timeLeft > 0 && (
+          <div style={{
+            fontSize: "0.8rem",
+            color: "var(--accent-color)",
+            fontWeight: 800,
+            marginBottom: "1.5rem",
+            fontFamily: "var(--font-manrope)",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            textAlign: "center"
+          }}>
+            ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
+          </div>
+        )}
 
         <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
       </motion.div>
