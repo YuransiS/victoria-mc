@@ -166,64 +166,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Determine target scripts and payloads
-    const submissions: Array<{url: string, body: any}> = [];
-    const apiKey = process.env.SHEETS_API_KEY;
-
-    if (data.target_sheet === 'VSL 1 етап' || data.target_sheet === 'Ленд 1' || data.target_sheet === 'VSL Воронка (старт)') {
-      if (GOOGLE_SCRIPT_URL_STVORYUI) {
-        submissions.push({
-          url: GOOGLE_SCRIPT_URL_STVORYUI,
-          body: { ...data, ...utms, entry_month: entryMonth, sheetName: 'VSL 1 етап', api_key: apiKey }
-        });
-      }
-      if (GOOGLE_SCRIPT_URL_MAIN) {
-        submissions.push({
-          url: GOOGLE_SCRIPT_URL_MAIN,
-          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'VSL 1 етап', sheet_id: '43961418', api_key: apiKey }
-        });
-      }
-    } else if (data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2') {
-      if (GOOGLE_SCRIPT_URL_STVORYUI) {
-        submissions.push({
-          url: GOOGLE_SCRIPT_URL_STVORYUI,
-          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'Ленд 2', api_key: apiKey }
-        });
-      }
-      if (GOOGLE_SCRIPT_URL_MAIN) {
-        submissions.push({
-          url: GOOGLE_SCRIPT_URL_MAIN,
-          body: { ...data, ...utms, entry_month: entryMonth, target_sheet: 'VSL Форма', api_key: apiKey }
-        });
-      }
-    } else {
-      let scriptUrl = GOOGLE_SCRIPT_URL_MAIN;
-      if (scriptUrl) {
-        submissions.push({
-          url: scriptUrl,
-          body: { ...data, ...utms, entry_month: entryMonth, api_key: apiKey }
-        });
-      }
-    }
-
-    // 2. Google Sheets Tasks
-    const sheetsPromise = Promise.allSettled(
-      submissions.map(async (sub) => {
-        try {
-          const res = await fetch(sub.url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub.body),
-            signal: AbortSignal.timeout(30000)
-          });
-          return await res.json();
-        } catch (err) {
-          console.error(`Sheets submission failed for ${sub.url}:`, err);
-          throw err;
-        }
-      })
-    );
-
     // 3. Supabase Integration & Lead Stitching
     const clientUuid = data.visitor_id || data.visitorId || null;
     const phoneOrSocial = phone || social || '';
@@ -299,23 +241,11 @@ export async function POST(req: Request) {
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
 
-    // Await all parallel jobs
-    const results = await Promise.allSettled([sheetsPromise, supabasePromise, ...tasks]);
-
-    // Log sheets results
-    let uuid = null;
-    const sheetsResult = results[0];
-    if (sheetsResult.status === 'fulfilled') {
-      const sheetsData = sheetsResult.value;
-      sheetsData.forEach(res => {
-        if (res.status === 'fulfilled' && res.value?.uuid) {
-          uuid = res.value.uuid;
-        }
-      });
-    }
+    // Await all parallel jobs (Supabase and notifications/CRM tasks)
+    const results = await Promise.allSettled([supabasePromise, ...tasks]);
 
     // Log Supabase results
-    const supabaseResult = results[1];
+    const supabaseResult = results[0];
     if (supabaseResult.status === 'rejected') {
       console.error('[Lead Ingest] Supabase insert failed:', supabaseResult.reason);
     } else {
@@ -327,7 +257,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, uuid, visitor_uuid: resolvedUuid });
+    return NextResponse.json({ success: true, uuid: null, visitor_uuid: resolvedUuid });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });

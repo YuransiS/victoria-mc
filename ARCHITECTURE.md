@@ -12,7 +12,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   **Styling & UI:** CSS Modules, TailwindCSS, Framer Motion
 *   **Database:** Supabase (PostgreSQL)
 *   **Payment Gateway:** WayForPay
-*   **CRM & Legacy Sync:** Google Sheets (Google Apps Script API)
+*   **CRM & Legacy Sync:** Google Sheets (Removed to maximize checkout redirect speed, all data now managed in Supabase)
 *   **Notifications:** Telegram Bot API
 *   **Marketing Automation:** SendPulse Chatbot API (for subscriber funnel tracking)
 
@@ -37,10 +37,10 @@ This live document outlines the architecture, routing structure, components, dat
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 
 ### 🌐 API Endpoints (`src/app/api/`)
-*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Google Sheets CRM (Unified Sheets + Stvoryui), Telegram, and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching. Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
-*   `api/create-payment/` — Initiate checkout route. Registers pending payments in Google Sheets, starts Telegram payment alerts, and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
-*   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`) and Google Sheets CRM.
-*   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and Google Sheets when users reach thanks/fail landing pages or manually update states.
+*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Telegram and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching (Google Sheets sync removed for performance). Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
+*   `api/create-payment/` — Initiate checkout route. Starts Telegram payment alerts and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
+*   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`).
+*   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and updates database status when users reach thanks/fail landing pages or manually update states.
 *   `api/analytics/log/` — Traffic tracking telemetry receiver. Logs page views (`Клик`) and form modal actions directly in Supabase (`victoria_leads`). Triggers SendPulse status `'1. Зайшов на сайт'` for VSL funnel if `sp_contact_id` is supplied.
 *   `api/video-progress/` — [NEW] Video watching progress tracking receiver. Logs played status, watch seconds, and updates lead status to `'полностью посмотрел'` once 20 minutes are reached. Triggers SendPulse status `'2. Подивився відео'` once the watch progress threshold (15 minutes) is met. Omits real-time Telegram alerts to prevent channel spam.
 *   `api/country/` — [NEW] Vercel Edge API endpoint that extracts `x-vercel-ip-country` from incoming CDN headers to resolve user country instantly on mount.

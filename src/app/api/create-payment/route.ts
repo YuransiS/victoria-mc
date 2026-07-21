@@ -209,44 +209,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Google Sheets CRM Logging
-    let sheetsUuid = null;
-    const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
-    let sheetsPromise: Promise<any> = Promise.resolve();
-
-    if (GOOGLE_SCRIPT_CRM) {
-      sheetsPromise = fetch(GOOGLE_SCRIPT_CRM, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'log_lead',
-          target_sheet: targetSheet || "Бронювання",
-          orderId: orderReference,
-          order_id: orderReference,
-          name: customerName,
-          phone: customerPhone,
-          telegram: formattedTelegram,
-          amount: amount,
-          tariff: tariffName,
-          status: "⏳ Очікується оплата",
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term,
-          full_url,
-          tg_msg_id: tgMsgId,
-          api_key: process.env.SHEETS_API_KEY
-        })
-      }).then(async (res) => {
-        const resData = await res.json();
-        if (resData.uuid) sheetsUuid = resData.uuid;
-        return resData;
-      }).catch(err => {
-        console.error('CRM sheets logging failed:', err);
-      });
-    }
-
     // 3. Supabase Integration & Lead Stitching
     const clientUuid = visitor_id || null;
     const phoneOrSocial = customerPhone || telegram || '';
@@ -313,24 +275,18 @@ export async function POST(request: Request) {
       tg_msg_id: tgMsgId ? String(tgMsgId) : null
     };
 
-    const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
-
-    // Parallel execution
-    const results = await Promise.allSettled([sheetsPromise, supabasePromise]);
-
-    const supabaseResult = results[1];
-    if (supabaseResult.status === 'rejected') {
-      console.error('[Create Payment] Supabase insert failed:', supabaseResult.reason);
-    } else {
-      const dbErr = (supabaseResult.value as any)?.error;
+    try {
+      const { error: dbErr } = await supabaseAdmin.from("victoria_leads").insert(dbPayload);
       if (dbErr) {
         console.error('[Create Payment] Supabase insert error:', dbErr);
       } else {
         console.log('[Create Payment] Successfully saved lead in Supabase');
       }
+    } catch (err: any) {
+      console.error('[Create Payment] Supabase insert exception:', err.message || err);
     }
 
-    return NextResponse.json({ ...paymentData, uuid: sheetsUuid, visitor_uuid: resolvedUuid, tgMsgId });
+    return NextResponse.json({ ...paymentData, uuid: null, visitor_uuid: resolvedUuid, tgMsgId });
   } catch (error) {
     console.error('WFP Error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

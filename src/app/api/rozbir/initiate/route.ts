@@ -135,68 +135,6 @@ export async function POST(req: Request) {
       await tgPromise;
     }
 
-    // 2. Log Lead to Google Sheets
-    let sheetsUuid = null;
-    const GOOGLE_SCRIPT_CRM = process.env.GOOGLE_SCRIPT_URL;
-    let sheetsPromise: Promise<any> = Promise.resolve();
-
-    if (GOOGLE_SCRIPT_CRM) {
-      sheetsPromise = fetch(GOOGLE_SCRIPT_CRM, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'log_lead',
-          target_sheet: "Ленд 3",
-          orderId: orderReference,
-          name,
-          social: formattedSocial,
-          phone,
-          amount,
-          utm_source: utm_source || '',
-          utm_medium: utm_medium || '',
-          utm_campaign: utm_campaign || '',
-          utm_content: utm_content || '',
-          utm_term: utm_term || '',
-          tg_msg_id: tgMsgId,
-          api_key: SHEETS_API_KEY
-        })
-      }).then(async (res) => {
-        const resData = await res.json();
-        if (resData.uuid) sheetsUuid = resData.uuid;
-        return resData;
-      }).catch(err => {
-        console.error('CRM logging failed:', err);
-      });
-    }
-
-    let stvoryuiPromise: Promise<any> = Promise.resolve();
-    if (GOOGLE_SCRIPT_URL) {
-      const leadData = {
-        target_sheet: "Ленд 3",
-        date: new Date().toLocaleString("uk-UA", { timeZone: "Europe/Kiev" }),
-        orderId: orderReference,
-        name,
-        social: formattedSocial,
-        phone,
-        amount,
-        variant_name: `Price: ${amount} UAH`,
-        status: "Новий лід (Не оплачено)",
-        utm_source: utm_source || '',
-        utm_medium: utm_medium || '',
-        utm_campaign: utm_campaign || '',
-        utm_content: utm_content || '',
-        utm_term: utm_term || '',
-        tg_msg_id: tgMsgId,
-        api_key: SHEETS_API_KEY
-      };
-
-      stvoryuiPromise = fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leadData)
-      }).catch(err => console.error('Stvoryui logging failed:', err));
-    }
-
     // 3. Supabase Integration & Lead Stitching
     const clientUuid = visitor_id || null;
     const phoneOrSocial = phone || social || '';
@@ -254,8 +192,6 @@ export async function POST(req: Request) {
       tg_msg_id: tgMsgId ? String(tgMsgId) : null
     };
 
-    const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);
-
     // 4. Generate WayForPay Signature
     const signatureData = [
       WFP_MERCHANT_ACCOUNT,
@@ -296,22 +232,18 @@ export async function POST(req: Request) {
       serviceUrl: `${currentDomain}/api/payment-callback`
     };
 
-    // Parallel execution
-    const results = await Promise.allSettled([sheetsPromise, stvoryuiPromise, supabasePromise]);
-
-    const supabaseResult = results[2];
-    if (supabaseResult.status === 'rejected') {
-      console.error('[Rozbir Ingest] Supabase insert failed:', supabaseResult.reason);
-    } else {
-      const dbErr = (supabaseResult.value as any)?.error;
+    try {
+      const { error: dbErr } = await supabaseAdmin.from("victoria_leads").insert(dbPayload);
       if (dbErr) {
         console.error('[Rozbir Ingest] Supabase insert error:', dbErr);
       } else {
         console.log('[Rozbir Ingest] Successfully saved lead in Supabase');
       }
+    } catch (err: any) {
+      console.error('[Rozbir Ingest] Supabase insert exception:', err.message || err);
     }
 
-    return NextResponse.json({ ...paymentData, uuid: sheetsUuid, visitor_uuid: resolvedUuid, tgMsgId });
+    return NextResponse.json({ ...paymentData, uuid: null, visitor_uuid: resolvedUuid, tgMsgId });
 
   } catch (error) {
     console.error('Initiate Error:', error);

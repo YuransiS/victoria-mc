@@ -33,51 +33,19 @@ export async function POST(request: Request) {
     const isSuccess = String(status).toUpperCase() === 'APPROVED';
     const parsedStatus = isSuccess ? 'Approved' : String(status);
 
-    // 1. UPDATE DB STATUS (Supabase victoria_leads)
-    const supabasePromise = supabaseAdmin
-      .from("victoria_leads")
-      .update({ status: parsedStatus })
-      .eq("order_id", String(orderRef));
-
-    // 2. SYNC STATUS TO GOOGLE SHEETS
-    const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
-    let googlePromise: Promise<any> = Promise.resolve();
-
-    if (GOOGLE_SCRIPT_URL) {
-      const sheetsStatus = isSuccess ? '✅ Оплачено' : `❌ Відхилено (${status})`;
-      googlePromise = fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update_status',
-          order_id: String(orderRef),
-          status: sheetsStatus,
-          amount: data.amount || '0',
-          currency: data.currency || 'UAH',
-          api_key: process.env.SHEETS_API_KEY
-        })
-      }).then(async (res) => {
-        const text = await res.text();
-        console.log(`[Callback] Google CRM Status Sync: ${text}`);
-        return text;
-      }).catch(err => {
-        console.error('[Callback] Google CRM Status Sync failed:', err);
-      });
-    }
-
-    const callbackResults = await Promise.allSettled([supabasePromise, googlePromise]);
-
-    // Log Supabase status update results
-    const dbRes = callbackResults[0];
-    if (dbRes.status === 'rejected') {
-      console.error("[Callback] Supabase status update failed:", dbRes.reason);
-    } else {
-      const dbErr = (dbRes.value as any)?.error;
+    // 2. UPDATE DB STATUS (Supabase victoria_leads)
+    try {
+      const { error: dbErr } = await supabaseAdmin
+        .from("victoria_leads")
+        .update({ status: parsedStatus })
+        .eq("order_id", String(orderRef));
       if (dbErr) {
         console.error("[Callback] Supabase status update error payload:", dbErr);
       } else {
         console.log(`[Callback] Supabase status updated successfully to ${parsedStatus} for order ${orderRef}`);
       }
+    } catch (err: any) {
+      console.error("[Callback] Supabase status update failed:", err.message || err);
     }
 
     // 3. RESPOND TO WAYFORPAY (Verify and sign)

@@ -194,39 +194,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Now talk to Google Sheets
-    const response = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...data,
-        api_key: process.env.SHEETS_API_KEY
-      }),
-    });
-
-    const resData = await response.json();
-    console.log('CRM Sheet Response:', resData);
-
-    // 3. If sheet returned an ID that we didn't have before, try updating TG now
-    if (isStatusUpdate && !messageId && resData.tg_msg_id && token && chatId) {
-      // (This is a fallback for when browser didn't have the ID)
-      const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
-      const orderId = data.order_id || data.orderId;
-      const text = buildMessageText(isSuccess, orderId, data, resData);
-
-      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_id: parseInt(resData.tg_msg_id),
-          text: text,
-          parse_mode: 'HTML'
-        })
-      }).catch(e => console.error('Fallback TG update failed:', e));
-    }
-
-    return NextResponse.json(resData);
+    return NextResponse.json({ success: true, tg_msg_id: finalMessageId });
   } catch (error) {
     console.error('Lead Proxy Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

@@ -134,21 +134,6 @@ export async function POST(req: Request) {
 
     // 2. Real-time Telegram alerts on video completion have been removed as requested (metrics are aggregated in the daily/weekly cron report).
 
-    // 3. Sync to Google Sheets
-    if (GOOGLE_SCRIPT_URL) {
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update_status',
-          api_key: process.env.SHEETS_API_KEY,
-          orderId: lead?.visitor_uuid || visitor_id,
-          status: newStatus,
-          targetSheet: lead?.target_sheet || 'VSL Форма'
-        })
-      }).catch(err => console.error('[Video Progress] Sheets sync error:', err));
-    }
-
     return NextResponse.json({ success: true, status: newStatus });
   } catch (error) {
     console.error('[Video Progress] API Route error:', error);
