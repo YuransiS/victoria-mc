@@ -155,14 +155,7 @@ export function Block1Hero() {
               </p>
             </motion.div>
 
-            <motion.div
-              className={styles.callout}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 0.9, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-            >
-              приходь на майстер-клас, щоб дізнатись що зараз дійсно працює
-            </motion.div>
+
 
             {/* Mobile CTA Button (opens modal) */}
             <div className={styles.mobileHeroCta}>
@@ -177,16 +170,17 @@ export function Block1Hero() {
                 </div>
                 {nextPrice && timeLeft > 0 && (
                   <div style={{
-                    fontSize: "0.7rem",
+                    fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)",
                     color: "var(--accent-color)",
-                    fontWeight: 700,
-                    marginTop: "0.4rem",
+                    fontWeight: 800,
+                    marginTop: "0.35rem",
                     fontFamily: "var(--font-manrope)",
                     textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    textAlign: "center"
+                    letterSpacing: "0.03em",
+                    textAlign: "center",
+                    whiteSpace: "nowrap"
                   }}>
-                    ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                    ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
                   </div>
                 )}
               </div>
@@ -218,16 +212,17 @@ export function Block1Hero() {
               </div>
               {nextPrice && timeLeft > 0 && (
                 <div style={{
-                  fontSize: "0.7rem",
+                  fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)",
                   color: "var(--accent-color)",
-                  fontWeight: 700,
-                  marginTop: "0.4rem",
+                  fontWeight: 800,
+                  marginTop: "0.35rem",
                   fontFamily: "var(--font-manrope)",
                   textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  textAlign: "center"
+                  letterSpacing: "0.03em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap"
                 }}>
-                  ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                  ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
                 </div>
               )}
             </div>
@@ -278,16 +273,17 @@ export function Block1Hero() {
                 </div>
                 {nextPrice && timeLeft > 0 && (
                   <div style={{
-                    fontSize: "0.7rem",
+                    fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)",
                     color: "var(--accent-color)",
-                    fontWeight: 700,
-                    marginTop: "0.4rem",
+                    fontWeight: 800,
+                    marginTop: "0.35rem",
                     fontFamily: "var(--font-manrope)",
                     textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    textAlign: "center"
+                    letterSpacing: "0.03em",
+                    textAlign: "center",
+                    whiteSpace: "nowrap"
                   }}>
-                    ⏱️ через {formatTime(timeLeft)} ціна збільшиться до {nextPrice} грн
+                    ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
                   </div>
                 )}
               </div>
