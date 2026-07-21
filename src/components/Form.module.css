@@ -191,3 +191,20 @@
     font-size: 0.75rem;
   }
 }
+
+.progressBarContainer {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  height: 6px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #a8947a 0%, #d1b897 100%);
+  border-radius: 9999px;
+  width: 0%;
+}

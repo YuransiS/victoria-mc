@@ -24,6 +24,24 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "redirecting">("idle");
   const [activeUsers, setActiveUsers] = useState(4);
   const [redirectUrl, setRedirectUrl] = useState("https://t.me/+sWnkQ4VJeYg3MWVi");
+  const [progressMessage, setProgressMessage] = useState("⏳ Створюємо безпечне з'єднання...");
+
+  useEffect(() => {
+    if (status === "redirecting") {
+      const t1 = setTimeout(() => {
+        setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
+      }, 650);
+      const t2 = setTimeout(() => {
+        setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
+      }, 1350);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    } else {
+      setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    }
+  }, [status]);
 
   useEffect(() => {
     // Fetch user's country code via Edge API
@@ -290,7 +308,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       // Give Meta Pixel and localStorage time to finalize before navigation
       setTimeout(() => {
         form.submit();
-      }, 800);
+      }, 2000);
     } catch (error) {
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
@@ -475,15 +493,40 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       <AnimatePresence>
         {status === "redirecting" && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className={styles.redirectOverlay}
           >
-            <div className={styles.redirectBox}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className={styles.redirectBox}
+            >
               <h3>Дякуємо! Заявку створено</h3>
-              <p>Зараз ви будете перенаправлені на сторінку оплати...</p>
-              <div className={styles.loader}></div>
-            </div>
+              
+              <div className={styles.progressBarContainer}>
+                <motion.div
+                  className={styles.progressBarFill}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2.0, ease: "linear" }}
+                />
+              </div>
+              
+              <motion.p
+                key={progressMessage}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+                style={{ fontSize: "0.95rem", fontWeight: 600, color: "rgba(255, 255, 255, 0.85)", minHeight: "1.5rem" }}
+              >
+                {progressMessage}
+              </motion.p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

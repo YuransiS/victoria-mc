@@ -42,6 +42,24 @@ export const BookingModal = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progressMessage, setProgressMessage] = useState("⏳ Створюємо безпечне з'єднання...");
+
+  useEffect(() => {
+    if (isSubmitting) {
+      const t1 = setTimeout(() => {
+        setProgressMessage("⏱️ Почекайте, ще трішки залишилось, не йдіть...");
+      }, 650);
+      const t2 = setTimeout(() => {
+        setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
+      }, 1350);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    } else {
+      setProgressMessage("⏳ Створюємо безпечне з'єднання...");
+    }
+  }, [isSubmitting]);
 
   const [isTestMode, setIsTestMode] = useState(false);
   const [countryCode, setCountryCode] = useState<string>("UA");
@@ -314,7 +332,7 @@ export const BookingModal = ({
       // Give Meta Pixel and localStorage time to finalize before navigation
       setTimeout(() => {
         form.submit();
-      }, 500);
+      }, 2000);
     } catch (error) {
       console.error("Payment error:", error);
       alert("Відбулася помилка. Перевірте з'єднання з інтернетом.");
@@ -572,9 +590,38 @@ export const BookingModal = ({
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="absolute inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[10005] bg-black/85 backdrop-blur-xl flex items-center justify-center p-6 pointer-events-auto"
                   >
-                    {/* Optional: Add a more complex loader or text here */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                      transition={{ type: "spring", duration: 0.5 }}
+                      className="bg-[#1e1e1c] p-12 text-center max-w-md w-full rounded-[1.5rem] border border-white/10 shadow-[0_60px_100px_rgba(0,0,0,0.9)]"
+                    >
+                      <h3 className="font-newsreader text-3xl text-[#d1b897] mb-4">Дякуємо! Заявку створено</h3>
+                      
+                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden my-6 border border-white/5">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-[#a8947a] to-[#d1b897] rounded-full"
+                          initial={{ width: "0%" }}
+                          animate={{ width: "100%" }}
+                          transition={{ duration: 2.0, ease: "linear" }}
+                        />
+                      </div>
+                      
+                      <motion.p
+                        key={progressMessage}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.2 }}
+                        className="font-manrope text-sm font-semibold text-white/85 min-h-[1.5rem]"
+                      >
+                        {progressMessage}
+                      </motion.p>
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
