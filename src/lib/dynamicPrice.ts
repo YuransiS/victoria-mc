@@ -12,11 +12,6 @@ export function getDynamicPriceState(): DynamicPriceState {
     return { price: 149, nextPrice: 249, phase: 1, timeLeft: 600 };
   }
 
-  // Force price to 249 on duplicated /249 route
-  if (window.location.pathname.startsWith("/249") || window.location.pathname.includes("249")) {
-    return { price: 249, nextPrice: null, phase: 1, timeLeft: 0 };
-  }
-
   const searchParams = new URLSearchParams(window.location.search);
   const pParam = searchParams.get("p");
   
@@ -25,8 +20,9 @@ export function getDynamicPriceState(): DynamicPriceState {
   if (pParam === "49") basePrice = 49;
   else if (pParam === "89") basePrice = 89;
   else if (pParam === "149") basePrice = 149;
+  else if (pParam === "249") basePrice = 249;
 
-  // p=89 is static as requested
+  // p=89 and p=249 are static
   if (basePrice !== 49 && basePrice !== 149) {
     return { price: basePrice, nextPrice: null, phase: 1, timeLeft: 0 };
   }
