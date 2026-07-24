@@ -12,6 +12,11 @@ export function getDynamicPriceState(): DynamicPriceState {
     return { price: 149, nextPrice: 249, phase: 1, timeLeft: 600 };
   }
 
+  // Force price to 249 on duplicated /249 route
+  if (window.location.pathname.startsWith("/249") || window.location.pathname.includes("249")) {
+    return { price: 249, nextPrice: null, phase: 1, timeLeft: 0 };
+  }
+
   const searchParams = new URLSearchParams(window.location.search);
   const pParam = searchParams.get("p");
   

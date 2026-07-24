@@ -12,7 +12,7 @@ export function Block6Registration() {
   const [nextPrice, setNextPrice] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  const discountPercent = price === 49 ? 89 : price === 89 ? 80 : 67;
+  const discountPercent = price === 49 ? 89 : price === 89 ? 80 : price === 249 ? 45 : 67;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
