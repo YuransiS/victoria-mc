@@ -215,7 +215,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       telegram: sanitizedSocial,
       instagram: formData.instagram,
       amount: price,
-      tariffName: "Майстер-клас 23.07"
+       tariffName: "Майстер-клас 28.07"
     };
 
     try {
@@ -268,13 +268,13 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
 
       // Save Tariff and Amount for the final TG update
-      localStorage.setItem('lead_tariff', "Майстер-клас 23.07");
+      localStorage.setItem('lead_tariff', "Майстер-клас 28.07");
       localStorage.setItem('lead_amount', price.toString());
       localStorage.setItem('lead_currency', "UAH");
 
       // Track Lead / InitiateCheckout to Facebook
       trackFBEvent("Lead", {
-        content_name: "Майстер-клас 23.07",
+        content_name: "Майстер-клас 28.07",
         value: price,
         currency: "UAH",
         ...utmData

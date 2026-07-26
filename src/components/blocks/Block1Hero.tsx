@@ -24,7 +24,7 @@ const OFFERS = {
 
 export function Block1Hero() {
   const [regCount, setRegCount] = useState(976);
-  const [formattedDate, setFormattedDate] = useState("23.07");
+  const [formattedDate, setFormattedDate] = useState("28.07");
   const [variant, setVariant] = useState<1 | 2 | 3>(1);
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
   const [price, setPrice] = useState(149);

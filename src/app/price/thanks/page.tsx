@@ -39,7 +39,7 @@ export default function ThanksPage() {
     if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     const tariff = localStorage.getItem('lead_tariff') || 'Бронювання';
-    if (tariff === "Майстер-клас 23.07") {
+    if (tariff === "Майстер-клас 28.07") {
       setIsMasterclass(true);
       const savedLink = localStorage.getItem('masterclass_tg_link');
       if (savedLink) {
@@ -66,7 +66,7 @@ export default function ThanksPage() {
           });
         }
 
-        const targetSheet = tariff === "Майстер-клас 23.07" ? "Автовеб" : "Бронювання";
+        const targetSheet = tariff === "Майстер-клас 28.07" ? "Автовеб" : "Бронювання";
 
         fetch('/api/leads', {
           method: "POST",
