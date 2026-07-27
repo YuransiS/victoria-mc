@@ -50,6 +50,7 @@ export async function GET(req: Request) {
     const type = searchParams.get('type') || 'daily';
     const isWeekly = type === 'weekly';
     const useNow = searchParams.get('now') === 'true';
+    const onlyMasterclass = searchParams.get('only') === 'masterclass';
 
     // 1.5. Automatically delete QA/test leads from the database before generating stats
     const { error: deleteError } = await supabaseAdmin
@@ -384,11 +385,23 @@ export async function GET(req: Request) {
     const bookingPaid = bookingLeads.filter(l => l.status === 'Approved');
     const bookingRevenue = bookingPaid.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
 
-    // 6. Autoweb (Автовеб)
+    // 6. Autoweb / Masterclass (Майстер-клас)
     const autowebLeads = safeLeads.filter(l => 
-      ['Автовеб', 'Masterclass_Leads'].includes(l.target_sheet || '') &&
-      l.status === 'Зареєстровано'
+      (['Автовеб', 'Masterclass_Leads'].includes(l.target_sheet || '') || l.page_path === '/') &&
+      !['Клик', 'КликФормы'].includes(l.status || '')
     );
+    const masterclassPaid = autowebLeads.filter(l => (l.status || '').toLowerCase() === 'approved');
+    const masterclassRevenue = masterclassPaid.reduce((sum, l) => sum + (Number(l.amount) || 0), 0);
+
+    const masterclassPriceBreakdown: Record<number, { count: number; sum: number }> = {};
+    masterclassPaid.forEach(l => {
+      const price = Number(l.amount) || 0;
+      if (!masterclassPriceBreakdown[price]) {
+        masterclassPriceBreakdown[price] = { count: 0, sum: 0 };
+      }
+      masterclassPriceBreakdown[price].count += 1;
+      masterclassPriceBreakdown[price].sum += price;
+    });
 
     // 7. Core Landing Page
     const coreClicks = safeLeads.filter(l => l.page_path === '/' && l.status === 'Клик');
@@ -513,11 +526,32 @@ export async function GET(req: Request) {
     }
 
     // 6. Masterclass (Майстер-клас)
-    if (autowebLeads.length > 0 || coreClicks.length > 0) {
-      message += `🎓 <b>6. МАЙСТЕР-КЛАС</b>\n`;
-      message += `👤 <b>Реєстрацій:</b> <code>${autowebLeads.length}</code>\n`;
-      message += `📈 <b>Трафік (Кліки):</b> <code>${coreClicks.length}</code>\n`;
-      message += `🏷️ <b>Найкраще джерело (реєстрації):</b> <code>${getBestSource(autowebLeads)}</code>\n`;
+    if (autowebLeads.length > 0 || coreClicks.length > 0 || masterclassPaid.length > 0) {
+      if (onlyMasterclass) {
+        message = `📊 <b>${isWeekly ? 'Тижневий' : 'Щоденний'} звіт: МАЙСТЕР-КЛАС</b>\n`;
+        message += `📅 <b>Період:</b> <code>${formattedStart}</code> — <code>${formattedEnd}</code> (Київ)\n\n`;
+      }
+
+      message += `🎓 <b>6. МАЙСТЕР-КЛАС (Платний)</b>\n`;
+      message += `👤 <b>Всього реєстрацій / заявок:</b> <code>${autowebLeads.length}</code>\n`;
+      message += `💳 <b>Продажів (Оплачено):</b> <code>${masterclassPaid.length}</code>\n`;
+      message += `💵 <b>Загальна сума продажів:</b> <code>${masterclassRevenue} UAH</code>\n\n`;
+      
+      message += `📊 <b>Розбивка продажів по цінах:</b>\n`;
+      if (Object.keys(masterclassPriceBreakdown).length > 0) {
+        Object.keys(masterclassPriceBreakdown)
+          .map(Number)
+          .sort((a, b) => a - b)
+          .forEach(price => {
+            const { count, sum } = masterclassPriceBreakdown[price];
+            message += `  • <b>${price} UAH:</b> <code>${count}</code> шт. (на <code>${sum} UAH</code>)\n`;
+          });
+      } else {
+        message += `  • <code>0 продажів за період</code>\n`;
+      }
+
+      message += `\n📈 <b>Трафік (Кліки):</b> <code>${coreClicks.length}</code>\n`;
+      message += `🏷️ <b>Найкраще джерело (реєстрації):</b> <code>${getBestSource(autowebLeads)}</code>\n\n`;
       
       message += `📊 <b>Ефективність офферів (Кліки → Реєстрації):</b>\n`;
       const offerNames = {
