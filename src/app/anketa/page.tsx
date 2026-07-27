@@ -17,6 +17,7 @@ interface QuestionnaireFormData {
   difficulties: string;
   readiness: string;
   consent: boolean;
+  team_call: boolean;
 }
 
 const SparkleSVG = ({ className }: { className?: string }) => (
@@ -72,6 +73,7 @@ function AnketaFormContent() {
       difficulties: '',
       readiness: '',
       consent: false,
+      team_call: false,
     }
   });
 
@@ -79,6 +81,7 @@ function AnketaFormContent() {
   const subscriptionDurationValue = watch('subscription_duration');
   const readinessValue = watch('readiness');
   const consentValue = watch('consent');
+  const teamCallValue = watch('team_call');
 
   useEffect(() => {
     if (success) {
@@ -143,6 +146,7 @@ function AnketaFormContent() {
       subscription_duration: data.subscription_duration,
       difficulties: data.difficulties,
       readiness: data.readiness,
+      team_call: data.team_call,
       target_sheet: 'Анкета передзапису',
       visitor_id: localStorage.getItem('visitor_id') || '',
       page_path: '/anketa',
@@ -594,7 +598,7 @@ function AnketaFormContent() {
                 <label className="flex items-start gap-4 cursor-pointer group select-none">
                   <input
                     type="checkbox"
-                    {...register('consent', { required: 'Для відправки необхідно дати згоду на обробку данных' })}
+                    {...register('consent', { required: 'Для відправки необхідно дати згоду на обробку даних' })}
                     className="sr-only"
                   />
                   {/* Custom checkbox design */}
@@ -609,6 +613,28 @@ function AnketaFormContent() {
                   </span>
                 </label>
                 {errors.consent && <span className="text-red-500/90 text-xs block font-manrope">{errors.consent.message}</span>}
+              </div>
+
+              {/* Team Call Expectation */}
+              <div id="form-group-team_call" className="space-y-2 transition-all duration-300">
+                <label className="flex items-start gap-4 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    {...register('team_call', { required: 'Будь ласка, підтвердьте, що ви очікуєте на дзвінок від команди' })}
+                    className="sr-only"
+                  />
+                  {/* Custom checkbox design */}
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${teamCallValue ? 'border-[#5d5f2c] bg-[#5d5f2c]' : 'border-gray-400'
+                    }`}>
+                    <svg className={`w-3.5 h-3.5 text-white transition-transform duration-300 ${teamCallValue ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
+                  <span className="text-xs md:text-sm font-semibold text-[#1a1c1c] leading-relaxed font-manrope group-hover:text-[#5d5f2c] transition-colors">
+                    Я очікую на дзвінок від команди
+                  </span>
+                </label>
+                {errors.team_call && <span className="text-red-500/90 text-xs block font-manrope">{errors.team_call.message}</span>}
               </div>
 
               {/* Submit */}
