@@ -13,6 +13,22 @@ function cleanPhone(phone: string): string {
   return cleaned;
 }
 
+function formatTelegramPhone(phone: string): string {
+  if (!phone) return '-';
+  const trimmed = phone.trim();
+  if (trimmed === '-' || trimmed === '') return '-';
+  
+  let cleaned = trimmed.replace(/\D/g, "");
+  if (cleaned.length === 9) {
+    cleaned = "380" + cleaned;
+  } else if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned ? `+${cleaned}` : trimmed;
+}
+
 function formatTelegramHandle(tg: string): string {
   if (!tg) return '';
   let username = tg.trim();
@@ -177,7 +193,7 @@ export async function POST(request: Request) {
 
       let message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${customerName || '-'}\n` +
-        `📞 <b>Телефон:</b> ${customerPhone || '-'}\n`;
+        `📞 <b>Телефон:</b> ${formatTelegramPhone(customerPhone)}\n`;
       if (formattedTelegram) {
         message += `📱 <b>Telegram:</b> ${formattedTelegram}\n`;
       }

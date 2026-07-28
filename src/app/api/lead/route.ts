@@ -29,6 +29,22 @@ function formatCrmPhone(phone: string): string {
   return cleaned ? `+${cleaned}` : phone;
 }
 
+function formatTelegramPhone(phone: string): string {
+  if (!phone) return '-';
+  const trimmed = phone.trim();
+  if (trimmed === '-' || trimmed === '') return '-';
+  
+  let cleaned = trimmed.replace(/\D/g, "");
+  if (cleaned.length === 9) {
+    cleaned = "380" + cleaned;
+  } else if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned ? `+${cleaned}` : trimmed;
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -60,7 +76,7 @@ export async function POST(req: Request) {
 
     let message = `🔥 <b>Новий лід: ${formTitle}</b>\n\n`;
     message += `👤 <b>Ім'я:</b> ${name || '-'}\n`;
-    message += `📞 <b>Телефон:</b> ${phone || '-'}\n`;
+    message += `📞 <b>Телефон:</b> ${formatTelegramPhone(phone)}\n`;
     message += `📱 <b>Social:</b> ${social || '-'}\n`;
     if (instagram) {
       message += `📸 <b>Instagram:</b> ${instagram}\n`;

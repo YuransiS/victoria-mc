@@ -72,6 +72,22 @@ function cleanPhone(phone: string): string {
   return cleaned;
 }
 
+function formatTelegramPhone(phone: string): string {
+  if (!phone) return '-';
+  const trimmed = phone.trim();
+  if (trimmed === '-' || trimmed === '') return '-';
+  
+  let cleaned = trimmed.replace(/\D/g, "");
+  if (cleaned.length === 9) {
+    cleaned = "380" + cleaned;
+  } else if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned ? `+${cleaned}` : trimmed;
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -102,7 +118,7 @@ export async function POST(req: Request) {
 
       const message = `${title}\n\n` +
         `👤 <b>Клієнт:</b> ${name || '-'}\n` +
-        `📞 <b>Телефон:</b> ${phone || '-'}\n` +
+        `📞 <b>Телефон:</b> ${formatTelegramPhone(phone)}\n` +
         `📱 <b>Social:</b> ${formattedSocial || '-'}\n` +
         (formattedInstagram ? `📸 <b>Instagram:</b> ${formattedInstagram}\n` : '') +
         `💰 <b>Сума:</b> ${amount} UAH\n` +

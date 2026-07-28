@@ -47,6 +47,22 @@ function formatInstagramHandle(ig: string): string {
   return username ? `<a href="https://instagram.com/${username}">@${username}</a>` : '';
 }
 
+function formatTelegramPhone(phone: string): string {
+  if (!phone) return '-';
+  const trimmed = phone.trim();
+  if (trimmed === '-' || trimmed === '') return '-';
+  
+  let cleaned = trimmed.replace(/\D/g, "");
+  if (cleaned.length === 9) {
+    cleaned = "380" + cleaned;
+  } else if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "38" + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith("80")) {
+    cleaned = "38" + cleaned.substring(1);
+  }
+  return cleaned ? `+${cleaned}` : trimmed;
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -131,7 +147,8 @@ export async function POST(request: Request) {
         ? `✅ <b>Оплата успішна! (${label})</b>` 
         : `❌ <b>Оплата відхилена (${label})</b>`;
 
-      const customerPhone = leadDbData?.phone || customData.customer_phone || resDataFallback?.customerPhone || '-';
+      const rawPhone = leadDbData?.phone || customData.customer_phone || resDataFallback?.customerPhone || '-';
+      const customerPhone = formatTelegramPhone(rawPhone);
       const rawSocial = leadDbData?.social || customData.social || resDataFallback?.telegram || '';
       const social = formatTelegramHandle(rawSocial);
       const instagram = formatInstagramHandle(leadDbData?.instagram || customData.instagram || '');
