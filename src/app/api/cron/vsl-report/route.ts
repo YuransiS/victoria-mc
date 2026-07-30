@@ -33,21 +33,26 @@ function getBestSource(items: any[]): string {
 
 export async function GET(req: Request) {
   try {
-    // 1. Verify Authorization Header from Vercel Cron, or ?secret parameter
+    // 1. Verify Authorization Header from Vercel Cron, x-cron-secret, or ?secret parameter
     const authHeader = req.headers.get('authorization');
+    const customHeader = req.headers.get('x-cron-secret');
     const { searchParams } = new URL(req.url);
     const secretParam = searchParams.get('secret');
     const cronSecret = process.env.CRON_SECRET;
 
     if (cronSecret) {
-      const isHeaderValid = authHeader === `Bearer ${cronSecret}`;
+      const isHeaderValid = authHeader === `Bearer ${cronSecret}` || authHeader === cronSecret;
+      const isCustomValid = customHeader === cronSecret;
       const isParamValid = secretParam === cronSecret;
-      if (!isHeaderValid && !isParamValid) {
+      const isDev = process.env.NODE_ENV === 'development';
+      if (!isHeaderValid && !isCustomValid && !isParamValid && !isDev) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
     }
 
-    const type = searchParams.get('type') || 'daily';
+    const rawType = searchParams.get('type');
+    const isMonday = new Date().getUTCDay() === 1;
+    const type = rawType || (isMonday ? 'weekly' : 'daily');
     const isWeekly = type === 'weekly';
     const useNow = searchParams.get('now') === 'true';
     const onlyMasterclass = searchParams.get('only') === 'masterclass';

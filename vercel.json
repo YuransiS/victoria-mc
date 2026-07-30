@@ -16,10 +16,6 @@
     {
       "path": "/api/cron/vsl-report",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/vsl-report?type=weekly",
-      "schedule": "0 7 * * 1"
     }
   ]
 }

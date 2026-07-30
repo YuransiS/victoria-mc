@@ -45,6 +45,33 @@ function formatTelegramPhone(phone: string): string {
   return cleaned ? `+${cleaned}` : trimmed;
 }
 
+function formatUkrainianDate(isoString: string): string {
+  try {
+    const d = new Date(isoString);
+    return d.toLocaleString('uk-UA', {
+      timeZone: 'Europe/Kiev',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(',', '');
+  } catch (e) {
+    return isoString;
+  }
+}
+
+function resolveProductFunnelName(targetSheet?: string | null, pagePath?: string | null): string {
+  if (targetSheet === 'Анкета передзапису' || pagePath === '/anketa') return 'Анкета передзапису';
+  if (targetSheet === 'VSL Форма' || targetSheet === 'Ленд 2' || targetSheet === 'Ленд2' || pagePath === '/free-lection/vsl-form') return 'VSL Анкета (Форма)';
+  if (targetSheet === 'VSL 1 етап' || targetSheet === 'Ленд 1' || targetSheet === 'VSL Воронка (старт)' || pagePath === '/free-lection') return 'VSL Воронка (Лекція)';
+  if (targetSheet === 'Автовеб' || targetSheet === 'Masterclass_Leads') return 'Майстер-клас';
+  if (pagePath === '/practicum') return 'Практикум';
+  if (pagePath === '/rozbir' || (targetSheet && targetSheet.includes('розбір'))) return 'Персональний розбір';
+  if (pagePath === '/price') return 'Сторінка тарифів';
+  return targetSheet || pagePath || '';
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -107,82 +134,7 @@ export async function POST(req: Request) {
     message += `Medium: ${utms.utm_medium}\n`;
     message += `Campaign: ${utms.utm_campaign}\n`;
 
-    // Define notification tasks
-    const tasks = [];
-
-    // 1. Telegram Task (For all incoming leads EXCEPT stage 1 VSL)
-    if (token && chatId && !isVSL1) {
-      tasks.push(
-        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            message_thread_id: topicId,
-            text: message,
-            parse_mode: 'HTML',
-          }),
-        }).catch(err => console.error('Telegram failed:', err))
-      );
-    }
-
-    // 1.5 BaseCRM Task (For VSL form and Anketa leads)
-    if (isVSL || isAnketa) {
-      const crmPhone = phone || '';
-      const formattedCrmPhone = formatCrmPhone(crmPhone);
-      const crmEmail = `noemail-${formattedCrmPhone.replace(/\D/g, '') || Math.random().toString(36).substring(2, 9)}@example.com`;
-      
-      // Form comment string from questionnaire fields if they exist
-      const commentLines: string[] = [];
-      commentLines.push(`Форма: ${formTitle}`);
-      if (niche) commentLines.push(`Ніша: ${niche}`);
-      if (purpose) commentLines.push(`Мета: ${purpose}`);
-      if (difficulties) commentLines.push(`Складнощі: ${difficulties}`);
-      if (readiness) commentLines.push(`Готовність: ${readiness}`);
-      if (subscription_duration) commentLines.push(`Підписка: ${subscription_duration}`);
-      const crmComment = commentLines.join('\n');
-
-      const crmPayload = {
-        pipeline_id: 110,
-        dev_key: "DF5-6E",
-        name: name || 'Без імені',
-        email: crmEmail,
-        phone: formattedCrmPhone,
-        telegram: social || '',
-        instagram: instagram || '',
-        comment: crmComment || '',
-        utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
-        utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
-        utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
-        utm_content: data.utm_content === '-' ? '' : (data.utm_content || '')
-      };
-
-      tasks.push(
-        fetch('https://prosales.base-crm.1-todo.com/api/client/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(crmPayload),
-        })
-        .then(async (res) => {
-          const text = await res.text();
-          console.log(`[BaseCRM] Lead sent. Status: ${res.status}, Response: ${text}`);
-          return text;
-        })
-        .catch(err => console.error('[BaseCRM] Failed to send lead:', err))
-      );
-    }
-
-
-    // SendPulse Task (State 3: Submitted form)
-    if (sp_contact_id) {
-      tasks.push(
-        updateSendPulseStatus(sp_contact_id, '3. Заповнив анкету').catch(err =>
-          console.error('[Lead API SendPulse] Failed to update status:', err)
-        )
-      );
-    }
-
-    // 3. Supabase Integration & Lead Stitching
+    // 1. Supabase Visitor Resolution & Lead Stitching
     const clientUuid = data.visitor_id || data.visitorId || null;
     const phoneOrSocial = phone || social || '';
     const isPhone = phoneOrSocial && !phoneOrSocial.startsWith('@') && phoneOrSocial.replace(/\D/g, '').length >= 7;
@@ -231,6 +183,146 @@ export async function POST(req: Request) {
       } catch (e: any) {
         console.error("[Lead Ingest] Merge exception:", e.message);
       }
+    }
+
+    // 2. Fetch Visitor's Prior Interaction History across Products/Funnels
+    let previousProductsList: { funnel: string; date: string }[] = [];
+    try {
+      const orConditions: string[] = [];
+      if (normalizedPhone) orConditions.push(`phone.eq.${normalizedPhone}`);
+      if (resolvedUuid) orConditions.push(`visitor_uuid.eq.${resolvedUuid}`);
+      if (clientUuid && clientUuid !== resolvedUuid) orConditions.push(`visitor_uuid.eq.${clientUuid}`);
+
+      if (orConditions.length > 0) {
+        const { data: historyRecords } = await supabaseAdmin
+          .from("victoria_leads")
+          .select("created_at, target_sheet, page_path")
+          .or(orConditions.join(','))
+          .order("created_at", { ascending: true });
+
+        if (historyRecords && historyRecords.length > 0) {
+          const currentFunnelName = resolveProductFunnelName(data.target_sheet, data.page_path);
+          const seenKeys = new Set<string>();
+
+          for (const item of historyRecords) {
+            const funnelName = resolveProductFunnelName(item.target_sheet, item.page_path);
+            if (!funnelName || funnelName === 'Лендінг' || funnelName === '/') continue;
+
+            const formattedDate = formatUkrainianDate(item.created_at);
+            const dateDay = formattedDate.split(' ')[0];
+            const uniqueKey = `${funnelName}_${dateDay}`;
+
+            if (!seenKeys.has(uniqueKey)) {
+              seenKeys.add(uniqueKey);
+              previousProductsList.push({
+                funnel: funnelName,
+                date: formattedDate
+              });
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('[Lead Ingest] Error fetching visitor history:', err.message || err);
+    }
+
+    // Define notification tasks
+    const tasks = [];
+
+    // 3. Telegram Task (For all incoming leads EXCEPT stage 1 VSL)
+    if (token && chatId && !isVSL1) {
+      tasks.push(
+        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            message_thread_id: topicId,
+            text: message,
+            parse_mode: 'HTML',
+          }),
+        }).catch(err => console.error('Telegram failed:', err))
+      );
+    }
+
+    // 4. BaseCRM Task (For VSL form and Anketa leads)
+    if (isVSL || isAnketa) {
+      const crmPhone = phone || '';
+      const formattedCrmPhone = formatCrmPhone(crmPhone);
+      const crmEmail = `noemail-${formattedCrmPhone.replace(/\D/g, '') || Math.random().toString(36).substring(2, 9)}@example.com`;
+      
+      // Form comment string from questionnaire fields, UTM tags, and prior products history
+      const commentLines: string[] = [];
+      commentLines.push(`Форма: ${formTitle}`);
+      if (niche) commentLines.push(`Ніша: ${niche}`);
+      if (purpose) commentLines.push(`Мета: ${purpose}`);
+      if (difficulties) commentLines.push(`Складнощі: ${difficulties}`);
+      if (readiness) commentLines.push(`Готовність: ${readiness}`);
+      if (subscription_duration) commentLines.push(`Підписка: ${subscription_duration}`);
+
+      // Add UTM parameters to comment
+      commentLines.push('');
+      commentLines.push('UTM-мітки:');
+      commentLines.push(`Source: ${utms.utm_source}`);
+      commentLines.push(`Medium: ${utms.utm_medium}`);
+      commentLines.push(`Campaign: ${utms.utm_campaign}`);
+      if (data.utm_content && data.utm_content !== '-') {
+        commentLines.push(`Content: ${data.utm_content}`);
+      }
+      if (data.utm_term && data.utm_term !== '-') {
+        commentLines.push(`Term: ${data.utm_term}`);
+      }
+
+      // Add history of other products/funnels if the user was on other products before
+      if (previousProductsList.length > 0) {
+        commentLines.push('');
+        commentLines.push('Бул(а) на інших продуктах/воронках: Так');
+        commentLines.push('Історія відвідувань:');
+        previousProductsList.forEach((item) => {
+          commentLines.push(`• [${item.date}] ${item.funnel}`);
+        });
+      }
+
+      const crmComment = commentLines.join('\n');
+
+      const crmPayload = {
+        pipeline_id: 110,
+        dev_key: "DF5-6E",
+        name: name || 'Без імені',
+        email: crmEmail,
+        phone: formattedCrmPhone,
+        telegram: social || '',
+        instagram: instagram || '',
+        comment: crmComment || '',
+        utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
+        utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
+        utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
+        utm_content: data.utm_content === '-' ? '' : (data.utm_content || '')
+      };
+
+      tasks.push(
+        fetch('https://prosales.base-crm.1-todo.com/api/client/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(crmPayload),
+        })
+        .then(async (res) => {
+          const text = await res.text();
+          console.log(`[BaseCRM] Lead sent. Status: ${res.status}, Response: ${text}`);
+          return text;
+        })
+        .catch(err => console.error('[BaseCRM] Failed to send lead:', err))
+      );
+    }
+
+
+    // SendPulse Task (State 3: Submitted form)
+    if (sp_contact_id) {
+      tasks.push(
+        updateSendPulseStatus(sp_contact_id, '3. Заповнив анкету').catch(err =>
+          console.error('[Lead API SendPulse] Failed to update status:', err)
+        )
+      );
     }
 
     const dbPayload = {
