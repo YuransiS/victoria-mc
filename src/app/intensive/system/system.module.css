@@ -1,0 +1,1086 @@
+/* ==========================================================================
+   INTENSIVE SYSTEM LANDING PAGE STYLES (Dark Editorial Brutalist Aesthetic)
+   ========================================================================== */
+
+.pageWrapper {
+  min-height: 100vh;
+  background-color: #09090b;
+  color: #ffffff;
+  font-family: var(--font-manrope), sans-serif;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* SECTION UTILITIES */
+.section {
+  position: relative;
+  padding: 5.5rem 1.5rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionTag {
+  display: inline-block;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff500;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  margin-bottom: 0.75rem;
+  background: rgba(255, 245, 0, 0.08);
+  border: 1px solid rgba(255, 245, 0, 0.3);
+  padding: 0.35rem 0.85rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 900;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+}
+
+.sectionSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0 auto;
+}
+
+.yellowDivider {
+  width: 50px;
+  height: 2px;
+  background-color: #fff500;
+  margin: 1.25rem auto 0;
+}
+
+/* BUTTONS */
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #fff500;
+  color: #000000;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 1.1rem 2rem;
+  border: 1.5px solid #fff500;
+  box-shadow: 0 10px 25px rgba(255, 245, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  width: 100%;
+  max-width: 440px;
+}
+
+.primaryButton:hover {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 255, 255, 0.3);
+}
+
+.primaryButton:active {
+  transform: translateY(0);
+}
+
+.buttonSubtext {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   1. HERO SECTION
+   ========================================================================== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 1.5rem 4rem;
+  background: radial-gradient(circle at 75% 30%, rgba(255, 245, 0, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(30, 30, 35, 0.8) 0%, #09090b 80%);
+  overflow: hidden;
+}
+
+.heroBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.heroImageBg {
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.28;
+  filter: contrast(1.15) brightness(0.85);
+}
+
+.heroOverlayGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 9, 11, 0.4) 0%, rgba(9, 9, 11, 0.85) 60%, #09090b 100%),
+              linear-gradient(90deg, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.6) 50%, rgba(9, 9, 11, 0.95) 100%);
+}
+
+.heroContainer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .heroContainer {
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 3.5rem;
+  }
+}
+
+.heroTextContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fff500;
+  color: #000000;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid #000000;
+  margin-bottom: 1.5rem;
+}
+
+.heroTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  text-transform: uppercase;
+}
+
+.heroTitleHighlight {
+  color: #fff500;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 1.8vw, 1.12rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2rem;
+  border-left: 3px solid #fff500;
+  padding-left: 1.25rem;
+}
+
+.heroPriceCard {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(26, 26, 28, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.heroPriceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.heroOldPrice {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.heroNewPrice {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff500;
+  line-height: 1;
+}
+
+.heroDiscountBadge {
+  background: rgba(255, 245, 0, 0.15);
+  color: #fff500;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(255, 245, 0, 0.4);
+}
+
+.heroTimerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.heroTimerValue {
+  color: #fff500;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+/* ==========================================================================
+   1.1 BONUSES SECTION (with 10-min timer)
+   ========================================================================== */
+.bonusTimerBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(255, 245, 0, 0.08);
+  border: 1.5px solid #fff500;
+  padding: 0.85rem 1.5rem;
+  margin: 0 auto 3rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.bonusTimerText {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.bonusesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .bonusesGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.bonusCard {
+  background: rgba(26, 26, 28, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  padding: 2rem 1.75rem;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bonusBadge {
+  position: absolute;
+  top: -0.9rem;
+  left: 1.5rem;
+  background: #fff500;
+  color: #000000;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #000000;
+}
+
+.bonusTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0.5rem 0 0.75rem 0;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.bonusDescription {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.bonusPriceFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.bonusOldPrice {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+.bonusFreePrice {
+  color: #fff500;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.bonusesSummaryCard {
+  background: rgba(255, 245, 0, 0.06);
+  border: 2px solid #fff500;
+  padding: 2rem;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 10px 30px rgba(255, 245, 0, 0.1);
+}
+
+.bonusesSummaryTitle {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.bonusesSummaryPrices {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1rem 0 1.5rem;
+}
+
+/* ==========================================================================
+   3. PAIN SECTION («Впізнаєш себе?»)
+   ========================================================================== */
+.painListGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto 3rem;
+}
+
+.painCard {
+  background: rgba(26, 26, 28, 0.6);
+  border-left: 4px solid #fff500;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem 1.75rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.painManifestoBox {
+  background: rgba(18, 18, 20, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
+}
+
+.painManifestoQuestion {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: #fff500;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+.painManifestoText {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+/* ==========================================================================
+   4. CASES & REVIEWS SECTION («ЦЕ ВЖЕ СПРАЦЮВАЛО У НИХ»)
+   ========================================================================== */
+.casesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.caseCard {
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.caseCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.6rem;
+}
+
+.caseClientName {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+}
+
+.caseClientNiche {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  margin-top: 0.15rem;
+}
+
+.caseComparisonRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.caseImageContainer {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: #111113;
+  cursor: pointer;
+}
+
+.caseImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.caseImageContainer:hover .caseImage {
+  transform: scale(1.04);
+}
+
+.caseTagBefore {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000000;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+}
+
+.caseTagAfter {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  background: #fff500;
+  color: #000000;
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+}
+
+.reviewsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.reviewItem {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.reviewItem:hover {
+  transform: scale(1.02);
+  border-color: #fff500;
+}
+
+.reviewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.5rem;
+}
+
+/* ==========================================================================
+   5. ABOUT EXPERT SECTION
+   ========================================================================== */
+.expertLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 860px) {
+  .expertLayout {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+}
+
+.expertImageWrapper {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+}
+
+.expertImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.expertInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.expertTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+}
+
+.expertPoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.expertCheckIcon {
+  color: #fff500;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.expertHighlightBox {
+  background: rgba(255, 245, 0, 0.08);
+  border-left: 3px solid #fff500;
+  padding: 1.25rem 1.5rem;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.instagramLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.instagramLink:hover {
+  color: #fff500;
+}
+
+/* ==========================================================================
+   6. INTENSIVE PROGRAM SECTION (4 Lessons)
+   ========================================================================== */
+.programGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 960px;
+  margin: 0 auto 3rem;
+}
+
+.lessonCard {
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  padding: 2.25rem 2rem;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease;
+}
+
+.lessonCard:hover {
+  border-color: rgba(255, 245, 0, 0.4);
+}
+
+.lessonHeaderRow {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lessonNumber {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  font-size: 2.2rem;
+  color: #fff500;
+  line-height: 1;
+}
+
+.lessonTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.lessonDescription {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.lessonPointsList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.lessonPointItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lessonPointBullet {
+  color: #fff500;
+  font-weight: 900;
+}
+
+.lessonOutcomeBox {
+  background: rgba(255, 245, 0, 0.08);
+  border: 1px solid rgba(255, 245, 0, 0.3);
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.lessonOutcomeLabel {
+  color: #fff500;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 0.35rem;
+}
+
+/* ==========================================================================
+   7. RESULTS SECTION («Що зміниться»)
+   ========================================================================== */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.resultCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.5;
+}
+
+.resultCheckIcon {
+  color: #fff500;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   7.1 NOT FOR YOU SECTION («Кому точно НЕ підійде»)
+   ========================================================================== */
+.notForYouGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+}
+
+.notForYouCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(30, 20, 22, 0.5);
+  border: 1.5px solid rgba(239, 68, 68, 0.2);
+  padding: 1.5rem 1.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.notForYouIcon {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.notForYouSummary {
+  background: rgba(26, 26, 28, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  padding: 2rem;
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   8. PRICING & PROCESS SECTION
+   ========================================================================== */
+.processFeaturesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 860px;
+  margin: 0 auto 3rem;
+}
+
+@media (min-width: 640px) {
+  .processFeaturesGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.processFeatureCard {
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   9. GUARANTEE SECTION
+   ========================================================================== */
+.guaranteeCard {
+  background: rgba(26, 26, 28, 0.8);
+  border: 2px solid #fff500;
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+}
+
+.guaranteeTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 1rem 0;
+}
+
+.guaranteeText {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   10. FAQ SECTION
+   ========================================================================== */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.faqItem {
+  background: rgba(26, 26, 28, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+
+.faqItemActive {
+  border-color: #fff500;
+}
+
+.faqQuestionButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.75rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.faqQuestionButton:hover {
+  color: #fff500;
+}
+
+.faqChevron {
+  color: #fff500;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.faqChevronOpen {
+  transform: rotate(180deg);
+}
+
+.faqAnswer {
+  padding: 0 1.75rem 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1rem;
+}
+
+/* ==========================================================================
+   11. FINAL BLOCK
+   ========================================================================== */
+.finalCard {
+  background: radial-gradient(circle at center, rgba(255, 245, 0, 0.08) 0%, rgba(20, 20, 24, 0.9) 70%);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  padding: 4rem 2rem;
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.finalTitle {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.finalText {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+}
+
+/* ==========================================================================
+   STICKY MOBILE CTA BAR
+   ========================================================================== */
+.stickyMobileBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(9, 9, 11, 0.95);
+  backdrop-blur-md: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.75rem 1rem env(safe-area-inset-bottom, 0.75rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.8);
+}
+
+@media (min-width: 768px) {
+  .stickyMobileBar {
+    display: none;
+  }
+}
+
+.stickyPriceColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.stickyTimer {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff500;
+  text-transform: uppercase;
+}
+
+.stickyPrice {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.stickyButton {
+  background: #fff500;
+  color: #000000;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.8rem 1.25rem;
+  border: none;
+  cursor: pointer;
+  flex-grow: 1;
+  max-width: 240px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   LIGHTBOX MODAL
+   ========================================================================== */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.lightboxCloseBtn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.lightboxContent {
+  position: relative;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxImage {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+}

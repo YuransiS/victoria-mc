@@ -33,6 +33,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `free-lection/vsl-form/` — VSL Step 2 form questionnaire.
 *   `rozbir/` — Personal video breakdown offer page.
 *   `anketa/` — Pre-registration Questionnaire Landing Page for lead capturing. Supports `?v=2` query parameter for A/B testing a different bonus structure (Consultation, Maximum Discount, Warming-up Structure) instead of the default layout. Form requires checking "Я очікую на дзвінок від команди" to submit.
+*   `intensive/5-likes/` — [NEW] 4-Lesson Intensive landing page ("5 Лайків") with dark luxury aesthetic, 10-min countdown timer, 125€ bonus package (4 bonuses), "Це про тебе якщо", "Кому не підійде", "Що зміниться", Expert profile, 4-lesson curriculum breakdown, before/after cases & reviews lightbox, format & curation, why price explanation, 100% money-back guarantee, FAQ accordions, and resilient 9€ (EUR) WayForPay checkout integration.
 *   `checkout/` — Dynamic checkout client page.
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 
@@ -59,6 +60,8 @@ This live document outlines the architecture, routing structure, components, dat
 *   `blocks/BlockReviews.tsx` — Student reviews grid with interactive lightbox.
 *   `blocks/BlockBonusTimer.tsx` — Active bonuses showcase with persistent 10-minute countdown timer.
 *   `blocks/BlockGuarantee.tsx` — Dynamic pricing details copy, money-back guarantee, and doubts resolution.
+*   `intensive/IntensiveCheckoutModal.tsx` — [NEW] Dedicated 9€ EUR checkout modal with instant validation and WayForPay integration.
+*   `intensive/use10MinTimer.ts` — [NEW] Synchronized persistent 10-minute countdown timer hook.
 
 ### 🧪 QA Regression Tests (`tests/`)
 *   `tests/test_all_landings.js` — Universal E2E test script simulating page views and form submissions across all 6 landing pages.
