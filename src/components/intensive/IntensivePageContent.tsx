@@ -16,8 +16,6 @@ import { IntensiveFAQ } from "./IntensiveFAQ";
 import { IntensiveFinalCTA } from "./IntensiveFinalCTA";
 import { IntensiveCheckoutModal } from "./IntensiveCheckoutModal";
 import { IntensiveStickyCTA } from "./IntensiveStickyCTA";
-import { CinematicEffects } from "@/components/CinematicEffects";
-import { LiveSocialProof } from "@/components/LiveSocialProof";
 import { Footer } from "@/components/Footer";
 
 export function IntensivePageContent() {
@@ -32,10 +30,7 @@ export function IntensivePageContent() {
   };
 
   return (
-    <main className="bg-[#101012] text-white min-h-screen relative overflow-x-hidden selection:bg-[#fff500] selection:text-black">
-      <CinematicEffects />
-      <LiveSocialProof variant="booking" />
-
+    <main className="bg-[#FAF6EE] text-[#2B0813] min-h-screen relative overflow-x-hidden selection:bg-[#451220] selection:text-[#FAF6EE]">
       {/* 1. HERO */}
       <IntensiveHero onOpenCheckout={openCheckout} />
 

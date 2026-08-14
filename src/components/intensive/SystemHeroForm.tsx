@@ -15,7 +15,7 @@ interface SystemHeroFormProps {
 }
 
 export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
-  buttonText = "ЗАБРАТИ УРОКИ ЗА 9 ЄВРО →",
+  buttonText = "Забрати уроки за 9 євро →",
   tariffName = "Інтенсив СИСТЕМА (4 уроки)",
   amount = 9,
   currency = "EUR",
@@ -260,26 +260,26 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
 
   return (
     <div
-      className={`w-full bg-[#18181a]/95 backdrop-blur-md border border-white/15 p-5 sm:p-6 shadow-2xl ${className}`}
+      className={`w-full bg-[#FFFFFF] text-[#2D0C14] rounded-3xl p-6 sm:p-7 shadow-xl border border-[#380E18]/12 ${className}`}
     >
       {/* Top Header */}
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
+      <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#380E18]/10">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#fff500] animate-pulse"></span>
-          <span className="text-[11px] font-manrope font-bold text-white/80 uppercase tracking-wider">
-            Зараз заповнюють: <strong className="text-[#fff500]">{activeUsers}</strong>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#380E18] animate-pulse"></span>
+          <span className="text-[11px] font-manrope font-bold text-[#2D0C14]/80 uppercase tracking-wider">
+            Зараз реєструються: <strong className="text-[#380E18]">{activeUsers} людей</strong>
           </span>
         </div>
         <div className="text-right">
-          <span className="text-white/40 line-through text-xs font-semibold mr-1.5">49€</span>
-          <span className="text-[#fff500] font-manrope font-extrabold text-base">{amount}€</span>
+          <span className="text-[#2D0C14]/40 line-through text-xs font-semibold mr-1.5">49€</span>
+          <span className="text-[#380E18] font-manrope font-black text-lg">{amount}€</span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Name */}
         <div>
-          <label className="block text-[10px] font-manrope font-bold uppercase tracking-wider text-white/70 mb-1">
+          <label className="block text-[11px] font-manrope font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1">
             Ім{`'`}я та прізвище
           </label>
           <input
@@ -288,23 +288,25 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
             onChange={(e) => handleChange("name", e.target.value)}
             placeholder="Ваше ім'я"
             disabled={status !== "idle"}
-            className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/20 px-3.5 py-2.5 text-xs font-manrope focus:border-[#fff500] focus:outline-none transition-colors"
+            className="w-full bg-[#F8F4EB] border border-[#380E18]/15 text-[#2D0C14] placeholder:text-[#2D0C14]/30 px-3.5 py-2.5 text-xs font-manrope rounded-xl focus:border-[#380E18] focus:outline-none transition-colors"
           />
-          {errors.name && <p className="text-red-400 text-[10px] mt-1">{errors.name}</p>}
+          {errors.name && <p className="text-red-600 text-[10px] mt-1">{errors.name}</p>}
         </div>
 
         {/* Contact Method */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-[10px] font-manrope font-bold uppercase tracking-wider text-white/70">
+            <label className="text-[11px] font-manrope font-bold uppercase tracking-wider text-[#2D0C14]/70">
               Спосіб зв{`'`}язку
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-1 bg-[#EFE8DC] p-0.5 rounded-full">
               <button
                 type="button"
                 onClick={() => setContactMethod("phone")}
-                className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 transition-all ${
-                  contactMethod === "phone" ? "bg-[#fff500] text-black" : "text-white/50 hover:text-white"
+                className={`text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full transition-all ${
+                  contactMethod === "phone"
+                    ? "bg-[#380E18] text-[#FDFBF7]"
+                    : "text-[#2D0C14]/60 hover:text-[#2D0C14]"
                 }`}
               >
                 Телефон
@@ -312,10 +314,10 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
               <button
                 type="button"
                 onClick={() => setContactMethod("telegram")}
-                className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 transition-all ${
+                className={`text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full transition-all ${
                   contactMethod === "telegram"
-                    ? "bg-[#fff500] text-black"
-                    : "text-white/50 hover:text-white"
+                    ? "bg-[#380E18] text-[#FDFBF7]"
+                    : "text-[#2D0C14]/60 hover:text-[#2D0C14]"
                 }`}
               >
                 Telegram
@@ -331,17 +333,17 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
                 value={formData.phone}
                 onChange={(val) => handleChange("phone", val || "")}
                 disabled={status !== "idle"}
-                className="w-full react-phone-input-dark bg-black/40 border border-white/15 px-2.5 py-1.5 text-white text-xs"
+                className="w-full bg-[#F8F4EB] border border-[#380E18]/15 text-[#2D0C14] px-2.5 py-1.5 text-xs rounded-xl react-phone-input-light"
                 numberInputProps={{
                   id: "hero-phone",
                   autoComplete: "tel",
                   inputMode: "tel",
                   className:
-                    "w-full bg-transparent border-none text-white text-xs focus:outline-none placeholder:text-white/20 font-manrope",
+                    "w-full bg-transparent border-none text-[#2D0C14] text-xs focus:outline-none placeholder:text-[#2D0C14]/30 font-manrope",
                   placeholder: "+"
                 }}
               />
-              {errors.phone && <p className="text-red-400 text-[10px] mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-600 text-[10px] mt-1">{errors.phone}</p>}
             </div>
           ) : (
             <div>
@@ -351,16 +353,16 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
                 onChange={(e) => handleChange("social", e.target.value)}
                 placeholder="@username"
                 disabled={status !== "idle"}
-                className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/20 px-3.5 py-2.5 text-xs font-manrope focus:border-[#fff500] focus:outline-none transition-colors"
+                className="w-full bg-[#F8F4EB] border border-[#380E18]/15 text-[#2D0C14] placeholder:text-[#2D0C14]/30 px-3.5 py-2.5 text-xs font-manrope rounded-xl focus:border-[#380E18] focus:outline-none transition-colors"
               />
-              {errors.social && <p className="text-red-400 text-[10px] mt-1">{errors.social}</p>}
+              {errors.social && <p className="text-red-600 text-[10px] mt-1">{errors.social}</p>}
             </div>
           )}
         </div>
 
         {/* Instagram */}
         <div>
-          <label className="block text-[10px] font-manrope font-bold uppercase tracking-wider text-white/70 mb-1">
+          <label className="block text-[11px] font-manrope font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1">
             Instagram @нікнейм
           </label>
           <input
@@ -369,23 +371,23 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
             onChange={(e) => handleChange("instagram", e.target.value)}
             placeholder="@nickname"
             disabled={status !== "idle"}
-            className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/20 px-3.5 py-2.5 text-xs font-manrope focus:border-[#fff500] focus:outline-none transition-colors"
+            className="w-full bg-[#F8F4EB] border border-[#380E18]/15 text-[#2D0C14] placeholder:text-[#2D0C14]/30 px-3.5 py-2.5 text-xs font-manrope rounded-xl focus:border-[#380E18] focus:outline-none transition-colors"
           />
-          {errors.instagram && <p className="text-red-400 text-[10px] mt-1">{errors.instagram}</p>}
+          {errors.instagram && <p className="text-red-600 text-[10px] mt-1">{errors.instagram}</p>}
         </div>
 
         {/* Submit */}
         <button
           type="submit"
           disabled={status !== "idle"}
-          className="w-full bg-[#fff500] hover:bg-[#fff733] text-black font-manrope font-black py-3.5 px-4 uppercase tracking-[0.15em] text-xs transition-all active:scale-[0.98] shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-2"
+          className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-black py-4 px-4 rounded-full uppercase tracking-[0.12em] text-xs transition-all active:scale-[0.98] shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-2"
         >
           {status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : buttonText}
         </button>
 
-        <div className="flex items-center justify-center gap-1.5 text-white/50 text-[10px] uppercase tracking-wider pt-1">
-          <ShieldCheck size={13} className="text-[#fff500]" />
-          <span>Гарантія повернення 9€</span>
+        <div className="flex items-center justify-center gap-1.5 text-[#2D0C14]/60 text-[10px] uppercase tracking-wider pt-1">
+          <ShieldCheck size={13} className="text-[#380E18]" />
+          <span>100% Гарантія повернення 9€</span>
         </div>
       </form>
 
@@ -396,29 +398,29 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10005] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-[10005] bg-[#23080F]/90 backdrop-blur-xl flex items-center justify-center p-6"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-[#18181a] p-8 md:p-12 text-center max-w-md w-full border border-white/15 shadow-2xl"
+              className="bg-[#FDFBF7] text-[#2D0C14] p-8 md:p-10 text-center max-w-md w-full rounded-3xl shadow-2xl border border-[#380E18]/15"
             >
-              <h3 className="font-manrope font-extrabold text-2xl text-[#fff500] mb-3 uppercase">
+              <h3 className="font-manrope font-black text-2xl text-[#380E18] mb-2 uppercase">
                 Дякуємо! Заявку створено
               </h3>
-              <p className="text-white/70 text-xs mb-6">Формуємо безпечне посилання для оплати...</p>
+              <p className="text-[#2D0C14]/70 text-xs mb-6">Формуємо безпечне посилання для оплати...</p>
 
-              <div className="w-full bg-white/10 h-2 overflow-hidden my-4 border border-white/10">
+              <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden my-4">
                 <motion.div
-                  className="h-full bg-[#fff500]"
+                  className="h-full bg-[#380E18] rounded-full"
                   initial={{ width: "0%" }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: progress === 100 ? 0.35 : 0.1, ease: "easeOut" }}
                 />
               </div>
 
-              <p className="font-manrope text-xs font-semibold text-white/80 min-h-[1.5rem] mt-2">
+              <p className="font-manrope text-xs font-semibold text-[#2D0C14]/85 min-h-[1.5rem] mt-2">
                 {progressMessage}
               </p>
             </motion.div>

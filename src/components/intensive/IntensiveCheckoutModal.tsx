@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
-import { X, Lock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { X, Clock, Lock, Check, Gift } from "lucide-react";
+import { use10MinTimer } from "./use10MinTimer";
 
 interface IntensiveCheckoutModalProps {
   isOpen: boolean;
@@ -19,6 +21,8 @@ export function IntensiveCheckoutModal({
   tariffName = "Інтенсив: 5 лайків",
   amount = 9
 }: IntensiveCheckoutModalProps) {
+  const { formattedTime } = use10MinTimer();
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -35,7 +39,6 @@ export function IntensiveCheckoutModal({
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [progressMessage, setProgressMessage] = useState("⏳ Створюємо безпечне з'єднання...");
 
   useEffect(() => {
     fetch("/api/country")
@@ -47,7 +50,6 @@ export function IntensiveCheckoutModal({
       })
       .catch(() => {});
 
-    // Restore from localStorage
     const savedName = localStorage.getItem("lead_name");
     const savedPhone = localStorage.getItem("lead_phone");
     const savedSocial = localStorage.getItem("lead_social");
@@ -66,54 +68,6 @@ export function IntensiveCheckoutModal({
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (progress === 0) {
-      setProgressMessage("⏳ Створюємо безпечне з'єднання...");
-    } else if (progress < 40) {
-      setProgressMessage("🔒 Формуємо захищений платіж...");
-    } else if (progress < 85) {
-      setProgressMessage("⏱️ Ще кілька секунд, не закривайте вікно...");
-    } else {
-      setProgressMessage("🚀 Перенаправляємо на сторінку оплати...");
-    }
-  }, [progress]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      trackFBEvent("InitiateCheckout", {
-        content_name: tariffName,
-        value: amount,
-        currency: "EUR"
-      });
-
-      try {
-        const visitorId = localStorage.getItem("visitor_id");
-        if (visitorId) {
-          fetch("/api/analytics/log", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              visitorId,
-              status: "КликФормы",
-              path: window.location.pathname,
-              name: localStorage.getItem("lead_name"),
-              phone: localStorage.getItem("lead_phone"),
-              social: localStorage.getItem("lead_social"),
-              tariff: tariffName,
-              amount: amount
-            })
-          }).catch(() => {});
-        }
-      } catch (_) {}
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen, tariffName, amount]);
 
   const validate = () => {
     const errs: typeof errors = {};
@@ -152,7 +106,7 @@ export function IntensiveCheckoutModal({
 
     const intervalId = setInterval(() => {
       setProgress((prev) => {
-        if (prev < 50) return prev + 7;
+        if (prev < 50) return prev + 8;
         if (prev < 80) return prev + 3;
         if (prev < 90) return prev + 0.8;
         return prev;
@@ -164,7 +118,6 @@ export function IntensiveCheckoutModal({
       ? formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`
       : "";
 
-    // UTM / Source tracking
     const searchParams = new URLSearchParams(window.location.search);
     let utmsFromStorage: Record<string, string> = {};
     try {
@@ -187,8 +140,8 @@ export function IntensiveCheckoutModal({
       customerPhone: sanitizedPhone,
       telegram: resolvedTelegram,
       instagram: formData.instagram,
-      amount: amount,
-      tariffName: tariffName,
+      amount,
+      tariffName,
       currency: "EUR",
       targetSheet: "Інтенсив 5 лайків",
       successUrl: "/price/thanks",
@@ -208,12 +161,11 @@ export function IntensiveCheckoutModal({
 
       if (paymentData.error) {
         clearInterval(intervalId);
-        alert("Помилка при створенні платежу. Спробуйте пізніше або зверніться до підтримки.");
+        alert("Помилка при створенні платежу. Спробуйте пізніше.");
         setIsSubmitting(false);
         return;
       }
 
-      // Persist user identification
       localStorage.setItem("lead_name", formData.name);
       localStorage.setItem("lead_phone", sanitizedPhone);
       localStorage.setItem("lead_social", resolvedTelegram);
@@ -236,7 +188,7 @@ export function IntensiveCheckoutModal({
         localStorage.setItem("lead_uuid", paymentData.uuid);
       }
 
-      trackFBEvent("Lead", {
+      trackFBEvent("InitiateCheckout", {
         content_name: tariffName,
         value: amount,
         currency: "EUR",
@@ -249,7 +201,6 @@ export function IntensiveCheckoutModal({
       clearInterval(intervalId);
       setProgress(100);
 
-      // Build and submit WayForPay form
       const form = document.createElement("form");
       form.method = "POST";
       form.action = "https://secure.wayforpay.com/pay";
@@ -280,7 +231,7 @@ export function IntensiveCheckoutModal({
       }, 350);
     } catch (err) {
       clearInterval(intervalId);
-      console.error("Payment submission error:", err);
+      console.error("Payment error:", err);
       alert("Виникла помилка. Перевірте з'єднання з інтернетом.");
       setIsSubmitting(false);
     }
@@ -289,241 +240,202 @@ export function IntensiveCheckoutModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[10001] overflow-y-auto">
-          {/* Overlay */}
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/85 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
           />
 
-          <div className="min-h-full flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="pointer-events-auto relative w-full max-w-lg bg-[#18181a] border-2 border-white/15 p-6 sm:p-10 shadow-[10px_10px_0px_rgba(0,0,0,0.8)] text-white"
-              onClick={(e) => e.stopPropagation()}
+          {/* Modal Content */}
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ type: "spring", duration: 0.4 }}
+            className="relative w-full max-w-lg bg-[#FAF6EE] text-[#2B0813] rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#2B0813]/10 overflow-hidden z-10 max-h-[92vh] overflow-y-auto"
+          >
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#2B0813]/70 hover:text-[#2B0813] transition-colors"
             >
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/50 hover:text-white p-2 transition-colors cursor-pointer"
-                aria-label="Закрити"
-              >
-                <X size={24} />
-              </button>
+              <X size={18} />
+            </button>
 
-              {/* Header */}
-              <div className="mb-6">
-                <div className="inline-block px-3 py-1 bg-[#fff500]/10 border border-[#fff500] text-[#fff500] font-manrope text-[11px] font-extrabold uppercase tracking-widest mb-3">
-                  Інтенсив · 4 уроки
-                </div>
-                <h3 className="font-inter text-2xl sm:text-3xl font-black uppercase text-white tracking-tight leading-tight">
-                  Отримати доступ до інтенсиву
-                </h3>
-                <p className="font-manrope text-xs sm:text-sm text-white/70 mt-1">
-                  Заповніть форму нижче для переходу до захищеної оплати
-                </p>
-              </div>
+            {/* Header */}
+            <div className="text-center mb-6 pt-2">
+              <span className="rounded-full bg-[#451220]/10 text-[#451220] px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] font-manrope">
+                Бронювання участі
+              </span>
 
-              {/* Price Banner */}
-              <div className="flex items-center justify-between p-4 bg-black/60 border border-white/10 mb-6">
-                <div>
-                  <p className="font-manrope text-[11px] text-white/50 uppercase tracking-widest font-bold">
-                    Тариф: <span className="text-white">Повний доступ + 4 бонуси</span>
-                  </p>
-                  <p className="font-manrope text-xs text-white/80 mt-0.5">
-                    Бонуси на 125€ включено безкоштовно
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="font-manrope text-xs text-white/40 line-through">49€</div>
-                  <div className="font-inter text-2xl font-black text-[#fff500] leading-none">
-                    9€
-                  </div>
+              <h3 className="font-playfair text-2xl sm:text-3xl font-bold mt-2 leading-snug">
+                Інтенсив: 5 лайків
+              </h3>
+
+              {/* Price Row */}
+              <div className="flex items-center justify-center gap-3 mt-3 bg-white/70 py-2 px-4 rounded-full border border-[#2B0813]/10 font-manrope max-w-xs mx-auto">
+                <span className="line-through opacity-50 text-xs">49€</span>
+                <span className="font-bold text-xl text-[#451220]">{amount}€</span>
+                <span className="opacity-30">·</span>
+                <div className="flex items-center gap-1 text-xs font-semibold text-[#451220]">
+                  <Clock size={12} />
+                  <span>{formattedTime}</span>
                 </div>
               </div>
+            </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name input */}
-                <div>
-                  <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
-                    Ваше ім{`'`}я та прізвище *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
-                      setErrors((prev) => ({ ...prev, name: undefined }));
-                      localStorage.setItem("lead_name", e.target.value);
-                    }}
-                    disabled={isSubmitting}
-                    placeholder="Олена Ковальчук"
-                    className={`w-full bg-black/40 border ${
-                      errors.name ? "border-red-500" : "border-white/15"
-                    } px-4 py-3 text-white font-manrope text-sm focus:outline-none focus:border-[#fff500] transition-colors`}
-                  />
-                  {errors.name && (
-                    <p className="font-manrope text-[11px] text-red-400 mt-1">{errors.name}</p>
-                  )}
-                </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block font-manrope text-xs font-bold uppercase tracking-wider text-[#2B0813]/70 mb-1">
+                  Ім{`'`}я та прізвище *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    setErrors((prev) => ({ ...prev, name: undefined }));
+                    localStorage.setItem("lead_name", e.target.value);
+                  }}
+                  disabled={isSubmitting}
+                  placeholder="Олена Ковальчук"
+                  className={`w-full bg-white border ${
+                    errors.name ? "border-red-500" : "border-[#2B0813]/15"
+                  } rounded-xl px-4 py-3 text-[#2B0813] font-manrope text-sm focus:outline-none focus:border-[#451220] transition-colors`}
+                />
+                {errors.name && (
+                  <p className="font-manrope text-[11px] text-red-500 mt-1">{errors.name}</p>
+                )}
+              </div>
 
-                {/* Contact Method Switch */}
-                <div>
-                  <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
-                    Оберіть спосіб зв{`'`}язку для доступу *
-                  </label>
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <button
-                      type="button"
-                      onClick={() => setContactMethod("phone")}
-                      className={`py-2.5 px-3 font-manrope text-xs font-bold uppercase tracking-wider transition-all border ${
-                        contactMethod === "phone"
-                          ? "bg-[#fff500] text-black border-[#fff500] font-black"
-                          : "bg-black/30 text-white/70 border-white/10 hover:border-white/30"
-                      }`}
-                    >
-                      📞 Телефон / WhatsApp
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setContactMethod("telegram")}
-                      className={`py-2.5 px-3 font-manrope text-xs font-bold uppercase tracking-wider transition-all border ${
-                        contactMethod === "telegram"
-                          ? "bg-[#fff500] text-black border-[#fff500] font-black"
-                          : "bg-black/30 text-white/70 border-white/10 hover:border-white/30"
-                      }`}
-                    >
-                      ✈️ Telegram
-                    </button>
-                  </div>
-
-                  {contactMethod === "phone" ? (
-                    <div>
-                      <PhoneInput
-                        international
-                        defaultCountry={countryCode as any}
-                        value={formData.phone}
-                        onChange={(val) => {
-                          setFormData((prev) => ({ ...prev, phone: val || "" }));
-                          setErrors((prev) => ({ ...prev, phone: undefined }));
-                          localStorage.setItem("lead_phone", val || "");
-                        }}
-                        disabled={isSubmitting}
-                        className="w-full flex items-center gap-2 react-phone-input-dark px-4 py-2.5 bg-black/40 border border-white/15 text-white font-manrope text-sm focus-within:border-[#fff500] transition-all"
-                        numberInputProps={{
-                          id: "phone",
-                          autoComplete: "tel",
-                          inputMode: "tel",
-                          className:
-                            "w-full bg-transparent border-0 p-0 text-white font-manrope text-sm focus:ring-0 focus:outline-none placeholder:text-white/20",
-                          placeholder: "+380 ..."
-                        }}
-                      />
-                      {errors.phone && (
-                        <p className="font-manrope text-[11px] text-red-400 mt-1">{errors.phone}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      <input
-                        type="text"
-                        value={formData.telegram}
-                        onChange={(e) => {
-                          setFormData({ ...formData, telegram: e.target.value });
-                          setErrors((prev) => ({ ...prev, telegram: undefined }));
-                          localStorage.setItem("lead_social", e.target.value);
-                        }}
-                        disabled={isSubmitting}
-                        placeholder="@username"
-                        className={`w-full bg-black/40 border ${
-                          errors.telegram ? "border-red-500" : "border-white/15"
-                        } px-4 py-3 text-white font-manrope text-sm focus:outline-none focus:border-[#fff500] transition-colors`}
-                      />
-                      {errors.telegram && (
-                        <p className="font-manrope text-[11px] text-red-400 mt-1">
-                          {errors.telegram}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Instagram Handle */}
-                <div>
-                  <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
-                    Ваш Instagram (для зв{`'`}язку та розбору)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.instagram}
-                    onChange={(e) => {
-                      setFormData({ ...formData, instagram: e.target.value });
-                      localStorage.setItem("lead_instagram", e.target.value);
-                    }}
-                    disabled={isSubmitting}
-                    placeholder="@your_instagram"
-                    className="w-full bg-black/40 border border-white/15 px-4 py-3 text-white font-manrope text-sm focus:outline-none focus:border-[#fff500] transition-colors"
-                  />
-                </div>
-
-                {/* Submit button */}
-                <div className="pt-2">
+              {/* Contact Method Switch */}
+              <div>
+                <label className="block font-manrope text-xs font-bold uppercase tracking-wider text-[#2B0813]/70 mb-1">
+                  Спосіб зв{`'`}язку для отримання доступу *
+                </label>
+                <div className="grid grid-cols-2 gap-2 mb-2">
                   <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 bg-[#fff500] text-black font-inter font-black text-sm uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,0.5)] hover:bg-white transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    type="button"
+                    onClick={() => setContactMethod("phone")}
+                    className={`py-2 px-3 rounded-full font-manrope text-xs font-bold transition-all border ${
+                      contactMethod === "phone"
+                        ? "bg-[#451220] text-[#FAF6EE] border-[#451220]"
+                        : "bg-white text-[#2B0813]/70 border-[#2B0813]/15 hover:border-[#451220]"
+                    }`}
                   >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                        Перенаправляємо...
-                      </span>
-                    ) : (
-                      <span>Забрати доступ за 9€ замість 49€ →</span>
-                    )}
+                    📞 Телефон
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setContactMethod("telegram")}
+                    className={`py-2 px-3 rounded-full font-manrope text-xs font-bold transition-all border ${
+                      contactMethod === "telegram"
+                        ? "bg-[#451220] text-[#FAF6EE] border-[#451220]"
+                        : "bg-white text-[#2B0813]/70 border-[#2B0813]/15 hover:border-[#451220]"
+                    }`}
+                  >
+                    ✈️ Telegram
                   </button>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 text-white/40 font-manrope text-[10px] uppercase tracking-wider text-center">
-                  <Lock size={12} />
-                  <span>Безпечна оплата через WayForPay · Дані зашифровано</span>
-                </div>
-              </form>
-
-              {/* Progress Overlay during redirect */}
-              <AnimatePresence>
-                {isSubmitting && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-[#18181a]/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-8 text-center"
-                  >
-                    <div className="w-12 h-12 rounded-full border-3 border-[#fff500]/20 border-t-[#fff500] animate-spin mb-4" />
-                    <h4 className="font-inter text-lg font-bold text-white mb-2">
-                      Замовлення сформовано
-                    </h4>
-                    <p className="font-manrope text-sm text-white/70 mb-4">{progressMessage}</p>
-                    <div className="w-full max-w-xs bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <motion.div
-                        className="bg-[#fff500] h-full"
-                        initial={{ width: "0%" }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                  </motion.div>
+                {contactMethod === "phone" ? (
+                  <div>
+                    <PhoneInput
+                      international
+                      defaultCountry={countryCode as any}
+                      value={formData.phone}
+                      onChange={(val) => {
+                        setFormData((prev) => ({ ...prev, phone: val || "" }));
+                        setErrors((prev) => ({ ...prev, phone: undefined }));
+                        localStorage.setItem("lead_phone", val || "");
+                      }}
+                      disabled={isSubmitting}
+                      className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 bg-white border border-[#2B0813]/15 text-[#2B0813] font-manrope text-sm focus-within:border-[#451220] transition-all"
+                      numberInputProps={{
+                        id: "modal-phone",
+                        autoComplete: "tel",
+                        inputMode: "tel",
+                        className:
+                          "w-full bg-transparent border-0 p-0 text-[#2B0813] font-manrope text-sm focus:ring-0 focus:outline-none placeholder:text-[#2B0813]/30",
+                        placeholder: "+380 ..."
+                      }}
+                    />
+                    {errors.phone && (
+                      <p className="font-manrope text-[11px] text-red-500 mt-1">{errors.phone}</p>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      value={formData.telegram}
+                      onChange={(e) => {
+                        setFormData({ ...formData, telegram: e.target.value });
+                        setErrors((prev) => ({ ...prev, telegram: undefined }));
+                        localStorage.setItem("lead_social", e.target.value);
+                      }}
+                      disabled={isSubmitting}
+                      placeholder="@username"
+                      className={`w-full bg-white border ${
+                        errors.telegram ? "border-red-500" : "border-[#2B0813]/15"
+                      } rounded-xl px-4 py-3 text-[#2B0813] font-manrope text-sm focus:outline-none focus:border-[#451220] transition-colors`}
+                    />
+                    {errors.telegram && (
+                      <p className="font-manrope text-[11px] text-red-500 mt-1">{errors.telegram}</p>
+                    )}
+                  </div>
                 )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
+              </div>
+
+              {/* Instagram */}
+              <div>
+                <label className="block font-manrope text-xs font-bold uppercase tracking-wider text-[#2B0813]/70 mb-1">
+                  Instagram нікнейм (для розбору та комюніті)
+                </label>
+                <input
+                  type="text"
+                  value={formData.instagram}
+                  onChange={(e) => {
+                    setFormData({ ...formData, instagram: e.target.value });
+                    localStorage.setItem("lead_instagram", e.target.value);
+                  }}
+                  disabled={isSubmitting}
+                  placeholder="@your_nickname"
+                  className="w-full bg-white border border-[#2B0813]/15 rounded-xl px-4 py-3 text-[#2B0813] font-manrope text-sm focus:outline-none focus:border-[#451220] transition-colors"
+                />
+              </div>
+
+              {/* Submit */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 rounded-full bg-[#451220] text-[#FAF6EE] font-manrope font-bold text-sm sm:text-base tracking-wide shadow-xl hover:bg-[#2B0813] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-[#FAF6EE]/30 border-t-[#FAF6EE] rounded-full animate-spin" />
+                      Перенаправляємо на оплату...
+                    </span>
+                  ) : (
+                    <span>Перейти до оплати {amount}€ →</span>
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 text-[#2B0813]/50 font-manrope text-[11px] text-center pt-1">
+                <Lock size={12} />
+                <span>Захищена оплата через WayForPay · 100% Гарантія повернення</span>
+              </div>
+            </form>
+          </motion.div>
         </div>
       )}
     </AnimatePresence>

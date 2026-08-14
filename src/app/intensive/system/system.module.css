@@ -1,25 +1,59 @@
 /* ==========================================================================
-   INTENSIVE SYSTEM LANDING PAGE STYLES (Dark Editorial Brutalist Aesthetic)
+   INTENSIVE SYSTEM LANDING PAGE — LUXURY WINE & CREAM EDITORIAL AESTHETIC
+   Inspired by anastasiiabystrova.com / yevaesty.com
    ========================================================================== */
 
 .pageWrapper {
   min-height: 100vh;
-  background-color: #09090b;
-  color: #ffffff;
+  background-color: #F8F4EB;
+  color: #2D0C14;
   font-family: var(--font-manrope), sans-serif;
   overflow-x: hidden;
   position: relative;
 }
 
-/* SECTION UTILITIES */
+/* SECTION CONTAINERS */
 .section {
   position: relative;
-  padding: 5.5rem 1.5rem;
-  max-width: 1180px;
+  padding: 5rem 1.5rem;
+  max-width: 1120px;
   margin: 0 auto;
   z-index: 10;
 }
 
+.sectionWide {
+  position: relative;
+  padding: 5rem 1.5rem;
+  width: 100%;
+  z-index: 10;
+}
+
+.bgCream {
+  background-color: #F8F4EB;
+  color: #2D0C14;
+}
+
+.bgIvory {
+  background-color: #FFFFFF;
+  color: #2D0C14;
+}
+
+.bgWine {
+  background-color: #380E18;
+  color: #FDFBF7;
+}
+
+.bgWineDeep {
+  background-color: #23080F;
+  color: #FDFBF7;
+}
+
+.bgWarmSand {
+  background-color: #EFE8DC;
+  color: #2D0C14;
+}
+
+/* HEADINGS & TYPOGRAPHY */
 .sectionHeader {
   text-align: center;
   margin-bottom: 3.5rem;
@@ -28,61 +62,113 @@
   margin-right: auto;
 }
 
-.sectionTag {
-  display: inline-block;
+.pillBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #380E18;
+  color: #FDFBF7;
   font-family: var(--font-manrope), sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  color: #fff500;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
-  margin-bottom: 0.75rem;
-  background: rgba(255, 245, 0, 0.08);
-  border: 1px solid rgba(255, 245, 0, 0.3);
-  padding: 0.35rem 0.85rem;
+  letter-spacing: 0.18em;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 15px rgba(56, 14, 24, 0.15);
+}
+
+.pillBadgeLight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(253, 251, 247, 0.15);
+  border: 1px solid rgba(253, 251, 247, 0.3);
+  color: #FDFBF7;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
 }
 
 .sectionTitle {
   font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-size: clamp(2rem, 4.2vw, 3.2rem);
   font-weight: 900;
-  line-height: 1.15;
+  line-height: 1.12;
   text-transform: uppercase;
   letter-spacing: -0.02em;
-  color: #ffffff;
   margin: 0 0 1rem 0;
+}
+
+.scriptItalic {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
 }
 
 .sectionSubtitle {
   font-size: clamp(0.95rem, 2vw, 1.15rem);
-  color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
+  opacity: 0.85;
   margin: 0 auto;
 }
 
-.yellowDivider {
-  width: 50px;
-  height: 2px;
-  background-color: #fff500;
-  margin: 1.25rem auto 0;
-}
-
 /* BUTTONS */
-.primaryButton {
+.pillButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  background-color: #fff500;
-  color: #000000;
+  gap: 0.6rem;
+  background-color: #380E18;
+  color: #FDFBF7;
   font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(0.75rem, 2vw, 0.85rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  padding: 1.1rem 2rem;
-  border: 1.5px solid #fff500;
-  box-shadow: 0 10px 25px rgba(255, 245, 0, 0.25);
+  font-size: clamp(0.8rem, 2vw, 0.92rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 1.15rem 2.25rem;
+  border-radius: 9999px;
+  border: none;
+  box-shadow: 0 10px 25px rgba(56, 14, 24, 0.25);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+  width: 100%;
+  max-width: 440px;
+}
+
+.pillButton:hover {
+  background-color: #23080F;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(35, 8, 15, 0.35);
+  color: #FDFBF7;
+}
+
+.pillButton:active {
+  transform: translateY(0);
+}
+
+.pillButtonLight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background-color: #FDFBF7;
+  color: #2D0C14;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(0.8rem, 2vw, 0.92rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 1.15rem 2.25rem;
+  border-radius: 9999px;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 0.25s ease;
   text-decoration: none;
@@ -90,136 +176,110 @@
   max-width: 440px;
 }
 
-.primaryButton:hover {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
+.pillButtonLight:hover {
+  background-color: #EFE8DC;
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(255, 255, 255, 0.3);
-}
-
-.primaryButton:active {
-  transform: translateY(0);
-}
-
-.buttonSubtext {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 0.75rem;
-  text-align: center;
-  font-weight: 500;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
 }
 
 /* ==========================================================================
-   1. HERO SECTION
+   1. HERO SECTION (Split Editorial Layout)
    ========================================================================== */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
-  align-items: center;
-  padding: 6rem 1.5rem 4rem;
-  background: radial-gradient(circle at 75% 30%, rgba(255, 245, 0, 0.08) 0%, transparent 60%),
-              radial-gradient(circle at 20% 80%, rgba(30, 30, 35, 0.8) 0%, #09090b 80%);
+  align-items: stretch;
+  background-color: #F8F4EB;
   overflow: hidden;
 }
 
-.heroBackdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.heroImageBg {
-  object-fit: cover;
-  object-position: center top;
-  opacity: 0.28;
-  filter: contrast(1.15) brightness(0.85);
-}
-
-.heroOverlayGradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(9, 9, 11, 0.4) 0%, rgba(9, 9, 11, 0.85) 60%, #09090b 100%),
-              linear-gradient(90deg, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.6) 50%, rgba(9, 9, 11, 0.95) 100%);
-}
-
-.heroContainer {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+.heroGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
-  align-items: center;
+  width: 100%;
+  min-height: 100svh;
 }
 
 @media (min-width: 992px) {
-  .heroContainer {
-    grid-template-columns: 1.2fr 0.9fr;
-    gap: 3.5rem;
+  .heroGrid {
+    grid-template-columns: 1.1fr 0.9fr;
   }
 }
 
-.heroTextContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+.heroVisualCol {
+  position: relative;
+  min-height: 55vh;
+  overflow: hidden;
+  background-color: #EFE8DC;
 }
 
-.heroBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #fff500;
-  color: #000000;
-  font-family: var(--font-manrope), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  padding: 0.45rem 1rem;
-  border: 1.5px solid #000000;
-  margin-bottom: 1.5rem;
+@media (min-width: 992px) {
+  .heroVisualCol {
+    min-height: 100%;
+  }
+}
+
+.heroImg {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.heroMobileGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(56, 14, 24, 0.1) 0%, rgba(56, 14, 24, 0.8) 75%, #23080F 100%);
+}
+
+@media (min-width: 992px) {
+  .heroMobileGradient {
+    display: none;
+  }
+}
+
+.heroContentCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 2rem 5rem;
+  max-width: 640px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+@media (min-width: 992px) {
+  .heroContentCol {
+    padding: 5rem 3.5rem 5rem 2rem;
+    margin: 0;
+    max-width: none;
+  }
 }
 
 .heroTitle {
   font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
+  font-size: clamp(2rem, 4vw, 3.4rem);
   font-weight: 900;
-  line-height: 1.15;
+  line-height: 1.08;
   letter-spacing: -0.02em;
-  color: #ffffff;
-  margin: 0 0 1.5rem 0;
+  color: #2D0C14;
+  margin: 0 0 1.25rem 0;
   text-transform: uppercase;
 }
 
-.heroTitleHighlight {
-  color: #fff500;
-}
-
 .heroSubtitle {
-  font-size: clamp(0.95rem, 1.8vw, 1.12rem);
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  line-height: 1.6;
+  color: rgba(45, 12, 20, 0.85);
   margin-bottom: 2rem;
-  border-left: 3px solid #fff500;
-  padding-left: 1.25rem;
 }
 
 .heroPriceCard {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  background: rgba(26, 26, 28, 0.8);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(56, 14, 24, 0.12);
+  box-shadow: 0 10px 30px rgba(56, 14, 24, 0.06);
+  margin-bottom: 1.75rem;
   max-width: 440px;
 }
 
@@ -227,77 +287,51 @@
   display: flex;
   align-items: baseline;
   gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .heroOldPrice {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.15rem;
+  color: rgba(45, 12, 20, 0.45);
   text-decoration: line-through;
   font-weight: 600;
 }
 
 .heroNewPrice {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  color: #fff500;
+  color: #380E18;
   line-height: 1;
-}
-
-.heroDiscountBadge {
-  background: rgba(255, 245, 0, 0.15);
-  color: #fff500;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid rgba(255, 245, 0, 0.4);
 }
 
 .heroTimerRow {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.heroTimerValue {
-  color: #fff500;
-  font-size: 0.95rem;
-  font-weight: 900;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #380E18;
 }
 
 /* ==========================================================================
-   1.1 BONUSES SECTION (with 10-min timer)
+   1.1 BONUSES SECTION (with 10-min countdown timer)
    ========================================================================== */
-.bonusTimerBanner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  background: rgba(255, 245, 0, 0.08);
-  border: 1.5px solid #fff500;
-  padding: 0.85rem 1.5rem;
-  margin: 0 auto 3rem;
-  width: fit-content;
-  max-width: 100%;
-}
-
-.bonusTimerText {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.bonusTimerBig {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  color: #380E18;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 1rem 0 2rem;
+  text-align: center;
 }
 
 .bonusesGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.75rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 @media (min-width: 768px) {
@@ -306,142 +340,166 @@
   }
 }
 
-.bonusCard {
-  background: rgba(26, 26, 28, 0.7);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  padding: 2rem 1.75rem;
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4);
+.bonusCardWine {
+  background-color: #380E18;
+  color: #FDFBF7;
+  border-radius: 1.5rem;
+  padding: 2.25rem 2rem;
   position: relative;
+  box-shadow: 0 15px 35px rgba(56, 14, 24, 0.15);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.bonusBadge {
-  position: absolute;
-  top: -0.9rem;
-  left: 1.5rem;
-  background: #fff500;
-  color: #000000;
-  font-size: 0.65rem;
-  font-weight: 900;
+.bonusCardWineDeep {
+  background-color: #23080F;
+  color: #FDFBF7;
+  border-radius: 1.5rem;
+  padding: 2.25rem 2rem;
+  position: relative;
+  box-shadow: 0 15px 35px rgba(35, 8, 15, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bonusCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.bonusTag {
+  font-size: 0.7rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid #000000;
+  letter-spacing: 0.18em;
+  opacity: 0.8;
+}
+
+.bonusIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background-color: #F8F4EB;
+  color: #380E18;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .bonusTitle {
   font-family: var(--font-manrope), sans-serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin: 0.5rem 0 0.75rem 0;
-  text-transform: uppercase;
-  line-height: 1.3;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0 0 0.85rem 0;
+  color: #FDFBF7;
 }
 
-.bonusDescription {
-  font-size: 0.9rem;
+.bonusDesc {
+  font-size: 0.95rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.75);
+  opacity: 0.9;
   margin-bottom: 1.5rem;
   flex-grow: 1;
 }
 
-.bonusPriceFooter {
+.bonusPriceRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(253, 251, 247, 0.15);
   padding-top: 1rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
-.bonusOldPrice {
-  color: rgba(255, 255, 255, 0.4);
+.bonusOldPriceVal {
+  opacity: 0.6;
   text-decoration: line-through;
 }
 
-.bonusFreePrice {
-  color: #fff500;
+.bonusFreePriceVal {
   font-weight: 900;
-  text-transform: uppercase;
+  font-size: 1.1rem;
+  color: #FFFFFF;
 }
 
 .bonusesSummaryCard {
-  background: rgba(255, 245, 0, 0.06);
-  border: 2px solid #fff500;
-  padding: 2rem;
+  background-color: #FFFFFF;
+  border-radius: 1.5rem;
+  padding: 2.5rem 2rem;
   text-align: center;
-  max-width: 600px;
+  max-width: 620px;
   margin: 0 auto;
-  box-shadow: 0 10px 30px rgba(255, 245, 0, 0.1);
-}
-
-.bonusesSummaryTitle {
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: #ffffff;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
-
-.bonusesSummaryPrices {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  margin: 1rem 0 1.5rem;
+  border: 1px solid rgba(56, 14, 24, 0.15);
+  box-shadow: 0 20px 40px rgba(56, 14, 24, 0.08);
 }
 
 /* ==========================================================================
    3. PAIN SECTION («Впізнаєш себе?»)
    ========================================================================== */
-.painListGrid {
+.painCardsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 1.5rem;
   max-width: 900px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 3.5rem;
+}
+
+@media (min-width: 768px) {
+  .painCardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .painCard {
-  background: rgba(26, 26, 28, 0.6);
-  border-left: 4px solid #fff500;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 1.5rem 1.75rem;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  background-color: #380E18;
+  color: #FDFBF7;
+  border-radius: 1.25rem;
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(56, 14, 24, 0.12);
 }
 
-.painManifestoBox {
-  background: rgba(18, 18, 20, 0.9);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  padding: 2.5rem 2rem;
-  text-align: center;
-  max-width: 820px;
-  margin: 0 auto;
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
-}
-
-.painManifestoQuestion {
+.scriptNum {
   font-family: var(--font-playfair), serif;
   font-style: italic;
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
-  color: #fff500;
-  margin-bottom: 1.25rem;
-  line-height: 1.4;
+  font-size: 2.5rem;
+  color: rgba(253, 251, 247, 0.7);
+  line-height: 1;
+  margin-bottom: 0.75rem;
 }
 
-.painManifestoText {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
-  margin: 0;
+.painCardText {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.manifestoBox {
+  background-color: #FFFFFF;
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 840px;
+  margin: 0 auto;
+  border: 1px solid rgba(56, 14, 24, 0.1);
+  box-shadow: 0 15px 35px rgba(56, 14, 24, 0.05);
+}
+
+.manifestoQuote {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: #380E18;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
 }
 
 /* ==========================================================================
@@ -455,437 +513,329 @@
 }
 
 .caseCard {
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
   padding: 1.25rem;
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(56, 14, 24, 0.1);
+  box-shadow: 0 10px 30px rgba(56, 14, 24, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.caseCardHeader {
+.caseHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.6rem;
+  align-items: baseline;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(56, 14, 24, 0.08);
 }
 
-.caseClientName {
-  font-family: var(--font-manrope), sans-serif;
+.caseName {
   font-size: 1.15rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin: 0;
+  font-weight: 800;
+  color: #2D0C14;
 }
 
-.caseClientNiche {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
+.caseNiche {
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  color: rgba(45, 12, 20, 0.6);
   font-weight: 700;
-  margin-top: 0.15rem;
 }
 
-.caseComparisonRow {
+.caseCompareRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
 
-.caseImageContainer {
+.caseImgWrap {
   position: relative;
   aspect-ratio: 3/4;
+  border-radius: 0.75rem;
   overflow: hidden;
-  background: #111113;
+  background-color: #EFE8DC;
   cursor: pointer;
 }
 
-.caseImage {
+.caseImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.caseImageContainer:hover .caseImage {
+.caseImgWrap:hover .caseImg {
   transform: scale(1.04);
 }
 
-.caseTagBefore {
+.caseLabelBefore {
   position: absolute;
   top: 0.4rem;
   left: 0.4rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: #000000;
+  background: rgba(45, 12, 20, 0.85);
+  color: #FFFFFF;
   font-size: 0.55rem;
   font-weight: 800;
   text-transform: uppercase;
-  padding: 0.15rem 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
 }
 
-.caseTagAfter {
+.caseLabelAfter {
   position: absolute;
   top: 0.4rem;
   left: 0.4rem;
-  background: #fff500;
-  color: #000000;
+  background: #380E18;
+  color: #FFFFFF;
   font-size: 0.55rem;
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
-  padding: 0.15rem 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
 }
 
-.reviewsGrid {
+.reviewsWrap {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1.25rem;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
 }
 
 .reviewItem {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 240px;
   aspect-ratio: 1;
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  border: 1px solid rgba(56, 14, 24, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   overflow: hidden;
+  box-shadow: 0 6px 20px rgba(56, 14, 24, 0.04);
   transition: all 0.25s ease;
 }
 
 .reviewItem:hover {
-  transform: scale(1.02);
-  border-color: #fff500;
-}
-
-.reviewImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 0.5rem;
+  transform: scale(1.03);
+  box-shadow: 0 12px 30px rgba(56, 14, 24, 0.12);
 }
 
 /* ==========================================================================
    5. ABOUT EXPERT SECTION
    ========================================================================== */
-.expertLayout {
+.expertGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem;
   align-items: center;
-  max-width: 1000px;
+  max-width: 1020px;
   margin: 0 auto;
 }
 
 @media (min-width: 860px) {
-  .expertLayout {
+  .expertGrid {
     grid-template-columns: 0.85fr 1.15fr;
   }
 }
 
-.expertImageWrapper {
+.expertImgContainer {
   position: relative;
   aspect-ratio: 4/5;
+  border-radius: 2rem;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(56, 14, 24, 0.15);
 }
 
-.expertImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.expertInfo {
+.expertFactsList {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
+  margin: 1.5rem 0;
 }
 
-.expertTitle {
-  font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #ffffff;
-  margin: 0;
-}
-
-.expertPoint {
+.expertFactItem {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid rgba(56, 14, 24, 0.08);
   font-size: 0.95rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.55;
+  color: #2D0C14;
 }
 
-.expertCheckIcon {
-  color: #fff500;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-}
-
-.expertHighlightBox {
-  background: rgba(255, 245, 0, 0.08);
-  border-left: 3px solid #fff500;
-  padding: 1.25rem 1.5rem;
-  font-style: italic;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #ffffff;
-}
-
-.instagramLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  margin-top: 0.5rem;
-}
-
-.instagramLink:hover {
-  color: #fff500;
+.expertQuoteBox {
+  background-color: #380E18;
+  color: #FDFBF7;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  margin-top: 1.5rem;
 }
 
 /* ==========================================================================
    6. INTENSIVE PROGRAM SECTION (4 Lessons)
    ========================================================================== */
-.programGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  max-width: 960px;
-  margin: 0 auto 3rem;
+.programList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto 3.5rem;
 }
 
 .lessonCard {
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background-color: #23080F;
+  color: #FDFBF7;
+  border-radius: 1.5rem;
   padding: 2.25rem 2rem;
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.3s ease;
+  box-shadow: 0 15px 35px rgba(35, 8, 15, 0.18);
+  border: 1px solid rgba(253, 251, 247, 0.1);
 }
 
-.lessonCard:hover {
-  border-color: rgba(255, 245, 0, 0.4);
-}
-
-.lessonHeaderRow {
+.lessonHeader {
   display: flex;
   align-items: baseline;
-  gap: 1rem;
+  justify-content: space-between;
   margin-bottom: 1rem;
 }
 
-.lessonNumber {
-  font-family: var(--font-playfair), serif;
-  font-style: italic;
-  font-size: 2.2rem;
-  color: #fff500;
-  line-height: 1;
+.lessonTag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.8;
 }
 
 .lessonTitle {
   font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
   font-weight: 900;
   text-transform: uppercase;
-  color: #ffffff;
-  margin: 0;
-  line-height: 1.3;
+  margin: 0.25rem 0 1rem 0;
+  color: #FDFBF7;
+  line-height: 1.25;
 }
 
-.lessonDescription {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-}
-
-.lessonPointsList {
+.lessonPoints {
   list-style-type: none;
   padding: 0;
   margin: 0 0 1.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
-.lessonPointItem {
+.lessonPoint {
   display: flex;
   align-items: flex-start;
   gap: 0.6rem;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.9);
+  opacity: 0.92;
 }
 
-.lessonPointBullet {
-  color: #fff500;
-  font-weight: 900;
-}
-
-.lessonOutcomeBox {
-  background: rgba(255, 245, 0, 0.08);
-  border: 1px solid rgba(255, 245, 0, 0.3);
+.lessonOutcome {
+  background-color: rgba(253, 251, 247, 0.08);
+  border-radius: 0.85rem;
   padding: 1rem 1.25rem;
-  font-size: 0.88rem;
+  border: 1px solid rgba(253, 251, 247, 0.15);
+  font-size: 0.9rem;
   line-height: 1.5;
-  color: #ffffff;
-}
-
-.lessonOutcomeLabel {
-  color: #fff500;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-right: 0.35rem;
 }
 
 /* ==========================================================================
-   7. RESULTS SECTION («Що зміниться»)
+   7. RESULTS & 7.1 DISQUALIFIERS
    ========================================================================== */
-.resultsGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-  max-width: 900px;
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 860px;
   margin: 0 auto;
 }
 
-.resultCard {
+.resultRow {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem 1.75rem;
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid rgba(56, 14, 24, 0.08);
   font-size: 1rem;
   font-weight: 700;
-  color: #ffffff;
-  line-height: 1.5;
+  color: #2D0C14;
 }
 
-.resultCheckIcon {
-  color: #fff500;
-  flex-shrink: 0;
-}
-
-/* ==========================================================================
-   7.1 NOT FOR YOU SECTION («Кому точно НЕ підійде»)
-   ========================================================================== */
-.notForYouGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-  max-width: 900px;
+.notForYouList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 860px;
   margin: 0 auto 2.5rem;
 }
 
-.notForYouCard {
+.notForYouRow {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  background: rgba(30, 20, 22, 0.5);
-  border: 1.5px solid rgba(239, 68, 68, 0.2);
-  padding: 1.5rem 1.75rem;
+  background-color: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
   font-size: 0.95rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.notForYouIcon {
-  color: #ef4444;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-}
-
-.notForYouSummary {
-  background: rgba(26, 26, 28, 0.8);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  padding: 2rem;
-  text-align: center;
-  max-width: 820px;
-  margin: 0 auto;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #ffffff;
 }
 
 /* ==========================================================================
-   8. PRICING & PROCESS SECTION
+   8. PROCESS & 9. GUARANTEE
    ========================================================================== */
-.processFeaturesGrid {
+.processGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
-  max-width: 860px;
+  max-width: 880px;
   margin: 0 auto 3rem;
 }
 
 @media (min-width: 640px) {
-  .processFeaturesGrid {
+  .processGrid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.processFeatureCard {
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
+.processCard {
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  border: 1px solid rgba(56, 14, 24, 0.08);
   display: flex;
   align-items: center;
   gap: 1rem;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #2D0C14;
 }
 
-/* ==========================================================================
-   9. GUARANTEE SECTION
-   ========================================================================== */
-.guaranteeCard {
-  background: rgba(26, 26, 28, 0.8);
-  border: 2px solid #fff500;
-  padding: 3rem 2rem;
+.guaranteeBox {
+  background-color: #380E18;
+  color: #FDFBF7;
+  border-radius: 2rem;
+  padding: 3.5rem 2rem;
   text-align: center;
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
-  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
-}
-
-.guaranteeTitle {
-  font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #ffffff;
-  margin: 1rem 0;
-}
-
-.guaranteeText {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 600px;
-  margin: 0 auto;
+  box-shadow: 0 20px 45px rgba(56, 14, 24, 0.2);
 }
 
 /* ==========================================================================
@@ -895,22 +845,19 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 860px;
+  max-width: 840px;
   margin: 0 auto;
 }
 
 .faqItem {
-  background: rgba(26, 26, 28, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(56, 14, 24, 0.08);
   overflow: hidden;
-  transition: border-color 0.25s ease;
+  transition: box-shadow 0.25s ease;
 }
 
-.faqItemActive {
-  border-color: #fff500;
-}
-
-.faqQuestionButton {
+.faqQuestionBtn {
   width: 100%;
   display: flex;
   align-items: center;
@@ -919,71 +866,39 @@
   padding: 1.5rem 1.75rem;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #2D0C14;
   font-family: var(--font-manrope), sans-serif;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   text-align: left;
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
-.faqQuestionButton:hover {
-  color: #fff500;
-}
-
-.faqChevron {
-  color: #fff500;
-  font-size: 1.2rem;
-  transition: transform 0.3s ease;
-  flex-shrink: 0;
-}
-
-.faqChevronOpen {
-  transform: rotate(180deg);
-}
-
-.faqAnswer {
+.faqAnswerBox {
   padding: 0 1.75rem 1.5rem;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.8);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 1rem;
+  color: rgba(45, 12, 20, 0.85);
+  border-top: 1px solid rgba(56, 14, 24, 0.06);
+  padding-top: 1.25rem;
 }
 
 /* ==========================================================================
    11. FINAL BLOCK
    ========================================================================== */
 .finalCard {
-  background: radial-gradient(circle at center, rgba(255, 245, 0, 0.08) 0%, rgba(20, 20, 24, 0.9) 70%);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #380E18 0%, #23080F 100%);
+  color: #FDFBF7;
+  border-radius: 2rem;
+  padding: 4.5rem 2rem;
   text-align: center;
-  max-width: 860px;
+  max-width: 840px;
   margin: 0 auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-}
-
-.finalTitle {
-  font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #ffffff;
-  margin-bottom: 1.5rem;
-}
-
-.finalText {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
-  max-width: 640px;
-  margin: 0 auto 2.5rem;
+  box-shadow: 0 25px 50px rgba(35, 8, 15, 0.3);
 }
 
 /* ==========================================================================
-   STICKY MOBILE CTA BAR
+   STICKY MOBILE CTA
    ========================================================================== */
 .stickyMobileBar {
   position: fixed;
@@ -991,15 +906,15 @@
   left: 0;
   right: 0;
   z-index: 999;
-  background: rgba(9, 9, 11, 0.95);
-  backdrop-blur-md: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0.75rem 1rem env(safe-area-inset-bottom, 0.75rem);
+  background-color: rgba(253, 251, 247, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(56, 14, 24, 0.12);
+  padding: 0.75rem 1.25rem env(safe-area-inset-bottom, 0.75rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.08);
 }
 
 @media (min-width: 768px) {
@@ -1008,37 +923,38 @@
   }
 }
 
-.stickyPriceColumn {
+.stickyPriceBox {
   display: flex;
   flex-direction: column;
 }
 
-.stickyTimer {
+.stickyTimerText {
   font-size: 0.65rem;
   font-weight: 800;
-  color: #fff500;
+  color: #380E18;
   text-transform: uppercase;
 }
 
-.stickyPrice {
-  font-size: 1.15rem;
+.stickyPriceVal {
+  font-size: 1.2rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #2D0C14;
 }
 
-.stickyButton {
-  background: #fff500;
-  color: #000000;
+.stickyBtn {
+  background-color: #380E18;
+  color: #FDFBF7;
   font-family: var(--font-manrope), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 900;
+  font-size: 0.78rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.8rem 1.25rem;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1.25rem;
+  border-radius: 9999px;
   border: none;
   cursor: pointer;
   flex-grow: 1;
-  max-width: 240px;
+  max-width: 220px;
   text-align: center;
 }
 
@@ -1049,7 +965,7 @@
   position: fixed;
   inset: 0;
   z-index: 10002;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(35, 8, 15, 0.92);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -1063,7 +979,7 @@
   right: 1.5rem;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #FDFBF7;
   cursor: pointer;
   padding: 0.5rem;
   z-index: 10;
@@ -1078,9 +994,10 @@
   justify-content: center;
 }
 
-.lightboxImage {
+.lightboxImg {
   max-width: 100%;
   max-height: 90vh;
   object-fit: contain;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }

@@ -2,9 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Gift, Clock, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
+import { Gift, Clock, ArrowRight, Check } from "lucide-react";
 import { use10MinTimer } from "./use10MinTimer";
-import styles from "./IntensiveShared.module.css";
 
 interface IntensiveBonusesProps {
   onOpenCheckout: () => void;
@@ -12,48 +11,32 @@ interface IntensiveBonusesProps {
 
 const bonusesData = [
   {
-    num: "1",
+    num: "Бонус 1",
     title: "Як я створюю контент за 30 хвилин на день",
     desc: "Покажу свою реальну систему роботи, як я поєдную життя матері двох дітей і ведення блогу, поділюсь 11-ти річним досвідом створення контенту.",
     oldPrice: "30€",
-    bullets: [
-      "Організація щоденної роботи без вигорання",
-      "Як готувати контент блоками на тиждень вперед",
-      "Лайфхаки поєднання сім'ї, двох дітей та блогу"
-    ]
+    cardBg: "bg-[#451220] border-[#451220]/30"
   },
   {
-    num: "2",
+    num: "Бонус 2",
     title: "Ефір з розборами профілей",
     desc: "Покроковий аналіз реальних профілей з покращеннями від мене під різні ніші. Після цього розбору ти по-іншому подивишся на власний блог. Кожен знайде для себе рішення і інструменти для контенту та візуалу.",
     oldPrice: "30€",
-    bullets: [
-      "Аналіз типових помилок у позиціонуванні",
-      "Розбір структури шапки, хайлайтс та візуалу",
-      "Готові ідеї для швидкого впровадження у своїй ніші"
-    ]
+    cardBg: "bg-[#451220] border-[#451220]/30"
   },
   {
-    num: "3",
+    num: "Бонус 3",
     title: "Формула працюючих заголовків, які не хочеться прогортати",
     desc: "Ти отримаєш готову формулу створення сильних заголовків для офферів і контенту + приклади її застосування в різних нішах. Береш формулу — підставляєш свою тему — отримуєш заголовок, який чіпляє конкретну проблему або бажання твоєї аудиторії.",
     oldPrice: "40€",
-    bullets: [
-      "Готовий конструктор заголовків для Reels та постів",
-      "Слова-тригери для залучення платоспроможної аудиторії",
-      "Приклади адаптації під м'які та тверді ніші"
-    ]
+    cardBg: "bg-[#2B0813] border-[#2B0813]/40"
   },
   {
-    num: "4",
+    num: "Бонус 4",
     title: "30 закликів до дії без нав'язливих «Купуйте зараз»",
     desc: "Ти отримаєш 30 готових закликів до дії, які можна використовувати в рілс, сторіс, постах, каруселях та прогрівах. У результаті ти не просто привертаєш увагу — ти розумієш, як направити людину до дії (купити, написати у дірект, залишити коментар).",
     oldPrice: "25€",
-    bullets: [
-      "30 готових CTA для сторіз, рілс та каруселей",
-      "Екологічні переводи в Директ на консультації та продажі",
-      "Як стимулювати збереження, репости та коментарі"
-    ]
+    cardBg: "bg-[#2B0813] border-[#2B0813]/40"
   }
 ];
 
@@ -61,116 +44,90 @@ export function IntensiveBonuses({ onOpenCheckout }: IntensiveBonusesProps) {
   const { formattedTime } = use10MinTimer();
 
   return (
-    <section className="py-20 px-4 sm:px-6 bg-[#141416] border-y border-white/10 relative">
+    <section className="px-5 md:px-10 py-16 md:py-24 bg-[#FAF6EE] relative overflow-hidden text-[#2B0813]">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#fff500]/10 border border-[#fff500] text-[#fff500] font-manrope text-xs font-black uppercase tracking-[0.2em] mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-[#451220]/10 text-[#451220] text-xs font-bold uppercase tracking-[0.18em] mb-4">
             <Gift size={14} />
-            <span>Спеціальний пакет бонусів</span>
+            <span>Спеціальна пропозиція</span>
           </div>
 
-          <h2 className="font-inter text-2xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight leading-tight mb-4">
-            БОНУСИ, якщо зареєструєшся <span className="text-[#fff500]">прямо зараз</span>
+          <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center leading-tight">
+            ТВОЇ БОНУСИ,<br />
+            <span className="italic font-normal">якщо зареєструєшся прямо зараз</span>
           </h2>
-
-          <p className="font-manrope text-sm sm:text-base text-white/70">
-            Отримай 4 практичні інструменти, які посилять твою систему контенту з першого дня
-          </p>
-
-          {/* Floating Timer Bar */}
-          <div className="inline-flex items-center gap-3 bg-black/60 border border-[#fff500]/50 px-5 py-2.5 mt-6 shadow-[0_0_25px_rgba(255,245,0,0.1)]">
-            <Clock size={18} className="text-[#fff500] animate-pulse" />
-            <span className="font-manrope text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
-              Бонуси зникнуть через: <span className="text-[#fff500] font-black text-base">{formattedTime}</span>
-            </span>
-          </div>
         </div>
 
-        {/* 4 Bonuses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        {/* 4 Bonuses Cards */}
+        <div className="grid md:grid-cols-2 gap-6 relative z-10">
           {bonusesData.map((bonus, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="bg-[#1a1a1d] border-2 border-white/10 p-6 sm:p-8 flex flex-col justify-between relative group hover:border-[#fff500]/50 transition-all duration-300 shadow-[6px_6px_0px_rgba(0,0,0,0.4)]"
+              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              className={`rounded-2xl text-[#FAF6EE] border p-7 sm:p-8 shadow-md relative overflow-hidden group ${bonus.cardBg}`}
             >
-              <div>
-                {/* Top Badge */}
-                <div className="flex items-center justify-between gap-2 mb-4 border-b border-white/10 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 bg-[#fff500] text-black font-manrope text-xs font-black uppercase tracking-wider">
-                      БОНУС #{bonus.num}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-manrope text-xs text-white/40 line-through mr-2">
-                      {bonus.oldPrice}
-                    </span>
-                    <span className="font-manrope text-xs font-black text-[#fff500] uppercase">
-                      Безкоштовно
-                    </span>
-                  </div>
-                </div>
-
-                <h3 className="font-inter text-lg sm:text-xl font-bold text-white mb-3 leading-snug">
-                  {bonus.title}
-                </h3>
-
-                <p className="font-manrope text-sm text-white/75 leading-relaxed mb-5">
-                  {bonus.desc}
-                </p>
-
-                {/* Bullets */}
-                <div className="space-y-2 mb-6">
-                  {bonus.bullets.map((b, bIdx) => (
-                    <div key={bIdx} className="flex items-start gap-2 font-manrope text-xs sm:text-sm text-white/90">
-                      <CheckCircle2 size={16} className="text-[#fff500] shrink-0 mt-0.5" />
-                      <span>{b}</span>
-                    </div>
-                  ))}
-                </div>
+              {/* Circular gift icon top-right */}
+              <div className="absolute top-5 right-5" aria-hidden="true">
+                <span className="inline-flex items-center justify-center rounded-full p-3 bg-[#FAF6EE] text-[#451220] shadow-sm">
+                  <Gift size={22} />
+                </span>
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-manrope text-white/50">
-                <span>Формат: PDF / Відеозапис</span>
-                <span className="text-[#fff500] font-bold">Доступ назавжди</span>
+              <div className="text-xs uppercase tracking-[0.18em] text-[#FAF6EE]/80 font-bold font-manrope">
+                {bonus.num}
+              </div>
+
+              <h3 className="font-playfair text-xl sm:text-2xl mt-2 text-[#FAF6EE] pr-14 leading-snug font-bold">
+                {bonus.title}
+              </h3>
+
+              <p className="mt-3 text-sm sm:text-base text-[#FAF6EE]/90 leading-relaxed font-manrope">
+                {bonus.desc}
+              </p>
+
+              <div className="mt-6 pt-4 border-t border-white/15 flex items-center justify-between font-manrope">
+                <div className="flex items-center gap-3">
+                  <span className="line-through opacity-60 text-sm">{bonus.oldPrice}</span>
+                  <span className="font-bold text-[#FAF6EE] text-lg uppercase tracking-wider">
+                    Безкоштовно
+                  </span>
+                </div>
+                <span className="text-xs text-[#FAF6EE]/70 uppercase tracking-widest font-semibold">
+                  Доступ назавжди
+                </span>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Bonus Summary Banner */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="bg-gradient-to-r from-[#1e1e24] via-[#1a1a1f] to-[#1e1e24] border-2 border-[#fff500] p-6 sm:p-10 shadow-[8px_8px_0px_rgba(0,0,0,0.6)] text-center flex flex-col items-center"
-        >
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
-            <span className="font-manrope text-base sm:text-lg text-white/70">
-              Сумарна цінність бонусів: <strong className="line-through text-white/40">125€</strong>
-            </span>
-            <span className="px-3 py-1 bg-[#fff500] text-black font-manrope text-sm font-black uppercase tracking-wider">
-              Ціна зараз: 0€
-            </span>
-          </div>
-
-          <p className="font-inter text-xl sm:text-2xl font-bold text-white mb-6 uppercase">
-            Забирай 4 уроки інтенсиву + усі 4 бонуси всього за <span className="text-[#fff500]">9€</span>
+        {/* Timer & Total Banner */}
+        <div className="mt-14 text-center relative z-10 max-w-xl mx-auto">
+          <p className="text-sm font-manrope uppercase tracking-[0.2em] text-[#451220] font-bold">
+            Сумарна цінність бонусів 125€ · Зараз безкоштовно
           </p>
 
-          <button
-            onClick={onOpenCheckout}
-            className="w-full max-w-md py-4 sm:py-5 bg-[#fff500] text-black font-inter font-black text-sm sm:text-base uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,0.5)] hover:bg-white transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-          >
-            <span>Забрати місце за 9€ замість 49€</span>
-            <ArrowRight size={18} />
-          </button>
-        </motion.div>
+          <p className="mt-2 text-xs font-manrope uppercase tracking-widest text-[#2B0813]/60">
+            Бонуси зникнуть через:
+          </p>
+
+          <div className="mt-2 font-manrope text-5xl md:text-6xl text-[#2B0813] font-bold tabular-nums tracking-tight">
+            {formattedTime}
+          </div>
+
+          <div className="mt-6">
+            <button
+              onClick={onOpenCheckout}
+              className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <span>Забрати місце за 9€ замість 49€</span>
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

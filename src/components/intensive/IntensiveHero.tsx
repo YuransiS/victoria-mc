@@ -3,9 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Clock, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { Clock, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { use10MinTimer } from "./use10MinTimer";
-import sharedStyles from "./IntensiveShared.module.css";
 
 interface IntensiveHeroProps {
   onOpenCheckout: () => void;
@@ -15,114 +14,97 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   const { formattedTime } = use10MinTimer();
 
   return (
-    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#101012] pt-20 pb-16 px-4 sm:px-6">
-      {/* Background Image Layer with Gradient Overlay */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#FAF6EE] text-[#2B0813] md:flex md:items-stretch">
+      {/* Photo Column / Background on mobile */}
+      <div className="absolute inset-0 md:relative md:w-[50%] md:h-auto overflow-hidden">
         <Image
           src="/rozbir/IMG_2534.jpg"
           alt="Вікторія Мещерякова"
           fill
           priority
-          className="object-cover object-center md:object-[center_20%] opacity-25 filter grayscale contrast-125"
+          className="object-cover object-[center_15%] md:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#101012]/90 via-[#101012]/80 to-[#101012]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#101012_80%)]" />
+        {/* Mobile Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2B0813] via-[#2B0813]/70 to-transparent md:hidden" />
+        {/* Desktop Gradient Blend */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#FAF6EE]/20" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#fff500]/10 border border-[#fff500] text-[#fff500] font-manrope text-xs sm:text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-[0_0_20px_rgba(255,245,0,0.15)]"
-        >
-          <Zap size={14} className="text-[#fff500]" />
-          <span>ІНТЕНСИВ · 4 УРОКИ</span>
-        </motion.div>
-
-        {/* Main Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="font-inter text-3xl sm:text-5xl md:text-6xl font-black text-white uppercase tracking-tight leading-[1.15] mb-6 text-balance"
-        >
-          Абсолютно випадковий контент може набрати мільйони.{" "}
-          <span className="text-[#fff500] block mt-1">
-            А той, у який ти вклала душу — 5 лайків
-          </span>
-        </motion.h1>
-
-        {/* Subtitle / Problem & Promise */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="max-w-2xl space-y-4 mb-8 text-white/85 font-manrope text-base sm:text-lg leading-relaxed"
-        >
-          <p className="border-l-2 border-[#fff500] pl-4 text-left sm:text-center sm:border-l-0 sm:pl-0 font-medium text-white/90">
-            І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.
-          </p>
-          <p className="font-bold text-white text-lg sm:text-xl bg-white/5 py-3 px-5 border border-white/10">
-            За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів
-          </p>
-        </motion.div>
-
-        {/* Price & Offer Box */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="w-full max-w-md bg-[#18181a]/90 border-2 border-white/15 p-6 sm:p-8 shadow-[8px_8px_0px_rgba(0,0,0,0.6)] mb-6 flex flex-col items-center"
-        >
-          <div className="flex items-center justify-center gap-4 mb-3">
-            <span className="font-manrope text-lg text-white/40 line-through font-bold">
-              49€
-            </span>
-            <span className="px-2.5 py-0.5 bg-[#fff500] text-black font-manrope text-xs font-black uppercase tracking-wider">
-              -82%
-            </span>
-            <span className="font-inter text-4xl sm:text-5xl font-black text-[#fff500]">
-              9€
-            </span>
-          </div>
-
-          {/* Countdown Timer */}
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-manrope font-bold text-white/80 uppercase tracking-wider mb-6 bg-black/40 px-4 py-2 border border-white/10">
-            <Clock size={16} className="text-[#fff500] animate-pulse" />
-            <span>
-              Ціна діє ще <span className="text-[#fff500] font-black">{formattedTime}</span>
-            </span>
-          </div>
-
-          {/* CTA Button */}
-          <button
-            onClick={onOpenCheckout}
-            className="w-full py-4 sm:py-5 bg-[#fff500] text-black font-inter font-black text-base sm:text-lg uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,0.4)] hover:bg-white hover:text-black transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-3"
+      {/* Content Column */}
+      <div className="relative z-10 flex flex-col justify-end md:justify-center md:w-[50%] px-5 sm:px-8 md:px-10 lg:px-14 pt-12 pb-14 md:py-16 text-[#FAF6EE] md:text-[#2B0813]">
+        <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left">
+          {/* Pill Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-5"
           >
-            <span>Хочу систему</span>
-            <ArrowRight size={20} />
-          </button>
-        </motion.div>
+            <span className="rounded-full bg-[#451220] md:bg-[#451220] text-[#FAF6EE] text-[10px] sm:text-xs font-bold tracking-[0.18em] uppercase px-4 py-1.5 shadow-sm backdrop-blur">
+              ІНТЕНСИВ · 4 УРОКИ
+            </span>
+            <span className="rounded-full bg-[#FAF6EE]/20 md:bg-[#451220]/10 text-[#FAF6EE] md:text-[#451220] text-[10px] sm:text-xs font-bold tracking-[0.14em] uppercase px-4 py-1.5 border border-current/20">
+              СИСТЕМА КОНТЕНТУ 2026
+            </span>
+          </motion.div>
 
-        {/* Micro guarantees */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-6 text-xs font-manrope text-white/50 uppercase tracking-widest font-semibold"
-        >
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck size={14} className="text-[#fff500]" /> 100% гарантія повернення
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Zap size={14} className="text-[#fff500]" /> Доступ назавжди
-          </span>
-          <span className="flex items-center gap-1.5">
-            🎁 4 бонуси на 125€ безкоштовно
-          </span>
-        </motion.div>
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="font-playfair text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.15] tracking-tight mb-4"
+          >
+            Абсолютно випадковий контент може набрати мільйони.{" "}
+            <span className="italic block mt-1 text-[#E5B887] md:text-[#451220] font-normal">
+              А той, у який ти вклала душу — 5 лайків
+            </span>
+          </motion.h1>
+
+          {/* Subtitle & Logic */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="space-y-2 mb-6 font-manrope text-xs sm:text-sm md:text-base leading-relaxed text-[#FAF6EE]/90 md:text-[#2B0813]/85"
+          >
+            <p className="font-medium">
+              І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.
+            </p>
+            <p className="font-semibold text-[#FAF6EE] md:text-[#451220] bg-[#451220]/40 md:bg-[#451220]/5 p-3 rounded-xl border border-[#FAF6EE]/20 md:border-[#451220]/15">
+              За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів
+            </p>
+          </motion.div>
+
+          {/* Price & CTA */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col items-center md:items-start gap-4"
+          >
+            <button
+              onClick={onOpenCheckout}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <span>Хочу систему</span>
+              <ArrowRight size={18} />
+            </button>
+
+            {/* Price Row & Timer */}
+            <div className="flex items-center gap-4 text-xs sm:text-sm font-manrope">
+              <div className="flex items-center gap-2">
+                <span className="line-through opacity-60 text-[#FAF6EE] md:text-[#2B0813]">49€</span>
+                <span className="font-bold text-lg sm:text-xl text-[#FAF6EE] md:text-[#451220]">9€</span>
+              </div>
+              <span className="opacity-40">·</span>
+              <div className="inline-flex items-center gap-1.5 font-semibold text-[#E5B887] md:text-[#451220]">
+                <Clock size={14} className="animate-pulse" />
+                <span>Ціна діє ще <strong className="font-bold">{formattedTime}</strong></span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

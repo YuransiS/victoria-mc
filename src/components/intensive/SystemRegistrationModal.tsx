@@ -97,7 +97,6 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
         currency: currency
       });
 
-      // Log telemetric form view event
       try {
         const visitorId = localStorage.getItem("visitor_id");
         if (visitorId) {
@@ -239,7 +238,6 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
         return;
       }
 
-      // Save user data in localStorage
       localStorage.setItem("lead_name", formData.name);
       localStorage.setItem("lead_phone", sanitizedPhone);
       localStorage.setItem("lead_social", resolvedTelegram);
@@ -277,7 +275,6 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
       clearInterval(intervalId);
       setProgress(100);
 
-      // Submit WayForPay form
       const form = document.createElement("form");
       form.method = "POST";
       form.action = "https://secure.wayforpay.com/pay";
@@ -323,7 +320,7 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md"
+            className="fixed inset-0 bg-[#23080F]/80 backdrop-blur-md"
             onClick={onClose}
           />
 
@@ -333,12 +330,12 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative w-full max-w-md bg-[#161618] border border-white/15 p-6 sm:p-8 shadow-2xl z-10 my-8 text-left"
+            className="relative w-full max-w-md bg-[#FDFBF7] text-[#2D0C14] rounded-3xl p-7 sm:p-9 shadow-2xl z-10 my-8 text-left border border-[#380E18]/15"
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-white/50 hover:text-white p-2 transition-colors focus:outline-none"
+              className="absolute top-5 right-5 text-[#2D0C14]/50 hover:text-[#2D0C14] p-1.5 transition-colors focus:outline-none"
               aria-label="Закрити"
             >
               <X size={22} />
@@ -346,16 +343,16 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
 
             {/* Modal Header */}
             <div className="mb-6">
-              <div className="inline-block bg-[#fff500] text-black font-manrope text-[10px] font-extrabold uppercase tracking-[0.15em] px-2.5 py-1 mb-2">
+              <div className="inline-block bg-[#380E18] text-[#FDFBF7] font-manrope text-[10px] font-extrabold uppercase tracking-[0.18em] px-3.5 py-1 rounded-full mb-3">
                 ІНТЕНСИВ · 4 УРОКИ
               </div>
-              <h3 className="font-manrope text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-tight">
+              <h3 className="font-manrope text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#2D0C14] leading-tight">
                 ЗАБРОНЮВАТИ МІСЦЕ
               </h3>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-white/40 line-through text-sm font-medium">49 євро</span>
-                <span className="text-[#fff500] text-xl font-black">{amount} євро</span>
-                <span className="text-[11px] text-white/60 uppercase tracking-wider font-semibold ml-1">
+                <span className="text-[#2D0C14]/40 line-through text-sm font-semibold">49 євро</span>
+                <span className="text-[#380E18] text-2xl font-black">{amount} євро</span>
+                <span className="text-[11px] text-[#2D0C14]/70 font-semibold ml-1">
                   (всі 4 бонуси включено)
                 </span>
               </div>
@@ -365,7 +362,7 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1.5">
                   Ваше ім{`'`}я
                 </label>
                 <input
@@ -374,27 +371,27 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   placeholder="Олена"
                   disabled={isSubmitting}
-                  className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/25 px-4 py-3 text-sm focus:border-[#fff500] focus:outline-none transition-colors"
+                  className="w-full bg-[#FFFFFF] border border-[#380E18]/15 text-[#2D0C14] rounded-xl px-4 py-3 text-sm focus:border-[#380E18] focus:ring-1 focus:ring-[#380E18]/20 focus:outline-none transition-all placeholder:text-[#2D0C14]/30"
                 />
                 {errors.name && (
-                  <p className="text-red-400 text-[11px] mt-1 font-medium">{errors.name}</p>
+                  <p className="text-red-600 text-[11px] mt-1 font-medium">{errors.name}</p>
                 )}
               </div>
 
               {/* Contact Method Switch */}
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70">
+                  <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-[#2D0C14]/70">
                     Спосіб зв{`'`}язку
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 bg-[#EFE8DC] p-1 rounded-full">
                     <button
                       type="button"
                       onClick={() => setContactMethod("phone")}
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 transition-all ${
+                      className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full transition-all ${
                         contactMethod === "phone"
-                          ? "bg-[#fff500] text-black"
-                          : "text-white/50 hover:text-white"
+                          ? "bg-[#380E18] text-[#FDFBF7]"
+                          : "text-[#2D0C14]/60 hover:text-[#2D0C14]"
                       }`}
                     >
                       Телефон
@@ -402,10 +399,10 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                     <button
                       type="button"
                       onClick={() => setContactMethod("telegram")}
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 transition-all ${
+                      className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full transition-all ${
                         contactMethod === "telegram"
-                          ? "bg-[#fff500] text-black"
-                          : "text-white/50 hover:text-white"
+                          ? "bg-[#380E18] text-[#FDFBF7]"
+                          : "text-[#2D0C14]/60 hover:text-[#2D0C14]"
                       }`}
                     >
                       Telegram
@@ -421,18 +418,18 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                       value={formData.phone}
                       onChange={(val) => handleInputChange("phone", val || "")}
                       disabled={isSubmitting}
-                      className="w-full react-phone-input-dark bg-black/40 border border-white/15 px-3 py-2 text-white"
+                      className="w-full bg-[#FFFFFF] border border-[#380E18]/15 text-[#2D0C14] rounded-xl px-3 py-2.5 react-phone-input-light"
                       numberInputProps={{
                         id: "modal-phone",
                         autoComplete: "tel",
                         inputMode: "tel",
                         className:
-                          "w-full bg-transparent border-none text-white text-sm focus:outline-none placeholder:text-white/25",
+                          "w-full bg-transparent border-none text-[#2D0C14] text-sm focus:outline-none placeholder:text-[#2D0C14]/30",
                         placeholder: "+"
                       }}
                     />
                     {errors.phone && (
-                      <p className="text-red-400 text-[11px] mt-1 font-medium">{errors.phone}</p>
+                      <p className="text-red-600 text-[11px] mt-1 font-medium">{errors.phone}</p>
                     )}
                   </div>
                 ) : (
@@ -443,10 +440,10 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                       onChange={(e) => handleInputChange("telegram", e.target.value)}
                       placeholder="@username"
                       disabled={isSubmitting}
-                      className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/25 px-4 py-3 text-sm focus:border-[#fff500] focus:outline-none transition-colors"
+                      className="w-full bg-[#FFFFFF] border border-[#380E18]/15 text-[#2D0C14] rounded-xl px-4 py-3 text-sm focus:border-[#380E18] focus:ring-1 focus:ring-[#380E18]/20 focus:outline-none transition-all placeholder:text-[#2D0C14]/30"
                     />
                     {errors.telegram && (
-                      <p className="text-red-400 text-[11px] mt-1 font-medium">{errors.telegram}</p>
+                      <p className="text-red-600 text-[11px] mt-1 font-medium">{errors.telegram}</p>
                     )}
                   </div>
                 )}
@@ -454,7 +451,7 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
 
               {/* Instagram */}
               <div>
-                <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1.5">
                   Instagram @нікнейм
                 </label>
                 <input
@@ -463,10 +460,10 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                   onChange={(e) => handleInputChange("instagram", e.target.value)}
                   placeholder="@nickname"
                   disabled={isSubmitting}
-                  className="w-full bg-black/40 border border-white/15 text-white placeholder:text-white/25 px-4 py-3 text-sm focus:border-[#fff500] focus:outline-none transition-colors"
+                  className="w-full bg-[#FFFFFF] border border-[#380E18]/15 text-[#2D0C14] rounded-xl px-4 py-3 text-sm focus:border-[#380E18] focus:ring-1 focus:ring-[#380E18]/20 focus:outline-none transition-all placeholder:text-[#2D0C14]/30"
                 />
                 {errors.instagram && (
-                  <p className="text-red-400 text-[11px] mt-1 font-medium">{errors.instagram}</p>
+                  <p className="text-red-600 text-[11px] mt-1 font-medium">{errors.instagram}</p>
                 )}
               </div>
 
@@ -474,13 +471,13 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#fff500] hover:bg-[#fff733] text-black font-manrope font-extrabold py-4 px-6 uppercase tracking-[0.15em] text-xs transition-all transform active:scale-[0.99] shadow-lg flex items-center justify-center gap-2 mt-6 cursor-pointer"
+                className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-extrabold py-4 px-6 rounded-full uppercase tracking-[0.12em] text-xs transition-all transform active:scale-[0.99] shadow-lg flex items-center justify-center gap-2 mt-6 cursor-pointer"
               >
                 {isSubmitting ? "ОБРОБКА..." : `ОПЛАТИТИ УЧАСТЬ ЗА ${amount} ЄВРО →`}
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-white/40 text-[10px] uppercase tracking-wider pt-2">
-                <ShieldCheck size={14} className="text-[#fff500]" />
+              <div className="flex items-center justify-center gap-2 text-[#2D0C14]/60 text-[11px] uppercase tracking-wider pt-2">
+                <ShieldCheck size={14} className="text-[#380E18]" />
                 <span>100% ГАРАНТІЯ ПОВЕРНЕННЯ КОШТІВ</span>
               </div>
             </form>
@@ -493,31 +490,31 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[10005] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6"
+                className="fixed inset-0 z-[10005] bg-[#23080F]/90 backdrop-blur-xl flex items-center justify-center p-6"
               >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                  className="bg-[#18181a] p-8 md:p-12 text-center max-w-md w-full border border-white/15 shadow-2xl"
+                  className="bg-[#FDFBF7] text-[#2D0C14] p-8 md:p-10 text-center max-w-md w-full rounded-3xl shadow-2xl border border-[#380E18]/15"
                 >
-                  <h3 className="font-manrope font-extrabold text-2xl text-[#fff500] mb-3 uppercase">
+                  <h3 className="font-manrope font-black text-2xl text-[#380E18] mb-2 uppercase">
                     Дякуємо! Заявку створено
                   </h3>
-                  <p className="text-white/70 text-xs mb-6">
+                  <p className="text-[#2D0C14]/70 text-xs mb-6">
                     Формуємо безпечне платіжне посилання WayForPay...
                   </p>
 
-                  <div className="w-full bg-white/10 h-2 overflow-hidden my-4 border border-white/10">
+                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden my-4">
                     <motion.div
-                      className="h-full bg-[#fff500]"
+                      className="h-full bg-[#380E18] rounded-full"
                       initial={{ width: "0%" }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: progress === 100 ? 0.35 : 0.1, ease: "easeOut" }}
                     />
                   </div>
 
-                  <p className="font-manrope text-xs font-semibold text-white/80 min-h-[1.5rem] mt-2">
+                  <p className="font-manrope text-xs font-semibold text-[#2D0C14]/85 min-h-[1.5rem] mt-2">
                     {progressMessage}
                   </p>
                 </motion.div>

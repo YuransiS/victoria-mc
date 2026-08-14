@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const faqList = [
   {
@@ -35,51 +35,38 @@ export function IntensiveFAQ() {
   };
 
   return (
-    <section className="py-20 px-4 sm:px-6 bg-[#141416] border-y border-white/10 relative">
+    <section className="px-5 md:px-10 py-16 md:py-24 bg-[#FAF6EE] text-[#2B0813] border-t border-[#2B0813]/10 relative">
       <div className="max-w-4xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/15 text-white/80 font-manrope text-xs font-black uppercase tracking-[0.2em] mb-4">
-            <HelpCircle size={14} className="text-[#fff500]" />
-            <span>Запитання та відповіді</span>
-          </div>
-
-          <h2 className="font-inter text-2xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight leading-tight">
-            FAQ. <span className="text-[#fff500]">ВІДПОВІДІ НА ЗАПИТАННЯ</span>
+          <p className="font-playfair italic text-2xl sm:text-3xl text-[#451220] mb-2">
+            FAQ
+          </p>
+          <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center leading-tight font-bold">
+            Запитання та відповіді
           </h2>
-          <div className="w-16 h-0.5 bg-[#fff500] mx-auto mt-4" />
         </div>
 
-        {/* FAQ List */}
-        <div className="space-y-4">
+        {/* Accordions */}
+        <div className="space-y-4 max-w-3xl mx-auto">
           {faqList.map((item, idx) => {
             const isOpen = openIdx === idx;
 
             return (
-              <motion.div
+              <div
                 key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: idx * 0.05 }}
-                className={`border transition-all ${
-                  isOpen
-                    ? "bg-[#18181b] border-[#fff500]"
-                    : "bg-[#161618] border-white/10 hover:border-white/20"
-                }`}
+                className="border-b border-[#2B0813]/15 pb-4 transition-all"
               >
                 <button
                   onClick={() => toggle(idx)}
                   type="button"
-                  className="w-full p-5 sm:p-6 flex items-center justify-between text-left gap-4 cursor-pointer"
+                  className="w-full py-4 flex items-center justify-between text-left gap-4 cursor-pointer group"
                 >
-                  <span className="font-inter text-base sm:text-lg font-bold text-white leading-snug">
+                  <span className="font-playfair text-lg sm:text-xl font-bold group-hover:text-[#451220] transition-colors leading-snug">
                     {item.q}
                   </span>
                   <div
-                    className={`w-7 h-7 shrink-0 flex items-center justify-center border transition-transform duration-200 ${
-                      isOpen
-                        ? "rotate-180 bg-[#fff500] text-black border-[#fff500]"
-                        : "bg-white/5 text-white/60 border-white/10"
+                    className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center border border-[#2B0813]/20 transition-transform duration-200 ${
+                      isOpen ? "rotate-180 bg-[#451220] text-[#FAF6EE] border-[#451220]" : "text-[#2B0813]"
                     }`}
                   >
                     <ChevronDown size={16} />
@@ -95,15 +82,13 @@ export function IntensiveFAQ() {
                       transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-5 sm:p-6 pt-0 border-t border-white/10">
-                        <div className="font-manrope text-sm sm:text-base text-white/80 leading-relaxed space-y-3 pt-4 whitespace-pre-line">
-                          {item.a}
-                        </div>
+                      <div className="font-manrope text-sm sm:text-base text-[#2B0813]/85 leading-relaxed space-y-3 pt-2 pb-4 whitespace-pre-line font-medium">
+                        {item.a}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             );
           })}
         </div>

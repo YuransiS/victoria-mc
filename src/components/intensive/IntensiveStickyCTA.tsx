@@ -34,26 +34,25 @@ export function IntensiveStickyCTA({ onOpenCheckout }: IntensiveStickyCTAProps) 
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-3 sm:p-4 bg-[#141416]/95 backdrop-blur-md border-t border-white/15 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]"
+          className="fixed bottom-4 left-0 right-0 z-50 px-4 flex justify-center pointer-events-none"
         >
-          <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="font-manrope text-xs text-white/40 line-through">49€</span>
-                <span className="font-inter text-xl font-black text-[#fff500]">9€</span>
-              </div>
-              <div className="flex items-center gap-1 text-[10px] font-manrope text-white/60 uppercase">
-                <Clock size={10} className="text-[#fff500]" />
+          <div className="w-full max-w-md bg-[#2B0813]/95 backdrop-blur-md text-[#FAF6EE] p-3 sm:p-3.5 rounded-full shadow-2xl border border-white/20 flex items-center justify-between gap-3 pointer-events-auto">
+            <div className="flex items-center gap-2 pl-3 font-manrope">
+              <span className="line-through opacity-50 text-xs">49€</span>
+              <span className="font-bold text-lg text-[#FAF6EE]">9€</span>
+              <span className="opacity-30">·</span>
+              <div className="flex items-center gap-1 text-[11px] font-semibold text-[#E5B887]">
+                <Clock size={11} />
                 <span>{formattedTime}</span>
               </div>
             </div>
 
             <button
               onClick={onOpenCheckout}
-              className="flex-1 max-w-xs py-3 px-4 bg-[#fff500] text-black font-inter font-black text-xs sm:text-sm uppercase tracking-wider border border-black shadow-[3px_3px_0px_rgba(0,0,0,0.5)] hover:bg-white transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="py-2.5 px-5 bg-[#FAF6EE] text-[#2B0813] font-manrope font-bold text-xs sm:text-sm rounded-full shadow-md hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
             >
               <span>Забрати за 9€</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={14} />
             </button>
           </div>
         </motion.div>
