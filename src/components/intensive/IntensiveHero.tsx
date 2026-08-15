@@ -16,11 +16,11 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   return (
     <section className="relative w-full min-h-[92svh] md:min-h-[88svh] overflow-hidden bg-[#2B0813] md:bg-[#FAF6EE] text-[#FAF6EE] md:text-[#2B0813] flex flex-col justify-between md:flex-row md:items-stretch">
       {/* ========================================================================= */}
-      {/* 1. MOBILE BACKGROUND: Victoria portrait photo + Gaussian blur covering bottom text */}
+      {/* 1. MOBILE BACKGROUND: Victoria portrait photo (/free-lection/krupn.JPG) */}
       {/* ========================================================================= */}
       <div className="absolute inset-0 md:hidden overflow-hidden pointer-events-none">
         <Image
-          src="/rozbir/IMG_2534.jpg"
+          src="/free-lection/krupn.JPG"
           alt="Вікторія Мещерякова"
           fill
           priority
@@ -28,10 +28,6 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
         />
         {/* Subtle top shade behind header pill */}
         <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
-        {/* Gaussian Blur & Dark Plum Overlay covering text area down to the very bottom */}
-        <div className="absolute top-[20%] inset-x-0 bottom-0 backdrop-blur-md bg-[#2B0813]/85" />
-        {/* Smooth feather transition at top of blur */}
-        <div className="absolute top-[14%] inset-x-0 h-16 bg-gradient-to-b from-transparent to-[#2B0813]/85" />
       </div>
 
       {/* ========================================================================= */}
@@ -39,7 +35,7 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
       {/* ========================================================================= */}
       <div className="hidden md:block relative md:w-[50%] md:h-auto overflow-hidden">
         <Image
-          src="/rozbir/IMG_2534.jpg"
+          src="/free-lection/krupn.JPG"
           alt="Вікторія Мещерякова"
           fill
           priority
@@ -66,11 +62,14 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
           </div>
         </motion.div>
 
-        {/* --- FLEXIBLE SPACER (Pushes the entire text block to the bottom of the hero) --- */}
+        {/* --- FLEXIBLE SPACER (Pushes text block to bottom) --- */}
         <div className="flex-1 min-h-[14vh] sm:min-h-[18vh] md:hidden" />
 
-        {/* --- MAIN HERO TEXT (Inside the Gaussian blur area) --- */}
-        <div className="max-w-xl mx-auto md:mx-0 w-full text-left">
+        {/* --- MAIN HERO TEXT (Directly linked to Gaussian blur gradient) --- */}
+        <div className="relative max-w-xl mx-auto md:mx-0 w-full text-left">
+          {/* Linked Gaussian Blur & Dark Plum Gradient directly attached behind text */}
+          <div className="absolute -inset-x-5 -top-10 -bottom-8 bg-gradient-to-b from-transparent via-[#2B0813]/90 to-[#2B0813] backdrop-blur-md -z-10 pointer-events-none md:hidden" />
+          <div className="absolute -inset-x-5 -top-20 h-12 bg-gradient-to-b from-transparent to-[#2B0813]/60 -z-10 pointer-events-none md:hidden" />
           {/* Main Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 15 }}

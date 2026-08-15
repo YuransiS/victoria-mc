@@ -121,8 +121,8 @@ export function Block1Hero() {
         transition={{ duration: 1.5, ease: "easeOut" }}
       >
         <Image
-          src="/free-lection/inst.jpg"
-          alt="Instagram Posts Grid"
+          src="/free-lection/krupn.JPG"
+          alt="Вікторія Мещерякова"
           fill
           className={styles.bgImage}
           priority
