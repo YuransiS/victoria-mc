@@ -65,11 +65,18 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
         {/* --- FLEXIBLE SPACER (Pushes text block to bottom) --- */}
         <div className="flex-1 min-h-[14vh] sm:min-h-[18vh] md:hidden" />
 
-        {/* --- MAIN HERO TEXT (Directly linked to Gaussian blur gradient) --- */}
+        {/* --- MAIN HERO TEXT (Directly linked to ultra-smooth progressive Gaussian blur gradient) --- */}
         <div className="relative max-w-xl mx-auto md:mx-0 w-full text-left">
-          {/* Linked Gaussian Blur & Dark Plum Gradient directly attached behind text */}
-          <div className="absolute -inset-x-5 -top-10 -bottom-8 bg-gradient-to-b from-transparent via-[#2B0813]/90 to-[#2B0813] backdrop-blur-md -z-10 pointer-events-none md:hidden" />
-          <div className="absolute -inset-x-5 -top-20 h-12 bg-gradient-to-b from-transparent to-[#2B0813]/60 -z-10 pointer-events-none md:hidden" />
+          {/* Ultra-Smooth Progressive Gaussian Blur with gradient mask */}
+          <div
+            className="absolute -inset-x-6 -top-24 -bottom-10 pointer-events-none -z-10 md:hidden backdrop-blur-xl bg-gradient-to-b from-transparent via-[#2B0813]/85 to-[#2B0813]"
+            style={{
+              WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,0.8) 50%, black 75%)",
+              maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,0.8) 50%, black 75%)",
+            }}
+          />
+          {/* Soft multi-stop color overlay for seamless feathering */}
+          <div className="absolute -inset-x-6 -top-28 -bottom-10 pointer-events-none -z-10 md:hidden bg-gradient-to-b from-transparent via-[#2B0813]/60 via-40% via-[#2B0813]/92 via-65% to-[#2B0813]" />
           {/* Main Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
