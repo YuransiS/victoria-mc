@@ -15,22 +15,17 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
 
   return (
     <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#FAF6EE] text-[#2B0813] md:flex md:items-stretch">
-      {/* --- MOBILE BACKGROUND (Half-Sharp Photo Top + Half Gaussian Blur Gradient Fade Bottom) --- */}
+      {/* --- MOBILE BACKGROUND (Sharp Top Victoria Photo + Smooth Lower Gradient Fade) --- */}
       <div className="absolute inset-0 md:hidden overflow-hidden bg-[#2B0813]">
-        {/* Top Photo Layer - Sharp and Well-Viewed */}
-        <div className="relative w-full h-[55%] overflow-hidden">
-          <Image
-            src="/rozbir/IMG_2534.jpg"
-            alt="Вікторія Мещерякова"
-            fill
-            priority
-            className="object-cover object-[center_15%]"
-          />
-          {/* Smooth Fade Out of Photo Bottom */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#2B0813]" />
-        </div>
-        {/* Lower Backdrop Blur & Gradient Layer for Pristine Text Readability */}
-        <div className="absolute bottom-0 inset-x-0 h-[68%] bg-gradient-to-b from-[#2B0813]/60 via-[#2B0813]/95 to-[#2B0813] backdrop-blur-md" />
+        <Image
+          src="/rozbir/IMG_2534.jpg"
+          alt="Вікторія Мещерякова"
+          fill
+          priority
+          className="object-cover object-[center_10%]"
+        />
+        {/* Gradient Overlay: Clear top for sharp portrait, smooth dark burgundy fade for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#2B0813]/70 to-[#2B0813]" />
       </div>
 
       {/* --- DESKTOP BACKGROUND / PHOTO COLUMN (Victoria Photo, Sharp Split Layout) --- */}
@@ -46,8 +41,8 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
       </div>
 
       {/* --- CONTENT COLUMN --- */}
-      <div className="relative z-10 flex flex-col justify-end md:justify-center w-full md:w-[50%] px-4 sm:px-8 md:px-10 lg:px-14 pt-8 pb-12 md:py-16 text-[#FAF6EE] md:text-[#2B0813]">
-        <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left p-0 rounded-3xl md:rounded-none">
+      <div className="relative z-10 flex flex-col justify-end md:justify-center w-full md:w-[50%] px-4 sm:px-8 md:px-10 lg:px-14 pt-20 pb-12 md:py-16 text-[#FAF6EE] md:text-[#2B0813]">
+        <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left bg-[#1c070e]/85 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none p-5 sm:p-7 md:p-0 rounded-3xl md:rounded-none border border-white/15 md:border-none shadow-2xl md:shadow-none">
           {/* Pill Badges */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -55,7 +50,7 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             transition={{ duration: 0.5 }}
             className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4"
           >
-            <span className="rounded-full bg-[#5c172a] md:bg-[#451220] text-[#FAF6EE] text-[10px] sm:text-xs font-extrabold tracking-[0.18em] uppercase px-4 py-1.5 shadow-md border border-white/20 md:border-none backdrop-blur-md">
+            <span className="rounded-full bg-[#5c172a] md:bg-[#451220] text-[#FAF6EE] text-[10px] sm:text-xs font-extrabold tracking-[0.18em] uppercase px-4 py-1.5 shadow-md border border-white/20 md:border-none">
               ІНТЕНСИВ · 4 УРОКИ
             </span>
             <span className="rounded-full bg-[#1c080f]/80 md:bg-[#451220]/10 text-[#FAF6EE] md:text-[#451220] text-[10px] sm:text-xs font-bold tracking-[0.14em] uppercase px-4 py-1.5 border border-white/20 md:border-current/20 backdrop-blur-md md:backdrop-blur-none">
@@ -86,7 +81,7 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             <p className="font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] md:drop-shadow-none">
               І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.
             </p>
-            <p className="font-semibold text-white md:text-[#451220] bg-[#451220]/75 md:bg-[#451220]/5 p-3 rounded-2xl border border-white/20 md:border-[#451220]/15 shadow-lg md:shadow-none backdrop-blur-md">
+            <p className="font-semibold text-white md:text-[#451220] bg-[#451220]/75 md:bg-[#451220]/5 p-3 rounded-2xl border border-white/20 md:border-[#451220]/15 shadow-lg md:shadow-none">
               За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів
             </p>
           </motion.div>
