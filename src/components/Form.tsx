@@ -473,7 +473,7 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
         )}
 
         <Input
-          label="INSTAGRAM @НІК"
+          label="INSTAGRAM НІКНЕЙМ"
           name="instagram"
           type="text"
           placeholder="@nickname"

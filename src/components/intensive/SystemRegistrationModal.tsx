@@ -452,7 +452,7 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
               {/* Instagram */}
               <div>
                 <label className="block font-manrope text-[11px] font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1.5">
-                  Instagram @нікнейм
+                  Instagram нікнейм
                 </label>
                 <input
                   type="text"

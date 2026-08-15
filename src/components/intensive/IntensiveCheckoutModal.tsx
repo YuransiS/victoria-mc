@@ -397,7 +397,7 @@ export function IntensiveCheckoutModal({
               {/* Instagram */}
               <div>
                 <label className="block font-manrope text-xs font-bold uppercase tracking-wider text-[#2B0813]/70 mb-1">
-                  Instagram нікнейм (для розбору та комюніті)
+                  Instagram нікнейм
                 </label>
                 <input
                   type="text"

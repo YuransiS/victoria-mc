@@ -14,9 +14,9 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   const { formattedTime } = use10MinTimer();
 
   return (
-    <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#2B0813] text-[#FAF6EE] flex flex-col justify-center items-center">
-      {/* Background Instagram Posts Grid Layer with Blur */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
+    <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#FAF6EE] text-[#2B0813] md:flex md:items-stretch">
+      {/* --- MOBILE BACKGROUND (Instagram Posts Grid with Blur) --- */}
+      <div className="absolute inset-0 md:hidden overflow-hidden">
         <Image
           src="/free-lection/inst.jpg"
           alt="Instagram Posts Grid"
@@ -24,13 +24,24 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
           priority
           className="object-cover object-center blur-[10px] scale-110 opacity-50"
         />
-        {/* Dark Burgundy Tint Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#2B0813]/85 via-[#2B0813]/90 to-[#19040b]/95" />
       </div>
 
-      {/* Content Column */}
-      <div className="relative z-10 flex flex-col justify-center items-center w-full max-w-4xl px-4 sm:px-8 md:px-10 py-12 md:py-16 text-[#FAF6EE]">
-        <div className="w-full text-center bg-[#1d050d]/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-3xl border border-white/15 shadow-2xl">
+      {/* --- DESKTOP BACKGROUND / PHOTO COLUMN (Victoria Photo, Sharp) --- */}
+      <div className="hidden md:block relative md:w-[50%] md:h-auto overflow-hidden">
+        <Image
+          src="/rozbir/IMG_2534.jpg"
+          alt="Вікторія Мещерякова"
+          fill
+          priority
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#FAF6EE]/20" />
+      </div>
+
+      {/* --- CONTENT COLUMN --- */}
+      <div className="relative z-10 flex flex-col justify-end md:justify-center w-full md:w-[50%] px-4 sm:px-8 md:px-10 lg:px-14 pt-12 pb-14 md:py-16 text-[#FAF6EE] md:text-[#2B0813]">
+        <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left bg-[#1d050d]/80 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none p-5 sm:p-7 md:p-0 rounded-3xl md:rounded-none border border-white/15 md:border-none shadow-2xl md:shadow-none">
           {/* Pill Badges */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -38,10 +49,10 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             transition={{ duration: 0.5 }}
             className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 mb-5"
           >
-            <span className="rounded-full bg-[#5c172a] text-[#FAF6EE] text-[10px] sm:text-xs font-extrabold tracking-[0.18em] uppercase px-4 py-1.5 shadow-md border border-white/20">
+            <span className="rounded-full bg-[#5c172a] md:bg-[#451220] text-[#FAF6EE] text-[10px] sm:text-xs font-extrabold tracking-[0.18em] uppercase px-4 py-1.5 shadow-md border border-white/20 md:border-none">
               ІНТЕНСИВ · 4 УРОКИ
             </span>
-            <span className="rounded-full bg-[#1c080f]/80 md:bg-[#451220]/10 text-[#FAF6EE] md:text-[#451220] text-[10px] sm:text-xs font-bold tracking-[0.14em] uppercase px-4 py-1.5 border border-white/20 md:border-current/20 backdrop-blur">
+            <span className="rounded-full bg-[#1c080f]/80 md:bg-[#451220]/10 text-[#FAF6EE] md:text-[#451220] text-[10px] sm:text-xs font-bold tracking-[0.14em] uppercase px-4 py-1.5 border border-white/20 md:border-current/20 backdrop-blur md:backdrop-blur-none">
               СИСТЕМА КОНТЕНТУ 2026
             </span>
           </motion.div>
@@ -69,7 +80,7 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             <p className="font-medium drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)] md:drop-shadow-none">
               І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.
             </p>
-            <p className="font-semibold text-white md:text-[#451220] bg-[#451220]/90 md:bg-[#451220]/5 p-3.5 rounded-2xl border border-white/20 md:border-[#451220]/15 shadow-lg">
+            <p className="font-semibold text-white md:text-[#451220] bg-[#451220]/90 md:bg-[#451220]/5 p-3.5 rounded-2xl border border-white/20 md:border-[#451220]/15 shadow-lg md:shadow-none">
               За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів
             </p>
           </motion.div>
@@ -83,7 +94,7 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
           >
             <button
               onClick={onOpenCheckout}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#5c172a] hover:bg-[#380d17] text-[#FAF6EE] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer border border-white/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#5c172a] md:bg-[#451220] hover:bg-[#380d17] md:hover:bg-[#2B0813] text-[#FAF6EE] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer border border-white/20 md:border-none"
             >
               <span>Хочу систему</span>
               <ArrowRight size={18} />

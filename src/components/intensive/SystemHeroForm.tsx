@@ -363,7 +363,7 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
         {/* Instagram */}
         <div>
           <label className="block text-[11px] font-manrope font-bold uppercase tracking-wider text-[#2D0C14]/70 mb-1">
-            Instagram @нікнейм
+            Instagram нікнейм
           </label>
           <input
             type="text"
