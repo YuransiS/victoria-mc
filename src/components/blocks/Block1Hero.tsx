@@ -9,16 +9,31 @@ import { getDynamicPriceState } from "@/lib/dynamicPrice";
 
 const OFFERS = {
   1: {
-    title: "Як знати що постити, виглядати у своєму стилі і отримувати заявки на послуги, інфопродукти",
-    subtitle: "Покажу свою систему - як витрачати на контент 2–3 години на тиждень, не думати що постити і отримувати клієнтів з блогу вже цим літом"
+    badge1: "ІНТЕНСИВ • 4 УРОКИ",
+    badge2: "СИСТЕМА КОНТЕНТУ 2026",
+    title: "Абсолютно випадковий контент може набрати мільйони.",
+    subtitle: "А той, у який ти вклала душу — 5 лайків",
+    description: "І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.",
+    cardText: "За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів",
+    buttonText: "Хочу систему →"
   },
   2: {
+    badge1: "ІНТЕНСИВ • 4 УРОКИ",
+    badge2: "СИСТЕМА КОНТЕНТУ 2026",
     title: "Як зробити так, щоб блог приносив заявки та продажі вже цим літом",
-    subtitle: "Зсередини покажу свою систему, як робити продаючий контент за 30хв на день"
+    subtitle: "Зсередини покажу свою систему, як робити продаючий контент за 30хв на день",
+    description: "Перестань витрачати години на контент без конверсії та побудуй прогнозовану систему.",
+    cardText: "За 4 уроки ти побудуєш систему контенту, яка генерує клієнтів щодня",
+    buttonText: "Хочу систему →"
   },
   3: {
+    badge1: "ІНТЕНСИВ • 4 УРОКИ",
+    badge2: "СИСТЕМА КОНТЕНТУ 2026",
     title: "Як перестати вести блог навмання та перетворити контент на джерело клієнтів",
-    subtitle: "Розповім, як знайти власний стиль, більше не думати щодня про контент і побудувати систему, яка працює на заявки та продажі навіть влітку"
+    subtitle: "Розповім, як знайти власний стиль і побудувати систему, яка працює на заявки",
+    description: "Система, яка працює на заявки та продажі навіть коли ти відпочиваєш.",
+    cardText: "За 4 уроки ти знайдеш власний стиль і створиш систему регулярних продажів",
+    buttonText: "Хочу систему →"
   }
 };
 
@@ -77,9 +92,7 @@ export function Block1Hero() {
     setVariant(detected);
     localStorage.setItem("current_offer_variant", `offer${detected}`);
 
-    // Dynamically set CSS variables for the active variant theme
     const root = document.documentElement;
-    // Set all variants to use the yellow accent color theme
     root.style.setProperty("--accent-color", "#fff500");
     root.style.setProperty("--accent-text-color", "#000000");
     root.style.setProperty("--accent-color-rgb", "255, 245, 0");
@@ -96,9 +109,11 @@ export function Block1Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  const activeOffer = OFFERS[variant];
+
   return (
     <section className={`${styles.hero} ${variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3}`}>
-      {/* BACKGROUND LAYER */}
+      {/* BACKGROUND LAYER WITH SUBTLE BLUR */}
       <motion.div
         className={styles.background}
         initial={{ opacity: 0, scale: 1.05 }}
@@ -119,43 +134,57 @@ export function Block1Hero() {
         {/* MAIN STACKED CONTENT */}
         <div className={styles.content}>
 
+          {/* BADGES ROW */}
           <motion.div
-            className={styles.topRow}
+            className={styles.badgeWrapper}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            <span>{formattedDate || "... "} в 19:00 ЗА КИЄВОМ</span>
+            <span className={styles.badgePillPrimary}>{activeOffer.badge1}</span>
+            <span className={styles.badgePillSecondary}>{activeOffer.badge2}</span>
           </motion.div>
-
-
 
           <div className={styles.textContent}>
 
             <motion.h1
-              className={`${styles.title} ${styles.longTitle} ${variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
-                }`}
+              className={styles.title}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             >
-              <span className={styles.highlightSpan}>
-                {OFFERS[variant].title}
-              </span>
+              {activeOffer.title}
             </motion.h1>
 
-            <motion.div
-              className={styles.subDescription}
+            <motion.p
+              className={styles.subtitle}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
             >
-              <p className={`${styles.subtitle} ${styles.longSubtitle}`}>
-                {OFFERS[variant].subtitle}
+              {activeOffer.subtitle}
+            </motion.p>
+
+            <motion.p
+              className={styles.descriptionText}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+            >
+              {activeOffer.description}
+            </motion.p>
+
+            {/* VALUE CARD */}
+            <motion.div
+              className={styles.valueCard}
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
+            >
+              <p className={styles.valueCardText}>
+                {activeOffer.cardText}
               </p>
             </motion.div>
-
-
 
             {/* Mobile CTA Button (opens modal) */}
             <div className={styles.mobileHeroCta}>
@@ -170,16 +199,7 @@ export function Block1Hero() {
                 </div>
               </div>
               {nextPrice && timeLeft > 0 && (
-                <div style={{
-                  fontSize: "0.8rem",
-                  color: "var(--accent-color)",
-                  fontWeight: 800,
-                  marginBottom: "1rem",
-                  fontFamily: "var(--font-manrope)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  textAlign: "center"
-                }}>
+                <div className={styles.timerText}>
                   ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
                 </div>
               )}
@@ -187,7 +207,7 @@ export function Block1Hero() {
                 className={styles.mainPageButton}
                 onClick={() => setIsRegModalOpen(true)}
               >
-                ОПЛАТИТИ УЧАСТЬ
+                {activeOffer.buttonText}
               </button>
             </div>
           </div>
@@ -225,7 +245,7 @@ export function Block1Hero() {
               </div>
             )}
 
-            <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
+            <Form buttonText={activeOffer.buttonText} buttonClassName={styles.mainPageButton} />
 
             <div className={styles.socialProof}>
               <div className={styles.avatars}>
@@ -284,7 +304,7 @@ export function Block1Hero() {
                   ⏱️ через {formatTime(timeLeft)} ціна буде {nextPrice} грн
                 </div>
               )}
-              <Form buttonText="ОПЛАТИТИ УЧАСТЬ" buttonClassName={styles.mainPageButton} />
+              <Form buttonText={activeOffer.buttonText} buttonClassName={styles.mainPageButton} />
             </motion.div>
           </motion.div>
         )}

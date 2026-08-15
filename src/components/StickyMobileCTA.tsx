@@ -5,21 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function StickyMobileCTA() {
   const [isVisible, setIsVisible] = useState(false);
-  const [variant, setVariant] = useState(1);
 
   useEffect(() => {
-    // Detect active offer variant
-    const currentOffer = localStorage.getItem("current_offer_variant") || "";
-    if (currentOffer === "offer2") {
-      setVariant(2);
-    } else if (currentOffer === "offer3") {
-      setVariant(3);
-    }
-
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      if (scrollPosition > windowHeight * 0.8) {
+      // Show sticky CTA as soon as user starts scrolling down past top section
+      if (scrollPosition > 120) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -39,17 +30,21 @@ export function StickyMobileCTA() {
     <AnimatePresence>
       {isVisible && (
         <motion.div 
-          className={`${styles.stickyWrapper} ${
-            variant === 1 ? styles.var1 : variant === 2 ? styles.var2 : styles.var3
-          }`}
+          className={styles.stickyWrapper}
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <a href="#registration-form" className={styles.stickyButton} onClick={handleClick}>
-            ОПЛАТИТИ УЧАСТЬ
-          </a>
+          <div className={styles.stickyContent}>
+            <div className={styles.stickyPriceInfo}>
+              <span className={styles.stickyPriceOld}>449 грн</span>
+              <span className={styles.stickyPriceNew}>149 грн</span>
+            </div>
+            <a href="#registration-form" className={styles.stickyButton} onClick={handleClick}>
+              Хочу систему →
+            </a>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
