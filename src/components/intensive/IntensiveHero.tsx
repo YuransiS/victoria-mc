@@ -14,25 +14,23 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   const { formattedTime } = use10MinTimer();
 
   return (
-    <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#FAF6EE] text-[#2B0813] md:flex md:items-stretch">
-      {/* Photo Column / Background on mobile with subtle blur */}
-      <div className="absolute inset-0 md:relative md:w-[50%] md:h-auto overflow-hidden">
+    <section className="relative min-h-[92svh] md:min-h-[88svh] w-full overflow-hidden bg-[#2B0813] text-[#FAF6EE] flex flex-col justify-center items-center">
+      {/* Background Instagram Posts Grid Layer with Blur */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
         <Image
-          src="/rozbir/IMG_2534.jpg"
-          alt="Вікторія Мещерякова"
+          src="/free-lection/inst.jpg"
+          alt="Instagram Posts Grid"
           fill
           priority
-          className="object-cover object-[center_15%] md:object-center blur-[8px] md:blur-none scale-110 md:scale-100 opacity-75 md:opacity-100"
+          className="object-cover object-center blur-[10px] scale-110 opacity-50"
         />
-        {/* Mobile Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1d050d] via-[#2B0813]/85 to-[#1d050d]/50 backdrop-blur-sm md:hidden" />
-        {/* Desktop Gradient Blend */}
-        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#FAF6EE]/20" />
+        {/* Dark Burgundy Tint Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2B0813]/85 via-[#2B0813]/90 to-[#19040b]/95" />
       </div>
 
       {/* Content Column */}
-      <div className="relative z-10 flex flex-col justify-end md:justify-center md:w-[50%] px-4 sm:px-8 md:px-10 lg:px-14 pt-12 pb-14 md:py-16 text-[#FAF6EE] md:text-[#2B0813]">
-        <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left bg-[#1d050d]/80 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none p-5 sm:p-7 rounded-3xl border border-white/15 md:border-none shadow-2xl md:shadow-none">
+      <div className="relative z-10 flex flex-col justify-center items-center w-full max-w-4xl px-4 sm:px-8 md:px-10 py-12 md:py-16 text-[#FAF6EE]">
+        <div className="w-full text-center bg-[#1d050d]/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-3xl border border-white/15 shadow-2xl">
           {/* Pill Badges */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
