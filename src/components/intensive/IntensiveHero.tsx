@@ -16,22 +16,22 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   return (
     <section className="relative w-full min-h-[92svh] md:min-h-[88svh] overflow-hidden bg-[#2B0813] md:bg-[#FAF6EE] text-[#FAF6EE] md:text-[#2B0813] flex flex-col justify-between md:flex-row md:items-stretch">
       {/* ========================================================================= */}
-      {/* 1. MOBILE BACKGROUND: Instagram grid with sharp top + Gaussian blur from blue line down */}
+      {/* 1. MOBILE BACKGROUND: Victoria portrait photo + Gaussian blur covering bottom text */}
       {/* ========================================================================= */}
       <div className="absolute inset-0 md:hidden overflow-hidden pointer-events-none">
         <Image
-          src="/free-lection/inst.jpg"
-          alt="Instagram Posts Grid"
+          src="/rozbir/IMG_2534.jpg"
+          alt="Вікторія Мещерякова"
           fill
           priority
           className="object-cover object-[center_top]"
         />
         {/* Subtle top shade behind header pill */}
-        <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/50 to-transparent" />
-        {/* Gaussian Blur & Dark Plum Overlay starting right at the blue line (covering all text) */}
-        <div className="absolute top-[24%] inset-x-0 bottom-0 backdrop-blur-md bg-[#2B0813]/85" />
-        {/* Smooth feather transition at the blue line edge */}
-        <div className="absolute top-[18%] inset-x-0 h-16 bg-gradient-to-b from-transparent to-[#2B0813]/85" />
+        <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
+        {/* Gaussian Blur & Dark Plum Overlay covering text area down to the very bottom */}
+        <div className="absolute top-[20%] inset-x-0 bottom-0 backdrop-blur-md bg-[#2B0813]/85" />
+        {/* Smooth feather transition at top of blur */}
+        <div className="absolute top-[14%] inset-x-0 h-16 bg-gradient-to-b from-transparent to-[#2B0813]/85" />
       </div>
 
       {/* ========================================================================= */}
@@ -51,13 +51,13 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
       {/* ========================================================================= */}
       {/* 3. MOBILE & DESKTOP CONTENT STACK */}
       {/* ========================================================================= */}
-      <div className="relative z-10 flex flex-col justify-between w-full md:w-[50%] px-5 sm:px-8 md:px-12 lg:px-16 pt-5 pb-8 md:py-16">
+      <div className="relative z-10 flex flex-col justify-between w-full md:w-[50%] px-5 sm:px-8 md:px-12 lg:px-16 pt-4 pb-6 md:py-16 min-h-[92svh] md:min-h-0">
         {/* --- TOP BADGES PILL --- */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-center md:justify-start w-full mb-4"
+          className="flex justify-center md:justify-start w-full mb-2"
         >
           <div className="inline-flex items-center gap-2.5 bg-white/95 backdrop-blur-md text-[#2B0813] text-[11px] sm:text-xs font-bold px-4 py-2 rounded-full shadow-lg border border-black/10 tracking-wide">
             <span className="text-[#451220] uppercase font-extrabold">Інтенсив · 4 уроки</span>
@@ -66,8 +66,8 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
           </div>
         </motion.div>
 
-        {/* --- MOBILE SPACING (Shows sharp top row of photos down to the blue line) --- */}
-        <div className="h-[14vh] sm:h-[18vh] md:hidden pointer-events-none" />
+        {/* --- FLEXIBLE SPACER (Pushes the entire text block to the bottom of the hero) --- */}
+        <div className="flex-1 min-h-[14vh] sm:min-h-[18vh] md:hidden" />
 
         {/* --- MAIN HERO TEXT (Inside the Gaussian blur area) --- */}
         <div className="max-w-xl mx-auto md:mx-0 w-full text-left">
