@@ -468,13 +468,18 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-extrabold py-4 px-6 rounded-full uppercase tracking-[0.12em] text-xs transition-all transform active:scale-[0.99] shadow-lg flex items-center justify-center gap-2 mt-6 cursor-pointer"
-              >
-                {isSubmitting ? "ОБРОБКА..." : `ОПЛАТИТИ УЧАСТЬ ЗА ${amount} ЄВРО →`}
-              </button>
+              <div className="mt-6">
+                <p className="font-manrope text-xs font-bold text-center text-[#2D0C14]/80 mb-2">
+                  Хочу систему за {amount}€ замість 49€
+                </p>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-extrabold py-4 px-6 rounded-full uppercase tracking-[0.12em] text-xs transition-all transform active:scale-[0.99] shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmitting ? "ОБРОБКА..." : "ХОЧУ СИСТЕМУ →"}
+                </button>
+              </div>
 
               <div className="flex items-center justify-center gap-2 text-[#2D0C14]/60 text-[11px] uppercase tracking-wider pt-2">
                 <ShieldCheck size={14} className="text-[#380E18]" />

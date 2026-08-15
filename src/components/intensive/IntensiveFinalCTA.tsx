@@ -381,6 +381,9 @@ export function IntensiveFinalCTA({ onOpenCheckout }: IntensiveFinalCTAProps) {
 
             {/* Submit */}
             <div className="pt-2">
+              <p className="font-manrope text-xs sm:text-sm font-bold text-center text-[#2B0813]/80 mb-2">
+                Хочу систему за 9€ замість 49€
+              </p>
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -389,7 +392,7 @@ export function IntensiveFinalCTA({ onOpenCheckout }: IntensiveFinalCTAProps) {
                 {isSubmitting ? (
                   <span>Перенаправляємо на оплату...</span>
                 ) : (
-                  <span>Реєструюсь за 9€ замість 49€ — хочу систему →</span>
+                  <span>Хочу систему →</span>
                 )}
               </button>
             </div>

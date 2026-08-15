@@ -414,6 +414,9 @@ export function IntensiveCheckoutModal({
 
               {/* Submit */}
               <div className="pt-2">
+                <p className="font-manrope text-xs sm:text-sm font-bold text-center text-[#2B0813]/80 mb-2">
+                  Хочу систему за {amount}€ замість 49€
+                </p>
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -425,7 +428,7 @@ export function IntensiveCheckoutModal({
                       Перенаправляємо на оплату...
                     </span>
                   ) : (
-                    <span>Перейти до оплати {amount}€ →</span>
+                    <span>Хочу систему →</span>
                   )}
                 </button>
               </div>

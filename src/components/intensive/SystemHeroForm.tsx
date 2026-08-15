@@ -377,13 +377,18 @@ export const SystemHeroForm: React.FC<SystemHeroFormProps> = ({
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          disabled={status !== "idle"}
-          className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-black py-4 px-4 rounded-full uppercase tracking-[0.12em] text-xs transition-all active:scale-[0.98] shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-2"
-        >
-          {status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : buttonText}
-        </button>
+        <div className="mt-4">
+          <p className="font-manrope text-xs font-bold text-center text-[#2D0C14]/80 mb-2">
+            Хочу систему за {amount}€ замість 49€
+          </p>
+          <button
+            type="submit"
+            disabled={status !== "idle"}
+            className="w-full bg-[#380E18] hover:bg-[#23080F] text-[#FDFBF7] font-manrope font-black py-4 px-4 rounded-full uppercase tracking-[0.12em] text-xs transition-all active:scale-[0.98] shadow-lg cursor-pointer flex items-center justify-center gap-2"
+          >
+            {status === "redirecting" ? "ПЕРЕНАПРАВЛЕННЯ..." : "ХОЧУ СИСТЕМУ →"}
+          </button>
+        </div>
 
         <div className="flex items-center justify-center gap-1.5 text-[#2D0C14]/60 text-[10px] uppercase tracking-wider pt-1">
           <ShieldCheck size={13} className="text-[#380E18]" />
