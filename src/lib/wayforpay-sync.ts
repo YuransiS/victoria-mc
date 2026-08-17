@@ -112,6 +112,15 @@ export function isTestTransaction(tx: WfpTransaction): boolean {
 }
 
 /**
+ * Validates that an order reference belongs specifically to the Victoria website/project.
+ */
+export function isVictoriaOrder(tx: WfpTransaction, existsInDb: boolean = false): boolean {
+  if (existsInDb) return true;
+  const ref = (tx.orderReference || '').toUpperCase();
+  return ref.startsWith('VMC_') || ref.startsWith('ROZ_');
+}
+
+/**
  * Detects the funnel/product properties from order reference, currency, and amount.
  */
 export function detectProductFunnel(tx: WfpTransaction): {
@@ -327,6 +336,11 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
     });
 
     for (const tx of batch) {
+      const existingLead = existingMap.get(tx.orderReference);
+      if (!isVictoriaOrder(tx, !!existingLead)) {
+        continue;
+      }
+
       const status = (tx.transactionStatus || '').trim();
       const isApproved = status.toLowerCase() === 'approved';
       const isDeclined = status.toLowerCase() === 'declined';
@@ -341,7 +355,6 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
         continue;
       }
 
-      const existingLead = existingMap.get(tx.orderReference);
       const parsedAmount = parseFloat(String(tx.amount || '0'));
 
       if (existingLead) {

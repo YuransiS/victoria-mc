@@ -112,6 +112,12 @@ function isTestTransaction(tx) {
   return false;
 }
 
+function isVictoriaOrder(tx, existsInDb = false) {
+  if (existsInDb) return true;
+  const ref = (tx.orderReference || '').toUpperCase();
+  return ref.startsWith('VMC_') || ref.startsWith('ROZ_');
+}
+
 function detectProductFunnel(tx) {
   const ref = (tx.orderReference || '').toUpperCase();
   const currency = (tx.currency || 'UAH').toUpperCase();
@@ -280,6 +286,11 @@ async function run() {
     existingLeads.forEach(l => existingMap.set(l.order_id, l));
 
     for (const tx of batch) {
+      const existingLead = existingMap.get(tx.orderReference);
+      if (!isVictoriaOrder(tx, !!existingLead)) {
+        continue;
+      }
+
       const status = (tx.transactionStatus || '').trim();
       const isApproved = status.toLowerCase() === 'approved';
       const isDeclined = status.toLowerCase() === 'declined';
@@ -299,8 +310,6 @@ async function run() {
         skippedTests++;
         continue;
       }
-
-      const existingLead = existingMap.get(tx.orderReference);
 
       if (existingLead) {
         const currentDbStatus = (existingLead.status || '').trim();
