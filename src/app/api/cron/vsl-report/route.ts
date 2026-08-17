@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { syncWayForPayTransactions } from '@/lib/wayforpay-sync';
 
 // Native formatter for Europe/Kyiv timezone
 function formatKyivTime(date: Date): string {
@@ -116,6 +117,15 @@ export async function GET(req: Request) {
       startTime = isWeekly
         ? new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000)
         : new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
+    }
+
+    // 1.8. Pre-report payment synchronization with WayForPay (auto-reconciling recent transactions)
+    try {
+      console.log('[Cron Report] Performing pre-report WayForPay auto-sync...');
+      const syncRes = await syncWayForPayTransactions({ daysBack: isWeekly ? 8 : 3 });
+      console.log(`[Cron Report] Pre-report sync complete: updated=${syncRes.updatedInDb}, created=${syncRes.createdInDb}, totalWfp=${syncRes.totalFetched}`);
+    } catch (syncErr) {
+      console.error('[Cron Report] Pre-report WayForPay sync error (non-fatal):', syncErr);
     }
 
     // 2. Fetch all leads and clicks in this window (selecting raw_payload for video/form telemetry)
