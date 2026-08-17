@@ -13,29 +13,29 @@ const casesData = [
     name: "Мар’яна",
     niche: "Вчителька танців",
     id: "01",
-    before: "https://i.ibb.co/350Z2MCW/IMG-5900.jpg",
-    after: "https://i.ibb.co/dhn0HQx/IMG-5901.jpg"
+    before: "/rozbir/do1.jpg",
+    after: "/rozbir/bo1.jpg"
   },
   {
     name: "Бізнес",
     niche: "Будівництво басейнів",
     id: "02",
-    before: "https://i.ibb.co/F4JG4p7D/IMG-5896.jpg",
-    after: "https://i.ibb.co/2Y7pmktn/IMG-5897.jpg"
+    before: "/rozbir/do2.jpg",
+    after: "/rozbir/bo2.jpg"
   },
   {
     name: "Аня",
     niche: "Дизайнер одягу",
     id: "03",
-    before: "https://i.ibb.co/ycV62Bsy/IMG-5898.jpg",
-    after: "https://i.ibb.co/kgCgSsyz/IMG-5899.jpg"
+    before: "/rozbir/do3.jpg",
+    after: "/rozbir/bo3.jpg"
   },
   {
     name: "Катя",
     niche: "Лайфстайл блог",
     id: "04",
-    before: "https://i.ibb.co/fdF1Y1b2/IMG-5892.jpg",
-    after: "https://i.ibb.co/fVgSyWQJ/IMG-5893.jpg"
+    before: "/rozbir/do1.jpg",
+    after: "/rozbir/bo4.jpg"
   }
 ];
 

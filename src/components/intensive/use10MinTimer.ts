@@ -3,21 +3,28 @@
 import { useState, useEffect } from "react";
 
 export function use10MinTimer() {
-  const [secondsLeft, setSecondsLeft] = useState(600);
+  const DURATION_SECS = 20 * 60; // 20 minutes countdown for /intensive/5-likes
+  const [secondsLeft, setSecondsLeft] = useState(DURATION_SECS);
 
   useEffect(() => {
-    const STORAGE_KEY = "intensive_5likes_timer_end";
+    const STORAGE_KEY = "intensive_5likes_timer_end_v20";
     const now = Date.now();
-    let endTime = localStorage.getItem(STORAGE_KEY);
+    let endTimeStr = localStorage.getItem(STORAGE_KEY);
+    let endTime = endTimeStr ? parseInt(endTimeStr, 10) : 0;
 
-    if (!endTime || parseInt(endTime, 10) <= now) {
-      // 10 minutes from now
-      endTime = (now + 10 * 60 * 1000).toString();
-      localStorage.setItem(STORAGE_KEY, endTime);
+    if (!endTime || isNaN(endTime) || endTime <= now) {
+      endTime = now + DURATION_SECS * 1000;
+      localStorage.setItem(STORAGE_KEY, endTime.toString());
     }
 
     const calculateRemaining = () => {
-      const remaining = Math.max(0, Math.floor((parseInt(endTime!, 10) - Date.now()) / 1000));
+      const currentNow = Date.now();
+      let storedEnd = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+      if (!storedEnd || isNaN(storedEnd) || storedEnd <= currentNow) {
+        storedEnd = currentNow + DURATION_SECS * 1000;
+        localStorage.setItem(STORAGE_KEY, storedEnd.toString());
+      }
+      const remaining = Math.max(0, Math.floor((storedEnd - currentNow) / 1000));
       setSecondsLeft(remaining);
     };
 

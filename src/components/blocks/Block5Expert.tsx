@@ -54,7 +54,7 @@ export function Block5Expert() {
           viewport={{ once: true, margin: "-100px" }}
         >
           <Image
-            src="https://i.ibb.co/BHbR3f2Q/IMG-5598.jpg"
+            src="/rozbir/IMG_2534.jpg"
             alt="Вікторія Мещерякова"
             fill
             className={styles.imageCover}

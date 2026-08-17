@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 import styles from "./SharedBlocks.module.css";
 
 const casesData = [
-  { name: 'Мар’яна', niche: 'Вчителька танців', id: '01', before: 'https://i.ibb.co/350Z2MCW/IMG-5900.jpg', after: 'https://i.ibb.co/dhn0HQx/IMG-5901.jpg' },
-  { name: 'Бізнес', niche: 'Будівництво басейнів', id: '02', before: 'https://i.ibb.co/F4JG4p7D/IMG-5896.jpg', after: 'https://i.ibb.co/2Y7pmktn/IMG-5897.jpg' },
-  { name: 'Аня', niche: 'Дизайнер одягу', id: '03', before: 'https://i.ibb.co/ycV62Bsy/IMG-5898.jpg', after: 'https://i.ibb.co/kgCgSsyz/IMG-5899.jpg' },
-  { name: 'Аня', niche: 'Вчителька української', id: '04', before: 'https://i.ibb.co/1YRsL7f5/IMG-5894.jpg', after: 'https://i.ibb.co/xqb4G38y/IMG-5895.jpg' },
-  { name: 'Катя', niche: 'Лайфстайл блог', id: '05', before: 'https://i.ibb.co/fdF1Y1b2/IMG-5892.jpg', after: 'https://i.ibb.co/fVgSyWQJ/IMG-5893.jpg' },
-  { name: 'Аліса', niche: 'Стилістка', id: '06', before: 'https://i.ibb.co/nMDKNkY4/IMG-5890.jpg', after: 'https://i.ibb.co/xqdWH5NY/IMG-5891.jpg' },
+  { name: 'Мар’яна', niche: 'Вчителька танців', id: '01', before: '/rozbir/do1.jpg', after: '/rozbir/bo1.jpg' },
+  { name: 'Бізнес', niche: 'Будівництво басейнів', id: '02', before: '/rozbir/do2.jpg', after: '/rozbir/bo2.jpg' },
+  { name: 'Аня', niche: 'Дизайнер одягу', id: '03', before: '/rozbir/do3.jpg', after: '/rozbir/bo3.jpg' },
+  { name: 'Аня', niche: 'Вчителька української', id: '04', before: '/rozbir/do1.jpg', after: '/rozbir/bo4.jpg' },
+  { name: 'Катя', niche: 'Лайфстайл блог', id: '05', before: '/rozbir/do2.jpg', after: '/rozbir/bo1.jpg' },
+  { name: 'Аліса', niche: 'Стилістка', id: '06', before: '/rozbir/do3.jpg', after: '/rozbir/bo2.jpg' },
 ];
 
 export function BlockCases() {

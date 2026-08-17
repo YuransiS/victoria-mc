@@ -43,7 +43,7 @@ export function PracticumExpert() {
           transition={{ duration: 0.5 }}
         >
           <Image
-            src="https://i.ibb.co/LMvf7DM/IMG-0901.jpg"
+            src="/rozbir/IMG_2534.jpg"
             alt="Вікторія Мещерякова"
             fill
             className={styles.imageCover}

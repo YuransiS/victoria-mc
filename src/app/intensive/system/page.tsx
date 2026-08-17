@@ -27,44 +27,42 @@ import styles from "./system.module.css";
 
 // 10-Minute Countdown Timer Hook
 function use10MinTimer() {
-  const [timeLeft, setTimeLeft] = useState({ minutes: 10, seconds: 0 });
+  const DURATION_SECS = 10 * 60; // 10 minutes
+  const [secondsLeft, setSecondsLeft] = useState(DURATION_SECS);
 
   useEffect(() => {
-    const STORAGE_KEY = "intensive_system_timer_start";
-    const DURATION = 10 * 60 * 1000; // 10 minutes
+    const STORAGE_KEY = "intensive_system_timer_end";
+    const now = Date.now();
+    let endTimeStr = localStorage.getItem(STORAGE_KEY);
+    let endTime = endTimeStr ? parseInt(endTimeStr, 10) : 0;
 
-    let startTime = localStorage.getItem(STORAGE_KEY);
-    if (!startTime) {
-      startTime = Date.now().toString();
-      localStorage.setItem(STORAGE_KEY, startTime);
+    if (!endTime || isNaN(endTime) || endTime <= now) {
+      endTime = now + DURATION_SECS * 1000;
+      localStorage.setItem(STORAGE_KEY, endTime.toString());
     }
 
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - parseInt(startTime!, 10);
-      const remaining = Math.max(0, DURATION - elapsed);
-
-      if (remaining <= 0) {
-        // Reset for continuous urgency loop
-        const newStart = Date.now().toString();
-        localStorage.setItem(STORAGE_KEY, newStart);
-        setTimeLeft({ minutes: 10, seconds: 0 });
-      } else {
-        const mins = Math.floor(remaining / 60000);
-        const secs = Math.floor((remaining % 60000) / 1000);
-        setTimeLeft({ minutes: mins, seconds: secs });
+    const calculateRemaining = () => {
+      const currentNow = Date.now();
+      let storedEnd = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+      if (!storedEnd || isNaN(storedEnd) || storedEnd <= currentNow) {
+        storedEnd = currentNow + DURATION_SECS * 1000;
+        localStorage.setItem(STORAGE_KEY, storedEnd.toString());
       }
-    }, 1000);
+      const remaining = Math.max(0, Math.floor((storedEnd - currentNow) / 1000));
+      setSecondsLeft(remaining);
+    };
+
+    calculateRemaining();
+    const interval = setInterval(calculateRemaining, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const formatTime = () => {
-    const m = String(timeLeft.minutes).padStart(2, "0");
-    const s = String(timeLeft.seconds).padStart(2, "0");
-    return `${m}:${s}`;
-  };
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  const formatted = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-  return { timeLeft, formatted: formatTime() };
+  return { secondsLeft, formatted };
 }
 
 export default function IntensiveSystemPage() {
@@ -178,7 +176,7 @@ export default function IntensiveSystemPage() {
                   «Як я створюю контент за 30 хвилин на день»
                 </h3>
                 <p className={styles.bonusDesc}>
-                  Повний запис закритого ефіру з демонстрацією мого власного процесу: від ідеї до готового допису за 30 хвилин.
+                  Повний запис уроку з демонстрацією мого власного процесу: від ідеї до готового допису за 30 хвилин.
                 </p>
               </div>
               <div className={styles.bonusPriceRow}>
@@ -259,12 +257,12 @@ export default function IntensiveSystemPage() {
             <div className="inline-block bg-[#380E18] text-[#FDFBF7] text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full mb-3">
               СУМАРНА ЦІННІСТЬ БОНУСІВ
             </div>
-            <div className="text-3xl sm:text-4xl font-black text-[#2D0C14] mb-2">
-              <span className="line-through opacity-40 text-2xl sm:text-3xl mr-3 font-bold">125 євро</span>
+            <div className="flex flex-wrap items-baseline justify-center gap-2 sm:gap-3 text-2xl sm:text-4xl font-black text-[#2D0C14] mb-2">
+              <span className="line-through opacity-40 text-xl sm:text-3xl font-bold">125 євро</span>
               <span className="text-[#380E18]">БЕЗКОШТОВНО</span>
             </div>
             <p className="text-sm sm:text-base text-[#2D0C14]/80 mb-6 font-medium">
-              Доступ до всіх 4 бонусів відкривається автоматично в особистому кабінеті відразу після оплати 9€.
+              Доступ до всіх 4 бонусів відкривається автоматично відразу після оплати 9€.
             </p>
             <button onClick={handleOpenModal} className={styles.pillButton}>
               <span>Забрати місце за 9 євро замість 49</span>
@@ -345,22 +343,22 @@ export default function IntensiveSystemPage() {
               {
                 name: "Ольга",
                 niche: "Бʼюті-майстер",
-                beforeImg: "https://i.ibb.co/3k5fS2Q/photo-2026-03-03-12-25-34.jpg",
-                afterImg: "https://i.ibb.co/6P0N22M/photo-2026-03-03-12-25-39.jpg",
+                beforeImg: "/rozbir/do1.jpg",
+                afterImg: "/rozbir/bo1.jpg",
                 result: "Вийшла з 300€ на 1400€/міс завдяки системі контенту"
               },
               {
                 name: "Марія",
                 niche: "Психолог-консультант",
-                beforeImg: "https://i.ibb.co/ZzVfW4T/photo-2026-03-03-12-25-45.jpg",
-                afterImg: "https://i.ibb.co/tPpzLwP/photo-2026-03-03-12-25-49.jpg",
+                beforeImg: "/rozbir/do2.jpg",
+                afterImg: "/rozbir/bo2.jpg",
                 result: "Заповнила запис на 2 місяці наперед без щоденних сторіс"
               },
               {
                 name: "Катерина",
                 niche: "Експерт з англійської",
-                beforeImg: "https://i.ibb.co/sKqX9mZ/photo-2026-03-03-12-25-54.jpg",
-                afterImg: "https://i.ibb.co/4T7F2bT/photo-2026-03-03-12-25-58.jpg",
+                beforeImg: "/rozbir/do3.jpg",
+                afterImg: "/rozbir/bo3.jpg",
                 result: "+850 цільових підписників за 3 тижні та перші 1100€"
               }
             ].map((c, idx) => (
@@ -703,7 +701,7 @@ export default function IntensiveSystemPage() {
               ЧОМУ ЦІНА <span className={styles.scriptItalic}>ВСЬОГО 9 ЄВРО?</span>
             </h2>
             <p className={styles.sectionSubtitle}>
-              Цінність цієї системи — понад 300€. Але я хочу, щоб кожен експерт та підприємець зміг переконатися у дієвості мого підходу без фінансового бар'єру.
+              Цінність цієї системи — набагато вища. Але я хочу, щоб кожен експерт та підприємець зміг переконатися у дієвості мого підходу без фінансового бар'єру.
             </p>
           </div>
 
