@@ -285,15 +285,37 @@ export async function POST(req: Request) {
 
       const crmComment = commentLines.join('\n');
 
+      // Resolve traffic_source_id for BaseCRM pipeline 127
+      let trafficSourceId = 1090; // Default: VSL (1090)
+      if (isAnketa) {
+        trafficSourceId = 1095; // Default: АНКЕТА ПЕРЕДЗАПИСУ (1095)
+        const src = (utms.utm_source || '').toLowerCase();
+        const med = (utms.utm_medium || '').toLowerCase();
+        const camp = (utms.utm_campaign || '').toLowerCase();
+
+        if (src.includes('bot') || med.includes('bot') || camp.includes('bot')) {
+          trafficSourceId = 1092; // Анкета Бот (1092)
+        } else if (src.includes('blog') || src.includes('insta') || med.includes('blog') || camp.includes('blog')) {
+          trafficSourceId = 1089; // Анкета Блог (1089)
+        } else if (src.includes('efir') || med.includes('efir') || camp.includes('efir') || src.includes('live')) {
+          trafficSourceId = 1091; // Анкети ефір (1091)
+        } else if (src.includes('baza') || src.includes('base') || med.includes('email') || src.includes('sendpulse')) {
+          trafficSourceId = 1093; // Анкети "розсилка база" (1093)
+        }
+      } else if (isVSL) {
+        trafficSourceId = 1090; // VSL (1090)
+      }
+
       const crmPayload = {
-        pipeline_id: 110,
-        dev_key: "DF5-6E",
+        pipeline_id: 127,
+        dev_key: "1B9D-7F",
         name: name || 'Без імені',
         email: crmEmail,
         phone: formattedCrmPhone,
         telegram: social || '',
         instagram: instagram || '',
         comment: crmComment || '',
+        traffic_source_id: trafficSourceId,
         utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
         utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
         utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
