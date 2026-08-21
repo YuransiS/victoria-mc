@@ -390,88 +390,26 @@ export default function IntensiveSystemPage() {
             ))}
           </div>
 
-          {/* Review Testimonial Cards */}
+          {/* Real Review Screenshots */}
           <div className={styles.sectionHeader} style={{ marginBottom: "2rem" }}>
             <h3 className="font-manrope text-xl sm:text-2xl font-black uppercase tracking-tight text-[#2D0C14]">
               ЩО КАЖУТЬ <span className={styles.scriptItalic}>УЧНІ:</span>
             </h3>
           </div>
 
-          <div className={styles.feedbackGrid}>
-            {[
-              {
-                name: "Олена",
-                role: "Учасниця розбору",
-                highlight: "«Так чітко, детально і в короткий час — навіть не очікувала!»",
-                text: "Супер! Так чітко, детально, зрозуміло і в короткий час. Навіть не очікувала настільки глибокого розбору! Дуже дякую вам.",
-                img: "/rozbir/r1.jpg"
-              },
-              {
-                name: "Анастасія",
-                role: "Крипто-експертка",
-                highlight: "«Отримала клієнтку з першого ж Reels після системи»",
-                text: "Контент почав викликати довіру та приводити реальних клієнтів. Отримала першу заявку та клієнтку з першого ж відео!",
-                img: "/cases/anastasia_review2.png"
-              },
-              {
-                name: "Ксенія",
-                role: "Дизайнерка інтер'єру",
-                highlight: "«Охоплення зросли з першої публікації»",
-                text: "Контент нарешті хочеться дивитися та взаємодіяти. Блог комплексно розкриває експертність і продає без нав'язування.",
-                img: "/cases/ksenia_review.png"
-              },
-              {
-                name: "Інна",
-                role: "Коуч",
-                highlight: "«Повернула собі натхнення до роботи з блогом»",
-                text: "Чітке розуміння, як вести блог через свій метод і цінності. З'явилося відчуття затишку і впевненості, клієнти пишуть самі.",
-                img: "/cases/inna_review.png"
-              },
-              {
-                name: "Вікторія",
-                role: "Експертка",
-                highlight: "«Дуже надихаєш і розкладаєш усе по поличках»",
-                text: "Неймовірно глибокий розбір. Все настільки структуровано, що тепер точно знаю, що постити щодня без хаосу.",
-                img: "/rozbir/r5.jpg"
-              },
-              {
-                name: "Марина",
-                role: "Контент-креаторка",
-                highlight: "«Зрозуміла, де втрачала заявки та як це виправити»",
-                text: "Після впровадження системи контент почав прогрівати аудиторію автоматично. Більше не витрачаю години на вигадування тем.",
-                img: "/rozbir/r4.jpg"
-              }
-            ].map((item, idx) => (
-              <div key={idx} className={styles.feedbackCard}>
-                <div>
-                  <div className={styles.feedbackHeader}>
-                    <div className={styles.feedbackAuthor}>
-                      <div className={styles.feedbackAvatar}>{item.name[0]}</div>
-                      <div>
-                        <div className={styles.feedbackAuthorName}>{item.name}</div>
-                        <div className={styles.feedbackAuthorRole}>{item.role}</div>
-                      </div>
-                    </div>
-                    <div className={styles.feedbackStars}>
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i}>★</span>
-                      ))}
-                    </div>
-                  </div>
-                  <p className={styles.feedbackHighlight}>{item.highlight}</p>
-                  <p className={styles.feedbackText}>{item.text}</p>
-                </div>
-
-                {item.img && (
-                  <button
-                    type="button"
-                    onClick={() => setLightboxImage(item.img)}
-                    className={styles.feedbackScreenshotTrigger}
-                  >
-                    <MessageCircle size={12} />
-                    <span>Дивитися оригінал відгуку</span>
-                  </button>
-                )}
+          <div className={styles.reviewsGrid}>
+            {REVIEWS_GALLERY.map((imgSrc, idx) => (
+              <div
+                key={idx}
+                className={styles.reviewFullCard}
+                onClick={() => setLightboxImage(imgSrc)}
+              >
+                <img
+                  src={imgSrc}
+                  alt={`Відгук учениці ${idx + 1}`}
+                  className={styles.reviewFullImg}
+                  loading="lazy"
+                />
               </div>
             ))}
           </div>
