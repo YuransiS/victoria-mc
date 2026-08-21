@@ -89,6 +89,15 @@ export default function IntensiveSystemPage() {
         <div className={styles.heroGrid}>
           {/* Left Column: Visual Portrait */}
           <div className={styles.heroVisualCol}>
+            {/* Mobile Top Badges */}
+            <div className="lg:hidden absolute top-3.5 left-3.5 right-3.5 z-20 flex flex-wrap items-center gap-2 pointer-events-none">
+              <span className={styles.pillBadgeMobileTop}>ІНТЕНСИВ · 4 УРОКИ</span>
+              <span className="inline-flex items-center gap-1.5 bg-[#FAF6EE]/90 backdrop-blur-md text-[#380E18] text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-[#380E18]/10 shadow-sm">
+                <Clock size={11} />
+                <span>ВІД 30 ХВИЛИН НА ДЕНЬ</span>
+              </span>
+            </div>
+
             <Image
               src="/free-lection/she.jpg"
               alt="Вікторія Мещерякова"
@@ -101,7 +110,8 @@ export default function IntensiveSystemPage() {
 
           {/* Right Column: Copy & Booking Form */}
           <div className={styles.heroContentCol}>
-            <div className="flex flex-wrap gap-2 mb-4">
+            {/* Desktop Badges */}
+            <div className="hidden lg:flex flex-wrap gap-2 mb-4">
               <span className={styles.pillBadge}>ІНТЕНСИВ · 4 УРОКИ</span>
               <span className="inline-flex items-center gap-1.5 bg-[#EFE8DC] text-[#380E18] text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full">
                 <Clock size={13} />
