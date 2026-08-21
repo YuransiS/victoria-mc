@@ -442,7 +442,7 @@ export default function IntensiveSystemPage() {
             {/* Expert Photo */}
             <div className={styles.expertImgContainer}>
               <Image
-                src="/rozbir/IMG_2534.jpg"
+                src="/rozbir/vik.jpg"
                 alt="Вікторія Мещерякова"
                 fill
                 className="object-cover object-top"
