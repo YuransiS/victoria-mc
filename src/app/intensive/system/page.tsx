@@ -371,6 +371,20 @@ export default function IntensiveSystemPage() {
                     ✦ {c.highlightResult}
                   </p>
                 )}
+                {c.reviewImgs && c.reviewImgs.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {c.reviewImgs.map((rev, revIdx) => (
+                      <button
+                        key={revIdx}
+                        type="button"
+                        onClick={() => setLightboxImage(rev)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/80 border border-[#2D0C14]/15 text-[10px] font-bold text-[#2D0C14] hover:bg-[#451220] hover:text-[#FAF6EE] transition-colors cursor-pointer"
+                      >
+                        <span>💬 Скріншот {c.reviewImgs!.length > 1 ? `#${revIdx + 1}` : "відгуку"}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

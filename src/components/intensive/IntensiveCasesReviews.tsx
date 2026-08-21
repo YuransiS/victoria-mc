@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ZoomIn, X, ArrowRight } from "lucide-react";
+import { ZoomIn, X, ArrowRight, MessageSquare } from "lucide-react";
 import { REAL_CASES, REVIEWS_GALLERY } from "@/data/cases";
 
 interface IntensiveCasesReviewsProps {
@@ -27,7 +27,7 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
         </div>
 
         {/* Before / After Section */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {REAL_CASES.map((item, idx) => (
             <motion.div
               key={item.id}
@@ -35,12 +35,12 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="bg-white rounded-2xl border border-[#2B0813]/10 p-6 shadow-sm flex flex-col justify-between"
+              className="bg-white rounded-2xl border border-[#2B0813]/10 p-5 sm:p-6 shadow-sm flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-4 border-b border-[#2B0813]/10 pb-3">
                   <div>
-                    <h4 className="font-playfair text-xl font-bold text-[#2B0813]">{item.name}</h4>
+                    <h4 className="font-playfair text-lg sm:text-xl font-bold text-[#2B0813]">{item.name}</h4>
                     <p className="font-manrope text-xs text-[#8F2D45] uppercase font-bold tracking-wider">
                       {item.niche}
                     </p>
@@ -50,7 +50,7 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="grid grid-cols-2 gap-2.5 mb-4">
                   <div
                     className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-[#FAF6EE]"
                     onClick={() => setActiveImage(item.beforeImg)}
@@ -60,11 +60,11 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
                       alt={`До — ${item.name}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <span className="absolute top-2 left-2 rounded-full bg-black/75 text-white font-manrope text-[10px] font-bold px-2.5 py-0.5">
+                    <span className="absolute top-2 left-2 rounded-full bg-black/75 text-white font-manrope text-[10px] font-bold px-2 py-0.5">
                       До
                     </span>
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <ZoomIn size={20} className="text-white" />
+                      <ZoomIn size={18} className="text-white" />
                     </div>
                   </div>
 
@@ -77,25 +77,25 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
                       alt={`Після — ${item.name}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <span className="absolute top-2 left-2 rounded-full bg-[#451220] text-[#FAF6EE] font-manrope text-[10px] font-bold px-2.5 py-0.5">
+                    <span className="absolute top-2 left-2 rounded-full bg-[#451220] text-[#FAF6EE] font-manrope text-[10px] font-bold px-2 py-0.5">
                       Після
                     </span>
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <ZoomIn size={20} className="text-white" />
+                      <ZoomIn size={18} className="text-white" />
                     </div>
                   </div>
                 </div>
 
                 {/* Text Description */}
-                <div className="space-y-2 text-xs sm:text-sm leading-relaxed border-t border-[#2B0813]/5 pt-3">
+                <div className="space-y-2 text-xs leading-relaxed border-t border-[#2B0813]/5 pt-3">
                   <p className="text-[#2B0813]/70">
-                    <strong className="text-[#8F2D45] uppercase font-bold text-[10px] tracking-wider block sm:inline mr-1">
+                    <strong className="text-[#8F2D45] uppercase font-bold text-[10px] tracking-wider block mr-1">
                       До:
                     </strong>
                     {item.beforeDesc}
                   </p>
                   <p className="text-[#2B0813] font-medium">
-                    <strong className="text-[#2B0813] uppercase font-bold text-[10px] tracking-wider block sm:inline mr-1">
+                    <strong className="text-[#2B0813] uppercase font-bold text-[10px] tracking-wider block mr-1">
                       Після:
                     </strong>
                     {item.afterDesc}
@@ -103,13 +103,29 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
                 </div>
               </div>
 
-              {item.highlightResult && (
-                <div className="mt-4 pt-3 border-t border-dashed border-[#2B0813]/10">
+              <div className="mt-4 pt-3 border-t border-dashed border-[#2B0813]/10 space-y-2.5">
+                {item.highlightResult && (
                   <p className="text-[11px] font-bold text-[#451220] flex items-center gap-1.5">
                     <span>✦</span> {item.highlightResult}
                   </p>
-                </div>
-              )}
+                )}
+
+                {item.reviewImgs && item.reviewImgs.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 items-center pt-1">
+                    {item.reviewImgs.map((rev, revIdx) => (
+                      <button
+                        key={revIdx}
+                        type="button"
+                        onClick={() => setActiveImage(rev)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FAF6EE] border border-[#2B0813]/15 text-[10px] font-bold text-[#2B0813] hover:bg-[#451220] hover:text-[#FAF6EE] transition-colors cursor-pointer"
+                      >
+                        <MessageSquare size={11} />
+                        <span>Скріншот {item.reviewImgs!.length > 1 ? `#${revIdx + 1}` : "відгуку"}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>

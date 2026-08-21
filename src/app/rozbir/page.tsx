@@ -353,19 +353,19 @@ export default function RozbirPage() {
             <div className="w-16 h-px bg-black mx-auto mt-6"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {REAL_CASES.map((c) => (
-              <div key={c.id} className="bg-[#F9F9F9] border border-gray-200 p-6 flex flex-col justify-between shadow-sm">
+              <div key={c.id} className="bg-[#F9F9F9] border border-gray-200 p-5 flex flex-col justify-between shadow-sm">
                 <div>
                   <div className="flex items-center justify-between mb-4 border-b border-gray-200 pb-3">
                     <div>
-                      <h3 className="font-serif text-xl font-bold text-black">{c.name}</h3>
+                      <h3 className="font-serif text-lg font-bold text-black">{c.name}</h3>
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{c.niche}</p>
                     </div>
                     <span className="font-serif italic text-2xl text-gray-300">#{c.id}</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="grid grid-cols-2 gap-2.5 mb-4">
                     <div 
                       className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer group border border-gray-200"
                       onClick={() => openImageModal(c.beforeImg)}
@@ -395,13 +395,27 @@ export default function RozbirPage() {
                   </div>
                 </div>
 
-                {c.highlightResult && (
-                  <div className="mt-4 pt-3 border-t border-gray-200">
+                <div className="mt-4 pt-3 border-t border-gray-200 space-y-2">
+                  {c.highlightResult && (
                     <p className="text-[11px] font-bold text-black flex items-center gap-1.5">
                       <span>✦</span> {c.highlightResult}
                     </p>
-                  </div>
-                )}
+                  )}
+                  {c.reviewImgs && c.reviewImgs.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {c.reviewImgs.map((rev, revIdx) => (
+                        <button
+                          key={revIdx}
+                          type="button"
+                          onClick={() => openImageModal(rev)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-300 text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors"
+                        >
+                          <span>💬 Скріншот {c.reviewImgs!.length > 1 ? `#${revIdx + 1}` : "відгуку"}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
