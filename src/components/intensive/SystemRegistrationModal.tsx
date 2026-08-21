@@ -5,6 +5,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
 import { X, ShieldCheck } from "lucide-react";
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram, normalizeAmount } from "@/lib/enrichment";
 
 interface SystemRegistrationModalProps {
   isOpen: boolean;
@@ -182,51 +183,41 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
       });
     }, 100);
 
-    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
-    const resolvedTelegram =
-      contactMethod === "telegram"
-        ? formData.telegram.startsWith("@")
-          ? formData.telegram
-          : `@${formData.telegram}`
-        : "";
+    const normalizedPhoneVal = contactMethod === "phone" ? normalizePhone(formData.phone) : null;
+    const cleanTg = contactMethod === "telegram" ? normalizeTelegram(formData.telegram) : null;
+    const resolvedTelegram = cleanTg ? `@${cleanTg}` : "";
+    const cleanInstagram = normalizeInstagram(formData.instagram);
 
-    // UTM tracking
-    const searchParams = new URLSearchParams(window.location.search);
-    const utmData = {
-      utm_source: searchParams.get("utm_source") || "direct",
-      utm_medium: searchParams.get("utm_medium") || "none",
-      utm_campaign: searchParams.get("utm_campaign") || "none",
-      utm_content: searchParams.get("utm_content") || "none",
-      utm_term: searchParams.get("utm_term") || "none",
-      full_url: window.location.href
-    };
+    // UTM / Source & Ads tracking via Enrichment Protocol v2.0
+    const marketingAttr = getClientMarketingAttribution();
+    const floatAmount = normalizeAmount(amount);
+    const finalCurrency = "EUR";
 
-    const payloadData = {
-      customerName: formData.name,
-      customerEmail: resolvedTelegram
-        ? `${resolvedTelegram.replace("@", "")}@telegram.com`
-        : "phone-client@telegram.com",
-      customerPhone: sanitizedPhone,
+    const clientEmail = cleanTg ? `${cleanTg}@telegram.com` : (normalizedPhoneVal ? `client-${normalizedPhoneVal.replace(/\D/g, '')}@telegram.com` : "phone-client@telegram.com");
+
+    const payload = {
+      customerName: formData.name.trim(),
+      customerEmail: clientEmail,
+      customerPhone: normalizedPhoneVal || formData.phone,
       telegram: resolvedTelegram,
-      instagram: formData.instagram,
-      amount: amount,
-      tariffName: tariffName
+      instagram: cleanInstagram || formData.instagram,
+      amount: floatAmount,
+      tariffName: tariffName,
+      currency: finalCurrency,
+      product_type: "tripwire" as const,
+      targetSheet: "Інтенсив",
+      successUrl: "/price/thanks",
+      failUrl: "/price/fail",
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem("visitor_id") || "",
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     try {
       const response = await fetch("/api/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...payloadData,
-          ...utmData,
-          visitor_id: localStorage.getItem("visitor_id") || "",
-          currency: currency,
-          amount: amount,
-          targetSheet: "Інтенсив",
-          successUrl: "/price/thanks",
-          failUrl: "/price/fail"
-        })
+        body: JSON.stringify(payload)
       });
 
       const paymentData = await response.json();
@@ -238,15 +229,15 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
         return;
       }
 
-      localStorage.setItem("lead_name", formData.name);
-      localStorage.setItem("lead_phone", sanitizedPhone);
+      localStorage.setItem("lead_name", formData.name.trim());
+      localStorage.setItem("lead_phone", normalizedPhoneVal || formData.phone);
       localStorage.setItem("lead_social", resolvedTelegram);
-      localStorage.setItem("lead_instagram", formData.instagram);
+      localStorage.setItem("lead_instagram", cleanInstagram || formData.instagram);
       localStorage.setItem("lead_tariff", tariffName);
-      localStorage.setItem("lead_amount", amount.toString());
-      localStorage.setItem("lead_currency", currency);
-      localStorage.setItem("lead_utm_source", utmData.utm_source);
-      localStorage.setItem("lead_utm_medium", utmData.utm_medium);
+      localStorage.setItem("lead_amount", floatAmount.toFixed(2));
+      localStorage.setItem("lead_currency", finalCurrency);
+      localStorage.setItem("lead_utm_source", marketingAttr.utm_source || "direct");
+      localStorage.setItem("lead_utm_medium", marketingAttr.utm_medium || "none");
 
       if (paymentData.tgMsgId) {
         localStorage.setItem(
@@ -264,9 +255,9 @@ export const SystemRegistrationModal: React.FC<SystemRegistrationModalProps> = (
 
       trackFBEvent("Lead", {
         content_name: tariffName,
-        value: amount,
-        currency: currency,
-        ...utmData
+        value: floatAmount,
+        currency: finalCurrency,
+        ...marketingAttr
       });
 
       sessionStorage.setItem("paymentAttempted", "true");

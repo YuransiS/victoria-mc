@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
+import { extractCookies, extractMarketingAttribution, MarketingAttribution } from '@/lib/enrichment';
 
 export interface UtmTags {
   utm_source?: string;
@@ -9,6 +10,13 @@ export interface UtmTags {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
+  campaign_id?: string;
+  adset_id?: string;
+  ad_id?: string;
+  fbclid?: string;
+  gclid?: string;
+  fbp?: string;
+  fbc?: string;
 }
 
 export interface AnalyticsData {
@@ -30,18 +38,13 @@ const AnalyticsInner = () => {
       localStorage.setItem('visitor_id', visitorId);
     }
 
-    // 2. UTM Tags
-    const utms: UtmTags = {};
-    const utmKeys: (keyof UtmTags)[] = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-    
-    let hasUtms = false;
-    utmKeys.forEach(key => {
-      const value = searchParams.get(key);
-      if (value) {
-        utms[key] = value;
-        hasUtms = true;
-      }
-    });
+    // 2. Extract full marketing attribution (UTM + Ads + Cookies + Clicks)
+    const attribution = extractMarketingAttribution(
+      searchParams,
+      typeof document !== 'undefined' ? document.cookie : '',
+      pathname,
+      typeof window !== 'undefined' ? window.location.href : ''
+    );
 
     const offerParam = searchParams.get('offer');
     const vParam = searchParams.get('v');
@@ -55,24 +58,38 @@ const AnalyticsInner = () => {
     };
     const detectedOffer = checkOffer(offerParam) || checkOffer(vParam);
     if (detectedOffer) {
-      const currentContent = utms.utm_content || searchParams.get('utm_content') || '';
+      const currentContent = attribution.utm_content || '';
       if (!currentContent) {
-        utms.utm_content = detectedOffer;
+        attribution.utm_content = detectedOffer;
       } else if (!currentContent.includes(detectedOffer)) {
-        utms.utm_content = `${currentContent}_${detectedOffer}`;
+        attribution.utm_content = `${currentContent}_${detectedOffer}`;
       }
-      hasUtms = true;
     }
 
-    if (hasUtms) {
-      localStorage.setItem('last_utms', JSON.stringify(utms));
+    const hasAnyAttribution = !!(
+      attribution.utm_source ||
+      attribution.utm_medium ||
+      attribution.utm_campaign ||
+      attribution.utm_content ||
+      attribution.utm_term ||
+      attribution.campaign_id ||
+      attribution.adset_id ||
+      attribution.ad_id ||
+      attribution.fbclid ||
+      attribution.gclid
+    );
+
+    if (hasAnyAttribution) {
+      localStorage.setItem('last_utms', JSON.stringify(attribution));
+      localStorage.setItem('last_marketing_attribution', JSON.stringify(attribution));
       
       if (!localStorage.getItem('first_utms')) {
-        localStorage.setItem('first_utms', JSON.stringify(utms));
+        localStorage.setItem('first_utms', JSON.stringify(attribution));
+        localStorage.setItem('first_marketing_attribution', JSON.stringify(attribution));
       }
     }
 
-    // 3. Journey
+    // 3. Journey navigation log
     const journeyRaw = localStorage.getItem('journey');
     let journey: { path: string; timestamp: string }[] = journeyRaw ? JSON.parse(journeyRaw) : [];
     
@@ -101,7 +118,18 @@ const AnalyticsInner = () => {
     }
     const spContactId = localStorage.getItem('sp_contact_id') || undefined;
 
-    // 5. Log to Backend (Identified if data exists)
+    // Load active attribution fallback
+    let finalAttribution = attribution;
+    if (!hasAnyAttribution) {
+      try {
+        const stored = localStorage.getItem('last_marketing_attribution') || localStorage.getItem('last_utms');
+        if (stored) {
+          finalAttribution = { ...JSON.parse(stored), page_path: pathname, page_url: window.location.href };
+        }
+      } catch (_) {}
+    }
+
+    // 5. Log to Backend Telemetry (Enrichment Protocol v2.0)
     fetch('/api/analytics/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -109,11 +137,17 @@ const AnalyticsInner = () => {
         visitorId,
         uuid,
         path: pathname,
+        fullUrl: typeof window !== 'undefined' ? window.location.href : '',
         name: savedName,
         phone: savedPhone,
         social: savedSocial,
         sp_contact_id: spContactId,
-        utms: hasUtms ? utms : JSON.parse(localStorage.getItem('last_utms') || '{}')
+        status: 'Клик',
+        amount: 0.00,
+        currency: 'UAH',
+        product_type: 'lead',
+        marketing: finalAttribution,
+        utms: finalAttribution
       })
     }).catch(() => {});
   }, [searchParams, pathname]);

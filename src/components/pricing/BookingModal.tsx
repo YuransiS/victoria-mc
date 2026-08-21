@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeCurrency, normalizeAmount } from "@/lib/enrichment";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -213,35 +214,32 @@ export const BookingModal = ({
       });
     }, 100);
 
-    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
-    const resolvedTelegram = contactMethod === "telegram" ? (formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`) : "";
+    const normalizedPhoneVal = contactMethod === "phone" ? normalizePhone(formData.phone) : null;
+    const cleanTg = contactMethod === "telegram" ? normalizeTelegram(formData.telegram) : null;
+    const resolvedTelegram = cleanTg ? `@${cleanTg}` : "";
 
-    // UTM / Source tracking
-    const searchParams = new URLSearchParams(window.location.search);
+    // UTM / Source & Ads tracking via Enrichment Protocol v2.0
+    const marketingAttr = getClientMarketingAttribution();
+    const finalCurrency = isTestMode ? "UAH" : normalizeCurrency(currency);
+    const floatAmount = normalizeAmount(actualAmount);
 
-    // Get UTMs from URL or fallback to localStorage (last_utms)
-    let utmsFromStorage = {};
-    try {
-      const savedUtms = localStorage.getItem('last_utms');
-      if (savedUtms) utmsFromStorage = JSON.parse(savedUtms);
-    } catch (e) { }
+    const clientEmail = cleanTg ? `${cleanTg}@telegram.com` : (normalizedPhoneVal ? `client-${normalizedPhoneVal.replace(/\D/g, '')}@telegram.com` : "phone-client@telegram.com");
 
-    const utmData = {
-      utm_source: searchParams.get("utm_source") || (utmsFromStorage as any).utm_source || "direct",
-      utm_medium: searchParams.get("utm_medium") || (utmsFromStorage as any).utm_medium || "none",
-      utm_campaign: searchParams.get("utm_campaign") || (utmsFromStorage as any).utm_campaign || "none",
-      utm_content: searchParams.get("utm_content") || (utmsFromStorage as any).utm_content || "none",
-      utm_term: searchParams.get("utm_term") || (utmsFromStorage as any).utm_term || "none",
-      full_url: window.location.href
-    };
-
-    const data = {
-      customerName: formData.name,
-      customerEmail: resolvedTelegram ? `${resolvedTelegram.replace("@", "")}@telegram.com` : "phone-client@telegram.com", // Fallback
-      customerPhone: sanitizedPhone,
+    const payload = {
+      customerName: formData.name.trim(),
+      customerEmail: clientEmail,
+      customerPhone: normalizedPhoneVal || formData.phone,
       telegram: resolvedTelegram,
-      amount: actualAmount,
-      tariffName: tariffName
+      amount: floatAmount,
+      tariffName: tariffName,
+      currency: finalCurrency,
+      product_type: "course" as const,
+      targetSheet: targetSheetName || "Бронювання",
+      successUrl,
+      failUrl,
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     try {
@@ -249,16 +247,7 @@ export const BookingModal = ({
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          ...utmData,
-          visitor_id: localStorage.getItem('visitor_id') || '',
-          currency: isTestMode ? "UAH" : currency,
-          amount: isTestMode ? 1 : actualAmount,
-          targetSheet: targetSheetName || "Бронювання",
-          successUrl,
-          failUrl
-        })
+        body: JSON.stringify(payload)
       });
 
       const paymentData = await response.json();
@@ -271,9 +260,9 @@ export const BookingModal = ({
       }
 
       // Save user identification for cross-page persistence
-      localStorage.setItem('lead_name', formData.name);
-      localStorage.setItem('lead_phone', sanitizedPhone);
-      localStorage.setItem('lead_social', formData.telegram);
+      localStorage.setItem('lead_name', formData.name.trim());
+      localStorage.setItem('lead_phone', normalizedPhoneVal || formData.phone);
+      localStorage.setItem('lead_social', resolvedTelegram);
 
       // CRITICAL: Save TG Message ID to local storage for Thanks page
       if (paymentData.tgMsgId) {
@@ -290,20 +279,20 @@ export const BookingModal = ({
       }
 
       // Save UTMs to localStorage for the final TG update
-      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
-      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+      localStorage.setItem('lead_utm_source', marketingAttr.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', marketingAttr.utm_medium || 'none');
 
       // Save Tariff and Amount for the final TG update
       localStorage.setItem('lead_tariff', tariffName);
-      localStorage.setItem('lead_amount', actualAmount.toString());
-      localStorage.setItem('lead_currency', currency);
+      localStorage.setItem('lead_amount', floatAmount.toFixed(2));
+      localStorage.setItem('lead_currency', finalCurrency);
 
       // 2. Track Lead to Facebook
       trackFBEvent("Lead", {
         content_name: tariffName,
-        value: actualAmount,
-        currency: currency,
-        ...utmData
+        value: floatAmount,
+        currency: finalCurrency,
+        ...marketingAttr
       });
 
       // Set flags for Thanks page logic

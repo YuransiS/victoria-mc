@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { trackFBEvent } from '@/components/FacebookPixel';
 import { REAL_CASES, REVIEWS_GALLERY } from '@/data/cases';
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeAmount } from '@/lib/enrichment';
 
 declare global {
   interface Window {
@@ -189,28 +190,29 @@ export default function RozbirPage() {
     }
 
     setLoading(true);
-    const fullPhone = phone;
+    const normalizedPhoneVal = normalizePhone(phone);
+    const cleanTg = hasTelegram ? normalizeTelegram(data.social) : null;
+    const floatAmount = normalizeAmount(currentPriceObj.current);
 
-    const params = new URLSearchParams(window.location.search);
-    const utms = {
-      utm_source: params.get('utm_source') || '',
-      utm_medium: params.get('utm_medium') || '',
-      utm_campaign: params.get('utm_campaign') || '',
-      utm_content: params.get('utm_content') || '',
-      utm_term: params.get('utm_term') || ''
-    };
+    const marketingAttr = getClientMarketingAttribution({
+      page_path: '/rozbir',
+      page_url: window.location.href
+    });
 
     try {
       const response = await fetch('/api/rozbir/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: data.name,
-          social: hasTelegram ? data.social : '',
-          phone: fullPhone,
-          amount: currentPriceObj.current,
-          visitor_id: localStorage.getItem('visitor_id') || '',
-          ...utms
+          name: data.name.trim(),
+          social: cleanTg ? `@${cleanTg}` : '',
+          phone: normalizedPhoneVal || phone,
+          amount: floatAmount,
+          currency: 'UAH',
+          product_type: 'consultation',
+          visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
+          ...marketingAttr,
+          marketing: marketingAttr
         })
       });
 
@@ -220,12 +222,15 @@ export default function RozbirPage() {
         throw new Error(paymentData.error);
       }
 
-      localStorage.setItem('purchase_price', String(currentPriceObj.current));
-      localStorage.setItem('lead_name', data.name);
-      localStorage.setItem('lead_phone', fullPhone);
-      localStorage.setItem('lead_social', hasTelegram ? data.social : '');
-      localStorage.setItem('lead_utm_source', utms.utm_source);
-      localStorage.setItem('lead_utm_medium', utms.utm_medium);
+      localStorage.setItem('purchase_price', floatAmount.toFixed(2));
+      localStorage.setItem('lead_amount', floatAmount.toFixed(2));
+      localStorage.setItem('lead_currency', 'UAH');
+      localStorage.setItem('lead_tariff', 'Персональний розбір');
+      localStorage.setItem('lead_name', data.name.trim());
+      localStorage.setItem('lead_phone', normalizedPhoneVal || phone);
+      localStorage.setItem('lead_social', cleanTg ? `@${cleanTg}` : '');
+      localStorage.setItem('lead_utm_source', marketingAttr.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', marketingAttr.utm_medium || 'none');
       if (paymentData.uuid) {
         localStorage.setItem('lead_uuid', paymentData.uuid);
       }
@@ -237,11 +242,12 @@ export default function RozbirPage() {
       }
 
       trackFBEvent('Lead', {
-        value: currentPriceObj.current,
+        value: floatAmount,
         currency: 'UAH',
         content_name: 'Персональна Діагностика Віка',
         content_type: 'product',
-        content_ids: ['diag_v_1']
+        content_ids: ['diag_v_1'],
+        ...marketingAttr
       });
 
       startPayment(paymentData);

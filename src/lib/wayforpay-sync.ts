@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
+import { normalizePhone, normalizeCurrency, normalizeAmount, resolveProductType } from '@/lib/enrichment';
 
 export interface WfpTransaction {
   orderReference: string;
@@ -361,14 +362,34 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
         const currentDbStatus = (existingLead.status || '').trim();
         const isDbApproved = currentDbStatus.toLowerCase() === 'approved';
 
+        const canonicalCurrency = normalizeCurrency(tx.currency);
+        const floatAmount = normalizeAmount(tx.amount);
+        const productInfo = detectProductFunnel(tx);
+        const prodType = resolveProductType({
+          tariffName: productInfo.tariffName,
+          targetSheet: productInfo.targetSheet,
+          pagePath: productInfo.pagePath,
+          amount: floatAmount
+        });
+
         if (isApproved) {
           if (!isDbApproved) {
             // Found unconfirmed payment in DB -> Update to Approved!
-            console.log(`[WFP Sync] Reconciling order ${tx.orderReference}: status was '${currentDbStatus}' -> updating to 'Approved' (${parsedAmount} ${tx.currency})`);
+            console.log(`[WFP Sync] Reconciling order ${tx.orderReference}: status was '${currentDbStatus}' -> updating to 'Approved' (${floatAmount} ${canonicalCurrency})`);
             if (!options.dryRun) {
               const updatedPayload = {
                 ...(typeof existingLead.raw_payload === 'object' ? existingLead.raw_payload : {}),
                 wayforpay_sync: tx,
+                currency: canonicalCurrency,
+                product_type: prodType,
+                product_name: productInfo.tariffName,
+                payment_system: 'wayforpay',
+                metadata: {
+                  currency: canonicalCurrency,
+                  product_type: prodType,
+                  product_name: productInfo.tariffName,
+                  payment_system: 'wayforpay'
+                },
                 synced_at: new Date().toISOString(),
               };
 
@@ -376,7 +397,7 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
                 .from('victoria_leads')
                 .update({
                   status: 'Approved',
-                  amount: parsedAmount,
+                  amount: floatAmount,
                   is_free: false,
                   raw_payload: updatedPayload,
                 })
@@ -389,6 +410,21 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
               } else {
                 updatedInDb++;
               }
+
+              // Update unified_orders directly to canonical closed_won
+              await supabaseAdmin
+                .from('unified_orders')
+                .update({
+                  status: 'closed_won',
+                  amount: floatAmount,
+                  metadata: {
+                    currency: canonicalCurrency,
+                    product_type: prodType,
+                    product_name: productInfo.tariffName,
+                    payment_system: 'wayforpay'
+                  }
+                })
+                .eq('order_id', tx.orderReference);
             } else {
               updatedInDb++;
             }
@@ -411,6 +447,16 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
                   raw_payload: {
                     ...(typeof existingLead.raw_payload === 'object' ? existingLead.raw_payload : {}),
                     wayforpay_sync: tx,
+                    currency: canonicalCurrency,
+                    product_type: prodType,
+                    product_name: productInfo.tariffName,
+                    payment_system: 'wayforpay',
+                    metadata: {
+                      currency: canonicalCurrency,
+                      product_type: prodType,
+                      product_name: productInfo.tariffName,
+                      payment_system: 'wayforpay'
+                    },
                     synced_at: new Date().toISOString(),
                   },
                 })
@@ -421,6 +467,20 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
               } else {
                 updatedInDb++;
               }
+
+              // Update unified_orders to declined
+              await supabaseAdmin
+                .from('unified_orders')
+                .update({
+                  status: 'declined',
+                  metadata: {
+                    currency: canonicalCurrency,
+                    product_type: prodType,
+                    product_name: productInfo.tariffName,
+                    payment_system: 'wayforpay'
+                  }
+                })
+                .eq('order_id', tx.orderReference);
             } else {
               updatedInDb++;
             }
@@ -431,8 +491,17 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
       } else {
         // Record NOT found in database
         if (isApproved) {
+          const canonicalCurrency = normalizeCurrency(tx.currency);
+          const floatAmount = normalizeAmount(tx.amount);
           const productInfo = detectProductFunnel(tx);
-          console.log(`[WFP Sync] Missing Approved order detected: ${tx.orderReference} (${parsedAmount} ${tx.currency}) -> inserting into DB`);
+          const prodType = resolveProductType({
+            tariffName: productInfo.tariffName,
+            targetSheet: productInfo.targetSheet,
+            pagePath: productInfo.pagePath,
+            amount: floatAmount
+          });
+
+          console.log(`[WFP Sync] Missing Approved order detected: ${tx.orderReference} (${floatAmount} ${canonicalCurrency}) -> inserting into DB`);
 
           if (!options.dryRun) {
             const customerName = (
@@ -441,12 +510,14 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
               'Клієнт WayForPay'
             ).trim();
 
+            const canonicalPhone = normalizePhone(tx.phone);
+
             const leadInsertPayload = {
               order_id: tx.orderReference,
               name: customerName,
-              phone: tx.phone || '',
+              phone: canonicalPhone || tx.phone || '',
               social: tx.email || '',
-              amount: parsedAmount,
+              amount: floatAmount,
               status: 'Approved',
               is_free: false,
               target_sheet: productInfo.targetSheet,
@@ -456,7 +527,16 @@ export async function syncWayForPayTransactions(options: SyncOptions = {}): Prom
                 : new Date().toISOString(),
               raw_payload: {
                 wayforpay_sync: tx,
-                tariffName: productInfo.tariffName,
+                currency: canonicalCurrency,
+                product_type: prodType,
+                product_name: productInfo.tariffName,
+                payment_system: 'wayforpay',
+                metadata: {
+                  currency: canonicalCurrency,
+                  product_type: prodType,
+                  product_name: productInfo.tariffName,
+                  payment_system: 'wayforpay'
+                },
                 source: 'wfp_sync_backfill',
                 synced_at: new Date().toISOString(),
               },

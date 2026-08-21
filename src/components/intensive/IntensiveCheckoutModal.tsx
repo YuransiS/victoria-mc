@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
 import { X, Clock, Lock, Check, Gift } from "lucide-react";
 import { use10MinTimer } from "./use10MinTimer";
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram, normalizeAmount } from "@/lib/enrichment";
 
 interface IntensiveCheckoutModalProps {
   isOpen: boolean;
@@ -113,41 +114,34 @@ export function IntensiveCheckoutModal({
       });
     }, 100);
 
-    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
-    const resolvedTelegram = contactMethod === "telegram"
-      ? formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`
-      : "";
+    const normalizedPhoneVal = contactMethod === "phone" ? normalizePhone(formData.phone) : null;
+    const cleanTg = contactMethod === "telegram" ? normalizeTelegram(formData.telegram) : null;
+    const resolvedTelegram = cleanTg ? `@${cleanTg}` : "";
+    const cleanInstagram = normalizeInstagram(formData.instagram);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    let utmsFromStorage: Record<string, string> = {};
-    try {
-      const savedUtms = localStorage.getItem("last_utms");
-      if (savedUtms) utmsFromStorage = JSON.parse(savedUtms);
-    } catch (_) {}
+    // UTM / Source & Ads tracking via Enrichment Protocol v2.0
+    const marketingAttr = getClientMarketingAttribution();
+    const floatAmount = normalizeAmount(amount);
+    const finalCurrency = "EUR";
 
-    const utmData = {
-      utm_source: searchParams.get("utm_source") || utmsFromStorage.utm_source || "direct",
-      utm_medium: searchParams.get("utm_medium") || utmsFromStorage.utm_medium || "none",
-      utm_campaign: searchParams.get("utm_campaign") || utmsFromStorage.utm_campaign || "none",
-      utm_content: searchParams.get("utm_content") || utmsFromStorage.utm_content || "none",
-      utm_term: searchParams.get("utm_term") || utmsFromStorage.utm_term || "none",
-      full_url: window.location.href
-    };
+    const clientEmail = cleanTg ? `${cleanTg}@telegram.com` : (normalizedPhoneVal ? `client-${normalizedPhoneVal.replace(/\D/g, '')}@telegram.com` : "phone-client@telegram.com");
 
     const payload = {
-      customerName: formData.name,
-      customerEmail: resolvedTelegram ? `${resolvedTelegram.replace("@", "")}@telegram.com` : "phone-client@telegram.com",
-      customerPhone: sanitizedPhone,
+      customerName: formData.name.trim(),
+      customerEmail: clientEmail,
+      customerPhone: normalizedPhoneVal || formData.phone,
       telegram: resolvedTelegram,
-      instagram: formData.instagram,
-      amount,
+      instagram: cleanInstagram || formData.instagram,
+      amount: floatAmount,
       tariffName,
-      currency: "EUR",
+      currency: finalCurrency,
+      product_type: "tripwire",
       targetSheet: "Інтенсив 5 лайків",
       successUrl: "/price/thanks",
       failUrl: "/price/fail",
-      visitor_id: localStorage.getItem("visitor_id") || "",
-      ...utmData
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem("visitor_id") || "",
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     try {
@@ -166,13 +160,15 @@ export function IntensiveCheckoutModal({
         return;
       }
 
-      localStorage.setItem("lead_name", formData.name);
-      localStorage.setItem("lead_phone", sanitizedPhone);
+      localStorage.setItem("lead_name", formData.name.trim());
+      localStorage.setItem("lead_phone", normalizedPhoneVal || formData.phone);
       localStorage.setItem("lead_social", resolvedTelegram);
-      localStorage.setItem("lead_instagram", formData.instagram);
+      localStorage.setItem("lead_instagram", cleanInstagram || formData.instagram);
       localStorage.setItem("lead_tariff", tariffName);
-      localStorage.setItem("lead_amount", amount.toString());
-      localStorage.setItem("lead_currency", "EUR");
+      localStorage.setItem("lead_amount", floatAmount.toFixed(2));
+      localStorage.setItem("lead_currency", finalCurrency);
+      localStorage.setItem("lead_utm_source", marketingAttr.utm_source || "direct");
+      localStorage.setItem("lead_utm_medium", marketingAttr.utm_medium || "none");
 
       if (paymentData.tgMsgId) {
         localStorage.setItem(
@@ -188,11 +184,11 @@ export function IntensiveCheckoutModal({
         localStorage.setItem("lead_uuid", paymentData.uuid);
       }
 
-      trackFBEvent("InitiateCheckout", {
+      trackFBEvent("Lead", {
         content_name: tariffName,
-        value: amount,
-        currency: "EUR",
-        ...utmData
+        value: floatAmount,
+        currency: finalCurrency,
+        ...marketingAttr
       });
 
       sessionStorage.setItem("paymentAttempted", "true");

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
 import { updateSendPulseStatus } from '@/lib/sendpulse';
+import { normalizePhone, normalizeTelegram, normalizeInstagram, normalizeCurrency, normalizeAmount, resolveProductType, extractMarketingAttribution } from '@/lib/enrichment';
 
 const GOOGLE_SCRIPT_URL_MAIN = process.env.GOOGLE_SCRIPT_URL;
 const GOOGLE_SCRIPT_URL_STVORYUI = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
@@ -347,26 +348,61 @@ export async function POST(req: Request) {
       );
     }
 
+    const marketingAttr = extractMarketingAttribution(
+      data,
+      undefined,
+      data.page_path || '',
+      data.full_url || data.page_url || ''
+    );
+
+    const canonicalCurrency = normalizeCurrency(data.currency);
+    const floatAmount = normalizeAmount(data.amount);
+    const resolvedProdType = resolveProductType({
+      productType: data.product_type,
+      tariffName: formTitle,
+      targetSheet: data.target_sheet,
+      pagePath: data.page_path,
+      amount: floatAmount
+    });
+
+    const canonicalPhone = normalizePhone(phone) || (normalizedPhone ? `+${normalizedPhone}` : null);
+    const canonicalTelegram = normalizeTelegram(social);
+    const canonicalInstagram = normalizeInstagram(instagram);
+
     const dbPayload = {
-      name: name || null,
-      phone: normalizedPhone || null,
-      social: social || null,
-      instagram: instagram || null,
+      name: name ? String(name).trim() : null,
+      phone: canonicalPhone,
+      social: canonicalTelegram ? `@${canonicalTelegram}` : (social || null),
+      instagram: canonicalInstagram || (instagram || null),
       niche: niche || null,
-      amount: 0,
+      amount: floatAmount,
       status: 'Зареєстровано',
-      is_free: true,
-      utm_source: utms.utm_source,
-      utm_medium: utms.utm_medium,
-      utm_campaign: utms.utm_campaign,
-      utm_content: data.utm_content || '',
-      utm_term: data.utm_term || '',
+      is_free: floatAmount === 0,
+      utm_source: marketingAttr.utm_source || utms.utm_source,
+      utm_medium: marketingAttr.utm_medium || utms.utm_medium,
+      utm_campaign: marketingAttr.utm_campaign || utms.utm_campaign,
+      utm_content: marketingAttr.utm_content || data.utm_content || '',
+      utm_term: marketingAttr.utm_term || data.utm_term || '',
       target_sheet: data.target_sheet || null,
       sheet_id: data.sheet_id || null,
-      page_path: data.page_path || '',
-      page_url: data.full_url || '',
+      page_path: marketingAttr.page_path || data.page_path || '',
+      page_url: marketingAttr.page_url || data.full_url || '',
       visitor_uuid: resolvedUuid,
-      raw_payload: { ...data, entry_month: entryMonth, vsl_sendpulse_stage: sp_contact_id ? 3 : undefined }
+      raw_payload: {
+        ...data,
+        ...marketingAttr,
+        currency: canonicalCurrency,
+        product_type: resolvedProdType,
+        product_name: formTitle,
+        entry_month: entryMonth,
+        vsl_sendpulse_stage: sp_contact_id ? 3 : undefined,
+        metadata: {
+          currency: canonicalCurrency,
+          product_type: resolvedProdType,
+          product_name: formTitle,
+          entry_month: entryMonth
+        }
+      }
     };
 
     const supabasePromise = supabaseAdmin.from("victoria_leads").insert(dbPayload);

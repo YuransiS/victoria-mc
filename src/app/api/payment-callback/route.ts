@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
+import { statusMapper } from '@/lib/statusMapper';
 
 export async function POST(request: Request) {
   const timestamp = new Date().toISOString();
@@ -31,19 +32,28 @@ export async function POST(request: Request) {
     console.log(`[Callback] Order ${orderRef} transaction status received: ${status}`);
 
     const isSuccess = String(status).toUpperCase() === 'APPROVED';
-    const parsedStatus = isSuccess ? 'Approved' : String(status);
+    const canonicalStatus = isSuccess ? 'closed_won' : statusMapper.normalize(status);
+    const dbVictoriaStatus = isSuccess ? 'Approved' : (canonicalStatus === 'declined' ? 'Declined' : String(status));
 
-    // 2. UPDATE DB STATUS (Supabase victoria_leads)
+    // 2. UPDATE DB STATUS (Supabase victoria_leads & unified_orders)
     try {
       const { error: dbErr } = await supabaseAdmin
         .from("victoria_leads")
-        .update({ status: parsedStatus })
+        .update({ status: dbVictoriaStatus })
         .eq("order_id", String(orderRef));
+      
       if (dbErr) {
         console.error("[Callback] Supabase status update error payload:", dbErr);
       } else {
-        console.log(`[Callback] Supabase status updated successfully to ${parsedStatus} for order ${orderRef}`);
+        console.log(`[Callback] Supabase victoria_leads status updated successfully to ${dbVictoriaStatus} for order ${orderRef}`);
       }
+
+      // Also directly update unified_orders to ensure canonical closed_won / declined
+      await supabaseAdmin
+        .from("unified_orders")
+        .update({ status: canonicalStatus })
+        .eq("order_id", String(orderRef));
+
     } catch (err: any) {
       console.error("[Callback] Supabase status update failed:", err.message || err);
     }

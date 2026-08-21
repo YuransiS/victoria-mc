@@ -7,6 +7,7 @@ import 'intl-tel-input/build/css/intlTelInput.css';
 import './globals.css';
 import { trackFBEvent } from '@/components/FacebookPixel';
 import { REAL_CASES } from '@/data/cases';
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram } from '@/lib/enrichment';
 
 // Types for form data
 interface FormData {
@@ -357,7 +358,7 @@ export default function StvoryuiPage() {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     
-    // Get full phone number (E.164) or fallback to raw input value
+    // Normalize phone number (E.164)
     let fullPhone = '';
     if (itiRef.current) {
       if (!itiRef.current.isValidNumber()) {
@@ -371,32 +372,15 @@ export default function StvoryuiPage() {
       fullPhone = phoneInputRef.current.value.trim();
     }
     
-    // Get UTMs from URL or fallback to localStorage
-    const params = new URLSearchParams(window.location.search);
-    const hasUrlUtms = params.get('utm_source') || params.get('utm_medium') || params.get('utm_campaign');
-    
-    let utms = {
-      utm_source: params.get('utm_source') || '',
-      utm_medium: params.get('utm_medium') || '',
-      utm_campaign: params.get('utm_campaign') || '',
-      utm_term: params.get('utm_term') || '',
-      utm_content: params.get('utm_content') || ''
-    };
+    const normalizedPhoneVal = normalizePhone(fullPhone);
+    const cleanTg = normalizeTelegram(data.social);
+    const cleanInstagram = normalizeInstagram(data.instagram);
 
-    if (!hasUrlUtms) {
-      try {
-        const savedUtms = JSON.parse(localStorage.getItem('last_utms') || localStorage.getItem('first_utms') || '{}');
-        utms = {
-          utm_source: savedUtms.utm_source || '',
-          utm_medium: savedUtms.utm_medium || '',
-          utm_campaign: savedUtms.utm_campaign || '',
-          utm_term: savedUtms.utm_term || '',
-          utm_content: savedUtms.utm_content || ''
-        };
-      } catch (e) {
-        console.error('Failed to parse saved UTMs:', e);
-      }
-    }
+    // Full marketing attribution via Enrichment Protocol v2.0
+    const marketingAttr = getClientMarketingAttribution({
+      page_path: '/free-lection/vsl-form',
+      page_url: window.location.href
+    });
 
     try {
       const spContactId = localStorage.getItem('sp_contact_id');
@@ -405,10 +389,17 @@ export default function StvoryuiPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
-          phone: fullPhone,
-          visitor_id: localStorage.getItem('visitor_id') || '',
+          phone: normalizedPhoneVal || fullPhone,
+          social: cleanTg ? `@${cleanTg}` : (data.social || ''),
+          instagram: cleanInstagram || data.instagram,
+          amount: 0.00,
+          currency: 'UAH',
+          product_type: 'lead',
+          status: 'new',
+          visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
           sp_contact_id: spContactId || undefined,
-          ...utms
+          ...marketingAttr,
+          marketing: marketingAttr
         }),
       });
 
@@ -416,17 +407,20 @@ export default function StvoryuiPage() {
 
       if (response.ok) {
         // Save to localStorage for cross-page persistence
-        localStorage.setItem('lead_name', data.name);
-        localStorage.setItem('lead_phone', fullPhone);
-        localStorage.setItem('lead_social', data.social || '');
-        localStorage.setItem('lead_instagram', data.instagram || '');
+        localStorage.setItem('lead_name', data.name.trim());
+        localStorage.setItem('lead_phone', normalizedPhoneVal || fullPhone);
+        localStorage.setItem('lead_social', cleanTg ? `@${cleanTg}` : (data.social || ''));
+        localStorage.setItem('lead_instagram', cleanInstagram || (data.instagram || ''));
         if (resData.uuid) {
           localStorage.setItem('lead_uuid', resData.uuid);
         }
         // Track Facebook Lead event
         trackFBEvent('Lead', {
           content_name: 'Анкета СТВОРЮЙ',
-          content_category: 'Pre-order'
+          content_category: 'Pre-order',
+          value: 0.00,
+          currency: 'UAH',
+          ...marketingAttr
         });
         
         setSuccess(true);

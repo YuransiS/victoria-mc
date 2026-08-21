@@ -111,7 +111,16 @@ export async function POST(req: Request) {
         .from('victoria_leads')
         .update({
           status: newStatus,
-          raw_payload: rawPayload
+          raw_payload: {
+            ...rawPayload,
+            currency: 'UAH',
+            product_type: 'lead',
+            metadata: {
+              currency: 'UAH',
+              product_type: 'lead',
+              entry_month: entryMonth
+            }
+          }
         })
         .eq('id', lead.id);
     } else {
@@ -121,9 +130,18 @@ export async function POST(req: Request) {
         .insert({
           visitor_uuid: visitor_id,
           status: newStatus,
-          raw_payload: rawPayload,
+          raw_payload: {
+            ...rawPayload,
+            currency: 'UAH',
+            product_type: 'lead',
+            metadata: {
+              currency: 'UAH',
+              product_type: 'lead',
+              entry_month: entryMonth
+            }
+          },
           is_free: true,
-          amount: 0,
+          amount: 0.00,
           page_path: '/free-lection/vsl-form'
         });
     }

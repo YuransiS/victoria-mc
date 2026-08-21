@@ -64,7 +64,7 @@ export default function Sidebar({ role, username }: SidebarProps) {
           <Shield className="text-[#C4A47C] w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-sm font-black uppercase tracking-widest text-admin-text leading-none font-headline">CRM Panel</h2>
+          <h2 className="text-sm font-black uppercase tracking-widest text-admin-text leading-none font-headline">Admin Panel</h2>
           <span className="text-[10px] text-admin-text-dim tracking-[0.2em] font-bold uppercase">Victoria MC</span>
         </div>
       </div>

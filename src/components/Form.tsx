@@ -8,6 +8,7 @@ import { trackFBEvent } from "./FacebookPixel";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { getDynamicPriceState } from "@/lib/dynamicPrice";
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram, normalizeAmount } from "@/lib/enrichment";
 
 const TELEGRAM_LINK = "https://telegram.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
@@ -159,34 +160,26 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       });
     }, 100);
 
-    // UTM / Source tracking
-    const searchParams = new URLSearchParams(window.location.search);
+    // UTM / Source & Ads tracking via Enrichment Protocol v2.0
     const detectedOffer = typeof window !== "undefined" ? (localStorage.getItem("current_offer_variant") || "") : "";
-    
-    let rawUtmContent = searchParams.get("utm_content") || "none";
-    let finalUtmContent = rawUtmContent;
+    const marketingAttr = getClientMarketingAttribution();
     if (detectedOffer) {
-      if (rawUtmContent === "none" || !rawUtmContent) {
-        finalUtmContent = detectedOffer;
-      } else if (!rawUtmContent.includes(detectedOffer)) {
-        finalUtmContent = `${rawUtmContent}_${detectedOffer}`;
+      if (!marketingAttr.utm_content) {
+        marketingAttr.utm_content = detectedOffer;
+      } else if (!marketingAttr.utm_content.includes(detectedOffer)) {
+        marketingAttr.utm_content = `${marketingAttr.utm_content}_${detectedOffer}`;
       }
     }
 
-    const utmData = {
-      utm_source: searchParams.get("utm_source") || "direct",
-      utm_medium: searchParams.get("utm_medium") || "none",
-      utm_campaign: searchParams.get("utm_campaign") || "none",
-      utm_content: finalUtmContent,
-      utm_term: searchParams.get("utm_term") || "none",
-      full_url: window.location.href
-    };
-
-    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
-    const sanitizedSocial = contactMethod === "telegram" ? (formData.social.startsWith("@") ? formData.social : `@${formData.social}`) : "";
+    const normalizedPhoneVal = contactMethod === "phone" ? normalizePhone(formData.phone) : null;
+    const cleanTg = contactMethod === "telegram" ? normalizeTelegram(formData.social) : null;
+    const sanitizedSocial = cleanTg ? `@${cleanTg}` : "";
+    const cleanInstagram = normalizeInstagram(formData.instagram);
 
     // Parse price dynamically
     const { price } = getDynamicPriceState();
+    const floatAmount = normalizeAmount(price);
+    const searchParams = new URLSearchParams(window.location.search);
     const pParam = searchParams.get("p");
 
     // Determine redirect link based on price
@@ -208,30 +201,31 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
     // Save TG link to local storage for Thanks page redirect
     localStorage.setItem('masterclass_tg_link', finalTgLink);
 
-    const data = {
-      customerName: formData.name,
-      customerEmail: sanitizedSocial ? `${sanitizedSocial.replace("@", "")}@telegram.com` : "phone-client@telegram.com", // Fallback
-      customerPhone: sanitizedPhone,
+    const clientEmail = cleanTg ? `${cleanTg}@telegram.com` : (normalizedPhoneVal ? `client-${normalizedPhoneVal.replace(/\D/g, '')}@telegram.com` : "phone-client@telegram.com");
+
+    const payload = {
+      customerName: formData.name.trim(),
+      customerEmail: clientEmail,
+      customerPhone: normalizedPhoneVal || formData.phone,
       telegram: sanitizedSocial,
-      instagram: formData.instagram,
-      amount: price,
-       tariffName: "Майстер-клас 28.07"
+      instagram: cleanInstagram || formData.instagram,
+      amount: floatAmount,
+      tariffName: "Майстер-клас 28.07",
+      currency: "UAH" as const,
+      product_type: "tripwire" as const,
+      targetSheet: "Автовеб",
+      successUrl: `/price/thanks`,
+      failUrl: `/price/fail`,
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     try {
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          ...utmData,
-          visitor_id: localStorage.getItem('visitor_id') || '',
-          currency: "UAH",
-          amount: price,
-          targetSheet: "Автовеб",
-          successUrl: `/price/thanks`,
-          failUrl: `/price/fail`
-        })
+        body: JSON.stringify(payload)
       });
 
       const paymentData = await response.json();
@@ -244,10 +238,10 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       }
 
       // Save user identification for cross-page persistence
-      localStorage.setItem('lead_name', formData.name);
-      localStorage.setItem('lead_phone', sanitizedPhone);
+      localStorage.setItem('lead_name', formData.name.trim());
+      localStorage.setItem('lead_phone', normalizedPhoneVal || formData.phone);
       localStorage.setItem('lead_social', sanitizedSocial);
-      localStorage.setItem('lead_instagram', formData.instagram);
+      localStorage.setItem('lead_instagram', cleanInstagram || formData.instagram);
 
       // Save TG Message ID to local storage for Thanks page
       if (paymentData.tgMsgId) {
@@ -264,20 +258,20 @@ export const Form: React.FC<FormProps> = ({ buttonText = "ОПЛАТИТИ УЧ�
       }
 
       // Save UTMs to localStorage for the final TG update
-      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
-      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+      localStorage.setItem('lead_utm_source', marketingAttr.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', marketingAttr.utm_medium || 'none');
 
       // Save Tariff and Amount for the final TG update
       localStorage.setItem('lead_tariff', "Майстер-клас 28.07");
-      localStorage.setItem('lead_amount', price.toString());
+      localStorage.setItem('lead_amount', floatAmount.toFixed(2));
       localStorage.setItem('lead_currency', "UAH");
 
       // Track Lead / InitiateCheckout to Facebook
       trackFBEvent("Lead", {
         content_name: "Майстер-клас 28.07",
-        value: price,
+        value: floatAmount,
         currency: "UAH",
-        ...utmData
+        ...marketingAttr
       });
 
       // Set flags for Thanks page logic

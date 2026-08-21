@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
+import { normalizePhone, normalizeEmail, normalizeTelegram, normalizeInstagram, normalizeCurrency, normalizeAmount, resolveProductType, extractMarketingAttribution } from '@/lib/enrichment';
 
 function cleanPhone(phone: string): string {
   let cleaned = phone.replace(/\D/g, "");
@@ -105,8 +106,22 @@ export async function POST(request: Request) {
       full_url,
       visitor_id
     } = body;
-    const formattedTelegram = formatTelegramHandle(telegram || '');
-    const dbInstagram = normalizeInstagramHandle(instagram || '');
+    const canonicalCurrency = normalizeCurrency(reqCurrency);
+    const floatAmount = normalizeAmount(amount);
+    const resolvedProdType = resolveProductType({
+      productType: body.product_type,
+      tariffName: tariffName,
+      targetSheet: targetSheet,
+      amount: floatAmount
+    });
+
+    const canonicalPhone = normalizePhone(customerPhone);
+    const canonicalTelegram = normalizeTelegram(telegram);
+    const canonicalInstagram = normalizeInstagram(instagram);
+    const canonicalEmail = normalizeEmail(customerEmail);
+
+    const formattedTelegram = canonicalTelegram ? `@${canonicalTelegram}` : '';
+    const dbInstagram = canonicalInstagram ? `@${canonicalInstagram}` : '';
     const formattedInstagram = formatInstagramLink(dbInstagram);
 
     const host = request.headers.get('host');
@@ -121,9 +136,9 @@ export async function POST(request: Request) {
     // Critical: orderReference!
     const orderReference = `VMC_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000).toString();
-    const currency = reqCurrency || 'UAH';
+    const currency = canonicalCurrency;
     
-    const productPriceStr = amount.toString();
+    const productPriceStr = floatAmount.toFixed(2);
     const productNameStr = `Booking: ${tariffName}`;
     const productCountStr = "1";
 
@@ -227,18 +242,17 @@ export async function POST(request: Request) {
 
     // 3. Supabase Integration & Lead Stitching
     const clientUuid = visitor_id || null;
-    const phoneOrSocial = customerPhone || telegram || '';
-    const isPhone = phoneOrSocial && !phoneOrSocial.startsWith('@') && phoneOrSocial.replace(/\D/g, '').length >= 7;
-    const normalizedPhone = isPhone ? cleanPhone(phoneOrSocial) : phoneOrSocial;
+    const phoneOrSocial = canonicalPhone || formattedTelegram || customerPhone || telegram || '';
+    const cleanDigits = phoneOrSocial ? cleanPhone(phoneOrSocial) : '';
 
     let resolvedUuid = clientUuid;
 
-    if (normalizedPhone) {
+    if (cleanDigits) {
       try {
         const { data: existingLeads, error: searchError } = await supabaseAdmin
           .from("victoria_leads")
           .select("visitor_uuid")
-          .eq("phone", normalizedPhone)
+          .or(`phone.eq.${canonicalPhone || cleanDigits},phone.eq.+${cleanDigits},phone.eq.${cleanDigits}`)
           .not("visitor_uuid", "is", null)
           .order("created_at", { ascending: true })
           .limit(1);
@@ -247,7 +261,7 @@ export async function POST(request: Request) {
           console.error("[Create Payment] Supabase stitch search error:", searchError);
         } else if (existingLeads && existingLeads.length > 0) {
           resolvedUuid = existingLeads[0].visitor_uuid;
-          console.log(`[Create Payment] Stitched visitor from ${clientUuid} to ${resolvedUuid} based on phone ${normalizedPhone}`);
+          console.log(`[Create Payment] Stitched visitor from ${clientUuid} to ${resolvedUuid} based on phone ${canonicalPhone || cleanDigits}`);
         }
       } catch (e: any) {
         console.error("[Create Payment] Stitch lookup exception:", e.message);
@@ -258,36 +272,47 @@ export async function POST(request: Request) {
       resolvedUuid = crypto.randomUUID();
     }
 
-    // Determine path from full url
-    let pagePath = '/';
-    if (full_url) {
-      try {
-        const urlObj = new URL(full_url);
-        pagePath = urlObj.pathname;
-      } catch (_) {}
-    }
+    const marketingAttr = extractMarketingAttribution(
+      body,
+      undefined,
+      body.page_path,
+      full_url || body.page_url
+    );
 
     const dbPayload = {
-      name: customerName || null,
-      phone: normalizedPhone || null,
+      name: customerName ? String(customerName).trim() : null,
+      phone: canonicalPhone || (cleanDigits ? `+${cleanDigits}` : null),
       social: formattedTelegram || null,
       instagram: dbInstagram || null,
       niche: null,
-      amount: Number(amount) || 0,
+      amount: floatAmount,
       status: '⏳ Очікується оплата',
-      is_free: Number(amount) === 0,
+      is_free: floatAmount === 0,
       order_id: orderReference,
       sheet_id: null,
       target_sheet: targetSheet || "Бронювання",
-      utm_source: utm_source || '',
-      utm_medium: utm_medium || '',
-      utm_campaign: utm_campaign || '',
-      utm_content: utm_content || '',
-      utm_term: utm_term || '',
-      page_path: pagePath,
-      page_url: full_url || '',
+      utm_source: marketingAttr.utm_source || utm_source || '',
+      utm_medium: marketingAttr.utm_medium || utm_medium || '',
+      utm_campaign: marketingAttr.utm_campaign || utm_campaign || '',
+      utm_content: marketingAttr.utm_content || utm_content || '',
+      utm_term: marketingAttr.utm_term || utm_term || '',
+      page_path: marketingAttr.page_path || '/',
+      page_url: marketingAttr.page_url || full_url || '',
       visitor_uuid: resolvedUuid,
-      raw_payload: body,
+      raw_payload: {
+        ...body,
+        ...marketingAttr,
+        currency: canonicalCurrency,
+        product_type: resolvedProdType,
+        product_name: tariffName,
+        payment_system: 'wayforpay',
+        metadata: {
+          currency: canonicalCurrency,
+          product_type: resolvedProdType,
+          product_name: tariffName,
+          payment_system: 'wayforpay'
+        }
+      },
       tg_msg_id: tgMsgId ? String(tgMsgId) : null
     };
 
@@ -296,7 +321,7 @@ export async function POST(request: Request) {
       if (dbErr) {
         console.error('[Create Payment] Supabase insert error:', dbErr);
       } else {
-        console.log('[Create Payment] Successfully saved lead in Supabase');
+        console.log('[Create Payment] Successfully saved lead in Supabase with Enrichment Protocol v2.0');
       }
     } catch (err: any) {
       console.error('[Create Payment] Supabase insert exception:', err.message || err);

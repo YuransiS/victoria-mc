@@ -37,8 +37,23 @@ This live document outlines the architecture, routing structure, components, dat
 *   `intensive/5-likes/` — [NEW] 4-Lesson Intensive landing page ("5 Лайків") with dark luxury aesthetic, 10-min countdown timer, 125€ bonus package (4 bonuses), "Це про тебе якщо", "Кому не підійде", "Що зміниться", Expert profile, 4-lesson curriculum breakdown, before/after cases & reviews lightbox, format & curation, why price explanation, 100% money-back guarantee, FAQ accordions, and resilient 9€ (EUR) WayForPay checkout integration.
 *   `checkout/` — Dynamic checkout client page.
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
+*   `minicourse/` — [NEW] Mini-Course Student LMS Dashboard. Dynamically displays course checkpoints progress, unlocked/locked module cards based on active lessons configuration, dynamic leaderboard with masked Telegram usernames, and rules agreement modal.
+*   `minicourse/lessons/[id]/` — [NEW] Interactive lesson viewer with YouTube Iframe API 80% auto-watch detection, dynamic materials and custom links (Google Sheets, Notion, files), rich description/notes under video, Supabase Storage homework submission form, 24h deadline countdown timer, and Telegram group redirect modal.
+*   `minicourse/login/` — [NEW] Student login interface supporting manual Telegram handle entry and seamless magic link autologin (`?token=...`).
+*   `minicourse/claim/` — [NEW] Promo & prize code claim page (`/minicourse/claim?code=...`).
+*   `minicourse/admin/` — [NEW] Curator & admin management portal: homework grading queue (Accept / Request rework + comments), student progress manager & lockout toggles, dynamic lesson builder (add/delete N lessons, auto YouTube ID parsing from URLs, dynamic custom material links up to 5 per lesson, notes under video), and gift code generator.
+*   `minicourse/admin/login/` — [NEW] Curator & admin authentication gateway.
 
 ### 🌐 API Endpoints (`src/app/api/`)
+*   `api/bot/webhook/` — [NEW] Telegram Bot Webhook endpoint handling `/start`, payment activations (`pay_...`), gift code redemptions (`gift_...`), contest codes (`prize_...`), and welcome-back flows.
+*   `api/minicourse/bot/notify/` — [NEW] Internal dispatcher for triggering Telegram bot notifications on homework submissions, curator approvals, reworks, and lesson unlock events.
+*   `api/minicourse/token-auth/` — [NEW] One-time magic link token validator and session creator for Telegram-to-LMS single-click transitions.
+*   `api/minicourse/telegram-auth/` — [NEW] Telegram Login Widget HMAC-SHA256 signature verifier.
+*   `api/minicourse/reminders/` — [NEW] Vercel Cron backup endpoint checking >18h pending homeworks.
+*   `api/minicourse/prize/verify/` — [NEW] Promo / prize code validation endpoint.
+*   `api/homework/assign/` — [NEW] Upstash QStash job creator scheduling homework reminder 3 hours before the 24-hour deadline.
+*   `api/homework/cancel-reminder/` — [NEW] Upstash QStash reminder cancellation when homework is submitted.
+*   `api/notifications/send/` — [NEW] Webhook receiver triggered by QStash to send Telegram reminders.
 *   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Telegram and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching (Google Sheets sync removed for performance). BaseCRM payload `comment` field is dynamically constructed to include all questionnaire answers, explicit UTM parameters (`Source`, `Medium`, `Campaign`, `Content`, `Term`), and prior product/funnel visit history (`Бул(а) на інших продуктах/воронках: Так` with timestamps in Kiev time) if the user previously interacted with other funnels. Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
 *   `api/create-payment/` — Initiate checkout route. Starts Telegram payment alerts and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
 *   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`).
@@ -106,12 +121,42 @@ Table name: `victoria_leads`
 | `tg_msg_id`   | `text`  | `NULL` | Telegram bot notification message identifier for editing |
 
 
-### 🔗 B&W Analytics Sync (Единая сквозная аналитика)
+### 🔗 B&W Analytics Sync (Единая сквозная аналитика v2.0)
 Вся таблица `victoria_leads` находится под постоянным наблюдением авто-триггера **`trg_sync_victoria_lead`** на стороне Supabase. 
 При любой вставке (INSERT) в `victoria_leads` данные автоматически обрабатываются триггером на уровне БД и реплицируются в централизованные таблицы сквозной аналитики под идентификатором проекта Victoria (`b526cfcf-2856-43b9-a299-65239e0f6c27`):
-*   **`unified_customers`** — таблица уникальных профилей. Триггер проверяет уникальность телефона/email/telegram строго внутри проекта Victoria, дедуплицируя контакты и предотвращая перезапись данных других экспертов холдинга.
-*   **`unified_orders`** — таблица лид-событий/заказов. Каждое действие, заявка или оплата регистрируется в виде **новой строки** со своими UTM-метками, суммами и рекламными ID (`campaign_id`, `ad_id`), сохраняя полную когортную историю и точный расчет LTV.
-*   **Бесшовность:** Исключает необходимость доработки или изменения серверного API-кода самого приложения Victoria.
+*   **`unified_customers`** — таблица уникальных профилей. Проверяет уникальность телефона/email/telegram строго внутри проекта Victoria, дедуплицируя контакты.
+*   **`unified_orders`** — таблица лид-событий/заказов. Сохраняет полную когортную историю, канонические статусы (`closed_won`, `declined`, `pending`, `new`, `внесена предоплата`, `Клик`), суммы (`amount` float), валюты (`currency: "UAH" | "USD" | "EUR"`), `product_type` (`"course" | "tripwire" | "subscription" | "consultation" | "lead"`), и сквозную атрибуцию (`campaign_id`, `adset_id`, `ad_id`, `fbclid`, `gclid`, `fbp`, `fbc`).
+
+---
+
+## 🎓 Mini-Course LMS Database Tables (`supabase_minicourse_schema.sql`)
+1. **`minicourse_users`** — Student & Admin profiles (`id`, `name`, `email`, `telegram`, `telegram_chat_id`, `phone`, `role: 'student' | 'admin'`, `is_paid`, `payment_status`, `device_uuids`, `status: 'active' | 'under_investigation'`, `access_opened_at`, `homework_access_opened_at`, `terms_accepted`).
+2. **`minicourse_progress`** — Student lesson progression (`user_id`, `progress_percent`, `lessons: JSONB` containing checkpoints, video watches, homework links, grading statuses, and QStash reminder IDs).
+3. **`minicourse_lessons_config`** — Dynamic lesson configuration (`lesson_id`, `title`, `description`, `youtube_id`, `links: JSONB`, `description_under_video`, `hw_instructions`, `sort_order`).
+4. **`minicourse_bot_templates`** — Dynamic Telegram bot message templates (`id`, `event_key`, `lesson_id`, `title`, `description`, `message_text`, `buttons: JSONB`, `is_enabled`, `sort_order`).
+5. **`minicourse_broadcasts`** — Mass bot broadcasts history and dispatch records (`id`, `message_text`, `button_text`, `button_url`, `target_audience`, `total_recipients`, `sent_count`, `failed_count`, `status`, `created_by`).
+6. **`minicourse_bot_config`** — Telegram bot configuration & webhook connection parameters (`id: 'current'`, `bot_token`, `bot_username`, `bot_name`, `bot_photo_url`, `webhook_url`, `is_connected`, `updated_at`).
+7. **`minicourse_gift_tokens`** — Gift tokens (`token: 'GIFT-XXXX'`, `is_used`, `used_by_chat_id`, `used_at`).
+8. **`minicourse_prize_codes`** — Contest & promo prize codes (`code: 'prize-XXXX'`, `description`, `status: 'active' | 'used' | 'cancelled'`, `used_by_id`, `used_at`).
+9. **`minicourse_autologin_tokens`** — Cryptographic magic tokens (`token: UUID`, `user_id`, `is_used`, `expires_at`).
+10. **Storage Bucket `homeworks`** — Public Supabase bucket for homework attachments.
+
+---
+
+## 💎 B&W CRM v2.0 Enrichment Protocol Specification
+Все клиентские формы, серверные API и фоновые процессы синхронизации соблюдают 5 правил протокола обогащения:
+1. **Валюта (`currency`)**: Строго верхний регистр (`"UAH"`, `"USD"`, `"EUR"`). Спецсимволы (`$`, `₴`, `€`) удаляются, дефолт — `"UAH"`.
+2. **Сумма (`amount`)**: Число с плавающей точкой (`1490.00`, для бесплатных лидов `0.00`).
+3. **Тип продукта (`product_type`)**: `"course"`, `"tripwire"`, `"subscription"`, `"consultation"`, `"lead"`.
+4. **Канонические статусы (`status`)**:
+   - Успешная оплата: `"closed_won"` (также распознает `"paid"`, `"approved"`, `"оплачено"`).
+   - Предоплата: `"внесена предоплата"`, `"передплата"`.
+   - Ожидание/новый: `"pending"`, `"new"`.
+   - Отказ/ошибка: `"declined"`, `"failed"`.
+   - Клик: `"Клик"`, `"КликФормы"`.
+5. **Маркетинговая атрибуция и контакты**:
+   - Атрибуция: `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `campaign_id`, `adset_id`, `ad_id`, `fbclid`, `gclid`, cookie `_fbp` / `_fbc`, `visitor_uuid`, `page_path`, `page_url`.
+   - Нормализация контактов: `phone` в формате `+380XXXXXXXXX` (E.164), `email` в `toLowerCase().trim()`, `telegram` username без `@`.
 
 ---
 
@@ -127,8 +172,8 @@ sequenceDiagram
 
     User->>Browser: Visit landing page
     Browser->>Browser: Load Analytics component (init visitor_id & UTMs)
-    Browser->>API: POST /api/analytics/log (path + visitorId)
-    API->>DB: Save visitor cold click session ('Клик')
+    Browser->>API: POST /api/analytics/log (path + visitorId + full attribution)
+    API->>DB: Save visitor cold click session ('Клик' / 'КликФормы')
 
     User->>Browser: Click Pay Button (Open BookingModal)
     Browser->>Browser: Track InitiateCheckout
@@ -138,7 +183,7 @@ sequenceDiagram
     API->>DB: Search for previous lead with same phone
     DB-->>API: Returns earlier records (if found)
     Note over API: Stitches UUID to first record's visitor_uuid if phone exists
-    API->>DB: Save full lead details (stitching UUID)
+    API->>DB: Save full lead details with Enrichment Protocol metadata
     API->>GAS: Parallel sync lead to legacy Sheets CRM
     API-->>Browser: Return signed WayForPay payment config
     Browser->>User: Redirect to WayForPay Checkout

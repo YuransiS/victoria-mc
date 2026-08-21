@@ -6,6 +6,7 @@ import { Input } from "@/components/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeAmount, normalizeCurrency } from "@/lib/enrichment";
 
 interface PracticumHeroFormProps {
   buttonText?: string;
@@ -110,36 +111,40 @@ export function PracticumHeroForm({
 
     setStatus("loading");
 
-    const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
-    const resolvedTelegram = contactMethod === "telegram" ? (formData.telegram.startsWith("@") ? formData.telegram : `@${formData.telegram}`) : "";
+    const normalizedPhoneVal = contactMethod === "phone" ? normalizePhone(formData.phone) : null;
+    const cleanTg = contactMethod === "telegram" ? normalizeTelegram(formData.telegram) : null;
+    const resolvedTelegram = cleanTg ? `@${cleanTg}` : "";
 
-    // UTM / Source tracking
-    const searchParams = new URLSearchParams(window.location.search);
-    const utmData = {
-      utm_source: searchParams.get("utm_source") || "direct",
-      utm_medium: searchParams.get("utm_medium") || "none",
-      utm_campaign: searchParams.get("utm_campaign") || "none",
-      utm_content: searchParams.get("utm_content") || "none",
-      utm_term: searchParams.get("utm_term") || "none",
-      full_url: window.location.href
-    };
+    // UTM / Source & Ads tracking via Enrichment Protocol v2.0
+    const marketingAttr = getClientMarketingAttribution();
+    const floatAmount = normalizeAmount(amount);
+    const finalCurrency = "USD";
 
-    const data = {
-      customerName: formData.name,
-      customerEmail: resolvedTelegram ? `${resolvedTelegram.replace("@", "")}@telegram.com` : "phone-client@telegram.com",
-      customerPhone: sanitizedPhone,
+    const clientEmail = cleanTg ? `${cleanTg}@telegram.com` : (normalizedPhoneVal ? `client-${normalizedPhoneVal.replace(/\D/g, '')}@telegram.com` : "phone-client@telegram.com");
+
+    const payload = {
+      customerName: formData.name.trim(),
+      customerEmail: clientEmail,
+      customerPhone: normalizedPhoneVal || formData.phone,
       telegram: resolvedTelegram,
-      amount: amount,
+      amount: floatAmount,
       tariffName: tariffName,
-      targetSheet: "Практикум"
+      currency: finalCurrency,
+      product_type: "tripwire" as const,
+      targetSheet: "Практикум",
+      successUrl: "/practicum/thanks",
+      failUrl: "/practicum/fail",
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     // Track Lead
     trackFBEvent("Lead", {
       content_name: tariffName,
-      value: amount,
-      currency: "USD",
-      ...utmData
+      value: floatAmount,
+      currency: finalCurrency,
+      ...marketingAttr
     });
 
     try {
@@ -147,13 +152,7 @@ export function PracticumHeroForm({
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          ...utmData,
-          visitor_id: localStorage.getItem('visitor_id') || '',
-          successUrl: "/practicum/thanks",
-          failUrl: "/practicum/fail"
-        })
+        body: JSON.stringify(payload)
       });
 
       const paymentData = await response.json();
@@ -165,8 +164,8 @@ export function PracticumHeroForm({
       }
 
       // Save to localStorage for cross-page persistence
-      localStorage.setItem('lead_name', formData.name);
-      localStorage.setItem('lead_phone', sanitizedPhone);
+      localStorage.setItem('lead_name', formData.name.trim());
+      localStorage.setItem('lead_phone', normalizedPhoneVal || formData.phone);
       localStorage.setItem('lead_social', resolvedTelegram);
       if (paymentData.uuid) {
         localStorage.setItem('lead_uuid', paymentData.uuid);
@@ -174,10 +173,10 @@ export function PracticumHeroForm({
 
       // CRITICAL: Save data for the final TG update on Thanks page
       localStorage.setItem('lead_tariff', tariffName);
-      localStorage.setItem('lead_amount', amount.toString());
-      localStorage.setItem('lead_currency', "USD");
-      localStorage.setItem('lead_utm_source', utmData.utm_source || 'direct');
-      localStorage.setItem('lead_utm_medium', utmData.utm_medium || 'none');
+      localStorage.setItem('lead_amount', floatAmount.toFixed(2));
+      localStorage.setItem('lead_currency', finalCurrency);
+      localStorage.setItem('lead_utm_source', marketingAttr.utm_source || 'direct');
+      localStorage.setItem('lead_utm_medium', marketingAttr.utm_medium || 'none');
 
       if (paymentData.tgMsgId) {
         const tgData = {

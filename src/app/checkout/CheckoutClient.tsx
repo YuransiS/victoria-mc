@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
+import { getClientMarketingAttribution, normalizePhone, normalizeCurrency, normalizeAmount, resolveProductType } from '@/lib/enrichment';
 
 export default function CheckoutClient({ payload }: { payload: any }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,16 +19,29 @@ export default function CheckoutClient({ payload }: { payload: any }) {
     setIsLoading(true);
     setStatus('idle');
     try {
+      const marketingAttr = getClientMarketingAttribution({
+        page_path: '/checkout',
+        page_url: window.location.href
+      });
+      const finalCurrency = normalizeCurrency(payload.c);
+      const floatAmount = normalizeAmount(payload.a);
+      const normalizedPhoneVal = normalizePhone(payload.p);
+      const prodType = resolveProductType({ tariffName: payload.t, amount: floatAmount, pagePath: '/checkout' });
+
       // 1. Get fresh signature and orderReference from our API
       const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: payload.a,
-          currency: payload.c,
+          amount: floatAmount,
+          currency: finalCurrency,
+          product_type: prodType,
           tariffName: payload.t,
           customerName: payload.n,
-          customerPhone: payload.p,
+          customerPhone: normalizedPhoneVal || payload.p,
+          ...marketingAttr,
+          marketing: marketingAttr,
+          visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
           // If they redirect, go to /price/thanks or /price/fail
           successUrl: `${window.location.origin}/price/thanks`,
           failUrl: `${window.location.origin}/checkout/fail` // Custom fail page or back here

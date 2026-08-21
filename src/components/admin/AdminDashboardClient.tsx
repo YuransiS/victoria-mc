@@ -848,7 +848,7 @@ export default function AdminDashboardClient({ role, username, defaultTab, hideA
               {onlyView === 'analytics' ? 'Аналітика' : (isSales ? 'Base of Leads' : 'Admin Portal')}
             </h1>
           </div>
-          <p className="text-admin-text-dim text-xs uppercase tracking-[0.3em] font-bold">Victoria MC CRM</p>
+          <p className="text-admin-text-dim text-xs uppercase tracking-[0.3em] font-bold">Victoria MC Admin</p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:flex-wrap items-end gap-3">

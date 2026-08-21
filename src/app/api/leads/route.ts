@@ -85,6 +85,7 @@ export async function POST(request: Request) {
     if (isStatusUpdate && orderIdVal) {
       const isSuccess = data.status && data.status.toUpperCase().includes('APPROV');
       const parsedStatus = isSuccess ? 'Approved' : (data.status || 'Declined');
+      const canonicalStatus = isSuccess ? 'closed_won' : 'declined';
       
       try {
         const { error } = await supabaseAdmin.from('victoria_leads')
@@ -96,6 +97,10 @@ export async function POST(request: Request) {
         } else {
           console.log(`[CRM Status Sync] Supabase status updated to ${parsedStatus} for order ${orderIdVal}`);
         }
+
+        await supabaseAdmin.from('unified_orders')
+          .update({ status: canonicalStatus })
+          .eq('order_id', String(orderIdVal));
       } catch (err: any) {
         console.error('[CRM Status Sync] Supabase exception:', err.message || err);
       }

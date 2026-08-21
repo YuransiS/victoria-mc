@@ -6,6 +6,7 @@ import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { trackFBEvent } from '@/components/FacebookPixel';
 import { useSearchParams } from 'next/navigation';
+import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram } from '@/lib/enrichment';
 
 interface QuestionnaireFormData {
   name: string;
@@ -110,50 +111,30 @@ function AnketaFormContent() {
   const onSubmit = async (data: QuestionnaireFormData) => {
     setLoading(true);
 
-    const params = new URLSearchParams(window.location.search);
-    const hasUrlUtms = params.get('utm_source') || params.get('utm_medium') || params.get('utm_campaign');
-
-    let utms = {
-      utm_source: params.get('utm_source') || 'direct',
-      utm_medium: params.get('utm_medium') || '-',
-      utm_campaign: params.get('utm_campaign') || '-',
-      utm_term: params.get('utm_term') || '-',
-      utm_content: params.get('utm_content') || '-'
-    };
-
-    if (!hasUrlUtms) {
-      try {
-        const savedUtms = JSON.parse(localStorage.getItem('last_utms') || localStorage.getItem('first_utms') || '{}');
-        if (savedUtms.utm_source || savedUtms.utm_medium || savedUtms.utm_campaign) {
-          utms = {
-            utm_source: savedUtms.utm_source || 'direct',
-            utm_medium: savedUtms.utm_medium || '-',
-            utm_campaign: savedUtms.utm_campaign || '-',
-            utm_term: savedUtms.utm_term || '-',
-            utm_content: savedUtms.utm_content || '-'
-          };
-        }
-      } catch (e) {
-        console.error('Failed to parse saved UTMs:', e);
-      }
-    }
+    const marketingAttr = getClientMarketingAttribution({ page_path: '/anketa', page_url: window.location.href });
+    const normalizedPhoneVal = normalizePhone(data.phone);
+    const cleanTg = normalizeTelegram(data.telegram);
+    const cleanInstagram = normalizeInstagram(data.instagram);
 
     const payload = {
-      name: data.name,
-      phone: data.phone,
-      social: data.telegram,
-      instagram: data.instagram,
+      name: data.name.trim(),
+      phone: normalizedPhoneVal || data.phone,
+      social: cleanTg ? `@${cleanTg}` : (data.telegram || ''),
+      instagram: cleanInstagram || data.instagram,
       purpose: data.purpose,
       subscription_duration: data.subscription_duration,
       difficulties: data.difficulties,
       readiness: data.readiness,
       team_call: data.team_call,
       target_sheet: 'Анкета передзапису',
-      visitor_id: localStorage.getItem('visitor_id') || '',
-      page_path: '/anketa',
-      full_url: window.location.href,
+      visitor_id: marketingAttr.visitor_uuid || localStorage.getItem('visitor_id') || '',
       anketa_version: version,
-      ...utms
+      amount: 0.00,
+      currency: 'UAH',
+      product_type: 'lead',
+      status: 'new',
+      ...marketingAttr,
+      marketing: marketingAttr
     };
 
     try {
@@ -167,14 +148,17 @@ function AnketaFormContent() {
         // Track Lead in pixel
         trackFBEvent('Lead', {
           content_name: 'Анкета предзапису',
-          content_category: 'Pre-registration'
+          content_category: 'Pre-registration',
+          value: 0.00,
+          currency: 'UAH',
+          ...marketingAttr
         });
 
         // Save local metadata
-        localStorage.setItem('lead_name', data.name);
-        localStorage.setItem('lead_phone', data.phone);
-        localStorage.setItem('lead_social', data.telegram);
-        localStorage.setItem('lead_instagram', data.instagram);
+        localStorage.setItem('lead_name', data.name.trim());
+        localStorage.setItem('lead_phone', normalizedPhoneVal || data.phone);
+        localStorage.setItem('lead_social', cleanTg ? `@${cleanTg}` : (data.telegram || ''));
+        localStorage.setItem('lead_instagram', cleanInstagram || data.instagram);
 
         setSuccess(true);
       } else {

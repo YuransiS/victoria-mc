@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { statusMapper } from '@/lib/statusMapper';
+import { 
+  normalizePhone, 
+  normalizeEmail, 
+  normalizeTelegram, 
+  normalizeCurrency, 
+  normalizeAmount, 
+  resolveProductType, 
+  extractMarketingAttribution 
+} from '@/lib/enrichment';
 
 export async function POST(req: Request) {
   try {
@@ -42,16 +51,12 @@ export async function POST(req: Request) {
     // Intercept raw clicks ('Клик' or 'КликФормы') and insert directly into traffic_clicks
     const leadStatus = lead.status;
     if (leadStatus === 'Клик' || leadStatus === 'КликФормы') {
-      const m = marketing || {};
-      const utm_source = m.utm_source || null;
-      const utm_medium = m.utm_medium || null;
-      const utm_campaign = m.utm_campaign || null;
-      const utm_content = m.utm_content || null;
-      const utm_term = m.utm_term || null;
-      const page_path = m.page_path || null;
-      const page_url = m.page_url || null;
-      const rawVisitorUuid = m.visitor_uuid || m.visitor_id || m.visitorId || metadata?.visitor_uuid || metadata?.visitor_id || metadata?.visitorId || lead?.visitor_uuid || lead?.visitor_id || lead?.visitorId || null;
+      const m = extractMarketingAttribution(marketing || body);
+      const rawVisitorUuid = m.visitor_uuid || metadata?.visitor_uuid || lead?.visitor_uuid || null;
       const visitor_uuid = rawVisitorUuid && isValidUuid(rawVisitorUuid) ? rawVisitorUuid : null;
+
+      const canonicalCurrency = normalizeCurrency(lead.currency || metadata?.currency);
+      const floatAmount = normalizeAmount(lead.amount || 0);
 
       const { data: clickData, error: clickError } = await supabaseAdmin
         .from('traffic_clicks')
@@ -59,14 +64,19 @@ export async function POST(req: Request) {
           project_id: projectId,
           visitor_uuid,
           status: leadStatus,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term,
-          page_path,
-          page_url,
-          metadata: metadata || {},
+          utm_source: m.utm_source,
+          utm_medium: m.utm_medium,
+          utm_campaign: m.utm_campaign,
+          utm_content: m.utm_content,
+          utm_term: m.utm_term,
+          page_path: m.page_path,
+          page_url: m.page_url,
+          metadata: {
+            ...(metadata || {}),
+            currency: canonicalCurrency,
+            product_type: 'lead',
+            amount: floatAmount
+          },
           created_at: createdAtIso
         })
         .select('id')
@@ -84,15 +94,12 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. Выделение и нормализация контактных данных лида
-    const name = lead.name || null;
-    let phone = lead.phone ? String(lead.phone).trim() : null;
-    let email = lead.email ? String(lead.email).trim().toLowerCase() : null;
-    let telegram = lead.telegram ? String(lead.telegram).trim() : null;
-
-    phone = phone ? phone.replace(/\s+/g, '') : null;
-    email = email || null;
-    telegram = telegram || null;
+    // 3. Выделение и нормализация контактных данных лида (Enrichment Protocol v2.0)
+    const name = lead.name ? String(lead.name).trim() : null;
+    const phone = normalizePhone(lead.phone);
+    const email = normalizeEmail(lead.email);
+    const cleanTg = normalizeTelegram(lead.telegram);
+    const telegram = cleanTg ? `@${cleanTg}` : null;
 
     if (!phone && !email && !telegram) {
       return NextResponse.json(
@@ -104,7 +111,6 @@ export async function POST(req: Request) {
     // 4. Поиск существующего профиля клиента строго внутри этого проекта
     let customerId: string | null = null;
     
-    // Формируем условия поиска
     let searchFilter = `project_id.eq.${projectId}`;
     const orConditions: string[] = [];
     if (phone) orConditions.push(`phone.eq.${phone}`);
@@ -165,33 +171,30 @@ export async function POST(req: Request) {
       }
     }
 
-    // 6. Подготовка маркетинговых полей
-    const m = marketing || {};
-    const utm_source = m.utm_source || null;
-    const utm_medium = m.utm_medium || null;
-    const utm_campaign = m.utm_campaign || null;
-    const utm_content = m.utm_content || null;
-    const utm_term = m.utm_term || null;
-    const campaign_id = m.campaign_id || null;
-    const adset_id = m.adset_id || null;
-    const ad_id = m.ad_id || null;
-    const fbclid = m.fbclid || null;
-    const gclid = m.gclid || null;
-    const fbp = m.fbp || null;
-    const fbc = m.fbc || null;
-    const ip_address = m.ip_address || null;
-    const user_agent = m.user_agent || null;
-    const page_path = m.page_path || null;
-    const page_url = m.page_url || null;
-    const rawVisitorUuid = m.visitor_uuid || m.visitor_id || m.visitorId || metadata?.visitor_uuid || metadata?.visitor_id || metadata?.visitorId || lead?.visitor_uuid || lead?.visitor_id || lead?.visitorId || null;
+    // 6. Подготовка маркетинговых полей (Enrichment Protocol v2.0)
+    const m = extractMarketingAttribution(marketing || body);
+    const rawVisitorUuid = m.visitor_uuid || metadata?.visitor_uuid || lead?.visitor_uuid || null;
     const visitor_uuid = rawVisitorUuid && isValidUuid(rawVisitorUuid) ? rawVisitorUuid : null;
 
-    // Ensure currency is resolved and set in metadata
-    const meta = metadata || {};
-    const reqCurrency = lead.currency || meta.currency || null;
-    if (reqCurrency) {
-      meta.currency = reqCurrency;
-    }
+    // Currency, Amount, Product Type Normalization
+    const canonicalCurrency = normalizeCurrency(lead.currency || metadata?.currency);
+    const floatAmount = normalizeAmount(lead.amount);
+    const canonicalStatus = statusMapper.normalize(lead.status);
+
+    const resolvedProdType = resolveProductType({
+      productType: lead.product_type || metadata?.product_type,
+      tariffName: lead.product_name || metadata?.product_name,
+      pagePath: m.page_path,
+      amount: floatAmount
+    });
+
+    const meta = {
+      ...(metadata || {}),
+      currency: canonicalCurrency,
+      product_type: resolvedProdType,
+      product_name: lead.product_name || metadata?.product_name || 'Victoria Course/Lead',
+      payment_system: metadata?.payment_system || 'wayforpay'
+    };
 
     // 7. Создание или обновление лид-события/заказа
     let orderIdToReturn = null;
@@ -216,15 +219,22 @@ export async function POST(req: Request) {
       const { data: updatedOrder, error: orderError } = await supabaseAdmin
         .from('unified_orders')
         .update({
-          amount: lead.amount !== undefined ? lead.amount : undefined,
-          status: lead.status ? statusMapper.normalize(lead.status) : undefined,
-          utm_source: utm_source || undefined,
-          utm_medium: utm_medium || undefined,
-          utm_campaign: utm_campaign || undefined,
-          utm_content: utm_content || undefined,
-          utm_term: utm_term || undefined,
-          page_path: page_path || undefined,
-          page_url: page_url || undefined,
+          amount: floatAmount,
+          status: canonicalStatus,
+          utm_source: m.utm_source || undefined,
+          utm_medium: m.utm_medium || undefined,
+          utm_campaign: m.utm_campaign || undefined,
+          utm_content: m.utm_content || undefined,
+          utm_term: m.utm_term || undefined,
+          campaign_id: m.campaign_id || undefined,
+          adset_id: m.adset_id || undefined,
+          ad_id: m.ad_id || undefined,
+          fbclid: m.fbclid || undefined,
+          gclid: m.gclid || undefined,
+          fbp: m.fbp || undefined,
+          fbc: m.fbc || undefined,
+          page_path: m.page_path || undefined,
+          page_url: m.page_url || undefined,
           visitor_uuid: visitor_uuid || undefined,
           metadata: meta
         })
@@ -244,25 +254,25 @@ export async function POST(req: Request) {
         .insert({
           customer_id: customerId,
           project_id: projectId,
-          amount: lead.amount || 0.00,
-          status: statusMapper.normalize(lead.status),
+          amount: floatAmount,
+          status: canonicalStatus,
           order_id: lead.order_id || null,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          utm_content,
-          utm_term,
-          campaign_id,
-          adset_id,
-          ad_id,
-          fbclid,
-          gclid,
-          fbp,
-          fbc,
-          ip_address,
-          user_agent,
-          page_path,
-          page_url,
+          utm_source: m.utm_source,
+          utm_medium: m.utm_medium,
+          utm_campaign: m.utm_campaign,
+          utm_content: m.utm_content,
+          utm_term: m.utm_term,
+          campaign_id: m.campaign_id,
+          adset_id: m.adset_id,
+          ad_id: m.ad_id,
+          fbclid: m.fbclid,
+          gclid: m.gclid,
+          fbp: m.fbp,
+          fbc: m.fbc,
+          ip_address: m.ip_address || (marketing as any)?.ip_address || null,
+          user_agent: m.user_agent || (marketing as any)?.user_agent || null,
+          page_path: m.page_path,
+          page_url: m.page_url,
           visitor_uuid,
           metadata: meta,
           created_at: createdAtIso
