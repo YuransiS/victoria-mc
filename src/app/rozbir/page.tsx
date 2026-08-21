@@ -353,7 +353,7 @@ export default function RozbirPage() {
             <div className="w-16 h-px bg-black mx-auto mt-6"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {REAL_CASES.map((c) => (
               <div key={c.id} className="bg-[#F9F9F9] border border-gray-200 p-5 flex flex-col justify-between shadow-sm">
                 <div>

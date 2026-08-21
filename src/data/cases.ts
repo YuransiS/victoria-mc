@@ -26,6 +26,16 @@ export const REAL_CASES: CaseTransformation[] = [
   },
   {
     id: "02",
+    name: "Марʼяна",
+    niche: "Викладачка сучасних танців для дітей",
+    beforeImg: "/cases/maryana_before.jpg",
+    afterImg: "/cases/maryana_after.jpg",
+    beforeDesc: "Блог без сенсів та мети, рандомні кадри виступів.",
+    afterDesc: "Кожен елемент працює на мету та розповідає про неї. Сторінка якісно упакована, прогріває та веде до співпраці.",
+    highlightResult: "Сторінка якісно упакована, прогріває та веде до співпраці"
+  },
+  {
+    id: "03",
     name: "Інна",
     niche: "Коуч",
     beforeImg: "/cases/inna_before.jpg",
@@ -37,7 +47,7 @@ export const REAL_CASES: CaseTransformation[] = [
     highlightResult: "Повернула натхнення до блогу, транслює свій метод та цінності"
   },
   {
-    id: "03",
+    id: "04",
     name: "Анастасія",
     niche: "Навчає крипті",
     beforeImg: "/cases/anastasia_before.jpg",
