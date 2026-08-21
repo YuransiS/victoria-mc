@@ -6,6 +6,7 @@ import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import './globals.css';
 import { trackFBEvent } from '@/components/FacebookPixel';
+import { REAL_CASES } from '@/data/cases';
 
 // Types for form data
 interface FormData {
@@ -717,37 +718,39 @@ export default function StvoryuiPage() {
               <div className="w-16 h-[1px] bg-black/10 mx-auto mt-8"></div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-32">
-              {[
-                { name: 'Мар’яна', niche: 'Вчителька танців', id: '01', before: '/rozbir/do1.jpg', after: '/rozbir/bo1.jpg' },
-                { name: 'Бізнес', niche: 'Будівництво басейнів', id: '02', before: '/rozbir/do2.jpg', after: '/rozbir/bo2.jpg' },
-                { name: 'Аня', niche: 'Дизайнер одягу', id: '03', before: '/rozbir/do3.jpg', after: '/rozbir/bo3.jpg' },
-                { name: 'Аня', niche: 'Вчителька української', id: '04', before: '/rozbir/do1.jpg', after: '/rozbir/bo4.jpg' },
-                { name: 'Катя', niche: 'Лайфстайл блог', id: '05', before: '/rozbir/do2.jpg', after: '/rozbir/bo1.jpg' },
-                { name: 'Аліса', niche: 'Стилістка', id: '06', before: '/rozbir/do3.jpg', after: '/rozbir/bo2.jpg' },
-              ].map((client, idx) => (
-                <div key={idx} className="space-y-8 animate-fade-in" style={{ animationDelay: `${(idx % 2 + 1) * 0.1}s` }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24">
+              {REAL_CASES.map((client, idx) => (
+                <div key={client.id} className="space-y-6 animate-fade-in" style={{ animationDelay: `${(idx % 2 + 1) * 0.1}s` }}>
                   <div className="flex items-end justify-between border-b border-gray-100 pb-4">
                     <div className="space-y-1">
                       <h3 className="font-serif text-2xl md:text-3xl font-medium text-black">{client.name}</h3>
                       <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-[0.25em] font-bold">{client.niche}</p>
                     </div>
-                    <span className="font-serif italic text-gray-300 text-3xl">{client.id}</span>
+                    <span className="font-serif italic text-gray-300 text-3xl">#{client.id}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative overflow-hidden group shadow-sm">
-                      <img src={client.before} alt={`До трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                      <img src={client.beforeImg} alt={`До трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" />
                       <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm">
                         <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-black">До</p>
                       </div>
                     </div>
                     <div className="relative overflow-hidden group shadow-md shadow-gray-200">
-                      <img src={client.after} alt={`Після трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-1000" />
+                      <img src={client.afterImg} alt={`Після трансформації - ${client.name}`} loading="lazy" className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-1000" />
                       <div className="absolute top-4 left-4 bg-black px-3 py-1.5 shadow-xl">
                         <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-white">Після</p>
                       </div>
                     </div>
                   </div>
+                  <div className="space-y-1.5 pt-2 text-xs text-gray-600 leading-relaxed border-t border-gray-100">
+                    <p><strong className="text-black uppercase text-[10px] tracking-wider font-bold">До:</strong> {client.beforeDesc}</p>
+                    <p><strong className="text-black uppercase text-[10px] tracking-wider font-bold">Після:</strong> {client.afterDesc}</p>
+                  </div>
+                  {client.highlightResult && (
+                    <p className="text-[11px] font-bold text-black flex items-center gap-1.5 pt-1">
+                      <span>✦</span> {client.highlightResult}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

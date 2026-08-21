@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { SystemHeroForm } from "@/components/intensive/SystemHeroForm";
 import { SystemRegistrationModal } from "@/components/intensive/SystemRegistrationModal";
+import { REAL_CASES, REVIEWS_GALLERY } from "@/data/cases";
 import styles from "./system.module.css";
 
 // 10-Minute Countdown Timer Hook
@@ -337,32 +338,10 @@ export default function IntensiveSystemPage() {
             </p>
           </div>
 
-          {/* 6 Before/After Student Cards */}
+          {/* Real Before/After Student Cards */}
           <div className={styles.casesGrid}>
-            {[
-              {
-                name: "Ольга",
-                niche: "Бʼюті-майстер",
-                beforeImg: "/rozbir/do1.jpg",
-                afterImg: "/rozbir/bo1.jpg",
-                result: "Вийшла з 300€ на 1400€/міс завдяки системі контенту"
-              },
-              {
-                name: "Марія",
-                niche: "Психолог-консультант",
-                beforeImg: "/rozbir/do2.jpg",
-                afterImg: "/rozbir/bo2.jpg",
-                result: "Заповнила запис на 2 місяці наперед без щоденних сторіс"
-              },
-              {
-                name: "Катерина",
-                niche: "Експерт з англійської",
-                beforeImg: "/rozbir/do3.jpg",
-                afterImg: "/rozbir/bo3.jpg",
-                result: "+850 цільових підписників за 3 тижні та перші 1100€"
-              }
-            ].map((c, idx) => (
-              <div key={idx} className={styles.caseCard}>
+            {REAL_CASES.map((c, idx) => (
+              <div key={c.id} className={styles.caseCard}>
                 <div className={styles.caseHeader}>
                   <span className={styles.caseName}>{c.name}</span>
                   <span className={styles.caseNiche}>{c.niche}</span>
@@ -383,9 +362,15 @@ export default function IntensiveSystemPage() {
                     <span className={styles.caseLabelAfter}>Після</span>
                   </div>
                 </div>
-                <p className="text-xs font-semibold text-[#2D0C14]/85 leading-relaxed pt-1">
-                  ✦ {c.result}
-                </p>
+                <div className="space-y-1.5 pt-2 text-[11px] sm:text-xs text-[#2D0C14]/85 leading-snug">
+                  <p><strong className="text-[#8F2D45] uppercase font-bold text-[10px]">До:</strong> {c.beforeDesc}</p>
+                  <p><strong className="text-[#2D0C14] uppercase font-bold text-[10px]">Після:</strong> {c.afterDesc}</p>
+                </div>
+                {c.highlightResult && (
+                  <p className="text-xs font-semibold text-[#8F2D45] leading-relaxed pt-2 border-t border-[#2D0C14]/10 mt-2">
+                    ✦ {c.highlightResult}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -398,15 +383,15 @@ export default function IntensiveSystemPage() {
           </div>
 
           <div className={styles.reviewsWrap}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+            {REVIEWS_GALLERY.map((imgSrc, idx) => (
               <div
-                key={num}
+                key={idx}
                 className={styles.reviewItem}
-                onClick={() => setLightboxImage(`/rozbir/r${num}.jpg`)}
+                onClick={() => setLightboxImage(imgSrc)}
               >
                 <Image
-                  src={`/rozbir/r${num}.jpg`}
-                  alt={`Відгук ${num}`}
+                  src={imgSrc}
+                  alt={`Відгук ${idx + 1}`}
                   fill
                   className="object-cover"
                 />

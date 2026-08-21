@@ -1,21 +1,16 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./SharedBlocks.module.css";
-
-const casesData = [
-  { name: 'Мар’яна', niche: 'Вчителька танців', id: '01', before: '/rozbir/do1.jpg', after: '/rozbir/bo1.jpg' },
-  { name: 'Бізнес', niche: 'Будівництво басейнів', id: '02', before: '/rozbir/do2.jpg', after: '/rozbir/bo2.jpg' },
-  { name: 'Аня', niche: 'Дизайнер одягу', id: '03', before: '/rozbir/do3.jpg', after: '/rozbir/bo3.jpg' },
-  { name: 'Аня', niche: 'Вчителька української', id: '04', before: '/rozbir/do1.jpg', after: '/rozbir/bo4.jpg' },
-  { name: 'Катя', niche: 'Лайфстайл блог', id: '05', before: '/rozbir/do2.jpg', after: '/rozbir/bo1.jpg' },
-  { name: 'Аліса', niche: 'Стилістка', id: '06', before: '/rozbir/do3.jpg', after: '/rozbir/bo2.jpg' },
-];
+import { REAL_CASES } from "@/data/cases";
+import { ZoomIn, X } from "lucide-react";
 
 export function BlockCases() {
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+
   return (
-    <section className={styles.section} style={{ paddingBottom: "2rem" }}>
+    <section className={styles.section} style={{ paddingBottom: "3rem" }}>
       <motion.div 
         className={styles.sectionHeader}
         initial={{ opacity: 0, y: -20 }}
@@ -50,25 +45,25 @@ export function BlockCases() {
         {/* Responsive Grid wrapper */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
           gap: "2.5rem"
         }}>
-          {casesData.map((client, idx) => (
+          {REAL_CASES.map((client, idx) => (
             <motion.div 
-              key={idx}
+              key={client.id}
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "1rem",
-                background: "rgba(26, 26, 28, 0.6)",
-                border: "1.5px solid rgba(255, 255, 255, 0.1)",
-                padding: "1.5rem",
+                gap: "1.25rem",
+                background: "rgba(26, 26, 28, 0.7)",
+                border: "1.5px solid rgba(255, 255, 255, 0.12)",
+                padding: "1.75rem",
                 boxShadow: "8px 8px 0px rgba(0, 0, 0, 0.3)"
               }}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: idx * 0.05 }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
             >
               <div style={{
                 display: "flex",
@@ -82,18 +77,18 @@ export function BlockCases() {
                   <h3 style={{
                     fontFamily: "var(--font-inter)",
                     fontWeight: 900,
-                    fontSize: "1.3rem",
+                    fontSize: "1.4rem",
                     color: "#ffffff",
                     margin: 0
                   }}>{client.name}</h3>
                   <p style={{
                     fontFamily: "var(--font-manrope)",
-                    fontSize: "0.7rem",
-                    color: "rgba(255, 255, 255, 0.4)",
+                    fontSize: "0.75rem",
+                    color: "var(--accent-color)",
                     textTransform: "uppercase",
                     letterSpacing: "0.15em",
                     fontWeight: 700,
-                    margin: "0.2rem 0 0 0"
+                    margin: "0.25rem 0 0 0"
                   }}>{client.niche}</p>
                 </div>
                 <span style={{
@@ -103,25 +98,29 @@ export function BlockCases() {
                   color: "var(--accent-color)",
                   opacity: 0.8,
                   lineHeight: 1
-                }}>{client.id}</span>
+                }}>#{client.id}</span>
               </div>
 
+              {/* Before / After Images */}
               <div style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
                 gap: "1rem"
               }}>
                 {/* Before Image */}
-                <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
+                <div 
+                  style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4", cursor: "pointer" }}
+                  onClick={() => setActiveImage(client.beforeImg)}
+                >
                   <img 
-                    src={client.before} 
+                    src={client.beforeImg} 
                     alt={`До - ${client.name}`}
                     loading="lazy"
                     style={{
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      filter: "grayscale(20%)"
+                      filter: "grayscale(15%)"
                     }}
                   />
                   <div style={{
@@ -142,12 +141,27 @@ export function BlockCases() {
                       margin: 0
                     }}>До</p>
                   </div>
+                  <div style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "rgba(0, 0, 0, 0.3)",
+                    opacity: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "opacity 0.2s"
+                  }} className="img-hover">
+                    <ZoomIn style={{ color: "#fff", width: 20, height: 20 }} />
+                  </div>
                 </div>
 
                 {/* After Image */}
-                <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
+                <div 
+                  style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4", cursor: "pointer" }}
+                  onClick={() => setActiveImage(client.afterImg)}
+                >
                   <img 
-                    src={client.after} 
+                    src={client.afterImg} 
                     alt={`Після - ${client.name}`}
                     loading="lazy"
                     style={{
@@ -174,12 +188,95 @@ export function BlockCases() {
                       margin: 0
                     }}>Після</p>
                   </div>
+                  <div style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "rgba(0, 0, 0, 0.3)",
+                    opacity: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "opacity 0.2s"
+                  }} className="img-hover">
+                    <ZoomIn style={{ color: "#fff", width: 20, height: 20 }} />
+                  </div>
                 </div>
+              </div>
+
+              {/* Before / After Description Breakdown */}
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.65rem",
+                paddingTop: "0.5rem",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                fontSize: "0.85rem",
+                lineHeight: 1.5
+              }}>
+                <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.65)", fontFamily: "var(--font-manrope)" }}>
+                  <strong style={{ color: "#ff6b6b", textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.08em" }}>До: </strong>
+                  {client.beforeDesc}
+                </p>
+                <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.95)", fontFamily: "var(--font-manrope)" }}>
+                  <strong style={{ color: "var(--accent-color)", textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.08em" }}>Після: </strong>
+                  {client.afterDesc}
+                </p>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {activeImage && (
+          <motion.div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9999,
+              background: "rgba(0, 0, 0, 0.95)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1.5rem"
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveImage(null)}
+          >
+            <button
+              style={{
+                position: "absolute",
+                top: "1.5rem",
+                right: "1.5rem",
+                background: "none",
+                border: "none",
+                color: "#ffffff",
+                cursor: "pointer",
+                padding: "0.5rem"
+              }}
+              onClick={() => setActiveImage(null)}
+            >
+              <X size={32} />
+            </button>
+            <div style={{ position: "relative", maxWidth: "90vw", maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
+              <img
+                src={activeImage}
+                alt="Збільшений результат"
+                style={{
+                  maxWidth: "90vw",
+                  maxHeight: "85vh",
+                  objectFit: "contain",
+                  borderRadius: "4px",
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.8)"
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

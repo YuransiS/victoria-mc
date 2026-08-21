@@ -4,11 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./SharedBlocks.module.css";
 import { ZoomIn, X, ChevronLeft, ChevronRight } from "lucide-react";
-
-const reviewImages = [
-  'r5.jpg', 'r1.jpg', 'r4.jpg', 'r2.jpg', 'r3.jpg', 
-  'r6.jpg', 'r7.jpg', 'r8.jpg', 'r9.jpg', 'r10.jpg'
-];
+import { REVIEWS_GALLERY } from "@/data/cases";
 
 export function BlockReviews() {
   const [activeImage, setActiveImage] = useState<string | null>(null);
@@ -48,7 +44,7 @@ export function BlockReviews() {
         gap: "1.5rem",
         width: "100%"
       }}>
-        {reviewImages.map((img, idx) => (
+        {REVIEWS_GALLERY.map((imgSrc, idx) => (
           <motion.div
             key={idx}
             style={{
@@ -66,14 +62,14 @@ export function BlockReviews() {
             }}
             whileHover={{ scale: 1.02, borderColor: "rgba(255, 255, 0, 0.4)" }}
             transition={{ duration: 0.3 }}
-            onClick={() => setActiveImage(`/rozbir/${img}`)}
+            onClick={() => setActiveImage(imgSrc)}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
           >
             <img 
-              src={`/rozbir/${img}`} 
-              alt="Відгук" 
+              src={imgSrc} 
+              alt={`Відгук ${idx + 1}`} 
               style={{
                 width: "100%",
                 height: "100%",

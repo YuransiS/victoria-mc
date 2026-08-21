@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { trackFBEvent } from '@/components/FacebookPixel';
+import { REAL_CASES, REVIEWS_GALLERY } from '@/data/cases';
 
 declare global {
   interface Window {
@@ -352,32 +353,57 @@ export default function RozbirPage() {
             <div className="w-16 h-px bg-black mx-auto mt-6"></div>
           </div>
 
-          <div className="relative group/slider">
-            <button onClick={() => scrollContainer(storytellingRef, -1)}
-              className="hidden md:flex absolute -left-12 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white border border-gray-200 text-black shadow-sm hover:border-black transition-all">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {REAL_CASES.map((c) => (
+              <div key={c.id} className="bg-[#F9F9F9] border border-gray-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-4 border-b border-gray-200 pb-3">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-black">{c.name}</h3>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{c.niche}</p>
+                    </div>
+                    <span className="font-serif italic text-2xl text-gray-300">#{c.id}</span>
+                  </div>
 
-            <div ref={storytellingRef} className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide px-4 md:px-0">
-              {['bo1.jpg', 'bo2.jpg', 'bo3.jpg', 'bo4.jpg'].map((img) => (
-                <div key={img} className="shrink-0 w-[80vw] md:w-[320px] aspect-square flex items-center justify-center overflow-hidden relative border border-gray-100 transition-all group cursor-pointer"
-                  onClick={() => openImageModal(`/rozbir/${img}`)}>
-                  <img src={`/rozbir/${img}`} alt="Результат" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                    <ZoomIn className="text-black w-8 h-8 opacity-80" />
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div 
+                      className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer group border border-gray-200"
+                      onClick={() => openImageModal(c.beforeImg)}
+                    >
+                      <img src={c.beforeImg} alt={`До — ${c.name}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <div className="absolute top-2 left-2 bg-black/80 text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider">До</div>
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <ZoomIn className="text-white w-5 h-5" />
+                      </div>
+                    </div>
+
+                    <div 
+                      className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer group border border-gray-200"
+                      onClick={() => openImageModal(c.afterImg)}
+                    >
+                      <img src={c.afterImg} alt={`Після — ${c.name}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <div className="absolute top-2 left-2 bg-black text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider">Після</div>
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <ZoomIn className="text-white w-5 h-5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-xs text-gray-700 leading-relaxed border-t border-gray-200/80 pt-3">
+                    <p><strong className="text-black uppercase text-[10px] tracking-wider block font-bold">До:</strong> {c.beforeDesc}</p>
+                    <p><strong className="text-black uppercase text-[10px] tracking-wider block font-bold">Після:</strong> {c.afterDesc}</p>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            <button onClick={() => scrollContainer(storytellingRef, 1)}
-              className="hidden md:flex absolute -right-12 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white border border-gray-200 text-black shadow-sm hover:border-black transition-all">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-center gap-2 text-[#6B6B6B] mt-2">
-            <p className="text-[9px] uppercase tracking-[0.2em] font-medium">Гортайте приклади</p>
+                {c.highlightResult && (
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-[11px] font-bold text-black flex items-center gap-1.5">
+                      <span>✦</span> {c.highlightResult}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <div className="w-full max-w-xs mx-auto mt-10 text-center">
@@ -545,10 +571,10 @@ export default function RozbirPage() {
           </button>
 
           <div ref={reviewsRef} className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide px-6 md:px-0 w-full">
-            {['r5.jpg', 'r1.jpg', 'r4.jpg', 'r2.jpg', 'r3.jpg', 'r6.jpg', 'r7.jpg', 'r8.jpg', 'r9.jpg', 'r10.jpg'].map((img) => (
-              <div key={img} className="relative shrink-0 w-[80vw] md:w-[320px] aspect-square bg-gray-50 border border-gray-100 flex items-center justify-center cursor-pointer overflow-hidden transition-transform hover:scale-[1.01]"
-                onClick={() => openImageModal(`/rozbir/${img}`)}>
-                <img src={`/rozbir/${img}`} alt="Review" className="w-full h-full object-contain" />
+            {REVIEWS_GALLERY.map((imgSrc, idx) => (
+              <div key={idx} className="relative shrink-0 w-[80vw] md:w-[320px] aspect-square bg-gray-50 border border-gray-100 flex items-center justify-center cursor-pointer overflow-hidden transition-transform hover:scale-[1.01]"
+                onClick={() => openImageModal(imgSrc)}>
+                <img src={imgSrc} alt={`Review ${idx + 1}`} className="w-full h-full object-contain" />
                 <div className="absolute inset-0 bg-gray-800/15 pointer-events-none"></div>
               </div>
             ))}

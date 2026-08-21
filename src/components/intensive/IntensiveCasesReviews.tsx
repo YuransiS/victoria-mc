@@ -3,54 +3,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ZoomIn, X, ArrowRight } from "lucide-react";
+import { REAL_CASES, REVIEWS_GALLERY } from "@/data/cases";
 
 interface IntensiveCasesReviewsProps {
   onOpenCheckout: () => void;
 }
-
-const casesData = [
-  {
-    name: "Мар’яна",
-    niche: "Вчителька танців",
-    id: "01",
-    before: "/rozbir/do1.jpg",
-    after: "/rozbir/bo1.jpg"
-  },
-  {
-    name: "Бізнес",
-    niche: "Будівництво басейнів",
-    id: "02",
-    before: "/rozbir/do2.jpg",
-    after: "/rozbir/bo2.jpg"
-  },
-  {
-    name: "Аня",
-    niche: "Дизайнер одягу",
-    id: "03",
-    before: "/rozbir/do3.jpg",
-    after: "/rozbir/bo3.jpg"
-  },
-  {
-    name: "Катя",
-    niche: "Лайфстайл блог",
-    id: "04",
-    before: "/rozbir/do1.jpg",
-    after: "/rozbir/bo4.jpg"
-  }
-];
-
-const reviews = [
-  "/rozbir/r1.jpg",
-  "/rozbir/r2.jpg",
-  "/rozbir/r3.jpg",
-  "/rozbir/r4.jpg",
-  "/rozbir/r5.jpg",
-  "/rozbir/r6.jpg",
-  "/rozbir/r7.jpg",
-  "/rozbir/r8.jpg",
-  "/rozbir/r9.jpg",
-  "/rozbir/r10.jpg"
-];
 
 export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsProps) {
   const [activeImage, setActiveImage] = useState<string | null>(null);
@@ -70,63 +27,89 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
         </div>
 
         {/* Before / After Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          {casesData.map((item, idx) => (
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {REAL_CASES.map((item, idx) => (
             <motion.div
-              key={idx}
+              key={item.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="bg-white rounded-2xl border border-[#2B0813]/10 p-6 shadow-sm flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between mb-4 border-b border-[#2B0813]/10 pb-3">
-                <div>
-                  <h4 className="font-playfair text-lg font-bold">{item.name}</h4>
-                  <p className="font-manrope text-xs text-[#451220] uppercase font-bold tracking-wider">
-                    {item.niche}
+              <div>
+                <div className="flex items-center justify-between mb-4 border-b border-[#2B0813]/10 pb-3">
+                  <div>
+                    <h4 className="font-playfair text-xl font-bold text-[#2B0813]">{item.name}</h4>
+                    <p className="font-manrope text-xs text-[#8F2D45] uppercase font-bold tracking-wider">
+                      {item.niche}
+                    </p>
+                  </div>
+                  <span className="font-newsreader italic text-2xl text-[#2B0813]/30">
+                    #{item.id}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div
+                    className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-[#FAF6EE]"
+                    onClick={() => setActiveImage(item.beforeImg)}
+                  >
+                    <img
+                      src={item.beforeImg}
+                      alt={`До — ${item.name}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="absolute top-2 left-2 rounded-full bg-black/75 text-white font-manrope text-[10px] font-bold px-2.5 py-0.5">
+                      До
+                    </span>
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <ZoomIn size={20} className="text-white" />
+                    </div>
+                  </div>
+
+                  <div
+                    className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-[#FAF6EE]"
+                    onClick={() => setActiveImage(item.afterImg)}
+                  >
+                    <img
+                      src={item.afterImg}
+                      alt={`Після — ${item.name}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="absolute top-2 left-2 rounded-full bg-[#451220] text-[#FAF6EE] font-manrope text-[10px] font-bold px-2.5 py-0.5">
+                      Після
+                    </span>
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <ZoomIn size={20} className="text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text Description */}
+                <div className="space-y-2 text-xs sm:text-sm leading-relaxed border-t border-[#2B0813]/5 pt-3">
+                  <p className="text-[#2B0813]/70">
+                    <strong className="text-[#8F2D45] uppercase font-bold text-[10px] tracking-wider block sm:inline mr-1">
+                      До:
+                    </strong>
+                    {item.beforeDesc}
+                  </p>
+                  <p className="text-[#2B0813] font-medium">
+                    <strong className="text-[#2B0813] uppercase font-bold text-[10px] tracking-wider block sm:inline mr-1">
+                      Після:
+                    </strong>
+                    {item.afterDesc}
                   </p>
                 </div>
-                <span className="font-newsreader italic text-2xl text-[#2B0813]/30">
-                  #{item.id}
-                </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div
-                  className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-[#FAF6EE]"
-                  onClick={() => setActiveImage(item.before)}
-                >
-                  <img
-                    src={item.before}
-                    alt={`До — ${item.name}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className="absolute top-2 left-2 rounded-full bg-black/70 text-white font-manrope text-[10px] font-bold px-2.5 py-0.5">
-                    До
-                  </span>
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <ZoomIn size={20} className="text-white" />
-                  </div>
+              {item.highlightResult && (
+                <div className="mt-4 pt-3 border-t border-dashed border-[#2B0813]/10">
+                  <p className="text-[11px] font-bold text-[#451220] flex items-center gap-1.5">
+                    <span>✦</span> {item.highlightResult}
+                  </p>
                 </div>
-
-                <div
-                  className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-[#FAF6EE]"
-                  onClick={() => setActiveImage(item.after)}
-                >
-                  <img
-                    src={item.after}
-                    alt={`Після — ${item.name}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className="absolute top-2 left-2 rounded-full bg-[#451220] text-[#FAF6EE] font-manrope text-[10px] font-bold px-2.5 py-0.5">
-                    Після
-                  </span>
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <ZoomIn size={20} className="text-white" />
-                  </div>
-                </div>
-              </div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -137,8 +120,8 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
             Скріншоти відгуків
           </h3>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-            {reviews.map((imgSrc, idx) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {REVIEWS_GALLERY.map((imgSrc, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, scale: 0.95 }}

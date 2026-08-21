@@ -53,15 +53,18 @@ This live document outlines the architecture, routing structure, components, dat
     *   Aggregates all funnels (VSL, Practicum, Pre-registration Anketa, Video Breakdown, Booking, Autoweb) and traffic/clicks metrics across all landing sites, performs conversion cohort matching, determines the best UTM source per funnel, and sends a comprehensive summary report to Telegram. Includes detailed VSL cohort analysis (site visits, watch button clicks, completed views, average watch duration, and questionnaire fill-out moment distributions).
 
 
-### 🧩 UI Components (`src/components/`)
+### 🧩 UI Components & Data (`src/components/`, `src/data/`)
+*   `src/data/cases.ts` — Centralized real student cases (Ksenia, Anastasia) with before/after visual metrics and reviews registry.
+*   `CASES_REGISTRY.md` — Central documentation registry of client cases, copy, and media assets.
 *   `Form.tsx` — Core registration form component.
 *   `Analytics.tsx` — Client-side React tracking component. Generates a secure `visitor_id`, extracts UTM parameters, and logs telemetric sessions on load.
 *   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay. Uses `react-phone-number-input` for exact international numbers with Edge CDN geo-detection.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
-*   `blocks/BlockCases.tsx` — Before-and-after student visual cases grid.
-*   `blocks/BlockReviews.tsx` — Student reviews grid with interactive lightbox.
+*   `blocks/BlockCases.tsx` — Before-and-after student visual cases grid connected to `REAL_CASES`.
+*   `blocks/BlockReviews.tsx` — Student reviews grid with interactive lightbox connected to `REVIEWS_GALLERY`.
 *   `blocks/BlockBonusTimer.tsx` — Active bonuses showcase with persistent 10-minute countdown timer.
 *   `blocks/BlockGuarantee.tsx` — Dynamic pricing details copy, money-back guarantee, and doubts resolution.
+*   `intensive/IntensiveCasesReviews.tsx` — High-converting Before/After cases and reviews section for 5-Likes Intensive.
 *   `intensive/IntensiveCheckoutModal.tsx` — [NEW] Dedicated 9€ EUR checkout modal with instant validation and WayForPay integration.
 *   `intensive/use10MinTimer.ts` — [NEW] Synchronized persistent 10-minute countdown timer hook.
 
