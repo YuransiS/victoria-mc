@@ -145,9 +145,59 @@ export default function IntensiveSystemPage() {
       </section>
 
       {/* ====================================================================
-          1.1 BONUSES (With 10-Min Countdown)
+          2. PAIN SECTION («Впізнаєш себе?»)
           ==================================================================== */}
       <section className={`${styles.sectionWide} ${styles.bgWarmSand}`}>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className={styles.sectionHeader}>
+            <span className={styles.pillBadge}>ДІАГНОСТИКА</span>
+            <h2 className={styles.sectionTitle}>
+              Впізнаєш <span className={styles.scriptItalic}>себе?</span>
+            </h2>
+            <p className={styles.sectionSubtitle}>
+              Якщо хоча б один пункт описує твій щоденний стан — цей інтенсив стане твоєю точкою розвороту.
+            </p>
+          </div>
+
+          <div className={styles.painCardsGrid}>
+            <div className={styles.painCard}>
+              <div className={styles.scriptNum}>01</div>
+              <p className={styles.painCardText}>
+                <strong>«Що сьогодні запостити?»</strong> — щоранку починається з пошуку ідей. Витрачаєш 3–4 години, втомлюєшся, а до вечора так нічого й не викладено або результат — нуль реакцій.
+              </p>
+            </div>
+
+            <div className={styles.painCard}>
+              <div className={styles.scriptNum}>02</div>
+              <p className={styles.painCardText}>
+                <strong>Контент є, а клієнтів немає.</strong> Публікуєш сторіз та Reels регулярно, але замість замовлень та оплат отримуєш лише лайки від знайомих і мовчання в Direct.
+              </p>
+            </div>
+
+            <div className={styles.painCard}>
+              <div className={styles.scriptNum}>03</div>
+              <p className={styles.painCardText}>
+                <strong>Страх підняти ціни або вийти на 1000€+.</strong> Здається, що для цього треба найняти команду продюсерів, знімати 50 Reels на тиждень і жити в телефоні 24/7.
+              </p>
+            </div>
+          </div>
+
+          {/* Manifesto Box */}
+          <div className={styles.manifestoBox}>
+            <p className={styles.manifestoQuote}>
+              «Тобі не потрібно більше працювати. Тобі потрібна працююча система.»
+            </p>
+            <p className="text-sm sm:text-base text-[#2D0C14]/85 leading-relaxed max-w-2xl mx-auto font-medium">
+              Коли кожен елемент (ідея → структура → контент → монетизація) з{`'`}єднано в єдиний ланцюг, блог приносить нову аудиторію та продажі щодня — навіть коли ти відпочиваєш або проводиш час із родиною.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          3. BONUSES (With 10-Min Countdown)
+          ==================================================================== */}
+      <section className={`${styles.sectionWide} ${styles.bgCream}`}>
         <div className="max-w-5xl mx-auto px-4">
           <div className={styles.sectionHeader}>
             <span className={styles.pillBadge}>
@@ -274,56 +324,6 @@ export default function IntensiveSystemPage() {
       </section>
 
       {/* ====================================================================
-          3. PAIN SECTION («Впізнаєш себе?»)
-          ==================================================================== */}
-      <section className={`${styles.sectionWide} ${styles.bgCream}`}>
-        <div className="max-w-5xl mx-auto px-4">
-          <div className={styles.sectionHeader}>
-            <span className={styles.pillBadge}>ДІАГНОСТИКА</span>
-            <h2 className={styles.sectionTitle}>
-              Впізнаєш <span className={styles.scriptItalic}>себе?</span>
-            </h2>
-            <p className={styles.sectionSubtitle}>
-              Якщо хоча б один пункт описує твій щоденний стан — цей інтенсив стане твоєю точкою розвороту.
-            </p>
-          </div>
-
-          <div className={styles.painCardsGrid}>
-            <div className={styles.painCard}>
-              <div className={styles.scriptNum}>01</div>
-              <p className={styles.painCardText}>
-                <strong>«Що сьогодні запостити?»</strong> — щоранку починається з пошуку ідей. Витрачаєш 3–4 години, втомлюєшся, а до вечора так нічого й не викладено або результат — нуль реакцій.
-              </p>
-            </div>
-
-            <div className={styles.painCard}>
-              <div className={styles.scriptNum}>02</div>
-              <p className={styles.painCardText}>
-                <strong>Контент є, а клієнтів немає.</strong> Публікуєш сторіз та Reels регулярно, але замість замовлень та оплат отримуєш лише лайки від знайомих і мовчання в Direct.
-              </p>
-            </div>
-
-            <div className={styles.painCard}>
-              <div className={styles.scriptNum}>03</div>
-              <p className={styles.painCardText}>
-                <strong>Страх підняти ціни або вийти на 1000€+.</strong> Здається, що для цього треба найняти команду продюсерів, знімати 50 Reels на тиждень і жити в телефоні 24/7.
-              </p>
-            </div>
-          </div>
-
-          {/* Manifesto Box */}
-          <div className={styles.manifestoBox}>
-            <p className={styles.manifestoQuote}>
-              «Тобі не потрібно більше працювати. Тобі потрібна працююча система.»
-            </p>
-            <p className="text-sm sm:text-base text-[#2D0C14]/85 leading-relaxed max-w-2xl mx-auto font-medium">
-              Коли кожен елемент (ідея → структура → контент → монетизація) з{`'`}єднано в єдиний ланцюг, блог приносить нову аудиторію та продажі щодня — навіть коли ти відпочиваєш або проводиш час із родиною.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
           4. CASES & REVIEWS («ЦЕ ВЖЕ СПРАЦЮВАЛО У НИХ»)
           ==================================================================== */}
       <section className={`${styles.sectionWide} ${styles.bgIvory}`}>
@@ -378,9 +378,10 @@ export default function IntensiveSystemPage() {
                         key={revIdx}
                         type="button"
                         onClick={() => setLightboxImage(rev)}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/80 border border-[#2D0C14]/15 text-[10px] font-bold text-[#2D0C14] hover:bg-[#451220] hover:text-[#FAF6EE] transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF6EE] border border-[#380E18]/15 text-[10px] font-bold text-[#380E18] hover:bg-[#380E18] hover:text-[#FAF6EE] transition-colors cursor-pointer"
                       >
-                        <span>💬 Скріншот {c.reviewImgs!.length > 1 ? `#${revIdx + 1}` : "відгуку"}</span>
+                        <MessageCircle size={11} />
+                        <span>Скріншот відгуку {c.reviewImgs!.length > 1 ? `#${revIdx + 1}` : ""}</span>
                       </button>
                     ))}
                   </div>
@@ -389,26 +390,88 @@ export default function IntensiveSystemPage() {
             ))}
           </div>
 
-          {/* Review Screenshots Gallery */}
+          {/* Review Testimonial Cards */}
           <div className={styles.sectionHeader} style={{ marginBottom: "2rem" }}>
             <h3 className="font-manrope text-xl sm:text-2xl font-black uppercase tracking-tight text-[#2D0C14]">
               ЩО КАЖУТЬ <span className={styles.scriptItalic}>УЧНІ:</span>
             </h3>
           </div>
 
-          <div className={styles.reviewsWrap}>
-            {REVIEWS_GALLERY.map((imgSrc, idx) => (
-              <div
-                key={idx}
-                className={styles.reviewItem}
-                onClick={() => setLightboxImage(imgSrc)}
-              >
-                <Image
-                  src={imgSrc}
-                  alt={`Відгук ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                />
+          <div className={styles.feedbackGrid}>
+            {[
+              {
+                name: "Олена",
+                role: "Учасниця розбору",
+                highlight: "«Так чітко, детально і в короткий час — навіть не очікувала!»",
+                text: "Супер! Так чітко, детально, зрозуміло і в короткий час. Навіть не очікувала настільки глибокого розбору! Дуже дякую вам.",
+                img: "/rozbir/r1.jpg"
+              },
+              {
+                name: "Анастасія",
+                role: "Крипто-експертка",
+                highlight: "«Отримала клієнтку з першого ж Reels після системи»",
+                text: "Контент почав викликати довіру та приводити реальних клієнтів. Отримала першу заявку та клієнтку з першого ж відео!",
+                img: "/cases/anastasia_review2.png"
+              },
+              {
+                name: "Ксенія",
+                role: "Дизайнерка інтер'єру",
+                highlight: "«Охоплення зросли з першої публікації»",
+                text: "Контент нарешті хочеться дивитися та взаємодіяти. Блог комплексно розкриває експертність і продає без нав'язування.",
+                img: "/cases/ksenia_review.png"
+              },
+              {
+                name: "Інна",
+                role: "Коуч",
+                highlight: "«Повернула собі натхнення до роботи з блогом»",
+                text: "Чітке розуміння, як вести блог через свій метод і цінності. З'явилося відчуття затишку і впевненості, клієнти пишуть самі.",
+                img: "/cases/inna_review.png"
+              },
+              {
+                name: "Вікторія",
+                role: "Експертка",
+                highlight: "«Дуже надихаєш і розкладаєш усе по поличках»",
+                text: "Неймовірно глибокий розбір. Все настільки структуровано, що тепер точно знаю, що постити щодня без хаосу.",
+                img: "/rozbir/r5.jpg"
+              },
+              {
+                name: "Марина",
+                role: "Контент-креаторка",
+                highlight: "«Зрозуміла, де втрачала заявки та як це виправити»",
+                text: "Після впровадження системи контент почав прогрівати аудиторію автоматично. Більше не витрачаю години на вигадування тем.",
+                img: "/rozbir/r4.jpg"
+              }
+            ].map((item, idx) => (
+              <div key={idx} className={styles.feedbackCard}>
+                <div>
+                  <div className={styles.feedbackHeader}>
+                    <div className={styles.feedbackAuthor}>
+                      <div className={styles.feedbackAvatar}>{item.name[0]}</div>
+                      <div>
+                        <div className={styles.feedbackAuthorName}>{item.name}</div>
+                        <div className={styles.feedbackAuthorRole}>{item.role}</div>
+                      </div>
+                    </div>
+                    <div className={styles.feedbackStars}>
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i}>★</span>
+                      ))}
+                    </div>
+                  </div>
+                  <p className={styles.feedbackHighlight}>{item.highlight}</p>
+                  <p className={styles.feedbackText}>{item.text}</p>
+                </div>
+
+                {item.img && (
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage(item.img)}
+                    className={styles.feedbackScreenshotTrigger}
+                  >
+                    <MessageCircle size={12} />
+                    <span>Дивитися оригінал відгуку</span>
+                  </button>
+                )}
               </div>
             ))}
           </div>

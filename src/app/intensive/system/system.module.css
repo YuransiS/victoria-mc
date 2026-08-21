@@ -209,26 +209,39 @@
 
 .heroVisualCol {
   position: relative;
-  min-height: 55vh;
+  height: 250px;
+  min-height: 250px;
+  max-height: 35vh;
   overflow: hidden;
   background-color: #EFE8DC;
 }
 
 @media (min-width: 992px) {
   .heroVisualCol {
+    height: auto;
     min-height: 100%;
+    max-height: none;
   }
 }
 
 .heroImg {
   object-fit: cover;
-  object-position: center top;
+  object-position: center 40%;
+  transform: scale(1.35);
+  transform-origin: center 40%;
+}
+
+@media (min-width: 992px) {
+  .heroImg {
+    object-position: center top;
+    transform: none;
+  }
 }
 
 .heroMobileGradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(56, 14, 24, 0.1) 0%, rgba(56, 14, 24, 0.8) 75%, #23080F 100%);
+  background: linear-gradient(180deg, rgba(56, 14, 24, 0.05) 0%, rgba(56, 14, 24, 0.65) 80%, #23080F 100%);
 }
 
 @media (min-width: 992px) {
@@ -241,7 +254,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 3rem 2rem 5rem;
+  padding: 1.75rem 1.25rem 3.5rem;
   max-width: 640px;
   margin: 0 auto;
   z-index: 10;
@@ -597,34 +610,127 @@
   border-radius: 9999px;
 }
 
-.reviewsWrap {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.feedbackGrid {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-bottom: 3.5rem;
 }
 
-.reviewItem {
-  position: relative;
-  width: 100%;
-  max-width: 240px;
-  aspect-ratio: 1;
+@media (min-width: 680px) {
+  .feedbackGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .feedbackGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feedbackCard {
   background-color: #FFFFFF;
-  border-radius: 1rem;
-  border: 1px solid rgba(56, 14, 24, 0.1);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(56, 14, 24, 0.08);
+  padding: 1.35rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
   box-shadow: 0 6px 20px rgba(56, 14, 24, 0.04);
   transition: all 0.25s ease;
 }
 
-.reviewItem:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 30px rgba(56, 14, 24, 0.12);
+.feedbackCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(56, 14, 24, 0.08);
+  border-color: rgba(56, 14, 24, 0.16);
+}
+
+.feedbackHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.feedbackAuthor {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.feedbackAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background-color: #380E18;
+  color: #FDFBF7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.feedbackAuthorName {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #2D0C14;
+  line-height: 1.2;
+}
+
+.feedbackAuthorRole {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(45, 12, 20, 0.55);
+  font-weight: 700;
+}
+
+.feedbackStars {
+  display: flex;
+  gap: 2px;
+  color: #C49746;
+}
+
+.feedbackHighlight {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #380E18;
+  line-height: 1.35;
+  margin-bottom: 0.4rem;
+}
+
+.feedbackText {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(45, 12, 20, 0.82);
+  font-weight: 500;
+  margin-bottom: 0.85rem;
+}
+
+.feedbackScreenshotTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8F2D45;
+  background-color: #FAF6EE;
+  border: 1px solid rgba(143, 45, 69, 0.2);
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.feedbackScreenshotTrigger:hover {
+  background-color: #380E18;
+  color: #FAF6EE;
+  border-color: #380E18;
 }
 
 /* ==========================================================================
