@@ -85,9 +85,10 @@ function AnketaFormContent() {
 
   useEffect(() => {
     if (success) {
+      const search = window.location.search || '';
       const timer = setTimeout(() => {
-        window.location.href = 'https://telegram.me/+idsZRC5s1yo0YmUy';
-      }, 2500);
+        window.location.href = `/anketa/thanks${search}`;
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [success]);
@@ -670,15 +671,15 @@ function AnketaFormContent() {
               </div>
               <h3 className="font-serif text-3xl font-bold text-[#1a1c1c] tracking-tight">Дякуємо!</h3>
               <p className="text-xs md:text-sm text-[#1a1c1c]/70 leading-relaxed max-w-sm mx-auto font-light">
-                Твою анкету успішно надіслано! Зараз тебе буде перенаправлено в наш Telegram-канал, де ти зможеш забирати свій подарунок <strong>{version === '2' ? '«Структура прогріву»' : '«50 тем для контенту»'}</strong> та додаткові бонуси🤍
+                Твою анкету успішно надіслано! Зараз тебе буде перенаправлено на коротке відео з подарунками та інструкцією🤍
               </p>
 
               <div className="pt-6">
                 <a
-                  href="https://telegram.me/+idsZRC5s1yo0YmUy"
+                  href="/anketa/thanks"
                   className="inline-block bg-[#5d5f2c] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:bg-[#484a22] transition-all hover:scale-[1.02] active:scale-[0.98] duration-300"
                 >
-                  Перейти в Telegram-канал
+                  Переглянути відео та бонуси →
                 </a>
               </div>
             </div>
