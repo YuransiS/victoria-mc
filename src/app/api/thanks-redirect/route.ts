@@ -19,12 +19,12 @@ export async function POST(request: Request) {
     // If payment failed or was declined
     if (status === 'Declined' || status === 'Failed' || status === 'Expired') {
       const targetFail = getFullUrl(failUrl, '/price/fail');
-      return NextResponse.redirect(`${targetFail}${targetFail.includes('?') ? '&' : '?'}orderReference=${orderReference}`, { status: 303 });
+      return NextResponse.redirect(`${targetFail}${targetFail.includes('?') ? '&' : '?'}orderReference=${orderReference}&transactionStatus=${status}`, { status: 303 });
     }
 
-    // Default: Success
+    // Success
     const targetSuccess = getFullUrl(successUrl, '/price/thanks');
-    return NextResponse.redirect(`${targetSuccess}${targetSuccess.includes('?') ? '&' : '?'}orderReference=${orderReference}`, { status: 303 });
+    return NextResponse.redirect(`${targetSuccess}${targetSuccess.includes('?') ? '&' : '?'}orderReference=${orderReference}&transactionStatus=${status || 'Approved'}`, { status: 303 });
   } catch (e) {
     const url = new URL(request.url);
     return NextResponse.redirect(`${url.origin}/price/thanks`, { status: 303 });
@@ -34,9 +34,10 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const searchParams = url.searchParams;
-  const status = searchParams.get('transactionStatus');
+  const status = searchParams.get('transactionStatus') || 'Approved';
   const successUrl = searchParams.get('successUrl');
   const failUrl = searchParams.get('failUrl');
+  const orderReference = searchParams.get('orderReference') || '';
   
   const getFullUrl = (path: string | null, fallback: string) => {
     if (!path) return `${url.origin}${fallback}`;
@@ -46,9 +47,9 @@ export async function GET(request: Request) {
 
   if (status === 'Declined' || status === 'Failed' || status === 'Expired') {
     const targetFail = getFullUrl(failUrl, '/price/fail');
-    return NextResponse.redirect(`${targetFail}${targetFail.includes('?') ? '&' : '?'}${searchParams.toString()}`, { status: 303 });
+    return NextResponse.redirect(`${targetFail}${targetFail.includes('?') ? '&' : '?'}orderReference=${orderReference}&transactionStatus=${status}`, { status: 303 });
   }
   
   const targetSuccess = getFullUrl(successUrl, '/price/thanks');
-  return NextResponse.redirect(`${targetSuccess}${targetSuccess.includes('?') ? '&' : '?'}${searchParams.toString()}`, { status: 303 });
+  return NextResponse.redirect(`${targetSuccess}${targetSuccess.includes('?') ? '&' : '?'}orderReference=${orderReference}&transactionStatus=${status}`, { status: 303 });
 }

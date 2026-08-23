@@ -39,7 +39,8 @@ function ThanksContent() {
       } catch (e) {}
     }
 
-    if (ref) {
+    const transactionStatus = searchParams.get('transactionStatus');
+    if (ref && transactionStatus && transactionStatus.toUpperCase() === 'APPROVED') {
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },

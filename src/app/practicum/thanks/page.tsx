@@ -39,7 +39,7 @@ export default function PracticumThanksPage() {
     if (activeOrderId) {
       const transactionStatus = searchParams.get('transactionStatus');
       
-      if (!transactionStatus || transactionStatus.toUpperCase() === 'APPROVED') {
+      if (transactionStatus && transactionStatus.toUpperCase() === 'APPROVED') {
         // Track Purchase
         const amount = parseFloat(localStorage.getItem('lead_amount') || '0');
         const currency = localStorage.getItem('lead_currency') || 'USD';
