@@ -138,8 +138,9 @@ export async function POST(request: Request) {
     const orderDate = Math.floor(Date.now() / 1000).toString();
     const currency = canonicalCurrency;
     
-    const productPriceStr = floatAmount.toFixed(2);
-    const productNameStr = `Booking: ${tariffName}`;
+    // Exact string match for amount in signature and form POST
+    const amountStr = floatAmount % 1 === 0 ? floatAmount.toString() : floatAmount.toFixed(2);
+    const productNameStr = `Booking: ${tariffName || 'Інтенсив'}`;
     const productCountStr = "1";
 
     const signatureData = [
@@ -147,11 +148,11 @@ export async function POST(request: Request) {
       merchantDomainName,
       orderReference,
       orderDate,
-      productPriceStr,
+      amountStr,
       currency,
       productNameStr,
       productCountStr,
-      productPriceStr
+      amountStr
     ].join(';');
 
     if (!merchantAccount || !merchantSecretKey) {
@@ -172,20 +173,27 @@ export async function POST(request: Request) {
       returnUrl += `?${params.toString()}`;
     }
 
+    // Prepare reliable contact info for WayForPay (WFP rejects '-' or non-numeric phone)
+    const rawDigits = (canonicalPhone || customerPhone || '').replace(/\D/g, '');
+    const validClientPhone = rawDigits.length >= 7 ? rawDigits : '380990000000';
+    const validClientEmail = canonicalEmail || (canonicalTelegram ? `${canonicalTelegram}@telegram.com` : `client-${validClientPhone}@victoria-mc.com`);
+    const validClientName = customerName ? String(customerName).trim() : 'Клієнт';
+
     const paymentData = {
       merchantAccount,
       merchantDomainName,
       merchantSignature,
       orderReference,
       orderDate,
-      amount: parseFloat(amount),
+      amount: amountStr,
       currency,
       productName: [productNameStr],
       productCount: [1],
-      productPrice: [parseFloat(amount)],
-      clientFirstName: customerName,
-      clientEmail: customerEmail,
-      clientPhone: customerPhone,
+      productPrice: [amountStr],
+      clientFirstName: validClientName,
+      clientEmail: validClientEmail,
+      clientPhone: validClientPhone,
+      language: 'UA',
       serviceUrl: `${currentDomain}/api/payment-callback`,
       returnUrl: returnUrl,
     };

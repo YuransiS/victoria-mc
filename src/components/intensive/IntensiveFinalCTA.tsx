@@ -182,6 +182,7 @@ export function IntensiveFinalCTA({ onOpenCheckout }: IntensiveFinalCTAProps) {
       form.acceptCharset = "utf-8";
 
       Object.entries(paymentData).forEach(([key, value]) => {
+        if (key === 'uuid' || key === 'visitor_uuid' || key === 'tgMsgId') return;
         if (Array.isArray(value)) {
           (value as any[]).forEach((val) => {
             const input = document.createElement("input");
