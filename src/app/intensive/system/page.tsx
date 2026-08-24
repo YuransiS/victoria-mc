@@ -353,8 +353,11 @@ export default function IntensiveSystemPage() {
             {REAL_CASES.map((c, idx) => (
               <div key={c.id} className={styles.caseCard}>
                 <div className={styles.caseHeader}>
-                  <span className={styles.caseName}>{c.name}</span>
-                  <span className={styles.caseNiche}>{c.niche}</span>
+                  <div className={styles.caseTitleGroup}>
+                    <h3 className={styles.caseName}>{c.name}</h3>
+                    <p className={styles.caseNiche}>{c.niche}</p>
+                  </div>
+                  <span className={styles.caseId}>#{c.id}</span>
                 </div>
                 <div className={styles.caseCompareRow}>
                   <div
