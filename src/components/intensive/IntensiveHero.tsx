@@ -16,15 +16,15 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
   return (
     <section className="relative w-full min-h-[92svh] md:min-h-[88svh] overflow-hidden bg-[#2B0813] md:bg-[#FAF6EE] text-[#FAF6EE] md:text-[#2B0813] flex flex-col justify-between md:flex-row md:items-stretch">
       {/* ========================================================================= */}
-      {/* 1. MOBILE BACKGROUND: Victoria portrait photo (/free-lection/krupn.JPG) */}
+      {/* 1. MOBILE BACKGROUND: Victoria portrait photo (/rozbir/vik.jpg) */}
       {/* ========================================================================= */}
       <div className="absolute inset-0 md:hidden overflow-hidden pointer-events-none">
         <Image
-          src="/free-lection/krupn.JPG"
+          src="/rozbir/vik.jpg"
           alt="Вікторія Мещерякова"
           fill
           priority
-          className="object-cover object-[center_top]"
+          className="object-cover object-[center_12%]"
         />
         {/* Subtle top shade behind header pill */}
         <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
@@ -35,11 +35,11 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
       {/* ========================================================================= */}
       <div className="hidden md:block relative md:w-[50%] md:h-auto overflow-hidden">
         <Image
-          src="/free-lection/krupn.JPG"
+          src="/rozbir/vik.jpg"
           alt="Вікторія Мещерякова"
           fill
           priority
-          className="object-cover object-center"
+          className="object-cover object-[center_20%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#FAF6EE]/20" />
       </div>
@@ -82,11 +82,11 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-playfair text-[26px] sm:text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.18] tracking-tight mb-2.5 text-white md:text-[#2B0813] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] md:drop-shadow-none"
+            className="font-playfair text-[26px] sm:text-3xl md:text-4xl lg:text-[40px] font-bold leading-[1.2] tracking-tight mb-3 text-white md:text-[#2B0813] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] md:drop-shadow-none"
           >
-            Абсолютно випадковий контент може набрати мільйони.{" "}
+            Перестань витрачати години на контент,{" "}
             <span className="italic block mt-1 text-[#f5d0a6] md:text-[#451220] font-normal">
-              А той, у який ти вклала душу — 5 лайків
+              який не дає результату
             </span>
           </motion.h1>
 
@@ -95,13 +95,10 @@ export function IntensiveHero({ onOpenCheckout }: IntensiveHeroProps) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-2.5 mb-4 font-manrope text-xs sm:text-sm md:text-base leading-relaxed text-white/95 md:text-[#2B0813]/85"
+            className="mb-4 font-manrope text-xs sm:text-sm md:text-base leading-relaxed text-white/95 md:text-[#2B0813]/85"
           >
-            <p className="font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] md:drop-shadow-none">
-              І поки ти не розумієш чому — кожна наступна одиниця контенту це не система, а випадковість.
-            </p>
-            <p className="font-semibold text-white md:text-[#451220] bg-white/10 md:bg-[#451220]/5 p-3 rounded-2xl border border-white/15 md:border-[#451220]/15 shadow-sm">
-              За 4 уроки ти перестанеш сподіватися на удачу і побудуєш систему, яка приводить аудиторію та клієнтів
+            <p className="font-semibold text-white md:text-[#451220] bg-white/10 md:bg-[#451220]/5 p-3.5 rounded-2xl border border-white/15 md:border-[#451220]/15 shadow-sm leading-relaxed">
+              За 4 уроки побудуєш систему, з якою зможеш швидко створювати контент, залучати нову аудиторію та приводити клієнтів у блог — без постійного хаосу й виснаження.
             </p>
           </motion.div>
 

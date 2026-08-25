@@ -8,11 +8,26 @@ interface IntensiveTransformationProps {
   onOpenCheckout: () => void;
 }
 
-const points = [
-  "Ти перестанеш сприймати охоплення як випадковість.",
-  "Замість чергових порад «пости о 19:00», трендових звуків і спроб вгадати алгоритми ти навчишся бачити, що саме змушує контент працювати — і як це повторювати у своїй ніші.",
-  "Ти розбереш власний контент, знайдеш закономірності у своїх результатах і побудуєш систему, за якою зможеш створювати наступні пости, рілси та сторіс не навмання, а з конкретною логікою.",
-  "Більше контролю над тим, що ти публікуєш і який результат це дає."
+interface TransformationPoint {
+  title?: string;
+  description: string;
+}
+
+const points: TransformationPoint[] = [
+  {
+    description: "Ти перестанеш сприймати охоплення як випадковість."
+  },
+  {
+    title: "Зрозумієш, чому один контент спрацьовує, а інший — ні",
+    description: "Ти побачиш конкретні принципи, які змушують людей зупинятися, дивитися та реагувати на твій контент."
+  },
+  {
+    title: "Отримаєш зрозумілу систему створення контенту",
+    description: "Будеш знати, де брати ідеї, як перетворювати їх на Reels і каруселі та як через контент залучати аудиторію й приводити потенційних клієнтів."
+  },
+  {
+    description: "Більше контролю над тим, що ти публікуєш і який результат це дає."
+  }
 ];
 
 export function IntensiveTransformation({ onOpenCheckout }: IntensiveTransformationProps) {
@@ -40,9 +55,16 @@ export function IntensiveTransformation({ onOpenCheckout }: IntensiveTransformat
               <div className="w-7 h-7 rounded-full bg-[#451220] text-[#FAF6EE] flex items-center justify-center shrink-0 mt-0.5 font-bold">
                 <Check size={16} />
               </div>
-              <p className="font-manrope text-base md:text-lg text-[#2B0813]/90 leading-relaxed font-medium">
-                {p}
-              </p>
+              <div className="flex-1">
+                {p.title && (
+                  <h3 className="font-manrope font-bold text-base md:text-lg text-[#2B0813] mb-1">
+                    {p.title}
+                  </h3>
+                )}
+                <p className="font-manrope text-sm md:text-base text-[#2B0813]/85 leading-relaxed font-medium">
+                  {p.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
