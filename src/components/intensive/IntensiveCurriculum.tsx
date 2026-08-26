@@ -143,7 +143,9 @@ export function IntensiveCurriculum({ onOpenCheckout }: IntensiveCurriculumProps
             onClick={onOpenCheckout}
             className="inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#FAF6EE] text-[#2B0813] hover:bg-white hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer whitespace-nowrap max-w-full"
           >
-            <span>Забрати всі 4 уроки</span>
+            <span>
+              Забрати всі 4 уроки<span className="hidden sm:inline"> за 9€</span>
+            </span>
             <ArrowRight size={17} />
           </button>
         </motion.div>

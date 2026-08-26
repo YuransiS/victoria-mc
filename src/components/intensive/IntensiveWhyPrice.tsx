@@ -39,7 +39,9 @@ export function IntensiveWhyPrice({ onOpenCheckout }: IntensiveWhyPriceProps) {
               onClick={onOpenCheckout}
               className="inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer whitespace-nowrap max-w-full"
             >
-              <span>Зайти за 9€</span>
+              <span>
+                Зайти за 9€<span className="hidden sm:inline"> замість 49€</span>
+              </span>
               <ArrowRight size={17} />
             </button>
           </div>

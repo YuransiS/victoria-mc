@@ -85,7 +85,9 @@ export function IntensiveAudience({ onOpenCheckout }: IntensiveAudienceProps) {
               onClick={onOpenCheckout}
               className="mt-2 inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-xs sm:text-base font-bold tracking-wide shadow-lg transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] cursor-pointer whitespace-nowrap max-w-full"
             >
-              <span>Хочу побудувати систему</span>
+              <span>
+                Хочу побудувати систему<span className="hidden sm:inline"> за 9€</span>
+              </span>
               <ArrowRight size={17} />
             </button>
           )}
