@@ -164,9 +164,10 @@ export function IntensiveCasesReviews({ onOpenCheckout }: IntensiveCasesReviewsP
         <div className="text-center">
           <button
             onClick={onOpenCheckout}
-            className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold tracking-wide shadow-xl transition-all duration-300 bg-[#451220] text-[#FAF6EE] hover:bg-[#2B0813] hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer whitespace-nowrap max-w-full"
           >
-            <span>Хочу такий самий результат — за 9€ →</span>
+            <span>Хочу такий самий результат</span>
+            <ArrowRight size={17} />
           </button>
         </div>
       </div>
