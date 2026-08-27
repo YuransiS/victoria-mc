@@ -1774,7 +1774,7 @@ export async function getBotTemplates(): Promise<BotMessageTemplate[]> {
           lesson_id: l.lesson_id,
           title: `Урок ${l.lesson_id}: Відкрито доступ до уроку`,
           description: `Надсилається учню, коли стає доступним Урок ${l.lesson_id}`,
-          message_text: `🔓 *Відкрито новий урок!*\n\nВам став доступний новий навчальний модуль:\n*Урок ${l.lesson_id}: ${l.title || ''}*\n\nШвидше переглядайте відео та робіть практичні кроки! 🚀`,
+          message_text: `🔓 Новий урок уже відкрито!\n\nТобі доступний новий урок:\n**Урок ${l.lesson_id}: ${l.title || ''}**\n\nТут буде ще один крок до того, щоб вести блог системно, створювати сильніший контент і отримувати від нього результат.\n\nВмикай відео та переходь до практики 🚀`,
           buttons: [
             { text: `👉 Відкрити Урок ${l.lesson_id}`, url_type: 'autologin_lesson', custom_url: '' }
           ],

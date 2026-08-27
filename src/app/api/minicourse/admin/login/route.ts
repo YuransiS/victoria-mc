@@ -3,6 +3,7 @@ import { supabase } from '@/app/minicourse/supabase';
 import { MinicourseUser } from '@/app/minicourse/types';
 
 const ADMIN_CREDENTIALS = [
+  { username: 'victoria', role: 'admin', label: 'Адміністратор Owner (Вікторія)', password: 'ndfdfh4#fd' },
   { username: 'sofifinsight', role: 'admin', label: 'Адміністратор Owner', password: 'ndfdfh4#fd' },
   { username: 'yuransis', role: 'admin', label: 'Адміністратор Admin', password: 'fdsjhe35Frgf' },
   { username: 'jeniaproop', role: 'admin', label: 'Адміністратор Admin', password: 'dfaGdxvvg@x3' },

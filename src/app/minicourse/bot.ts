@@ -4,7 +4,7 @@ import crypto from 'crypto';
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 
 async function generateAutologinLink(chatId: number, targetPath: string): Promise<string> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sofifinsight.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://victoria-mc.vercel.app';
   
   if (supabase) {
     try {
@@ -39,6 +39,32 @@ async function generateAutologinLink(chatId: number, targetPath: string): Promis
 
   // Fallback to manual entry redirect if database fails
   return `${siteUrl}/minicourse/login?redirect=${encodeURIComponent(targetPath)}`;
+}
+
+export function interpolateTemplateVariables(
+  text: string,
+  data: {
+    userName?: string;
+    lessonId?: number;
+    lessonTitle?: string;
+    comment?: string;
+  }
+): string {
+  if (!text) return '';
+  const nameVal = data.userName || 'Учасник';
+  const lessonIdVal = String(data.lessonId || '');
+  const lessonTitleVal = data.lessonTitle || '';
+  const commentVal = data.comment || '';
+
+  return text
+    .replace(/{userName}/g, nameVal)
+    .replace(/{name}/g, nameVal)
+    .replace(/{firstName}/g, nameVal)
+    .replace(/{lessonId}/g, lessonIdVal)
+    .replace(/{lesson_id}/g, lessonIdVal)
+    .replace(/{lessonTitle}/g, lessonTitleVal)
+    .replace(/{lesson_title}/g, lessonTitleVal)
+    .replace(/{comment}/g, commentVal);
 }
 
 export async function sendTelegramNotification(
@@ -89,20 +115,12 @@ export async function sendTelegramNotification(
         }
 
         templateFound = true;
-        let renderedText = dbTemplate.message_text;
-        renderedText = renderedText.replace(/{name}/g, templateData.userName || 'Учасник');
-        renderedText = renderedText.replace(/{lesson_id}/g, String(templateData.lessonId || ''));
-        renderedText = renderedText.replace(/{lesson_title}/g, templateData.lessonTitle || '');
-        renderedText = renderedText.replace(/{comment}/g, templateData.comment || '');
-
-        text = renderedText;
+        text = interpolateTemplateVariables(dbTemplate.message_text, templateData);
 
         if (Array.isArray(dbTemplate.buttons) && dbTemplate.buttons.length > 0) {
           for (const btn of dbTemplate.buttons) {
             let btnUrl = btn.custom_url || '';
-            let btnText = (btn.text || 'Перейти')
-              .replace(/{lesson_id}/g, String(templateData.lessonId || ''))
-              .replace(/{name}/g, templateData.userName || '');
+            let btnText = interpolateTemplateVariables(btn.text || 'Перейти', templateData);
 
             if (btn.url_type === 'autologin_lesson') {
               const target = templateData.lessonId ? `/minicourse/lessons/${templateData.lessonId}` : '/minicourse/lessons/1';
@@ -124,33 +142,38 @@ export async function sendTelegramNotification(
 
   // 2. Fallback to default message format if not customized in database
   if (!templateFound) {
+    const userDisplayName = templateData.userName || 'Учасник';
+    const currentLessonNum = templateData.lessonId || 1;
+    const currentLessonName = templateData.lessonTitle || '';
+    const curatorComment = templateData.comment || '';
+
     switch (messageType) {
-      case 'hw_accepted':
-        text = `🎉 *Домашнє завдання прийнято!*\n\nЧудові новини, ${templateData.userName || 'шановний ученю'}! Ваше завдання до Уроку ${templateData.lessonId || ''} успішно зараховано куратором.\n\n💬 *Коментар куратора:*\n"${templateData.comment || 'Чудова робота!'}"\n\n🔓 Вам відкрито доступ до наступного уроку! Продовжуйте рух до мети.`;
-        break;
-
-      case 'hw_needs_improvement':
-        text = `⚠️ *Домашнє завдання потребує доопрацювання*\n\nВітаємо, ${templateData.userName || ''}. Куратор перевірив Ваше ДЗ до Уроку ${templateData.lessonId || ''} та залишив рекомендації для покращення.\n\n💬 *Що потрібно виправити:*\n"${templateData.comment || 'Будь ласка, перевірте розрахунки.'}"\n\n👉 Будь ласка, внесіть необхідні зміни та надішліть оновлене посилання в кабінеті курсу.`;
-        break;
-
-      case 'new_lesson_unlocked':
-        text = `🔓 *Відкрито новий урок!*\n\nВам став доступний новий навчальний модуль:\n*Урок ${templateData.lessonId || ''}: ${templateData.lessonTitle || ''}*\n\nШвидше переглядайте відео та виконуйте практичні кроки! 🚀`;
-        break;
-
       case 'payment_success':
-        text = `🚀 *Оплату успішно підтверджено!*\n\nВітаємо на курсі, ${templateData.userName || ''}! 🎉 Ваш особистий кабінет активовано.\n\nЯ — Ваш особистий Telegram-помічник. Тут я буду надсилати Вам корисні нагадування, результати перевірки домашніх завдань та коментарі кураторів.\n\nЗверніть увагу!\n\nДоступ до курсу відкрито на 2 тижні. Перевірка зі зворотнім зв’язком від куратора доступна протягом 7 днів.\n\nТому не відкладайте перегляд уроків та починайте прямо зараз!\n\nДавайте розпочнемо навчання!`;
-        break;
-
-      case 'reminder':
-        text = `⏳ *Час зробити наступний крок!*\n\nВітаємо, ${templateData.userName || ''}! Нагадуємо, що Урок ${templateData.lessonId || ''} вже чекає на Вас. Виділіть трохи часу сьогодні для навчання.\n\nУспіхів! 💪`;
+        text = `🚀 Оплату успішно підтверджено!\n\nВітаємо на навчанні! 🎉 Твій особистий кабінет уже активовано.\n\nТут я буду нагадувати тобі про уроки, повідомляти про перевірку домашніх завдань та передавати коментарі куратора.\n\nНе відкладай навчання на потім. Починай прямо зараз 💛\n\nГотова? Поїхали!`;
         break;
 
       case 'hw_submitted':
-        text = `📥 *Домашнє завдання надіслано на перевірку!*\n\nДякуємо, ${templateData.userName || 'шановний ученю'}! Ваше завдання до Уроку ${templateData.lessonId || ''} успішно отримано.\n\n⏳ Куратор вже взявся за перевірку. Щойно з'являться результати, я одразу Вам про це повідомлю!`;
+        text = `📥 Домашнє завдання надіслано!\n\nДякуємо, ${userDisplayName}! Твоє завдання до Уроку ${currentLessonNum} успішно отримано 💛\n\n⏳ Куратор уже взяв його в роботу.\n\nЩойно з’явиться результат - одразу тобі повідомлю.\n\nА поки можеш рухатись далі та повертатись до своїх напрацювань ✨`;
+        break;
+
+      case 'hw_accepted':
+        text = `🎉 Домашнє завдання прийнято!\n\nКласні новини, ${userDisplayName}! Твоє завдання до Уроку ${currentLessonNum} успішно зараховано 💛\n\n💬 Коментар куратора:\n"${curatorComment}"\n\n🔓 Наступний урок уже відкрито!\n\nНе зупиняйся — саме практика допомагає перетворити знання на результат.\n\nРухаємось далі 🚀`;
+        break;
+
+      case 'hw_needs_improvement':
+        text = `⚠️ Тут потрібно трохи допрацювати\n\n${userDisplayName}, куратор перевірив твоє ДЗ до Уроку ${currentLessonNum} та залишив рекомендації.\n\n💬 Що варто виправити:\n"${curatorComment}"\n\nНе переживай — саме для цього й потрібна перевірка 💛\n\nВнеси зміни та надішли оновлене завдання на перевірку.`;
+        break;
+
+      case 'new_lesson_unlocked':
+        text = `🔓 Новий урок уже відкрито!\n\nТобі доступний новий урок:\n*Урок ${currentLessonNum}: ${currentLessonName}*\n\nТут буде ще один крок до того, щоб вести блог системно, створювати сильніший контент і отримувати від нього результат.\n\nВмикай відео та переходь до практики 🚀`;
+        break;
+
+      case 'reminder':
+        text = `⏳ ${userDisplayName}, час зробити наступний крок\n\nУрок ${currentLessonNum} вже чекає на тебе.\n\nВиділи сьогодні хоча б 20 хвилин, щоб переглянути урок і зробити практичне завдання.\n\nНе потрібно чекати ідеального моменту — просто відкрий урок і почни 💛\n\nУспіхів!`;
         break;
         
       default:
-        text = `Повідомлення від бота навчального курсу.`;
+        text = `Повідомлення від бота курсу.`;
     }
   }
 

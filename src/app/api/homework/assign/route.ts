@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
     // 4. Construct callback URL
     const protocol = req.headers.get('x-forwarded-proto') || 'https';
-    const host = req.headers.get('host') || 'sofifinsight.vercel.app';
+    const host = req.headers.get('host') || 'victoria-mc.vercel.app';
     const callbackUrl = `${protocol}://${host}/api/notifications/send`;
 
     // 5. Publish to QStash

@@ -150,7 +150,7 @@ export async function POST(req: Request) {
 
         if (giftTokenData) {
           if (giftTokenData.is_used) {
-            const alreadyUsedText = `⚠️ *Цей подарунковий код уже був використаний.*\n\nКожен подарунковий код можна активувати лише один раз. Якщо у Вас виникли запитання, зверніться в підтримку: @YuransiS`;
+            const alreadyUsedText = `⚠️ Цей подарунковий код уже використаний.\n\nКожен код можна активувати лише один раз.\n\nЯкщо виникли запитання або щось не працює — напиши в підтримку: @YuransiS`;
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -213,7 +213,7 @@ export async function POST(req: Request) {
               .single();
             user = updatedUser;
           } else {
-            const emailPlaceholder = `${username || `gift_user_${Math.floor(Math.random() * 10000)}`}@economica.edu`;
+            const emailPlaceholder = `${username || `gift_user_${Math.floor(Math.random() * 10000)}`}@victoria.mc`;
             const { data: newUser } = await supabase
               .from('minicourse_users')
               .insert({
@@ -232,7 +232,7 @@ export async function POST(req: Request) {
             user = newUser;
           }
         } else {
-          const invalidTokenText = `⚠️ *Невірний подарунковий код.*\n\nБудь ласка, переконайтеся, що Ви перейшли за коректним посиланням або ввели правильний код. Якщо виникли запитання, зверніться в підтримку: @YuransiS`;
+          const invalidTokenText = `⚠️ Схоже, код не працює.\n\nПеревір, чи правильно введений код або чи відкрила ти правильне посилання.\n\nЯкщо виникли запитання — напиши в підтримку: @YuransiS`;
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -283,7 +283,7 @@ export async function POST(req: Request) {
               .from('minicourse_users')
               .insert({
                 name: firstName || 'Учасник',
-                email: `${username || `prize_${Math.floor(Math.random() * 10000)}`}@economica.edu`,
+                email: `${username || `prize_${Math.floor(Math.random() * 10000)}`}@victoria.mc`,
                 role: 'student',
                 is_paid: true,
                 payment_status: 'paid',
@@ -309,46 +309,69 @@ export async function POST(req: Request) {
       }
 
       if (user) {
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sofifinsight.vercel.app';
+        const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://victoria-mc.vercel.app';
         const autologinUrl = `${siteUrl}/minicourse/login?tg_id=${chatId}&redirect=${encodeURIComponent('/minicourse/lessons/1')}`;
 
-        const welcomeText = tokenType === 'gift' || tokenType === 'prize'
-          ? `🎁 **Вітаємо! Вам активовано подарунковий доступ до міні-курсу!** 🎉\n\nВітаємо на курсі Софії, ${firstName}! Вашу участь успішно активовано за подарунковим доступом.\n\nЯ — Ваш особистий Telegram-помічник, де Ви будете отримувати нагадування та результати перевірки домашніх завдань.\n\n👉 Почніть навчання за кнопкою нижче:`
-          : `Дякуємо за купівлю! 🎉\n\nВітаємо на курсі, ${firstName}! Ваш доступ до кабінету міні-курсу успішно активовано. Я — Ваш особистий Telegram-помічник, де Ви будете отримувати нагадування та результати перевірки домашніх завдань.\n\n👉 Почніть навчання за кнопкою нижче:`;
-        
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: welcomeText,
-            parse_mode: 'Markdown',
-            protect_content: true,
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  {
-                    text: tokenType === 'gift' || tokenType === 'prize' ? '🎁 Почати навчання (Урок 1)' : '👉 Почати навчання (Урок 1)',
-                    url: autologinUrl
-                  }
+        if (tokenType === 'gift' || tokenType === 'prize') {
+          // Message 7.1
+          const msg1Text = `🎁 Вітаємо! Твій доступ до міні-курсу активовано! 🎉\n\n${firstName}, тепер ти можеш розпочати навчання та розібратися, як працювати з блогом і контентом системно.\n\nТут ти отримуватимеш нагадування про уроки, результати перевірки домашніх завдань та коментарі куратора.\n\n👉 Починай навчання за кнопкою нижче:`;
+          
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: msg1Text,
+              protect_content: true,
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: '👉 Почати навчання (Урок 1)',
+                      url: autologinUrl
+                    }
+                  ]
                 ]
-              ]
-            }
-          })
-        });
+              }
+            })
+          });
 
-        const warningText = `⚠️ *Зверніть увагу!*\n\nДоступ до міні-курсу відкрито на 2 тижні. Перевірка зі зворотнім зв’язком від куратора доступна протягом 7 днів.\n\nТому не відкладайте перегляд уроків та починайте прямо зараз!`;
-        
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: warningText,
-            parse_mode: 'Markdown',
-            protect_content: true
-          })
-        });
+          // Message 7.2
+          const msg2Text = `Доступ до міні-курсу вже відкрито, тому не гай часу\n\nНе відкладай навчання - краще почати зараз, поки є мотивація та час 💛`;
+          
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: msg2Text,
+              protect_content: true
+            })
+          });
+        } else {
+          // Standard payment activation
+          const welcomePayText = `🚀 Оплату успішно підтверджено!\n\nВітаємо на навчанні! 🎉 Твій особистий кабінет уже активовано.\n\nТут я буду нагадувати тобі про уроки, повідомляти про перевірку домашніх завдань та передавати коментарі куратора.\n\nНе відкладай навчання на потім. Починай прямо зараз 💛\n\nГотова? Поїхали!`;
+          
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: welcomePayText,
+              protect_content: true,
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: '👉 Почати навчання (Урок 1)',
+                      url: autologinUrl
+                    }
+                  ]
+                ]
+              }
+            })
+          });
+        }
 
         return NextResponse.json({ ok: true });
       }
@@ -391,24 +414,25 @@ export async function POST(req: Request) {
 
         if (linkedUser) {
           if (linkedUser.role === 'student' && !linkedUser.is_paid) {
-            const unpaidText = `⚠️ *Оплата не підтверджена.*\n\nШановний(а) ${firstName}, оплату за Вашою участю в практикумі ще не підтверджено. Будь ласка, завершіть оплату на нашому сайті.\n\nЯкщо у Вас є подарунковий код, просто надішліть його сюди (наприклад: GIFT-XXXXXX).`;
+            // Scenario 10: Unpaid user
+            const unpaidText = `⚠️ Оплата ще не підтверджена.\n\n${firstName}, схоже, оплату за участь у навчанні ще не завершено.\n\nБудь ласка, заверши оплату на сайті, щоб отримати доступ до уроків.\n\nЯкщо в тебе є подарунковий код — просто надішли його сюди, наприклад: GIFT-XXXXXX.`;
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 chat_id: chatId,
                 text: unpaidText,
-                parse_mode: 'Markdown',
                 protect_content: true
               })
             });
             return NextResponse.json({ ok: true });
           }
 
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sofifinsight.vercel.app';
+          // Scenario 11: Welcome back active student
+          const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://victoria-mc.vercel.app';
           const autologinUrl = `${siteUrl}/minicourse/login?tg_id=${chatId}&redirect=${encodeURIComponent('/minicourse')}`;
 
-          const welcomeBackText = `Вітаємо, ${firstName}! 👋\n\nРаді бачити Вас знову. Ви можете увійти у свій кабінет практикуму за кнопкою нижче (авторизація відбудеться автоматично):`;
+          const welcomeBackText = `З поверненням, ${firstName}! 👋\n\nРада бачити тебе знову 💛\n\nТи можеш продовжити навчання в особистому кабінеті за кнопкою нижче.\n\nУсі твої уроки та напрацювання вже чекають на тебе 👇`;
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -435,9 +459,9 @@ export async function POST(req: Request) {
       }
     }
 
-    // Default welcome fallback if user not found in DB
-    const defaultWelcome = `Вітаємо, ${firstName}! 👋\n\nЯ ваш персональний помічник на міні-курсі Софії.\n\n🎁 Якщо у Вас є подарунковий код або посилання (наприклад: \`GIFT-...\` або \`prize-...\`), **надішліть його сюди прямо у відповідь на це повідомлення**, і бот миттєво активує Ваш доступ!\n\nАбо відкрийте кабінет за кнопкою нижче:`;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sofifinsight.vercel.app';
+    // Scenario 12: Default welcome fallback if user not found in DB (Guest screen)
+    const defaultWelcome = `Привіт, ${firstName}! 👋\n\nЯ твій персональний помічник у навчанні Віки про блог та контент.\n\n🎁 Якщо в тебе є подарунковий код або посилання (наприклад: \`GIFT-...\` або \`prize-...\`), надішли його сюди — бот автоматично активує твій доступ.\n\nАбо відкрий особистий кабінет за кнопкою нижче 👇`;
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://victoria-mc.vercel.app';
     
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',

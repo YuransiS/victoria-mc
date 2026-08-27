@@ -135,11 +135,26 @@ Table name: `victoria_leads`
 3. **`minicourse_lessons_config`** — Dynamic lesson configuration (`lesson_id`, `title`, `description`, `youtube_id`, `links: JSONB`, `description_under_video`, `hw_instructions`, `sort_order`).
 4. **`minicourse_bot_templates`** — Dynamic Telegram bot message templates (`id`, `event_key`, `lesson_id`, `title`, `description`, `message_text`, `buttons: JSONB`, `is_enabled`, `sort_order`).
 5. **`minicourse_broadcasts`** — Mass bot broadcasts history and dispatch records (`id`, `message_text`, `button_text`, `button_url`, `target_audience`, `total_recipients`, `sent_count`, `failed_count`, `status`, `created_by`).
-6. **`minicourse_bot_config`** — Telegram bot configuration & webhook connection parameters (`id: 'current'`, `bot_token`, `bot_username`, `bot_name`, `bot_photo_url`, `webhook_url`, `is_connected`, `updated_at`).
+6. **`minicourse_bot_config`** — Telegram bot configuration & webhook connection parameters (`id: 'default'`, `bot_token`, `bot_username`, `bot_name`, `bot_photo_url`, `webhook_url`, `is_connected`, `updated_at`).
 7. **`minicourse_gift_tokens`** — Gift tokens (`token: 'GIFT-XXXX'`, `is_used`, `used_by_chat_id`, `used_at`).
 8. **`minicourse_prize_codes`** — Contest & promo prize codes (`code: 'prize-XXXX'`, `description`, `status: 'active' | 'used' | 'cancelled'`, `used_by_id`, `used_at`).
 9. **`minicourse_autologin_tokens`** — Cryptographic magic tokens (`token: UUID`, `user_id`, `is_used`, `expires_at`).
 10. **Storage Bucket `homeworks`** — Public Supabase bucket for homework attachments.
+
+### 🤖 Telegram Bot Communication Scenarios (Victoria Course)
+The Telegram bot handles 12 distinct communication scenarios with universal template interpolation (`{userName}` / `{name}` / `{firstName}`, `{lessonId}` / `{lesson_id}`, `{lessonTitle}` / `{lesson_title}`, `{comment}`):
+1. **Успішна оплата курсу (Активація кабінету)** (`payment_success` / `welcome`): Activates LMS access and greets student.
+2. **Підтвердження отримання домашнього завдання** (`hw_submitted`): Confirms homework received and under review.
+3. **Домашнє завдання прийнято куратором** (`hw_accepted`): Delivers curator comment and next lesson button.
+4. **Домашнє завдання потребує доопрацювання** (`hw_needs_improvement`): Delivers curator suggestions and revision link.
+5. **Відкрито доступ до нового уроку** (`lesson_unlocked` / `new_lesson_unlocked`): Dynamic lesson unlock notification with direct autologin.
+6. **Нагадування про дедлайн здачі завдання** (`reminder`): Scheduled motivation and checkpoint reminder.
+7. **Активація подарункового коду / призового доступу** (Webhook 7.1 & 7.2): Sequential welcome and access duration notices.
+8. **Помилка: Подарунковий код уже використано** (Webhook 8): Notifies code single-use constraint.
+9. **Помилка: Недійсний подарунковий код** (Webhook 9): Notifies invalid token format with support handle `@YuransiS`.
+10. **Старт бота неоплаченим користувачем** (Webhook 10): Prompts payment completion or gift code input.
+11. **Повернення діючого студента в бота** (Webhook 11): Welcome-back flow with 1-click autologin to dashboard.
+12. **Старт бота невідомим користувачем** (Webhook 12): Guest greeting with prompt to submit gift/prize token.
 
 ---
 
