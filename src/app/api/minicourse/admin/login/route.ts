@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       // Live Supabase Mode
       // Get or create admin user
       let { data: user, error } = await supabase
-        .from('victoria_mc_users')
+        .from('victoria_mc_minicourse_users')
         .select('*')
         .or(`email.eq.${adminEmail},telegram.eq.${adminUsername}`)
         .maybeSingle();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       if (!user) {
         // Create admin user in db
         const { data: newUser, error: createError } = await supabase
-          .from('victoria_mc_users')
+          .from('victoria_mc_minicourse_users')
           .insert({
             name: adminMatch.label,
             email: adminEmail,
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
       } else if (user.role !== 'admin') {
         // Update role to admin if they are registered as student but matched admin password
         const { data: updatedUser, error: updateError } = await supabase
-          .from('victoria_mc_users')
+          .from('victoria_mc_minicourse_users')
           .update({ role: 'admin', is_paid: true, payment_status: 'paid' })
           .eq('id', user.id)
           .select()

@@ -162,7 +162,7 @@ export async function sendBotBroadcast(payload: {
 
   // 1. Fetch target students with valid chat IDs
   let query = db.supabase!
-    .from('victoria_mc_users')
+    .from('victoria_mc_minicourse_users')
     .select('id, name, telegram, telegram_chat_id, is_paid')
     .not('telegram_chat_id', 'is', null);
 

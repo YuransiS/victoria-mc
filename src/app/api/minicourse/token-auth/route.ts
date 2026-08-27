@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     if (token) {
       // 1. Fetch the token from database, ensuring it is unused and not expired
       const { data: tokenData, error: tokenErr } = await supabase
-        .from('victoria_mc_autologin_tokens')
+        .from('victoria_mc_minicourse_autologin_tokens')
         .select('*')
         .eq('token', token)
         .eq('is_used', false)
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
       // 2. Mark token as used immediately to prevent replay attacks / link sharing
       const { error: updateTokenErr } = await supabase
-        .from('victoria_mc_autologin_tokens')
+        .from('victoria_mc_minicourse_autologin_tokens')
         .update({ is_used: true })
         .eq('token', token);
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       userId = tokenData.user_id;
     } else if (tgId) {
       const isNumeric = /^\d+$/.test(tgId.toString().trim());
-      let query = supabase.from('victoria_mc_users').select('*');
+      let query = supabase.from('victoria_mc_minicourse_users').select('*');
 
       if (isNumeric) {
         query = query.eq('telegram_chat_id', Number(tgId));
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     if (!user && userId) {
       // 3. Fetch user details
       const { data: dbUser, error: userErr } = await supabase
-        .from('victoria_mc_users')
+        .from('victoria_mc_minicourse_users')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
@@ -134,7 +134,7 @@ export async function POST(req: Request) {
           if (uuids.length >= 4) {
             // Block user immediately
             const { error: blockErr } = await supabase
-              .from('victoria_mc_users')
+              .from('victoria_mc_minicourse_users')
               .update({
                 status: 'under_investigation',
                 device_uuids: newUuids
@@ -150,7 +150,7 @@ export async function POST(req: Request) {
           } else {
             // Update device list
             const { error: updateDevicesErr } = await supabase
-              .from('victoria_mc_users')
+              .from('victoria_mc_minicourse_users')
               .update({ device_uuids: newUuids })
               .eq('id', user.id);
             
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
 
     // 5. Fetch or create progress record
     let { data: progress, error: progErr } = await supabase
-      .from('victoria_mc_progress')
+      .from('victoria_mc_minicourse_progress')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
@@ -182,7 +182,7 @@ export async function POST(req: Request) {
       };
 
       const { data: newProg, error: createProgErr } = await supabase
-        .from('victoria_mc_progress')
+        .from('victoria_mc_minicourse_progress')
         .insert({
           user_id: user.id,
           progress_percent: 0,

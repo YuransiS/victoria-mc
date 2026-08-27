@@ -35,7 +35,7 @@ async function handleReminders(req: Request) {
 
     // 1. Fetch all student profiles
     const { data: users, error: userErr } = await supabase
-      .from('victoria_mc_users')
+      .from('victoria_mc_minicourse_users')
       .select('*')
       .eq('role', 'student');
 
@@ -67,7 +67,7 @@ async function handleReminders(req: Request) {
 
     // 3. Fetch progress records for active students
     const { data: progressRecords, error: progErr } = await supabase
-      .from('victoria_mc_progress')
+      .from('victoria_mc_minicourse_progress')
       .select('*')
       .in('user_id', studentIds);
 
@@ -133,7 +133,7 @@ async function handleReminders(req: Request) {
       // 5. Update database if reminders were successfully triggered and marked
       if (hasUpdates) {
         await supabase
-          .from('victoria_mc_progress')
+          .from('victoria_mc_minicourse_progress')
           .update({
             lessons: updatedLessons,
             updated_at: new Date().toISOString()
