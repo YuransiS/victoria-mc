@@ -124,11 +124,19 @@ function resolveBaseCrmTrafficSource(params: {
   }
 
   // 4. Ефір / Вебінар (1091)
+  const isWebinarMatch = (val: string) => {
+    return val.includes('efir') || 
+      val.includes('vebinar') || val.includes('webinar') ||
+      val.includes('web_') || val.includes('veb_') ||
+      val.includes('_web') || val.includes('_veb') ||
+      val.includes('live') || val.includes('stream') || val.includes('zoom');
+  };
+
   if (
-    src.includes('efir') || src.includes('veb') || src.includes('web') || src.includes('live') ||
-    med.includes('efir') || med.includes('veb') || med.includes('web') ||
-    camp.includes('efir') || camp.includes('veb') || camp.includes('web') ||
-    fullText.includes('stream') || fullText.includes('zoom')
+    isWebinarMatch(src) ||
+    isWebinarMatch(med) ||
+    isWebinarMatch(camp) ||
+    isWebinarMatch(fullText)
   ) {
     return { id: 1091, name: 'Анкети ефір' };
   }
