@@ -9,7 +9,7 @@ async function generateAutologinLink(chatId: number, targetPath: string): Promis
   if (supabase) {
     try {
       const { data: user } = await supabase
-        .from('minicourse_users')
+        .from('victoria_mc_users')
         .select('id')
         .eq('telegram_chat_id', chatId)
         .maybeSingle();
@@ -19,7 +19,7 @@ async function generateAutologinLink(chatId: number, targetPath: string): Promis
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
         const { error } = await supabase
-          .from('minicourse_autologin_tokens')
+          .from('victoria_mc_autologin_tokens')
           .insert({
             token: tokenUuid,
             user_id: user.id,
@@ -103,7 +103,7 @@ export async function sendTelegramNotification(
           : messageType;
 
       const { data: dbTemplate } = await supabase
-        .from('minicourse_bot_templates')
+        .from('victoria_mc_bot_templates')
         .select('*')
         .eq('id', templateId)
         .maybeSingle();

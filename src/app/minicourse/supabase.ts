@@ -58,9 +58,9 @@ const DEFAULT_PROGRESS: MinicourseProgress[] = [];
 // Helper functions for mock storage
 function getLocalUsers(): MinicourseUser[] {
   if (typeof window === 'undefined') return DEFAULT_USERS;
-  const data = localStorage.getItem('minicourse_users');
+  const data = localStorage.getItem('victoria_mc_users');
   if (!data) {
-    localStorage.setItem('minicourse_users', JSON.stringify(DEFAULT_USERS));
+    localStorage.setItem('victoria_mc_users', JSON.stringify(DEFAULT_USERS));
     return DEFAULT_USERS;
   }
   try {
@@ -76,7 +76,7 @@ function getLocalUsers(): MinicourseUser[] {
        !u.name.includes('Марія'))
     );
     if (cleaned.length !== parsed.length) {
-      localStorage.setItem('minicourse_users', JSON.stringify(cleaned));
+      localStorage.setItem('victoria_mc_users', JSON.stringify(cleaned));
       return cleaned;
     }
     return parsed;
@@ -87,15 +87,15 @@ function getLocalUsers(): MinicourseUser[] {
 
 function saveLocalUsers(users: MinicourseUser[]) {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('minicourse_users', JSON.stringify(users));
+    localStorage.setItem('victoria_mc_users', JSON.stringify(users));
   }
 }
 
 function getLocalProgress(): MinicourseProgress[] {
   if (typeof window === 'undefined') return DEFAULT_PROGRESS;
-  const data = localStorage.getItem('minicourse_progress');
+  const data = localStorage.getItem('victoria_mc_progress');
   if (!data) {
-    localStorage.setItem('minicourse_progress', JSON.stringify(DEFAULT_PROGRESS));
+    localStorage.setItem('victoria_mc_progress', JSON.stringify(DEFAULT_PROGRESS));
     return DEFAULT_PROGRESS;
   }
   try {
@@ -103,7 +103,7 @@ function getLocalProgress(): MinicourseProgress[] {
     const validUserIds = new Set(getLocalUsers().map(u => u.id));
     const cleaned = parsed.filter(p => validUserIds.has(p.userId));
     if (cleaned.length !== parsed.length) {
-      localStorage.setItem('minicourse_progress', JSON.stringify(cleaned));
+      localStorage.setItem('victoria_mc_progress', JSON.stringify(cleaned));
       return cleaned;
     }
     return parsed;
@@ -114,7 +114,7 @@ function getLocalProgress(): MinicourseProgress[] {
 
 function saveLocalProgress(progress: MinicourseProgress[]) {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('minicourse_progress', JSON.stringify(progress));
+    localStorage.setItem('victoria_mc_progress', JSON.stringify(progress));
   }
 }
 
@@ -152,9 +152,9 @@ export const DEFAULT_LESSONS_CONFIG: MinicourseLessonConfig[] = [
 
 function getLocalLessonsConfig(): MinicourseLessonConfig[] {
   if (typeof window === 'undefined') return DEFAULT_LESSONS_CONFIG;
-  const data = localStorage.getItem('minicourse_lessons_config');
+  const data = localStorage.getItem('victoria_mc_lessons_config');
   if (!data) {
-    localStorage.setItem('minicourse_lessons_config', JSON.stringify(DEFAULT_LESSONS_CONFIG));
+    localStorage.setItem('victoria_mc_lessons_config', JSON.stringify(DEFAULT_LESSONS_CONFIG));
     return DEFAULT_LESSONS_CONFIG;
   }
   try {
@@ -166,7 +166,7 @@ function getLocalLessonsConfig(): MinicourseLessonConfig[] {
 
 function saveLocalLessonsConfig(config: MinicourseLessonConfig[]) {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('minicourse_lessons_config', JSON.stringify(config));
+    localStorage.setItem('victoria_mc_lessons_config', JSON.stringify(config));
   }
 }
 
@@ -280,7 +280,7 @@ export async function loginUser(telegramUsername: string, name?: string, deviceU
     }
 
     let { data: users, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .or(queryFilter)
       .order('created_at', { ascending: false });
@@ -319,7 +319,7 @@ export async function loginUser(telegramUsername: string, name?: string, deviceU
           const newUuids = [...uuids, deviceUuid];
           if (uuids.length >= 4) {
             const { error: blockErr } = await supabase!
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({
                 status: 'under_investigation',
                 device_uuids: newUuids
@@ -330,7 +330,7 @@ export async function loginUser(telegramUsername: string, name?: string, deviceU
             throw new Error("Доступ заблоковано. Зафіксовано вхід з 5 унікальних пристроїв. Зверніться до підтримки.");
           } else {
             const { error: updateErr } = await supabase!
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({
                 device_uuids: newUuids
               })
@@ -345,7 +345,7 @@ export async function loginUser(telegramUsername: string, name?: string, deviceU
 
     // 2. Fetch or create progress
     let { data: progress, error: progError } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
@@ -360,7 +360,7 @@ export async function loginUser(telegramUsername: string, name?: string, deviceU
       };
 
       const { data: newProg, error: createProgErr } = await supabase!
-        .from('minicourse_progress')
+        .from('victoria_mc_progress')
         .insert({
           user_id: user.id,
           progress_percent: 0,
@@ -392,7 +392,7 @@ export async function getProfile(userId: string): Promise<MinicourseUser | null>
     return users.find(u => u.id === userId) || null;
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .eq('id', userId)
       .single();
@@ -407,7 +407,7 @@ export async function getProgress(userId: string): Promise<MinicourseProgress | 
     return progressList.find(p => p.userId === userId) || null;
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('*')
       .eq('user_id', userId)
       .single();
@@ -469,7 +469,7 @@ export async function updateProgress(userId: string, lessonId: 1 | 2 | 3, update
     const newPercent = calculateProgressPercent(updatedLessons);
 
     const { data, error } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .update({
         lessons: updatedLessons,
         progress_percent: newPercent,
@@ -525,14 +525,14 @@ export async function getLeaderboard(currentUserId?: string): Promise<StudentLea
   } else {
     // Join logic in supabase or via dual query
     const { data: users, error: uErr } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('id, name, telegram')
       .eq('role', 'student');
     
     if (uErr) throw uErr;
 
     const { data: progress, error: pErr } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('user_id, progress_percent');
 
     if (pErr) throw pErr;
@@ -597,14 +597,14 @@ export async function getAdminSubmissions(): Promise<AdminSubmissionItem[]> {
     return items.sort((a, b) => new Date(b.hwSubmittedAt).getTime() - new Date(a.hwSubmittedAt).getTime());
   } else {
     const { data: users, error: uErr } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('id, name, email, telegram, created_at, access_opened_at')
       .eq('role', 'student');
     
     if (uErr) throw uErr;
 
     const { data: progress, error: pErr } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('user_id, lessons');
     
     if (pErr) throw pErr;
@@ -674,14 +674,14 @@ export async function deleteStudentUser(userId: string): Promise<boolean> {
   } else {
     // 1. Delete progress
     const { error: pErr } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .delete()
       .eq('user_id', userId);
     if (pErr) throw pErr;
 
     // 2. Delete user
     const { error: uErr } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .delete()
       .eq('id', userId);
     if (uErr) throw uErr;
@@ -695,7 +695,7 @@ export async function getLessonsConfig(): Promise<MinicourseLessonConfig[]> {
     return getLocalLessonsConfig();
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_lessons_config')
+      .from('victoria_mc_lessons_config')
       .select('*')
       .order('lesson_id', { ascending: true });
 
@@ -736,7 +736,7 @@ export async function saveAllLessonsConfig(configs: MinicourseLessonConfig[]): P
   } else {
     // 1. Get existing IDs in database
     const { data: existing } = await supabase!
-      .from('minicourse_lessons_config')
+      .from('victoria_mc_lessons_config')
       .select('lesson_id');
     
     const existingIds = (existing || []).map(r => r.lesson_id);
@@ -745,7 +745,7 @@ export async function saveAllLessonsConfig(configs: MinicourseLessonConfig[]): P
 
     if (idsToDelete.length > 0) {
       await supabase!
-        .from('minicourse_lessons_config')
+        .from('victoria_mc_lessons_config')
         .delete()
         .in('lesson_id', idsToDelete);
     }
@@ -765,7 +765,7 @@ export async function saveAllLessonsConfig(configs: MinicourseLessonConfig[]): P
       }));
 
       const { data, error } = await supabase!
-        .from('minicourse_lessons_config')
+        .from('victoria_mc_lessons_config')
         .upsert(rows, { onConflict: 'lesson_id' })
         .select();
 
@@ -783,7 +783,7 @@ export async function deleteLessonConfig(lessonId: number): Promise<void> {
     saveLocalLessonsConfig(configs);
   } else {
     const { error } = await supabase!
-      .from('minicourse_lessons_config')
+      .from('victoria_mc_lessons_config')
       .delete()
       .eq('lesson_id', lessonId);
     if (error) throw error;
@@ -817,7 +817,7 @@ export async function updateLessonConfig(lessonId: number, updates: Partial<Mini
     }
 
     const { data, error } = await supabase!
-      .from('minicourse_lessons_config')
+      .from('victoria_mc_lessons_config')
       .upsert({
         lesson_id: lessonId,
         ...cleanUpdates
@@ -927,7 +927,7 @@ export async function syncProgressStates(userId: string, user?: MinicourseUser):
       return progressList.find(p => p.userId === userId) || null;
     } else {
       const { data, error } = await supabase!
-        .from('minicourse_progress')
+        .from('victoria_mc_progress')
         .update({
           lessons: synced.lessons,
           progress_percent: synced.progressPercent,
@@ -979,7 +979,7 @@ export async function getAllStudentsWithProgress(): Promise<StudentWithProgress[
     });
   } else {
     const { data: users, error: uErr } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .eq('role', 'student')
       .order('created_at', { ascending: false });
@@ -987,7 +987,7 @@ export async function getAllStudentsWithProgress(): Promise<StudentWithProgress[
     if (uErr) throw uErr;
 
     const { data: progress, error: pErr } = await supabase!
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('*');
 
     if (pErr) throw pErr;
@@ -1026,7 +1026,7 @@ export async function getAllStudents(): Promise<MinicourseUser[]> {
     return getLocalUsers().filter(u => u.role === 'student');
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .eq('role', 'student')
       .order('created_at', { ascending: false });
@@ -1051,7 +1051,7 @@ export async function toggleUserLockout(userId: string, shouldBlock: boolean): P
     return users[idx];
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .update({
         status: newStatus,
         device_uuids: shouldBlock ? undefined : [] // Reset devices when unblocking
@@ -1121,7 +1121,7 @@ export async function acceptTerms(userId: string): Promise<MinicourseUser> {
     return users[idx];
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .update({
         terms_accepted: true,
         access_opened_at: nowStr
@@ -1227,7 +1227,7 @@ export async function extendStudentAccess(
           }
         } else {
           await supabase!
-            .from('minicourse_progress')
+            .from('victoria_mc_progress')
             .update({ lessons: updatedLessons })
             .eq('user_id', userId);
         }
@@ -1259,7 +1259,7 @@ export async function extendStudentAccess(
     }
 
     const { data, error } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .update(updates)
       .eq('id', userId)
       .select()
@@ -1276,7 +1276,7 @@ export async function extendStudentAccess(
 
 function getLocalPrizeCodes(): MinicoursePrizeCode[] {
   if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem('minicourse_prize_codes');
+  const data = localStorage.getItem('victoria_mc_prize_codes');
   if (!data) return [];
   try {
     return JSON.parse(data) as MinicoursePrizeCode[];
@@ -1287,7 +1287,7 @@ function getLocalPrizeCodes(): MinicoursePrizeCode[] {
 
 function saveLocalPrizeCodes(codes: MinicoursePrizeCode[]): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('minicourse_prize_codes', JSON.stringify(codes));
+    localStorage.setItem('victoria_mc_prize_codes', JSON.stringify(codes));
   }
 }
 
@@ -1310,7 +1310,7 @@ export async function createPrizeCode(description: string, createdBy: string): P
     return newCode;
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_prize_codes')
+      .from('victoria_mc_prize_codes')
       .insert({
         code,
         description,
@@ -1344,17 +1344,17 @@ export async function getPrizeCodes(): Promise<MinicoursePrizeCode[]> {
   } else {
     // Join used_by details from minicourse_users
     const { data, error } = await supabase!
-      .from('minicourse_prize_codes')
+      .from('victoria_mc_prize_codes')
       .select(`
         *,
-        minicourse_users(name, telegram)
+        victoria_mc_users(name, telegram)
       `)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
     return (data || []).map(row => {
-      const u = row.minicourse_users;
+      const u = row.victoria_mc_users;
       return {
         code: row.code,
         description: row.description,
@@ -1380,7 +1380,7 @@ export async function cancelPrizeCode(code: string): Promise<void> {
     }
   } else {
     const { error } = await supabase!
-      .from('minicourse_prize_codes')
+      .from('victoria_mc_prize_codes')
       .update({ status: 'cancelled' })
       .eq('code', code);
 
@@ -1397,7 +1397,7 @@ export async function verifyPrizeCode(code: string): Promise<MinicoursePrizeCode
     return item;
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_prize_codes')
+      .from('victoria_mc_prize_codes')
       .select('*')
       .eq('code', code)
       .maybeSingle();
@@ -1529,7 +1529,7 @@ export async function claimPrizeCode(
     }
 
     let { data: users, error: fetchErr } = await supabase!
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .or(queryFilter);
 
@@ -1539,7 +1539,7 @@ export async function claimPrizeCode(
       const existingUser = users[0];
       
       const { data: updatedUsr, error: updateUsrErr } = await supabase!
-        .from('minicourse_users')
+        .from('victoria_mc_users')
         .update({
           is_paid: true,
           payment_status: 'paid',
@@ -1557,7 +1557,7 @@ export async function claimPrizeCode(
 
       // Update progress lessons
       let { data: prog, error: progErr } = await supabase!
-        .from('minicourse_progress')
+        .from('victoria_mc_progress')
         .select('*')
         .eq('user_id', existingUser.id)
         .maybeSingle();
@@ -1575,7 +1575,7 @@ export async function claimPrizeCode(
         }
 
         const { data: newProg, error: updateProgErr } = await supabase!
-          .from('minicourse_progress')
+          .from('victoria_mc_progress')
           .update({
             lessons: updatedLessons,
             updated_at: now.toISOString()
@@ -1594,7 +1594,7 @@ export async function claimPrizeCode(
         };
       } else {
         const { data: newProg, error: createProgErr } = await supabase!
-          .from('minicourse_progress')
+          .from('victoria_mc_progress')
           .insert({
             user_id: existingUser.id,
             progress_percent: 0,
@@ -1615,7 +1615,7 @@ export async function claimPrizeCode(
     } else {
       // Create user
       const { data: newUser, error: createUsrErr } = await supabase!
-        .from('minicourse_users')
+        .from('victoria_mc_users')
         .insert({
           name,
           telegram: normInput,
@@ -1636,7 +1636,7 @@ export async function claimPrizeCode(
 
       // Create progress
       const { data: newProg, error: createProgErr } = await supabase!
-        .from('minicourse_progress')
+        .from('victoria_mc_progress')
         .insert({
           user_id: newUser.id,
           progress_percent: 0,
@@ -1657,7 +1657,7 @@ export async function claimPrizeCode(
 
     // Redeem prize code
     const { error: codeErr } = await supabase!
-      .from('minicourse_prize_codes')
+      .from('victoria_mc_prize_codes')
       .update({
         status: 'used',
         used_at: now.toISOString(),
@@ -1685,10 +1685,10 @@ export interface GiftTokenItem {
 export async function getGiftTokens(): Promise<GiftTokenItem[]> {
   if (IS_MOCK_MODE) {
     if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem('minicourse_gift_tokens') || '[]');
+    return JSON.parse(localStorage.getItem('victoria_mc_gift_tokens') || '[]');
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_gift_tokens')
+      .from('victoria_mc_gift_tokens')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -1705,14 +1705,14 @@ export async function generateGiftToken(): Promise<GiftTokenItem> {
     if (typeof window === 'undefined') {
       return { token, created_at: new Date().toISOString(), is_used: false, used_by_chat_id: null, used_at: null };
     }
-    const tokens = JSON.parse(localStorage.getItem('minicourse_gift_tokens') || '[]');
+    const tokens = JSON.parse(localStorage.getItem('victoria_mc_gift_tokens') || '[]');
     const newItem = { token, created_at: new Date().toISOString(), is_used: false, used_by_chat_id: null, used_at: null };
     tokens.unshift(newItem);
-    localStorage.setItem('minicourse_gift_tokens', JSON.stringify(tokens));
+    localStorage.setItem('victoria_mc_gift_tokens', JSON.stringify(tokens));
     return newItem;
   } else {
     const { data, error } = await supabase!
-      .from('minicourse_gift_tokens')
+      .from('victoria_mc_gift_tokens')
       .insert({ token })
       .select()
       .single();
@@ -1734,13 +1734,13 @@ export function normalizeMessageText(text: string): string {
 export async function getBotTemplates(): Promise<BotMessageTemplate[]> {
   if (IS_MOCK_MODE) {
     if (typeof window === 'undefined') return [];
-    const raw = JSON.parse(localStorage.getItem('minicourse_bot_templates') || '[]');
+    const raw = JSON.parse(localStorage.getItem('victoria_mc_bot_templates') || '[]');
     return raw.map((t: any) => ({ ...t, message_text: normalizeMessageText(t.message_text) }));
   }
 
   // 1. Fetch saved templates from database
   const { data: dbTemplates, error } = await supabase!
-    .from('minicourse_bot_templates')
+    .from('victoria_mc_bot_templates')
     .select('*')
     .order('sort_order', { ascending: true });
 
@@ -1795,7 +1795,7 @@ export async function saveBotTemplate(template: BotMessageTemplate): Promise<voi
 
   if (IS_MOCK_MODE) {
     if (typeof window === 'undefined') return;
-    const templates = JSON.parse(localStorage.getItem('minicourse_bot_templates') || '[]');
+    const templates = JSON.parse(localStorage.getItem('victoria_mc_bot_templates') || '[]');
     const idx = templates.findIndex((t: BotMessageTemplate) => t.id === template.id);
     const updated = { ...template, message_text: cleanText };
     if (idx >= 0) {
@@ -1803,12 +1803,12 @@ export async function saveBotTemplate(template: BotMessageTemplate): Promise<voi
     } else {
       templates.push(updated);
     }
-    localStorage.setItem('minicourse_bot_templates', JSON.stringify(templates));
+    localStorage.setItem('victoria_mc_bot_templates', JSON.stringify(templates));
     return;
   }
 
   const { error } = await supabase!
-    .from('minicourse_bot_templates')
+    .from('victoria_mc_bot_templates')
     .upsert({
       id: template.id,
       event_key: template.event_key,
@@ -1828,14 +1828,14 @@ export async function saveBotTemplate(template: BotMessageTemplate): Promise<voi
 export async function deleteBotTemplate(templateId: string): Promise<void> {
   if (IS_MOCK_MODE) {
     if (typeof window === 'undefined') return;
-    const templates = JSON.parse(localStorage.getItem('minicourse_bot_templates') || '[]');
+    const templates = JSON.parse(localStorage.getItem('victoria_mc_bot_templates') || '[]');
     const filtered = templates.filter((t: BotMessageTemplate) => t.id !== templateId);
-    localStorage.setItem('minicourse_bot_templates', JSON.stringify(filtered));
+    localStorage.setItem('victoria_mc_bot_templates', JSON.stringify(filtered));
     return;
   }
 
   const { error } = await supabase!
-    .from('minicourse_bot_templates')
+    .from('victoria_mc_bot_templates')
     .delete()
     .eq('id', templateId);
 
@@ -1845,12 +1845,12 @@ export async function deleteBotTemplate(templateId: string): Promise<void> {
 export async function getBroadcasts(): Promise<BotBroadcast[]> {
   if (IS_MOCK_MODE) {
     if (typeof window === 'undefined') return [];
-    const raw = JSON.parse(localStorage.getItem('minicourse_broadcasts') || '[]');
+    const raw = JSON.parse(localStorage.getItem('victoria_mc_broadcasts') || '[]');
     return raw.map((b: any) => ({ ...b, message_text: normalizeMessageText(b.message_text) }));
   }
 
   const { data, error } = await supabase!
-    .from('minicourse_broadcasts')
+    .from('victoria_mc_broadcasts')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -1872,15 +1872,15 @@ export async function saveBroadcastRecord(broadcast: Omit<BotBroadcast, 'id' | '
       message_text: cleanText
     };
     if (typeof window !== 'undefined') {
-      const items = JSON.parse(localStorage.getItem('minicourse_broadcasts') || '[]');
+      const items = JSON.parse(localStorage.getItem('victoria_mc_broadcasts') || '[]');
       items.unshift(item);
-      localStorage.setItem('minicourse_broadcasts', JSON.stringify(items));
+      localStorage.setItem('victoria_mc_broadcasts', JSON.stringify(items));
     }
     return item;
   }
 
   const { data, error } = await supabase!
-    .from('minicourse_broadcasts')
+    .from('victoria_mc_broadcasts')
     .insert({
       message_text: cleanText,
       button_text: broadcast.button_text || null,
@@ -1910,13 +1910,13 @@ export async function getBotConfig(): Promise<BotConfig> {
     if (typeof window === 'undefined') {
       return { id: 'default', is_connected: !!envToken, bot_token: envToken };
     }
-    const saved = localStorage.getItem('minicourse_bot_config');
+    const saved = localStorage.getItem('victoria_mc_bot_config');
     if (saved) return JSON.parse(saved);
     return { id: 'default', is_connected: !!envToken, bot_token: envToken };
   }
 
   const { data, error } = await supabase!
-    .from('minicourse_bot_config')
+    .from('victoria_mc_bot_config')
     .select('*')
     .eq('id', 'default')
     .maybeSingle();
@@ -1957,13 +1957,13 @@ export async function saveBotConfig(config: Partial<BotConfig>): Promise<BotConf
 
   if (IS_MOCK_MODE) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('minicourse_bot_config', JSON.stringify(updated));
+      localStorage.setItem('victoria_mc_bot_config', JSON.stringify(updated));
     }
     return updated;
   }
 
   const { data, error } = await supabase!
-    .from('minicourse_bot_config')
+    .from('victoria_mc_bot_config')
     .upsert({
       id: 'default',
       bot_token: updated.bot_token || null,

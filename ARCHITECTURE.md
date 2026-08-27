@@ -130,15 +130,15 @@ Table name: `victoria_leads`
 ---
 
 ## 🎓 Mini-Course LMS Database Tables (`supabase_minicourse_schema.sql`)
-1. **`minicourse_users`** — Student & Admin profiles (`id`, `name`, `email`, `telegram`, `telegram_chat_id`, `phone`, `role: 'student' | 'admin'`, `is_paid`, `payment_status`, `device_uuids`, `status: 'active' | 'under_investigation'`, `access_opened_at`, `homework_access_opened_at`, `terms_accepted`).
-2. **`minicourse_progress`** — Student lesson progression (`user_id`, `progress_percent`, `lessons: JSONB` containing checkpoints, video watches, homework links, grading statuses, and QStash reminder IDs).
-3. **`minicourse_lessons_config`** — Dynamic lesson configuration (`lesson_id`, `title`, `description`, `youtube_id`, `links: JSONB`, `description_under_video`, `hw_instructions`, `sort_order`).
-4. **`minicourse_bot_templates`** — Dynamic Telegram bot message templates (`id`, `event_key`, `lesson_id`, `title`, `description`, `message_text`, `buttons: JSONB`, `is_enabled`, `sort_order`).
-5. **`minicourse_broadcasts`** — Mass bot broadcasts history and dispatch records (`id`, `message_text`, `button_text`, `button_url`, `target_audience`, `total_recipients`, `sent_count`, `failed_count`, `status`, `created_by`).
-6. **`minicourse_bot_config`** — Telegram bot configuration & webhook connection parameters (`id: 'default'`, `bot_token`, `bot_username`, `bot_name`, `bot_photo_url`, `webhook_url`, `is_connected`, `updated_at`).
-7. **`minicourse_gift_tokens`** — Gift tokens (`token: 'GIFT-XXXX'`, `is_used`, `used_by_chat_id`, `used_at`).
-8. **`minicourse_prize_codes`** — Contest & promo prize codes (`code: 'prize-XXXX'`, `description`, `status: 'active' | 'used' | 'cancelled'`, `used_by_id`, `used_at`).
-9. **`minicourse_autologin_tokens`** — Cryptographic magic tokens (`token: UUID`, `user_id`, `is_used`, `expires_at`).
+1. **`victoria_mc_users`** — Student & Admin profiles (`id`, `name`, `email`, `telegram`, `telegram_chat_id`, `phone`, `role: 'student' | 'admin'`, `is_paid`, `payment_status`, `device_uuids`, `status: 'active' | 'under_investigation'`, `access_opened_at`, `homework_access_opened_at`, `terms_accepted`).
+2. **`victoria_mc_progress`** — Student lesson progression (`user_id`, `progress_percent`, `lessons: JSONB` containing checkpoints, video watches, homework links, grading statuses, and QStash reminder IDs).
+3. **`victoria_mc_lessons_config`** — Dynamic lesson configuration (`lesson_id`, `title`, `description`, `youtube_id`, `links: JSONB`, `description_under_video`, `hw_instructions`, `sort_order`).
+4. **`victoria_mc_bot_templates`** — Dynamic Telegram bot message templates (`id`, `event_key`, `lesson_id`, `title`, `description`, `message_text`, `buttons: JSONB`, `is_enabled`, `sort_order`).
+5. **`victoria_mc_broadcasts`** — Mass bot broadcasts history and dispatch records (`id`, `message_text`, `button_text`, `button_url`, `target_audience`, `total_recipients`, `sent_count`, `failed_count`, `status`, `created_by`).
+6. **`victoria_mc_bot_config`** — Telegram bot configuration & webhook connection parameters (`id: 'default'`, `bot_token`, `bot_username`, `bot_name`, `bot_photo_url`, `webhook_url`, `is_connected`, `updated_at`).
+7. **`victoria_mc_gift_tokens`** — Gift tokens (`token: 'GIFT-XXXX'`, `is_used`, `used_by_chat_id`, `used_at`).
+8. **`victoria_mc_prize_codes`** — Contest & promo prize codes (`code: 'prize-XXXX'`, `description`, `status: 'active' | 'used' | 'cancelled'`, `used_by_id`, `used_at`).
+9. **`victoria_mc_autologin_tokens`** — Cryptographic magic tokens (`token: UUID`, `user_id`, `is_used`, `expires_at`).
 10. **Storage Bucket `homeworks`** — Public Supabase bucket for homework attachments.
 
 ### 🤖 Telegram Bot Communication Scenarios (Victoria Course)

@@ -89,7 +89,7 @@ export async function POST(req: Request) {
           const phoneNorm = normalizePhone(phoneToMatch);
           const digitsOnly = phoneNorm.replace(/\D/g, '');
           const { data: existingUser } = await supabase
-            .from('minicourse_users')
+            .from('victoria_mc_users')
             .select('*')
             .or(`phone.eq.${digitsOnly},phone.eq.${phoneNorm}`)
             .order('created_at', { ascending: false })
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
 
           if (existingUser) {
             const { data: updatedUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({
                 telegram: username || existingUser.telegram,
                 telegram_chat_id: chatId,
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
             user = updatedUser;
           } else {
             const { data: newUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .insert({
                 name: leadName,
                 email: `${digitsOnly || Math.random().toString(36).substr(2, 9)}@economica.edu`,
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
 
         // 1. Fetch gift token flexible search
         const { data: giftTokenData, error: giftTokenErr } = await supabase
-          .from('minicourse_gift_tokens')
+          .from('victoria_mc_gift_tokens')
           .select('*')
           .or(`token.eq.${normalizedToken},token.ilike.${rawToken}`)
           .limit(1)
@@ -166,7 +166,7 @@ export async function POST(req: Request) {
 
           // Burn the token immediately
           await supabase
-            .from('minicourse_gift_tokens')
+            .from('victoria_mc_gift_tokens')
             .update({
               is_used: true,
               used_by_chat_id: chatId,
@@ -178,7 +178,7 @@ export async function POST(req: Request) {
           let existingUser = null;
           if (username) {
             const { data } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .select('*')
               .ilike('telegram', username)
               .order('created_at', { ascending: false })
@@ -189,7 +189,7 @@ export async function POST(req: Request) {
 
           if (!existingUser) {
             const { data } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .select('*')
               .eq('telegram_chat_id', chatId)
               .order('created_at', { ascending: false })
@@ -200,7 +200,7 @@ export async function POST(req: Request) {
 
           if (existingUser) {
             const { data: updatedUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({
                 telegram: username || existingUser.telegram,
                 telegram_chat_id: chatId,
@@ -215,7 +215,7 @@ export async function POST(req: Request) {
           } else {
             const emailPlaceholder = `${username || `gift_user_${Math.floor(Math.random() * 10000)}`}@victoria.mc`;
             const { data: newUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .insert({
                 name: firstName || 'Учасник',
                 email: emailPlaceholder,
@@ -248,7 +248,7 @@ export async function POST(req: Request) {
       } else if (tokenType === 'prize') {
         const lowerCode = rawToken.toLowerCase().trim();
         const { data: prizeData } = await supabase
-          .from('minicourse_prize_codes')
+          .from('victoria_mc_prize_codes')
           .select('*')
           .eq('code', lowerCode)
           .maybeSingle();
@@ -257,7 +257,7 @@ export async function POST(req: Request) {
           let existingUser = null;
           if (username) {
             const { data } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .select('*')
               .ilike('telegram', username)
               .limit(1)
@@ -267,7 +267,7 @@ export async function POST(req: Request) {
 
           if (existingUser) {
             const { data: updatedUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({
                 telegram_chat_id: chatId,
                 is_paid: true,
@@ -280,7 +280,7 @@ export async function POST(req: Request) {
             user = updatedUser;
           } else {
             const { data: newUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .insert({
                 name: firstName || 'Учасник',
                 email: `${username || `prize_${Math.floor(Math.random() * 10000)}`}@victoria.mc`,
@@ -298,7 +298,7 @@ export async function POST(req: Request) {
           }
 
           await supabase
-            .from('minicourse_prize_codes')
+            .from('victoria_mc_prize_codes')
             .update({
               status: 'used',
               used_at: new Date().toISOString(),
@@ -382,7 +382,7 @@ export async function POST(req: Request) {
       try {
         let linkedUser = null;
         const { data: byChatId } = await supabase
-          .from('minicourse_users')
+          .from('victoria_mc_users')
           .select('*')
           .eq('telegram_chat_id', chatId)
           .order('created_at', { ascending: false })
@@ -393,7 +393,7 @@ export async function POST(req: Request) {
           linkedUser = byChatId;
         } else if (username) {
           const { data: byUsername } = await supabase
-            .from('minicourse_users')
+            .from('victoria_mc_users')
             .select('*')
             .ilike('telegram', username)
             .order('created_at', { ascending: false })
@@ -402,7 +402,7 @@ export async function POST(req: Request) {
 
           if (byUsername) {
             const { data: updatedUser } = await supabase
-              .from('minicourse_users')
+              .from('victoria_mc_users')
               .update({ telegram_chat_id: chatId })
               .eq('id', byUsername.id)
               .select()

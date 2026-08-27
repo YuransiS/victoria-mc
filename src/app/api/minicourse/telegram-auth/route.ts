@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     // Fetch user profile matching telegram username (order by newest to handle multiple test entries)
     const { data: user, error: fetchErr } = await supabase
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .select('*')
       .ilike('telegram', telegramUsername)
       .order('created_at', { ascending: false })
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
 
     // 5. Update the telegram_chat_id column with authentic chat ID from widget
     const { error: updateErr } = await supabase
-      .from('minicourse_users')
+      .from('victoria_mc_users')
       .update({ telegram_chat_id: telegramChatId })
       .eq('id', user.id);
 
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
 
     // Return profile & progress response to client
     const { data: progress } = await supabase
-      .from('minicourse_progress')
+      .from('victoria_mc_progress')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
