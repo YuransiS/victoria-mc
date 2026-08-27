@@ -404,6 +404,7 @@ export async function POST(req: Request) {
       const cleanMed = utms.utm_medium === '-' ? '' : (utms.utm_medium || '');
       const cleanCamp = utms.utm_campaign === '-' ? '' : (utms.utm_campaign || '');
       const cleanCnt = utms.utm_content === '-' ? '' : (utms.utm_content || '');
+      const cleanTerm = utms.utm_term === '-' ? '' : (utms.utm_term || '');
 
       const crmTags = [
         trafficSourceName,
@@ -426,7 +427,8 @@ export async function POST(req: Request) {
         utm_source: cleanSrc,
         utm_medium: cleanMed,
         utm_campaign: cleanCamp,
-        utm_content: cleanCnt
+        utm_content: cleanCnt,
+        utm_term: cleanTerm
       };
 
       tasks.push(
