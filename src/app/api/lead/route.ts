@@ -73,6 +73,102 @@ function resolveProductFunnelName(targetSheet?: string | null, pagePath?: string
   return targetSheet || pagePath || '';
 }
 
+interface CrmTrafficSourceResult {
+  id: number;
+  name: string;
+}
+
+function resolveBaseCrmTrafficSource(params: {
+  isVSL: boolean;
+  isAnketa: boolean;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  page_path?: string | null;
+}): CrmTrafficSourceResult {
+  const src = (params.utm_source || '').toLowerCase().trim();
+  const med = (params.utm_medium || '').toLowerCase().trim();
+  const camp = (params.utm_campaign || '').toLowerCase().trim();
+  const cnt = (params.utm_content || '').toLowerCase().trim();
+  const path = (params.page_path || '').toLowerCase().trim();
+  const fullText = `${src} ${med} ${camp} ${cnt} ${path}`;
+
+  // 1. Stories / Відповідь на сторіс (1094)
+  if (
+    src.includes('stori') || src.includes('story') ||
+    med.includes('stori') || med.includes('story') ||
+    camp.includes('stori') || camp.includes('story') ||
+    fullText.includes('vidpovid') || fullText.includes('reply')
+  ) {
+    return { id: 1094, name: 'Відповідь на сторіс' };
+  }
+
+  // 2. Чат / Direct / Передані в чаті (1088)
+  if (
+    src.includes('direct') || src.includes('chat') || src.includes('dm') || src.includes('pm') ||
+    med.includes('direct') || med.includes('chat') ||
+    camp.includes('direct') || camp.includes('chat') ||
+    fullText.includes('peredan') || fullText.includes('manual')
+  ) {
+    return { id: 1088, name: 'Передані в чаті' };
+  }
+
+  // 3. Бот / Telegram Bot (1092)
+  if (
+    src.includes('bot') || src.includes('tg_bot') || src.includes('telegram_bot') ||
+    src.includes('manychat') || src.includes('smartsender') ||
+    med.includes('bot') || camp.includes('bot')
+  ) {
+    return { id: 1092, name: 'Анкета Бот' };
+  }
+
+  // 4. Ефір / Вебінар (1091)
+  if (
+    src.includes('efir') || src.includes('veb') || src.includes('web') || src.includes('live') ||
+    med.includes('efir') || med.includes('veb') || med.includes('web') ||
+    camp.includes('efir') || camp.includes('veb') || camp.includes('web') ||
+    fullText.includes('stream') || fullText.includes('zoom')
+  ) {
+    return { id: 1091, name: 'Анкети ефір' };
+  }
+
+  // 5. Розсилка база / Email / SendPulse (1093)
+  if (
+    src.includes('baza') || src.includes('base') || src.includes('email') || src.includes('mail') ||
+    src.includes('sendpulse') || src.includes('sp') ||
+    med.includes('baza') || med.includes('base') || med.includes('email') || med.includes('mail') ||
+    camp.includes('baza') || camp.includes('base') || camp.includes('email') ||
+    fullText.includes('newsletter') || fullText.includes('rozsylka')
+  ) {
+    return { id: 1093, name: 'Анкети "розсилка база"' };
+  }
+
+  // 6. Анкета Блог (1089)
+  // Covers organic Instagram bio/profile, blog, and followers retargeting traffic (traff + RETARG_FOLLOWERS, LEEDS_RETATG, etc.)
+  if (
+    src.includes('blog') || src.includes('shapka') || src.includes('bio') || src.includes('profile') ||
+    src.includes('insta') || src.includes('reels') || src.includes('post') || src.includes('feed') ||
+    fullText.includes('follower') || fullText.includes('retarg') ||
+    (src === 'traff' && (camp.includes('blog') || camp.includes('follower') || camp.includes('retarg') || med.includes('retatg') || med.includes('blog')))
+  ) {
+    return { id: 1089, name: 'Анкета Блог' };
+  }
+
+  // 7. VSL (1090)
+  if (params.isVSL || path.includes('free-lection') || fullText.includes('vsl')) {
+    return { id: 1090, name: 'VSL' };
+  }
+
+  // 8. General Анкета передзапису (1095)
+  if (params.isAnketa) {
+    return { id: 1095, name: 'АНКЕТА ПЕРЕДЗАПИСУ' };
+  }
+
+  // Default fallback
+  return { id: 1095, name: 'АНКЕТА ПЕРЕДЗАПИСУ' };
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -88,12 +184,19 @@ export async function POST(req: Request) {
     const chatId = process.env.TELEGRAM_CHAT_ID;
     const topicId = process.env.TOPIC_ID;
 
+    const marketingAttr = extractMarketingAttribution(
+      data,
+      undefined,
+      data.page_path || '',
+      data.full_url || data.page_url || ''
+    );
+
     const utms = {
-      utm_source: data.utm_source || 'direct',
-      utm_medium: data.utm_medium || '-',
-      utm_campaign: data.utm_campaign || '-',
-      utm_content: data.utm_content || '-',
-      utm_term: data.utm_term || '-',
+      utm_source: marketingAttr.utm_source || data.utm_source || 'direct',
+      utm_medium: marketingAttr.utm_medium || data.utm_medium || '-',
+      utm_campaign: marketingAttr.utm_campaign || data.utm_campaign || '-',
+      utm_content: marketingAttr.utm_content || data.utm_content || '-',
+      utm_term: marketingAttr.utm_term || data.utm_term || '-',
     };
 
     const isVSL = data.target_sheet === 'VSL Форма' || data.target_sheet === 'Ленд 2' || data.target_sheet === 'Ленд2';
@@ -252,8 +355,19 @@ export async function POST(req: Request) {
       const formattedCrmPhone = formatCrmPhone(crmPhone);
       const crmEmail = `noemail-${formattedCrmPhone.replace(/\D/g, '') || Math.random().toString(36).substring(2, 9)}@example.com`;
       
+      const { id: trafficSourceId, name: trafficSourceName } = resolveBaseCrmTrafficSource({
+        isVSL,
+        isAnketa,
+        utm_source: utms.utm_source,
+        utm_medium: utms.utm_medium,
+        utm_campaign: utms.utm_campaign,
+        utm_content: utms.utm_content,
+        page_path: marketingAttr.page_path || data.page_path
+      });
+
       // Form comment string from questionnaire fields, UTM tags, and prior products history
       const commentLines: string[] = [];
+      commentLines.push(`Джерело: [${trafficSourceName}]`);
       commentLines.push(`Форма: ${formTitle}`);
       if (niche) commentLines.push(`Ніша: ${niche}`);
       if (purpose) commentLines.push(`Мета: ${purpose}`);
@@ -267,11 +381,11 @@ export async function POST(req: Request) {
       commentLines.push(`Source: ${utms.utm_source}`);
       commentLines.push(`Medium: ${utms.utm_medium}`);
       commentLines.push(`Campaign: ${utms.utm_campaign}`);
-      if (data.utm_content && data.utm_content !== '-') {
-        commentLines.push(`Content: ${data.utm_content}`);
+      if (utms.utm_content && utms.utm_content !== '-') {
+        commentLines.push(`Content: ${utms.utm_content}`);
       }
-      if (data.utm_term && data.utm_term !== '-') {
-        commentLines.push(`Term: ${data.utm_term}`);
+      if (utms.utm_term && utms.utm_term !== '-') {
+        commentLines.push(`Term: ${utms.utm_term}`);
       }
 
       // Add history of other products/funnels if the user was on other products before
@@ -286,26 +400,17 @@ export async function POST(req: Request) {
 
       const crmComment = commentLines.join('\n');
 
-      // Resolve traffic_source_id for BaseCRM pipeline 127
-      let trafficSourceId = 1090; // Default: VSL (1090)
-      if (isAnketa) {
-        trafficSourceId = 1095; // Default: АНКЕТА ПЕРЕДЗАПИСУ (1095)
-        const src = (utms.utm_source || '').toLowerCase();
-        const med = (utms.utm_medium || '').toLowerCase();
-        const camp = (utms.utm_campaign || '').toLowerCase();
+      const cleanSrc = utms.utm_source === '-' ? '' : (utms.utm_source || '');
+      const cleanMed = utms.utm_medium === '-' ? '' : (utms.utm_medium || '');
+      const cleanCamp = utms.utm_campaign === '-' ? '' : (utms.utm_campaign || '');
+      const cleanCnt = utms.utm_content === '-' ? '' : (utms.utm_content || '');
 
-        if (src.includes('bot') || med.includes('bot') || camp.includes('bot')) {
-          trafficSourceId = 1092; // Анкета Бот (1092)
-        } else if (src.includes('blog') || src.includes('insta') || med.includes('blog') || camp.includes('blog')) {
-          trafficSourceId = 1089; // Анкета Блог (1089)
-        } else if (src.includes('efir') || med.includes('efir') || camp.includes('efir') || src.includes('live')) {
-          trafficSourceId = 1091; // Анкети ефір (1091)
-        } else if (src.includes('baza') || src.includes('base') || med.includes('email') || src.includes('sendpulse')) {
-          trafficSourceId = 1093; // Анкети "розсилка база" (1093)
-        }
-      } else if (isVSL) {
-        trafficSourceId = 1090; // VSL (1090)
-      }
+      const crmTags = [
+        trafficSourceName,
+        cleanSrc ? `src:${cleanSrc}` : '',
+        cleanCamp ? `camp:${cleanCamp}` : '',
+        cleanMed ? `med:${cleanMed}` : '',
+      ].filter(Boolean);
 
       const crmPayload = {
         pipeline_id: 127,
@@ -317,10 +422,11 @@ export async function POST(req: Request) {
         instagram: instagram || '',
         comment: crmComment || '',
         traffic_source_id: trafficSourceId,
-        utm_source: utms.utm_source === '-' ? '' : (utms.utm_source || ''),
-        utm_medium: utms.utm_medium === '-' ? '' : (utms.utm_medium || ''),
-        utm_campaign: utms.utm_campaign === '-' ? '' : (utms.utm_campaign || ''),
-        utm_content: data.utm_content === '-' ? '' : (data.utm_content || '')
+        tags: crmTags,
+        utm_source: cleanSrc,
+        utm_medium: cleanMed,
+        utm_campaign: cleanCamp,
+        utm_content: cleanCnt
       };
 
       tasks.push(
@@ -331,13 +437,12 @@ export async function POST(req: Request) {
         })
         .then(async (res) => {
           const text = await res.text();
-          console.log(`[BaseCRM] Lead sent. Status: ${res.status}, Response: ${text}`);
+          console.log(`[BaseCRM] Lead sent (${trafficSourceName}, ID: ${trafficSourceId}). Status: ${res.status}, Response: ${text}`);
           return text;
         })
         .catch(err => console.error('[BaseCRM] Failed to send lead:', err))
       );
     }
-
 
     // SendPulse Task (State 3: Submitted form)
     if (sp_contact_id) {
@@ -347,13 +452,6 @@ export async function POST(req: Request) {
         )
       );
     }
-
-    const marketingAttr = extractMarketingAttribution(
-      data,
-      undefined,
-      data.page_path || '',
-      data.full_url || data.page_url || ''
-    );
 
     const canonicalCurrency = normalizeCurrency(data.currency);
     const floatAmount = normalizeAmount(data.amount);
