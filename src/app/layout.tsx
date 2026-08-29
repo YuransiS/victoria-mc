@@ -33,6 +33,7 @@ export const metadata: Metadata = {
   description: "Дізнайтеся, як доносити цінність послуг через естетичний візуал та отримувати клієнтів з Instagram без цілодобового постингу.",
 };
 
+import { Suspense } from "react";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Analytics } from "@/components/Analytics";
@@ -50,7 +51,9 @@ export default function RootLayout({
       <body className={`${manrope.variable} ${newsreader.variable} ${inter.variable} ${playfair.variable} ${manrope.className}`}>
         <Analytics />
         <SmoothScroll />
-        <FacebookPixel />
+        <Suspense fallback={null}>
+          <FacebookPixel />
+        </Suspense>
         {children}
       </body>
     </html>

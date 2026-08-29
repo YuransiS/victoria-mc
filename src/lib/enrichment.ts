@@ -24,10 +24,63 @@ export interface MarketingAttribution {
   fbp: string | null;
   fbc: string | null;
   visitor_uuid: string | null;
+  bw_cid?: string | null;
   page_path: string | null;
   page_url: string | null;
   ip_address?: string | null;
   user_agent?: string | null;
+}
+
+export const ATTRIBUTION_STORAGE_KEY = 'bw_attribution_data';
+export const VISITOR_UUID_KEY = 'bw_visitor_uuid';
+export const BW_CID_KEY = 'bw_cid';
+
+export function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+export function setCookie(name: string, value: string, days = 30): void {
+  if (typeof document === 'undefined') return;
+  const maxAge = days * 24 * 60 * 60;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+export function getVisitorUUID(): string {
+  if (typeof window === 'undefined') return '';
+  let uuid =
+    localStorage.getItem(VISITOR_UUID_KEY) ||
+    getCookie(VISITOR_UUID_KEY) ||
+    localStorage.getItem('visitor_id') ||
+    localStorage.getItem('lead_uuid') ||
+    '';
+  if (!uuid) {
+    uuid = crypto.randomUUID();
+  }
+  localStorage.setItem(VISITOR_UUID_KEY, uuid);
+  localStorage.setItem('visitor_id', uuid);
+  setCookie(VISITOR_UUID_KEY, uuid, 30);
+  return uuid;
+}
+
+export function getBwCid(uuid?: string): string {
+  if (typeof window === 'undefined') return '';
+  const searchParams = new URLSearchParams(window.location.search);
+  const fromUrl = searchParams.get('bw_cid') || searchParams.get('cid');
+  if (fromUrl) {
+    localStorage.setItem(BW_CID_KEY, fromUrl);
+    setCookie(BW_CID_KEY, fromUrl, 30);
+    return fromUrl;
+  }
+  let cid = localStorage.getItem(BW_CID_KEY) || getCookie(BW_CID_KEY);
+  if (!cid) {
+    const activeUuid = uuid || getVisitorUUID();
+    cid = activeUuid.startsWith('bw_') ? activeUuid : `bw_${activeUuid.replace(/-/g, '')}`;
+  }
+  localStorage.setItem(BW_CID_KEY, cid);
+  setCookie(BW_CID_KEY, cid, 30);
+  return cid;
 }
 
 export interface OrderMetadata {
@@ -294,25 +347,35 @@ export function extractMarketingAttribution(
     fbc = `fb.1.${Date.now()}.${fbclid}`;
   }
 
-  const rawVisitor = getParam('visitor_uuid') || getParam('visitor_id') || getParam('visitorId');
+  const rawVisitor = getParam('visitor_uuid') || getParam('visitor_id') || getParam('visitorId') || getParam('visitorUuid');
   const visitor_uuid = rawVisitor && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawVisitor)
     ? rawVisitor
     : null;
 
+  const rawBwCid = getParam('bw_cid') || getParam('cid');
+  const utmCampaign = getParam('utm_campaign');
+  const campaign_id =
+    getParam('campaign_id') ||
+    getParam('utm_id') ||
+    getParam('campaignId') ||
+    getParam('ad_campaign_id') ||
+    (utmCampaign && /^\d+$/.test(utmCampaign) ? utmCampaign : null);
+
   return {
     utm_source: getParam('utm_source'),
     utm_medium: getParam('utm_medium'),
-    utm_campaign: getParam('utm_campaign'),
+    utm_campaign: utmCampaign,
     utm_content: getParam('utm_content'),
     utm_term: getParam('utm_term'),
-    campaign_id: getParam('campaign_id') || getParam('campaignId') || getParam('ad_campaign_id'),
-    adset_id: getParam('adset_id') || getParam('adsetId') || getParam('ad_group_id'),
-    ad_id: getParam('ad_id') || getParam('adId') || getParam('creative_id'),
+    campaign_id,
+    adset_id: getParam('adset_id') || getParam('adsetId') || getParam('adset') || getParam('ad_group_id'),
+    ad_id: getParam('ad_id') || getParam('adId') || getParam('adid') || getParam('creative_id'),
     fbclid,
     gclid,
     fbp,
     fbc,
     visitor_uuid,
+    bw_cid: rawBwCid || (visitor_uuid ? `bw_${visitor_uuid.replace(/-/g, '')}` : null),
     page_path: getParam('page_path') || defaultPath || null,
     page_url: getParam('page_url') || getParam('full_url') || defaultUrl || null
   };
@@ -337,6 +400,7 @@ export function getClientMarketingAttribution(overrides: Partial<MarketingAttrib
       fbp: overrides.fbp || null,
       fbc: overrides.fbc || null,
       visitor_uuid: overrides.visitor_uuid || null,
+      bw_cid: overrides.bw_cid || null,
       page_path: overrides.page_path || null,
       page_url: overrides.page_url || null
     };
@@ -345,14 +409,19 @@ export function getClientMarketingAttribution(overrides: Partial<MarketingAttrib
   const searchParams = new URLSearchParams(window.location.search);
   const currentAttr = extractMarketingAttribution(searchParams, document.cookie, window.location.pathname, window.location.href);
 
-  // Fallback to localStorage saved attribution
+  // Fallback to dual-storage (localStorage + Cookie)
   let storedAttr: Partial<MarketingAttribution> = {};
   try {
-    const raw = localStorage.getItem('last_marketing_attribution') || localStorage.getItem('last_utms');
+    const raw =
+      localStorage.getItem(ATTRIBUTION_STORAGE_KEY) ||
+      getCookie(ATTRIBUTION_STORAGE_KEY) ||
+      localStorage.getItem('last_marketing_attribution') ||
+      localStorage.getItem('last_utms');
     if (raw) storedAttr = JSON.parse(raw);
   } catch (_) {}
 
-  const visitorId = localStorage.getItem('visitor_id') || currentAttr.visitor_uuid || crypto.randomUUID();
+  const visitorUuid = overrides.visitor_uuid || currentAttr.visitor_uuid || getVisitorUUID();
+  const bwCid = overrides.bw_cid || currentAttr.bw_cid || getBwCid(visitorUuid);
 
   return {
     utm_source: overrides.utm_source || currentAttr.utm_source || storedAttr.utm_source || null,
@@ -367,7 +436,8 @@ export function getClientMarketingAttribution(overrides: Partial<MarketingAttrib
     gclid: overrides.gclid || currentAttr.gclid || storedAttr.gclid || null,
     fbp: overrides.fbp || currentAttr.fbp || storedAttr.fbp || null,
     fbc: overrides.fbc || currentAttr.fbc || storedAttr.fbc || null,
-    visitor_uuid: overrides.visitor_uuid || visitorId,
+    visitor_uuid: visitorUuid,
+    bw_cid: bwCid,
     page_path: overrides.page_path || window.location.pathname,
     page_url: overrides.page_url || window.location.href
   };

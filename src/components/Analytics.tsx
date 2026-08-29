@@ -2,7 +2,17 @@
 
 import { useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { extractCookies, extractMarketingAttribution, MarketingAttribution } from '@/lib/enrichment';
+import {
+  extractCookies,
+  extractMarketingAttribution,
+  MarketingAttribution,
+  getVisitorUUID,
+  getBwCid,
+  setCookie,
+  ATTRIBUTION_STORAGE_KEY,
+  VISITOR_UUID_KEY,
+  BW_CID_KEY
+} from '@/lib/enrichment';
 
 export interface UtmTags {
   utm_source?: string;
@@ -17,6 +27,8 @@ export interface UtmTags {
   gclid?: string;
   fbp?: string;
   fbc?: string;
+  visitor_uuid?: string;
+  bw_cid?: string;
 }
 
 export interface AnalyticsData {
@@ -31,12 +43,9 @@ const AnalyticsInner = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    // 1. Visitor ID
-    let visitorId = localStorage.getItem('visitor_id');
-    if (!visitorId) {
-      visitorId = crypto.randomUUID();
-      localStorage.setItem('visitor_id', visitorId);
-    }
+    // 1. Visitor ID & bw_cid (UUID v4 and canonical cid)
+    const visitorUuid = getVisitorUUID();
+    const bwCid = getBwCid(visitorUuid);
 
     // 2. Extract full marketing attribution (UTM + Ads + Cookies + Clicks)
     const attribution = extractMarketingAttribution(
@@ -45,6 +54,8 @@ const AnalyticsInner = () => {
       pathname,
       typeof window !== 'undefined' ? window.location.href : ''
     );
+    attribution.visitor_uuid = visitorUuid;
+    attribution.bw_cid = bwCid;
 
     const offerParam = searchParams.get('offer');
     const vParam = searchParams.get('v');
@@ -79,13 +90,17 @@ const AnalyticsInner = () => {
       attribution.gclid
     );
 
+    // Dual-Storage: localStorage + 30-day Cookie (SameSite=Lax)
+    const attrJson = JSON.stringify(attribution);
     if (hasAnyAttribution) {
-      localStorage.setItem('last_utms', JSON.stringify(attribution));
-      localStorage.setItem('last_marketing_attribution', JSON.stringify(attribution));
+      localStorage.setItem(ATTRIBUTION_STORAGE_KEY, attrJson);
+      localStorage.setItem('last_utms', attrJson);
+      localStorage.setItem('last_marketing_attribution', attrJson);
+      setCookie(ATTRIBUTION_STORAGE_KEY, attrJson, 30);
       
       if (!localStorage.getItem('first_utms')) {
-        localStorage.setItem('first_utms', JSON.stringify(attribution));
-        localStorage.setItem('first_marketing_attribution', JSON.stringify(attribution));
+        localStorage.setItem('first_utms', attrJson);
+        localStorage.setItem('first_marketing_attribution', attrJson);
       }
     }
 
@@ -118,23 +133,29 @@ const AnalyticsInner = () => {
     }
     const spContactId = localStorage.getItem('sp_contact_id') || undefined;
 
-    // Load active attribution fallback
+    // Load active attribution fallback from dual storage
     let finalAttribution = attribution;
     if (!hasAnyAttribution) {
       try {
-        const stored = localStorage.getItem('last_marketing_attribution') || localStorage.getItem('last_utms');
+        const stored =
+          localStorage.getItem(ATTRIBUTION_STORAGE_KEY) ||
+          localStorage.getItem('last_marketing_attribution') ||
+          localStorage.getItem('last_utms');
         if (stored) {
-          finalAttribution = { ...JSON.parse(stored), page_path: pathname, page_url: window.location.href };
+          finalAttribution = { ...JSON.parse(stored), visitor_uuid: visitorUuid, bw_cid: bwCid, page_path: pathname, page_url: window.location.href };
         }
       } catch (_) {}
     }
 
-    // 5. Log to Backend Telemetry (Enrichment Protocol v2.0)
+    // 5. Log to Backend Telemetry (Enrichment Protocol v2.0 - Cold Session)
     fetch('/api/analytics/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        visitorId,
+        visitor_uuid: visitorUuid,
+        visitorId: visitorUuid,
+        bw_cid: bwCid,
+        is_cold: true,
         uuid,
         path: pathname,
         fullUrl: typeof window !== 'undefined' ? window.location.href : '',

@@ -1,18 +1,29 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 
 const FB_PIXEL_IDS = ["1230047148487254"];
 
 export const FacebookPixel = () => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     if (typeof window !== "undefined" && (window as any).fbq) {
       FB_PIXEL_IDS.forEach(id => {
         (window as any).fbq("track", "PageView", {}, { pixelId: id });
       });
+      console.log("[Meta Pixel] Tracked PageView on route change:", pathname);
     }
-  }, []);
+  }, [pathname, searchParams]);
 
   return (
     <>
@@ -49,16 +60,31 @@ export const FacebookPixel = () => {
   );
 };
 
-export const trackFBEvent = (eventName: string, params?: any) => {
+export const trackFBEvent = (
+  eventName: string,
+  params?: any,
+  options?: { eventID?: string; pixelId?: string } | string
+) => {
   if (typeof window !== "undefined" && (window as any).fbq) {
-    const standardEvents = ["AddPaymentInfo", "AddToCart", "AddToWishlist", "CompleteRegistration", "Contact", "CustomizeProduct", "Donate", "FindLocation", "InitiateCheckout", "Lead", "Purchase", "Schedule", "Search", "StartTrial", "SubmitApplication", "Subscribe", "ViewContent"];
+    const standardEvents = [
+      "AddPaymentInfo", "AddToCart", "AddToWishlist", "CompleteRegistration",
+      "Contact", "CustomizeProduct", "Donate", "FindLocation", "InitiateCheckout",
+      "Lead", "Purchase", "Schedule", "Search", "StartTrial", "SubmitApplication",
+      "Subscribe", "ViewContent"
+    ];
     const isStandard = standardEvents.includes(eventName);
-    
+    const eventID = typeof options === "string" ? options : options?.eventID;
+
     FB_PIXEL_IDS.forEach(id => {
+      const trackOptions: Record<string, any> = { pixelId: id };
+      if (eventID) {
+        trackOptions.eventID = eventID;
+      }
+
       if (isStandard) {
-        (window as any).fbq("track", eventName, params, { pixelId: id });
+        (window as any).fbq("track", eventName, params, trackOptions);
       } else {
-        (window as any).fbq("trackCustom", eventName, params, { pixelId: id });
+        (window as any).fbq("trackCustom", eventName, params, trackOptions);
       }
     });
   }

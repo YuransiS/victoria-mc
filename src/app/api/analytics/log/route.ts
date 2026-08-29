@@ -74,6 +74,40 @@ export async function POST(req: Request) {
         } else {
           console.log(`[Analytics Telemetry] Logged ${status} for visitor ${activeUuid}`);
         }
+
+        // 2. Insert into central traffic_clicks
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const validVisitorUuid = activeUuid && uuidRegex.test(activeUuid) ? activeUuid : null;
+
+        const { data: proj } = await supabaseAdmin.from('projects').select('id').eq('slug', 'victoria').maybeSingle();
+        const projectId = proj?.id || 'd3b2a1c0-4e5f-6a7b-8c9d-0e1f2a3b4c5d';
+
+        await supabaseAdmin.from('traffic_clicks').insert({
+          project_id: projectId,
+          visitor_uuid: validVisitorUuid,
+          status,
+          utm_source: marketingAttr.utm_source || null,
+          utm_medium: marketingAttr.utm_medium || null,
+          utm_campaign: marketingAttr.utm_campaign || null,
+          utm_content: marketingAttr.utm_content || null,
+          utm_term: marketingAttr.utm_term || null,
+          page_path: marketingAttr.page_path || path || '/',
+          page_url: marketingAttr.page_url || body.fullUrl || '',
+          metadata: {
+            campaign_id: marketingAttr.campaign_id || null,
+            adset_id: marketingAttr.adset_id || null,
+            ad_id: marketingAttr.ad_id || null,
+            fbclid: marketingAttr.fbclid || null,
+            gclid: marketingAttr.gclid || null,
+            fbp: marketingAttr.fbp || null,
+            fbc: marketingAttr.fbc || null,
+            bw_cid: marketingAttr.bw_cid || body.bw_cid || null,
+            raw_payload: body,
+            enrichment_protocol: 'v2.0',
+            recorded_at: new Date().toISOString()
+          },
+          created_at: new Date().toISOString()
+        });
       } catch (err: any) {
         console.error('[Analytics Telemetry] Supabase exception:', err.message || err);
       }

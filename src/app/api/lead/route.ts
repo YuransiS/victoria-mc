@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
 import { updateSendPulseStatus } from '@/lib/sendpulse';
 import { normalizePhone, normalizeTelegram, normalizeInstagram, normalizeCurrency, normalizeAmount, resolveProductType, extractMarketingAttribution } from '@/lib/enrichment';
+import { sendFacebookCapiEvent } from '@/lib/capi';
 
 const GOOGLE_SCRIPT_URL_MAIN = process.env.GOOGLE_SCRIPT_URL;
 const GOOGLE_SCRIPT_URL_STVORYUI = process.env.GOOGLE_SCRIPT_URL_STVORYUI;
@@ -530,6 +531,32 @@ export async function POST(req: Request) {
         console.log('[Lead Ingest] Successfully saved lead in Supabase');
       }
     }
+
+    // Dispatch Facebook CAPI Lead event for new registrations
+    const clientIpAddress = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+                            req.headers.get("x-real-ip") || undefined;
+    const clientUserAgent = req.headers.get("user-agent") || undefined;
+    const eventSourceUrl = req.headers.get("referer") || marketingAttr.page_url || data.full_url || undefined;
+
+    sendFacebookCapiEvent("Lead", {
+      eventSourceUrl,
+      clientIpAddress,
+      clientUserAgent,
+      email: data.email || undefined,
+      phone: canonicalPhone || undefined,
+      name: name ? String(name).trim() : undefined,
+      visitorUuid: resolvedUuid,
+      fbp: marketingAttr.fbp || undefined,
+      fbc: marketingAttr.fbc || undefined,
+      customData: {
+        content_name: formTitle || "Lead Registration",
+        currency: canonicalCurrency,
+        value: floatAmount,
+        utm_source: marketingAttr.utm_source || utms.utm_source || undefined,
+        utm_medium: marketingAttr.utm_medium || utms.utm_medium || undefined,
+        utm_campaign: marketingAttr.utm_campaign || utms.utm_campaign || undefined,
+      },
+    }).catch((err) => console.error("[Victoria Lead CAPI Error]:", err));
 
     return NextResponse.json({ success: true, uuid: null, visitor_uuid: resolvedUuid });
   } catch (error) {

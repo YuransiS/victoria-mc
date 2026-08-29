@@ -18,16 +18,7 @@ function ThanksContent() {
     const leadPhone = (localStorage.getItem('lead_phone') || '').replace(/\D/g, '');
     const savedPrice = localStorage.getItem('purchase_price') || '390';
 
-    trackFBEvent('Purchase', {
-      value: parseFloat(savedPrice),
-      currency: 'UAH',
-      content_name: 'Персональна Діагностика Віка',
-      content_type: 'product',
-      content_ids: ['diag_v_1'],
-      external_id: ref,
-    });
-
-    // Update Telegram Bot Status
+    // Retrieve active tg_msg_id if available
     let activeTgMsgId = null;
     const tgDataRaw = localStorage.getItem('tg_msg_id_data');
     if (tgDataRaw) {
@@ -40,7 +31,24 @@ function ThanksContent() {
     }
 
     const transactionStatus = searchParams.get('transactionStatus');
-    if (ref && transactionStatus && transactionStatus.toUpperCase() === 'APPROVED') {
+    const isApproved = transactionStatus && transactionStatus.toUpperCase() === 'APPROVED';
+
+    // Guard Purchase pixel event behind verified APPROVED transaction status with session deduplication
+    if (ref && isApproved) {
+      const dedupKey = `purchase_tracked_${ref}`;
+      if (typeof window !== "undefined" && !sessionStorage.getItem(dedupKey)) {
+        sessionStorage.setItem(dedupKey, 'true');
+        trackFBEvent('Purchase', {
+          value: parseFloat(savedPrice),
+          currency: 'UAH',
+          content_name: 'Персональна Діагностика Віка',
+          content_type: 'product',
+          content_ids: ['diag_v_1'],
+          order_id: ref,
+          external_id: ref,
+        }, { eventID: ref });
+      }
+
       fetch('/api/leads', {
         method: "POST",
         headers: { "Content-Type": "application/json" },

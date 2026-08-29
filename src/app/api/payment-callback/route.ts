@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
 import { statusMapper } from '@/lib/statusMapper';
+import { sendFacebookCapiEvent } from '@/lib/capi';
 
 export async function POST(request: Request) {
   const timestamp = new Date().toISOString();
@@ -56,6 +57,46 @@ export async function POST(request: Request) {
 
     } catch (err: any) {
       console.error("[Callback] Supabase status update failed:", err.message || err);
+    }
+
+    // 3. Dispatch Facebook CAPI Purchase event on approved payment
+    if (isSuccess) {
+      try {
+        const { data: leadRecord } = await supabaseAdmin
+          .from("victoria_leads")
+          .select("*")
+          .eq("order_id", String(orderRef))
+          .maybeSingle();
+
+        const clientIpAddress = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+                                request.headers.get("x-real-ip") || undefined;
+        const clientUserAgent = request.headers.get("user-agent") || undefined;
+        const eventSourceUrl = request.headers.get("referer") || leadRecord?.page_url || undefined;
+        const paidAmount = Number(data.amount) || Number(leadRecord?.amount) || 0;
+        const paidCurrency = String(data.currency || leadRecord?.raw_payload?.currency || 'UAH').toUpperCase();
+
+        sendFacebookCapiEvent("Purchase", {
+          eventSourceUrl,
+          clientIpAddress,
+          clientUserAgent,
+          phone: leadRecord?.phone || undefined,
+          name: leadRecord?.name || undefined,
+          email: leadRecord?.email || leadRecord?.raw_payload?.email || undefined,
+          visitorUuid: leadRecord?.visitor_uuid || undefined,
+          eventId: String(orderRef),
+          fbp: leadRecord?.raw_payload?.fbp || undefined,
+          fbc: leadRecord?.raw_payload?.fbc || undefined,
+          customData: {
+            value: paidAmount,
+            currency: paidCurrency,
+            content_name: leadRecord?.raw_payload?.product_name || leadRecord?.target_sheet || "Victoria MC Purchase",
+            content_type: "product",
+            order_id: String(orderRef),
+          },
+        }).catch((err) => console.error("[Victoria Purchase CAPI Error]:", err));
+      } catch (capiErr) {
+        console.error("[Victoria Purchase CAPI Exception]:", capiErr);
+      }
     }
 
     // 3. RESPOND TO WAYFORPAY (Verify and sign)
