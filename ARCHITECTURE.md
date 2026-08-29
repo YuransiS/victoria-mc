@@ -35,6 +35,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `anketa/` — Pre-registration Questionnaire Landing Page for lead capturing. Supports `?v=2` query parameter for A/B testing a different bonus structure (Consultation, Maximum Discount, Warming-up Structure) instead of the default layout. Form requires checking "Я очікую на дзвінок від команди" to submit.
 *   `anketa/thanks/` — [NEW] Pre-registration video thank you landing page with YouTube auto-embed, Telegram pre-registration channel CTA, and direct links to YouTube & Instagram profiles.
 *   `intensive/5-likes/` — [NEW] 4-Lesson Intensive landing page ("5 Лайків") with dark luxury aesthetic, 10-min countdown timer, 125€ bonus package (4 bonuses), "Це про тебе якщо", "Кому не підійде", "Що зміниться", Expert profile, 4-lesson curriculum breakdown, before/after cases & reviews lightbox, format & curation, why price explanation, 100% money-back guarantee, FAQ accordions, and resilient 9€ (EUR) WayForPay checkout integration.
+*   `style/` & `intensive/style/` — [NEW] 3-Day Style Intensive landing page ("Твій блог може виділятися і запам'ятовуватися") based on Framer reference design with mint/sage aesthetics, 3-step roadmap cards (01, 02, 03), 3-day curriculum breakdowns with outcome highlights, "Ти або... або... Обирай перше" choice card, Victoria's speaker profile card, and resilient 9€ WayForPay checkout integration.
 *   `checkout/` — Dynamic checkout client page.
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 *   `minicourse/` — [NEW] Mini-Course Student LMS Dashboard. Dynamically displays course checkpoints progress, unlocked/locked module cards based on active lessons configuration, dynamic leaderboard with masked Telegram usernames, and rules agreement modal.
@@ -83,6 +84,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `intensive/IntensiveCasesReviews.tsx` — High-converting Before/After cases and reviews section for 5-Likes Intensive.
 *   `intensive/IntensiveCheckoutModal.tsx` — [NEW] Dedicated 9€ EUR checkout modal with instant validation and WayForPay integration.
 *   `intensive/use10MinTimer.ts` — [NEW] Synchronized persistent 10-minute countdown timer hook.
+*   `style/` — [NEW] Complete 3-Day Style Intensive component suite (`StyleHero`, `StyleInsight`, `StyleRoadmap`, `StyleProgram`, `StyleChoice`, `StyleSpeaker`, `StyleFinalCTA`, `StyleStickyCTA`, `StyleCheckoutModal`, `StyleLandingPage`).
 
 ### 🧪 QA Regression Tests (`tests/`)
 *   `tests/test_all_landings.js` — Universal E2E test script simulating page views and form submissions across all 6 landing pages.
