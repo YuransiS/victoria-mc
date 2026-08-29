@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Award, Users, Sparkles, Instagram } from "lucide-react";
+import { Award, Users, Sparkles } from "lucide-react";
 
 export function StyleSpeaker() {
   return (
@@ -53,7 +53,11 @@ export function StyleSpeaker() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-[#06874F] hover:underline mt-2 font-manrope bg-[#F0FAF3] px-3 py-1 rounded-full border border-[#C9F7DB]"
             >
-              <Instagram size={13} />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+              </svg>
               <span>@victoria_meshcheriakova</span>
               <span>↗</span>
             </a>
