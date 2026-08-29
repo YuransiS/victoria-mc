@@ -218,3 +218,24 @@ The VSL funnel tracks user interactions and updates contact variables in SendPul
    * **State 3: `3. Заповнив анкету`** — Set when the user submits the questionnaire form (handled via `/api/lead`).
 4. **State Persistence**: The contact ID is stored in the lead's `raw_payload` as `sp_contact_id` along with `vsl_sendpulse_stage` (1, 2, or 3) to prevent duplicate API requests.
 5. **SendPulse API Helper**: The backend calls [sendpulse.ts](file:///c:/B&W%20Prod/B&W%20Prod/victoria-mc/src/lib/sendpulse.ts) to handle OAuth token caching and set the `vsl_status` variable.
+
+---
+
+## 🛡️ Стандарт разработки новых лендингов и страниц (New Landing Mandatory Standard)
+
+При создании любой новой посадочной страницы (например, нового оффера, интенсива, квиза или разбора) **ОБЯЗАТЕЛЬНО** соблюдать:
+
+1. **Dual-Storage Атрибуция (`enrichment.ts` / `Analytics.tsx`):**
+   - Все параметры URL (`utm_*`, `campaign_id`, `adset_id`, `ad_id`, `fbclid`, `gclid`) и Meta-cookies (`_fbp`, `_fbc`) сохраняются в `localStorage` (`last_marketing_attribution`) **И** в 1st-party Cookie на 30 дней (`SameSite=Lax; path=/`).
+   - При входе генерируются стабильные `visitor_uuid` и `bw_cid`.
+   - Автоматическая фиксация холодного трафика: вход на страницу отправляет `POST /api/analytics/log` со статусом `Клик` (`is_cold: true`).
+
+2. **Meta Pixel & Conversions API (`capi.ts`):**
+   - Запрещен дублирующий `PageView` в `<script>` макета — используется `FacebookPixel.tsx`.
+   - **Защита `Purchase`**: На страницах `/thanks` событие `Purchase` вызывается строго после подтверждения `transactionStatus === 'APPROVED'`. Безусловный вызов запрещен.
+   - **Серверный CAPI**: Использовать `sendFacebookCapiEvent` в `/api/lead` (`Lead`) и `/api/payment-callback` (`Purchase`) с SHA-256 хэшированием PII, передачей IP/UA и сквозным `event_id`.
+
+3. **Сохранение UTM при оплате:**
+   - Предварительное создание записи в `victoria_leads` перед редиректом на WayForPay.
+   - В `/api/payment-callback` обновление заказа выполняется по `orderReference` (`order_id`) без обнуления UTM.
+
