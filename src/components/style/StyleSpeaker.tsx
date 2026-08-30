@@ -32,12 +32,12 @@ export function StyleSpeaker({ onOpenModal }: StyleSpeakerProps) {
       >
         {/* Speaker Photo & Bio Header */}
         <div className="flex flex-col sm:flex-row items-center gap-5 mb-6 text-center sm:text-left">
-          <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden border-2 border-[#D96B27] shadow-lg shrink-0 bg-gradient-to-b from-[#FDF2E9] to-[#F5D6C1]">
+          <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden border-2 border-[#D96B27] shadow-lg shrink-0 bg-[#FDF2E9]">
             <Image
-              src="/free-lection/expert.png"
+              src="/IMG_2824.webp"
               alt="Віка Мещерякова"
               fill
-              className="object-cover object-top"
+              className="object-cover object-[center_12%]"
             />
           </div>
 
