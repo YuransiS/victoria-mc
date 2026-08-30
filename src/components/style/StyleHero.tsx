@@ -69,14 +69,14 @@ export function StyleHero({ onOpenModal }: StyleHeroProps) {
           </span>
         </h1>
 
-        {/* Hero Visual Card (Victoria Photo with Aesthetic Warm Framing) */}
+        {/* Hero Visual Card (Victoria Portrait Photo with Direct Eye Contact) */}
         <div className="relative w-full h-64 sm:h-76 rounded-2xl overflow-hidden mb-5 border border-[#EADBCE] shadow-inner group">
           <Image
-            src="/free-lection/estet.JPG"
+            src="/rozbir/vik.jpg"
             alt="Вікторія Мещерякова"
             fill
             priority
-            className="object-cover object-[center_30%] group-hover:scale-[1.02] transition-transform duration-700"
+            className="object-cover object-[center_15%] group-hover:scale-[1.02] transition-transform duration-700"
           />
           {/* Subtle warm bottom gradient overlay for card badge */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#231815]/85 via-transparent to-black/10" />
