@@ -26,12 +26,12 @@ export function StyleRoadmap() {
   return (
     <section className="relative py-6 px-4 max-w-lg md:max-w-xl mx-auto">
       <div className="text-center mb-6">
-        <span className="inline-flex items-center gap-1.5 bg-[#F0FAF3] text-[#06874F] border border-[#C9F7DB] px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-[0.16em] mb-2">
+        <span className="inline-flex items-center gap-1.5 bg-[#FDF2E9] text-[#A33D12] border border-[#F5D6C1] px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-[0.16em] mb-2">
           <Compass size={12} />
           ПРОГРАМА В 3 КРОКАХ
         </span>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-[#142117] tracking-tight">
-          Маршрут, <span className="italic text-[#06874F]">який пройдемо</span>
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-[#231815] tracking-tight">
+          Маршрут, <span className="italic text-[#C85A17]">який пройдемо</span>
         </h2>
       </div>
 
@@ -44,16 +44,16 @@ export function StyleRoadmap() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: idx * 0.1 }}
-            className="bg-white rounded-2xl p-5 border border-[#DFEADF] shadow-[0_4px_16px_rgba(13,78,42,0.04)] flex items-start gap-4 hover:border-[#18B66F]/50 transition-colors"
+            className="bg-white rounded-2xl p-5 border border-[#EADBCE] shadow-[0_4px_16px_rgba(163,61,18,0.04)] flex items-start gap-4 hover:border-[#D96B27]/50 transition-colors"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#142117] text-[#7EDEAA] flex items-center justify-center font-extrabold text-sm shrink-0 shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-[#1F1410] text-[#F5C7A3] flex items-center justify-center font-extrabold text-sm shrink-0 shadow-md border border-[#3A261D]">
               {step.num}
             </div>
             <div>
-              <h3 className="font-manrope text-sm sm:text-base font-extrabold uppercase tracking-wide text-[#142117] mb-1">
+              <h3 className="font-manrope text-sm sm:text-base font-extrabold uppercase tracking-wide text-[#231815] mb-1">
                 {step.title}
               </h3>
-              <p className="font-manrope text-xs sm:text-sm text-[#142117]/80 leading-relaxed">
+              <p className="font-manrope text-xs sm:text-sm text-[#231815]/80 leading-relaxed">
                 {step.desc}
               </p>
             </div>

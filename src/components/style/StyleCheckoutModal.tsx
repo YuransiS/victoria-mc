@@ -5,7 +5,8 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
-import { X, Lock, Check, Sparkles, Send } from "lucide-react";
+import { X, Lock, Check, Sparkles, Flame, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface StyleCheckoutModalProps {
   isOpen: boolean;
@@ -17,9 +18,10 @@ interface StyleCheckoutModalProps {
 export function StyleCheckoutModal({
   isOpen,
   onClose,
-  tariffName = "3-денне навчання: Твій стиль блогу",
-  amount = 9,
+  tariffName = "3-денне навчання: Твій стиль блогу (Безкоштовно)",
+  amount = 0,
 }: StyleCheckoutModalProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -35,7 +37,6 @@ export function StyleCheckoutModal({
   const [contactMethod, setContactMethod] = useState<"phone" | "telegram">("phone");
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     fetch("/api/country")
@@ -99,16 +100,6 @@ export function StyleCheckoutModal({
     if (!validate()) return;
 
     setIsSubmitting(true);
-    setProgress(0);
-
-    const intervalId = setInterval(() => {
-      setProgress((prev) => {
-        if (prev < 50) return prev + 8;
-        if (prev < 80) return prev + 3;
-        if (prev < 90) return prev + 0.8;
-        return prev;
-      });
-    }, 100);
 
     const sanitizedPhone = contactMethod === "phone" ? formData.phone.replace(/[\s()-]/g, "") : "";
     const resolvedTelegram =
@@ -135,103 +126,50 @@ export function StyleCheckoutModal({
     };
 
     const payload = {
-      customerName: formData.name,
-      customerEmail: resolvedTelegram
-        ? `${resolvedTelegram.replace("@", "")}@telegram.com`
-        : "phone-client@telegram.com",
-      customerPhone: sanitizedPhone,
+      name: formData.name,
+      phone: sanitizedPhone,
       telegram: resolvedTelegram,
       instagram: formData.instagram,
-      amount,
-      tariffName,
-      currency: "EUR",
-      targetSheet: "3-денне навчання Стиль",
-      successUrl: "/price/thanks",
-      failUrl: "/price/fail",
+      amount: amount.toString(),
+      currency: "UAH",
+      targetSheet: "3-денне навчання Стиль (Безкоштовно)",
       visitor_id: localStorage.getItem("visitor_id") || "",
       ...utmData,
     };
 
     try {
-      const res = await fetch("/api/create-payment", {
+      // Free Registration Lead Submission
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      const paymentData = await res.json();
-
-      if (paymentData.error) {
-        clearInterval(intervalId);
-        alert("Помилка при створенні платежу. Спробуйте пізніше.");
-        setIsSubmitting(false);
-        return;
-      }
 
       localStorage.setItem("lead_name", formData.name);
       localStorage.setItem("lead_phone", sanitizedPhone);
       localStorage.setItem("lead_social", resolvedTelegram);
       localStorage.setItem("lead_instagram", formData.instagram);
       localStorage.setItem("lead_tariff", tariffName);
-      localStorage.setItem("lead_amount", amount.toString());
-      localStorage.setItem("lead_currency", "EUR");
+      localStorage.setItem("lead_amount", "0");
+      localStorage.setItem("lead_currency", "UAH");
 
-      if (paymentData.tgMsgId) {
-        localStorage.setItem(
-          "tg_msg_id_data",
-          JSON.stringify({
-            id: paymentData.tgMsgId.toString(),
-            timestamp: Date.now(),
-          })
-        );
-      }
-
-      if (paymentData.uuid) {
-        localStorage.setItem("lead_uuid", paymentData.uuid);
-      }
-
-      trackFBEvent("InitiateCheckout", {
+      trackFBEvent("Lead", {
         content_name: tariffName,
-        value: amount,
-        currency: "EUR",
+        value: 0,
+        currency: "UAH",
         ...utmData,
       });
 
-      sessionStorage.setItem("paymentAttempted", "true");
-      sessionStorage.setItem("lastOrderId", paymentData.orderReference);
-
-      clearInterval(intervalId);
-      setProgress(100);
-
-      // Submit WayForPay Form
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "https://secure.wayforpay.com/pay";
-      form.acceptCharset = "utf-8";
-
-      Object.entries(paymentData).forEach(([key, value]) => {
-        if (["error", "tgMsgId", "uuid"].includes(key)) return;
-        if (Array.isArray(value)) {
-          value.forEach((val) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = `${key}[]`;
-            input.value = String(val);
-            form.appendChild(input);
-          });
-        } else if (value !== undefined && value !== null) {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = String(value);
-          form.appendChild(input);
-        }
+      trackFBEvent("CompleteRegistration", {
+        content_name: tariffName,
+        value: 0,
+        currency: "UAH",
+        ...utmData,
       });
 
-      document.body.appendChild(form);
-      form.submit();
+      // Redirect directly to thanks page with immediate access
+      router.push("/price/thanks");
     } catch (err) {
-      clearInterval(intervalId);
       console.error(err);
       alert("Виникла мережева помилка. Спробуйте ще раз.");
       setIsSubmitting(false);
@@ -248,7 +186,7 @@ export function StyleCheckoutModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/65 backdrop-blur-sm"
           />
 
           {/* Modal Content */}
@@ -257,7 +195,7 @@ export function StyleCheckoutModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#DFEADF] z-10 overflow-hidden"
+            className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#EADBCE] z-10 overflow-hidden"
           >
             {/* Close Button */}
             <button
@@ -268,42 +206,48 @@ export function StyleCheckoutModal({
             </button>
 
             {/* Header */}
-            <div className="text-center mb-5">
-              <span className="inline-flex items-center gap-1.5 bg-[#F0FAF3] text-[#06874F] border border-[#C9F7DB] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
-                <Sparkles size={12} />
-                РЕЄСТРАЦІЯ НА ІНТЕНСИВ
+            <div className="text-center mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-[#FDF2E9] text-[#A33D12] border border-[#F5D6C1] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
+                <Flame size={12} className="text-[#D96B27]" />
+                БЕЗКОШТОВНА РЕЄСТРАЦІЯ
               </span>
-              <h3 className="font-playfair text-xl sm:text-2xl font-bold text-[#142117]">
+              <h3 className="font-playfair text-xl sm:text-2xl font-bold text-[#231815]">
                 Знайди власний стиль блогу
               </h3>
-              <p className="font-manrope text-xs text-[#142117]/70 mt-1">
-                Заповни контактні дані для відкриття доступу
+              <p className="font-manrope text-xs text-[#231815]/70 mt-1">
+                Заповни дані для отримання миттєвого доступу
               </p>
             </div>
 
-            {/* Price Badge */}
-            <div className="bg-[#F8FFF9] border border-[#C9F7DB] rounded-2xl p-3 mb-5 flex items-center justify-between">
-              <div>
-                <div className="text-[10px] font-bold text-[#06874F] uppercase tracking-wider">
-                  Вартість навчання:
+            {/* Free Spots Urgency Callout */}
+            <div className="bg-[#FEF5EE] border border-[#F5D6C1] rounded-2xl p-3.5 mb-4">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <div>
+                  <div className="text-[10px] font-extrabold text-[#A33D12] uppercase tracking-wider">
+                    Вартість участі:
+                  </div>
+                  <div className="text-xl font-black text-[#D96B27]">
+                    0 грн{" "}
+                    <span className="line-through text-xs font-normal text-gray-400 ml-1.5">
+                      690 грн
+                    </span>
+                  </div>
                 </div>
-                <div className="text-lg font-black text-[#142117]">
-                  {amount}€{" "}
-                  <span className="line-through text-xs font-normal opacity-50 ml-1">
-                    49€
-                  </span>
-                </div>
+                <span className="bg-gradient-to-r from-[#D96B27] to-[#A33D12] text-white font-extrabold text-[10px] px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                  100% ЗНИЖКА
+                </span>
               </div>
-              <span className="bg-[#18B66F] text-white font-extrabold text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                -80% ЗНИЖКА
-              </span>
+              <div className="text-[11px] font-bold text-[#A33D12] flex items-center justify-between border-t border-[#F5D6C1]/60 pt-2 font-manrope">
+                <span>Зайнято 79 із 100 місць</span>
+                <span className="text-[#D96B27]">Залишився 21 слот!</span>
+              </div>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5">
               {/* Name */}
               <div>
-                <label className="block text-xs font-bold text-[#142117] uppercase tracking-wider mb-1 font-manrope">
+                <label className="block text-xs font-bold text-[#231815] uppercase tracking-wider mb-1 font-manrope">
                   Твоє ім'я
                 </label>
                 <input
@@ -314,9 +258,9 @@ export function StyleCheckoutModal({
                     if (errors.name) setErrors({ ...errors, name: undefined });
                   }}
                   placeholder="Олена"
-                  className={`w-full bg-[#F8FFF9] border ${
-                    errors.name ? "border-red-500" : "border-[#DFEADF]"
-                  } rounded-xl px-4 py-3 text-sm text-[#142117] focus:outline-none focus:border-[#18B66F] font-manrope transition-colors`}
+                  className={`w-full bg-[#FAF4EC] border ${
+                    errors.name ? "border-red-500" : "border-[#EADBCE]"
+                  } rounded-xl px-4 py-2.5 text-sm text-[#231815] focus:outline-none focus:border-[#D96B27] font-manrope transition-colors`}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-xs mt-1 font-medium font-manrope">
@@ -328,16 +272,16 @@ export function StyleCheckoutModal({
               {/* Contact Method Switcher */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-[#142117] uppercase tracking-wider font-manrope">
+                  <label className="block text-xs font-bold text-[#231815] uppercase tracking-wider font-manrope">
                     Спосіб зв'язку
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <button
                       type="button"
                       onClick={() => setContactMethod("phone")}
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md transition-colors ${
+                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md transition-colors ${
                         contactMethod === "phone"
-                          ? "bg-[#142117] text-white"
+                          ? "bg-[#1F1410] text-white"
                           : "text-gray-500 hover:text-black"
                       }`}
                     >
@@ -346,9 +290,9 @@ export function StyleCheckoutModal({
                     <button
                       type="button"
                       onClick={() => setContactMethod("telegram")}
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md transition-colors ${
+                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md transition-colors ${
                         contactMethod === "telegram"
-                          ? "bg-[#142117] text-white"
+                          ? "bg-[#1F1410] text-white"
                           : "text-gray-500 hover:text-black"
                       }`}
                     >
@@ -360,9 +304,9 @@ export function StyleCheckoutModal({
                 {contactMethod === "phone" ? (
                   <div>
                     <div
-                      className={`bg-[#F8FFF9] border ${
-                        errors.phone ? "border-red-500" : "border-[#DFEADF]"
-                      } rounded-xl px-3 py-2 text-sm text-[#142117] focus-within:border-[#18B66F] transition-colors`}
+                      className={`bg-[#FAF4EC] border ${
+                        errors.phone ? "border-red-500" : "border-[#EADBCE]"
+                      } rounded-xl px-3 py-2 text-sm text-[#231815] focus-within:border-[#D96B27] transition-colors`}
                     >
                       <PhoneInput
                         international
@@ -392,9 +336,9 @@ export function StyleCheckoutModal({
                         if (errors.telegram) setErrors({ ...errors, telegram: undefined });
                       }}
                       placeholder="@username"
-                      className={`w-full bg-[#F8FFF9] border ${
-                        errors.telegram ? "border-red-500" : "border-[#DFEADF]"
-                      } rounded-xl px-4 py-3 text-sm text-[#142117] focus:outline-none focus:border-[#18B66F] font-manrope transition-colors`}
+                      className={`w-full bg-[#FAF4EC] border ${
+                        errors.telegram ? "border-red-500" : "border-[#EADBCE]"
+                      } rounded-xl px-4 py-2.5 text-sm text-[#231815] focus:outline-none focus:border-[#D96B27] font-manrope transition-colors`}
                     />
                     {errors.telegram && (
                       <p className="text-red-500 text-xs mt-1 font-medium font-manrope">
@@ -407,7 +351,7 @@ export function StyleCheckoutModal({
 
               {/* Instagram Handle */}
               <div>
-                <label className="block text-xs font-bold text-[#142117] uppercase tracking-wider mb-1 font-manrope">
+                <label className="block text-xs font-bold text-[#231815] uppercase tracking-wider mb-1 font-manrope">
                   Instagram нікнейм
                 </label>
                 <input
@@ -417,35 +361,30 @@ export function StyleCheckoutModal({
                     setFormData({ ...formData, instagram: e.target.value });
                   }}
                   placeholder="@your.instagram"
-                  className="w-full bg-[#F8FFF9] border border-[#DFEADF] rounded-xl px-4 py-3 text-sm text-[#142117] focus:outline-none focus:border-[#18B66F] font-manrope transition-colors"
+                  className="w-full bg-[#FAF4EC] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-sm text-[#231815] focus:outline-none focus:border-[#D96B27] font-manrope transition-colors"
                 />
-              </div>
-
-              {/* Submit Pricing Callout Above Button (User Directive) */}
-              <div className="text-center font-manrope text-xs font-bold text-[#06874F] pt-2">
-                Отримати доступ за {amount}€ замість 49€
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#18B66F] to-[#06874F] hover:from-[#159f61] hover:to-[#057343] text-white font-extrabold text-sm uppercase tracking-wider py-4 px-6 rounded-xl shadow-[0_10px_28px_rgba(24,182,111,0.35)] transition-all cursor-pointer disabled:opacity-70"
+                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D96B27] via-[#C85A17] to-[#9E380E] hover:from-[#C85A17] hover:to-[#882F0B] text-white font-extrabold text-sm uppercase tracking-wider py-4 px-6 rounded-xl shadow-[0_10px_28px_rgba(200,90,23,0.35)] transition-all cursor-pointer disabled:opacity-70 mt-2"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Перехід до оплати... ({Math.round(progress)}%)</span>
+                    <span>Відкриваємо доступ...</span>
                   </div>
                 ) : (
-                  <span>Хочу знайти свій стиль →</span>
+                  <span>Зареєструватися безкоштовно →</span>
                 )}
               </button>
 
               {/* Security guarantee */}
               <div className="flex items-center justify-center gap-1.5 text-gray-400 text-[11px] font-manrope pt-1">
                 <Lock size={12} />
-                <span>Безпечна оплата через WayForPay · Миттєвий доступ</span>
+                <span>Миттєве відкриття доступу · Без спаму</span>
               </div>
             </form>
           </motion.div>
