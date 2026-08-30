@@ -38,7 +38,7 @@ export function StyleLandingPage() {
         <StyleRoadmap />
         <StyleProgram onOpenModal={handleOpenModal} />
         <StyleChoice />
-        <StyleSpeaker />
+        <StyleSpeaker onOpenModal={handleOpenModal} />
         <StyleFinalCTA onOpenModal={handleOpenModal} />
         <Footer />
       </div>
