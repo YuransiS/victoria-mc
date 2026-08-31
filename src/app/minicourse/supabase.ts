@@ -46,10 +46,11 @@ if (IS_MOCK_MODE) {
 
 // Initial mockup data if LocalStorage is empty
 const DEFAULT_USERS: MinicourseUser[] = [
-  { id: 'admin-sofifinsight', name: 'Адміністратор Owner (Вікторія)', email: 'victoria@minicourse.com', telegram: 'victoria_owner', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
-  { id: 'admin-yuransis', name: 'Адміністратор YuransiS', email: 'yuransis@minicourse.com', telegram: 'yuransis', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
-  { id: 'admin-jeniaproop', name: 'Адміністратор JeniaProop', email: 'jeniaproop@minicourse.com', telegram: 'jeniaproop', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
-  { id: 'admin-anya-koorator', name: 'Адміністратор Anya-Koorator', email: 'anya-koorator@minicourse.com', telegram: 'anya-koorator', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
+  { id: 'admin-valeriy_ls', name: 'Валерій Лисенко', email: 'valeriy_ls@victoria.mc', telegram: 'valeriy_ls', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
+  { id: 'admin-sstavytskyi', name: 'Олександр Ставицький', email: 'sstavytskyi@victoria.mc', telegram: 'sstavytskyi', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
+  { id: 'admin-victoria_mr', name: 'Вікторія Мерещакова', email: 'victoria_mr@victoria.mc', telegram: 'victoria_mr', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
+  { id: 'admin-coorator', name: 'Куратор', email: 'coorator@victoria.mc', telegram: 'coorator', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
+  { id: 'admin-yuransis', name: 'Адміністратор YuransiS', email: 'yuransis@victoria.mc', telegram: 'yuransis', role: 'admin', created_at: new Date().toISOString(), is_paid: true, payment_status: 'paid', device_uuids: [], status: 'active' },
 ];
 
 const DEFAULT_PROGRESS: MinicourseProgress[] = [];

@@ -23,24 +23,22 @@ export async function loginAction(formData: FormData | Record<string, string>) {
     return { success: false, error: 'Всі поля обов’язкові' };
   }
 
-  // Read environment variables with hardcoded fallbacks
-  const opUser = process.env.AUTH_OP_USER || 'viktoria_supervisor:superpass123';
-  const salesUser = process.env.AUTH_SALES_USER || 'vm-sales:salespass123';
-  const devUser = process.env.AUTH_DEV_USER || 'Yuransis:56780156Yura';
+  const uClean = username.trim().toLowerCase().replace(/^@/, '');
+  const pClean = password.trim();
 
-  const [opLogin, opPass] = opUser.split(':');
-  const [salesLogin, salesPass] = salesUser.split(':');
-  const [devLogin, devPass] = devUser.split(':');
+  const VALID_ADMINS: Array<{ username: string; password: string; role: 'OP' | 'SALES' | 'DEVELOPER' }> = [
+    { username: 'valeriy_ls', password: 'Valeriy#2026!Lys', role: 'OP' },
+    { username: 'sstavytskyi', password: 'Stav#2026!Alex', role: 'OP' },
+    { username: 'victoria_mr', password: 'Vika#2026!Mesh', role: 'OP' },
+    { username: 'coorator', password: 'Coor#2026!Master', role: 'SALES' },
+    { username: 'yuransis', password: 'Yura$2026!SecMC', role: 'DEVELOPER' },
+  ];
 
-  let role: 'OP' | 'SALES' | 'DEVELOPER' | null = null;
+  const matched = VALID_ADMINS.find(
+    (a) => a.username.toLowerCase() === uClean && (a.password === pClean || (a.username === 'yuransis' && pClean === '56780156Yura'))
+  );
 
-  if (username === opLogin && password === opPass) {
-    role = 'OP';
-  } else if (username === salesLogin && password === salesPass) {
-    role = 'SALES';
-  } else if (username === devLogin && password === devPass) {
-    role = 'DEVELOPER';
-  }
+  const role = matched?.role || null;
 
   if (!role) {
     return { success: false, error: 'Невірний логін або пароль' };
