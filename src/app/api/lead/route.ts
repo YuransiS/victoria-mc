@@ -153,13 +153,24 @@ function resolveBaseCrmTrafficSource(params: {
     return { id: 1093, name: 'Анкети "розсилка база"' };
   }
 
-  // 6. Анкета Блог (1089)
-  // Covers organic Instagram bio/profile, blog, and followers retargeting traffic (traff + RETARG_FOLLOWERS, LEEDS_RETATG, etc.)
+  // 6. Ретаргет (1190)
+  if (
+    src.includes('retarg') || src.includes('retatg') || src.includes('rmkt') || src.includes('remarket') ||
+    med.includes('retarg') || med.includes('retatg') || med.includes('rmkt') || med.includes('remarket') ||
+    camp.includes('retarg') || camp.includes('retatg') || camp.includes('rmkt') || camp.includes('remarket') ||
+    cnt.includes('retarg') || cnt.includes('retatg') ||
+    fullText.includes('retarg') || fullText.includes('retatg') || fullText.includes('remarket')
+  ) {
+    return { id: 1190, name: 'Ретаргет' };
+  }
+
+  // 7. Анкета Блог (1089)
+  // Covers organic Instagram bio/profile, blog, and regular followers traffic
   if (
     src.includes('blog') || src.includes('shapka') || src.includes('bio') || src.includes('profile') ||
     src.includes('insta') || src.includes('reels') || src.includes('post') || src.includes('feed') ||
-    fullText.includes('follower') || fullText.includes('retarg') ||
-    (src === 'traff' && (camp.includes('blog') || camp.includes('follower') || camp.includes('retarg') || med.includes('retatg') || med.includes('blog')))
+    fullText.includes('follower') ||
+    (src === 'traff' && (camp.includes('blog') || camp.includes('follower') || med.includes('blog')))
   ) {
     return { id: 1089, name: 'Анкета Блог' };
   }
