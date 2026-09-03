@@ -498,6 +498,7 @@ export async function POST(req: Request) {
       amount: floatAmount,
       status: 'Зареєстровано',
       is_free: floatAmount === 0,
+      order_id: data.order_id || data.orderReference || null,
       utm_source: marketingAttr.utm_source || utms.utm_source,
       utm_medium: marketingAttr.utm_medium || utms.utm_medium,
       utm_campaign: marketingAttr.utm_campaign || utms.utm_campaign,
@@ -569,7 +570,13 @@ export async function POST(req: Request) {
       },
     }).catch((err) => console.error("[Victoria Lead CAPI Error]:", err));
 
-    return NextResponse.json({ success: true, uuid: null, visitor_uuid: resolvedUuid });
+    return NextResponse.json({
+      success: true,
+      uuid: null,
+      visitor_uuid: resolvedUuid,
+      order_id: data.order_id || data.orderReference || null,
+      bw_cid: data.bw_cid || (resolvedUuid ? (resolvedUuid.startsWith('bw_') ? resolvedUuid : `bw_${resolvedUuid.replace(/-/g, '')}`) : null)
+    });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
