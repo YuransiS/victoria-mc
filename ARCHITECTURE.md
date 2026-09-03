@@ -21,7 +21,7 @@ This live document outlines the architecture, routing structure, components, dat
 ## 📂 File Map & Routing Structure
 
 ### 🛣️ App Router Routes (`src/app/`)
-*   `layout.tsx` — Root layout initialized with global styles, fonts, and the visitor analytics logger.
+*   `layout.tsx` — Root layout initialized with global styles, fonts, Meta Pixel, Microsoft Clarity, and the visitor analytics logger.
 *   `page.tsx` — Core landing page. Now supports dynamic headline testing via `?offer=1/2/3`, `?v=1/2/3`, or `utm_content` values, defaulting to Variant 1 (completely removing the old "ВІД ХАОСУ ДО СИСТЕМИ" version). Stitches selection into lead analytics.
 *   `price/` — Price selection and package landing page.
 *   `price/thanks/` — Thanks/success confirmation page after checkout.
@@ -75,6 +75,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `CASES_REGISTRY.md` — Central documentation registry of client cases, copy, and media assets.
 *   `Form.tsx` — Core registration form component.
 *   `Analytics.tsx` — Client-side React tracking component. Generates a secure `visitor_id`, extracts UTM parameters, and logs telemetric sessions on load.
+*   `MicrosoftClarity.tsx` — [NEW] Microsoft Clarity integration component (`next/script` with `strategy="afterInteractive"`). Features SPA route-change virtual pageview tracking, custom event dispatcher (`trackClarityEvent`), session tagging (`setClarityTag`), and user identity stitching (`identifyClarityUser`) coupled with Supabase `visitor_uuid`.
 *   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay. Uses `react-phone-number-input` for exact international numbers with Edge CDN geo-detection.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
 *   `blocks/BlockCases.tsx` — Before-and-after student visual cases grid connected to `REAL_CASES`.
