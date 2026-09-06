@@ -39,21 +39,6 @@ export function StyleCheckoutModal({
   const [countryCode, setCountryCode] = useState<string>("UA");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [copiedKeyword, setCopiedKeyword] = useState(false);
-  const [copiedUsername, setCopiedUsername] = useState(false);
-
-  const handleCopy = (text: string, type: "keyword" | "username") => {
-    try {
-      navigator.clipboard.writeText(text);
-      if (type === "keyword") {
-        setCopiedKeyword(true);
-        setTimeout(() => setCopiedKeyword(false), 2000);
-      } else {
-        setCopiedUsername(true);
-        setTimeout(() => setCopiedUsername(false), 2000);
-      }
-    } catch (_) {}
-  };
 
   const handleModalClose = () => {
     onClose();
@@ -447,72 +432,13 @@ export function StyleCheckoutModal({
                   Останній крок до отримання доступу!
                 </h3>
 
-                <p className="font-manrope text-xs sm:text-sm text-[#231815]/80 mb-5 leading-relaxed">
-                  Щоб отримати всі матеріали та посилання на уроки, напиши слово{" "}
+                <p className="font-manrope text-xs sm:text-sm text-[#231815]/80 mb-6 leading-relaxed">
+                  Щоб отримати всі матеріали та посилання на уроки, натисни кнопку нижче та надішли слово{" "}
                   <strong className="text-[#A33D12] font-black bg-[#FEF5EE] px-1.5 py-0.5 rounded border border-[#F5D6C1]">
-                    ДОСТУП
+                    «ДОСТУП»
                   </strong>{" "}
-                  в особисті повідомлення на акаунт:
+                  у Telegram:
                 </p>
-
-                {/* Info Card with Keyword and Target Account */}
-                <div className="bg-[#FAF4EC] border border-[#EADBCE] rounded-2xl p-4 mb-5 space-y-3 text-left font-manrope">
-                  <div className="flex items-center justify-between gap-2 p-2.5 bg-white rounded-xl border border-[#EADBCE]">
-                    <div>
-                      <div className="text-[10px] font-bold text-[#231815]/60 uppercase tracking-wider">
-                        Куди написати:
-                      </div>
-                      <div className="text-sm font-extrabold text-[#231815]">
-                        @vika_cooperation
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy("@vika_cooperation", "username")}
-                      className="inline-flex items-center gap-1 bg-[#FEF5EE] hover:bg-[#FDF2E9] text-[#A33D12] border border-[#F5D6C1] text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                    >
-                      {copiedUsername ? (
-                        <>
-                          <Check size={12} />
-                          <span>Скопійовано</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={12} />
-                          <span>Скопіювати</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2 p-2.5 bg-white rounded-xl border border-[#EADBCE]">
-                    <div>
-                      <div className="text-[10px] font-bold text-[#231815]/60 uppercase tracking-wider">
-                        Кодове слово:
-                      </div>
-                      <div className="text-sm font-black text-[#D96B27] tracking-wider">
-                        ДОСТУП
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy("ДОСТУП", "keyword")}
-                      className="inline-flex items-center gap-1 bg-[#FEF5EE] hover:bg-[#FDF2E9] text-[#A33D12] border border-[#F5D6C1] text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                    >
-                      {copiedKeyword ? (
-                        <>
-                          <Check size={12} />
-                          <span>Скопійовано</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={12} />
-                          <span>Скопіювати</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
 
                 {/* Big Direct Button to Telegram */}
                 <a
@@ -526,8 +452,8 @@ export function StyleCheckoutModal({
                   <ArrowRight size={16} />
                 </a>
 
-                <p className="text-[11px] text-[#231815]/65 font-manrope mt-3 leading-relaxed">
-                  * Натисни на кнопку (діалог відкриється з готовим словом «ДОСТУП») або напиши в Telegram на <strong className="text-[#231815]">@vika_cooperation</strong>
+                <p className="text-[11px] text-[#231815]/65 font-manrope mt-4 leading-relaxed">
+                  * Натисни на кнопку — діалог з <strong className="text-[#231815]">@vika_cooperation</strong> відкриється автоматично з готовим словом «ДОСТУП»
                 </p>
               </div>
             )}
