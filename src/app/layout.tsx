@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 
 import { Suspense } from "react";
 import { FacebookPixel } from "@/components/FacebookPixel";
+import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Analytics } from "@/components/Analytics";
 
@@ -53,6 +54,9 @@ export default function RootLayout({
         <SmoothScroll />
         <Suspense fallback={null}>
           <FacebookPixel />
+        </Suspense>
+        <Suspense fallback={null}>
+          <MicrosoftClarity />
         </Suspense>
         {children}
       </body>

@@ -153,13 +153,24 @@ function resolveBaseCrmTrafficSource(params: {
     return { id: 1093, name: 'Анкети "розсилка база"' };
   }
 
-  // 6. Анкета Блог (1089)
-  // Covers organic Instagram bio/profile, blog, and followers retargeting traffic (traff + RETARG_FOLLOWERS, LEEDS_RETATG, etc.)
+  // 6. Ретаргет (1190)
+  if (
+    src.includes('retarg') || src.includes('retatg') || src.includes('rmkt') || src.includes('remarket') ||
+    med.includes('retarg') || med.includes('retatg') || med.includes('rmkt') || med.includes('remarket') ||
+    camp.includes('retarg') || camp.includes('retatg') || camp.includes('rmkt') || camp.includes('remarket') ||
+    cnt.includes('retarg') || cnt.includes('retatg') ||
+    fullText.includes('retarg') || fullText.includes('retatg') || fullText.includes('remarket')
+  ) {
+    return { id: 1190, name: 'Ретаргет' };
+  }
+
+  // 7. Анкета Блог (1089)
+  // Covers organic Instagram bio/profile, blog, and regular followers traffic
   if (
     src.includes('blog') || src.includes('shapka') || src.includes('bio') || src.includes('profile') ||
     src.includes('insta') || src.includes('reels') || src.includes('post') || src.includes('feed') ||
-    fullText.includes('follower') || fullText.includes('retarg') ||
-    (src === 'traff' && (camp.includes('blog') || camp.includes('follower') || camp.includes('retarg') || med.includes('retatg') || med.includes('blog')))
+    fullText.includes('follower') ||
+    (src === 'traff' && (camp.includes('blog') || camp.includes('follower') || med.includes('blog')))
   ) {
     return { id: 1089, name: 'Анкета Блог' };
   }
@@ -487,6 +498,7 @@ export async function POST(req: Request) {
       amount: floatAmount,
       status: 'Зареєстровано',
       is_free: floatAmount === 0,
+      order_id: data.order_id || data.orderReference || null,
       utm_source: marketingAttr.utm_source || utms.utm_source,
       utm_medium: marketingAttr.utm_medium || utms.utm_medium,
       utm_campaign: marketingAttr.utm_campaign || utms.utm_campaign,
@@ -558,7 +570,13 @@ export async function POST(req: Request) {
       },
     }).catch((err) => console.error("[Victoria Lead CAPI Error]:", err));
 
-    return NextResponse.json({ success: true, uuid: null, visitor_uuid: resolvedUuid });
+    return NextResponse.json({
+      success: true,
+      uuid: null,
+      visitor_uuid: resolvedUuid,
+      order_id: data.order_id || data.orderReference || null,
+      bw_cid: data.bw_cid || (resolvedUuid ? (resolvedUuid.startsWith('bw_') ? resolvedUuid : `bw_${resolvedUuid.replace(/-/g, '')}`) : null)
+    });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });

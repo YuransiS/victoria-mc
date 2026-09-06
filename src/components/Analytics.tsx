@@ -13,6 +13,7 @@ import {
   VISITOR_UUID_KEY,
   BW_CID_KEY
 } from '@/lib/enrichment';
+import { identifyClarityUser, setClarityTag } from '@/components/MicrosoftClarity';
 
 export interface UtmTags {
   utm_source?: string;
@@ -146,6 +147,20 @@ const AnalyticsInner = () => {
         }
       } catch (_) {}
     }
+
+    // 4.6 Microsoft Clarity user identity & custom session tags stitching
+    identifyClarityUser(visitorUuid, bwCid, pathname, savedName || savedSocial || undefined);
+    setClarityTag('visitor_uuid', visitorUuid);
+    setClarityTag('bw_cid', bwCid);
+    setClarityTag('page_path', pathname);
+    if (detectedOffer) setClarityTag('offer', detectedOffer);
+    if (finalAttribution.utm_source) setClarityTag('utm_source', finalAttribution.utm_source);
+    if (finalAttribution.utm_medium) setClarityTag('utm_medium', finalAttribution.utm_medium);
+    if (finalAttribution.utm_campaign) setClarityTag('utm_campaign', finalAttribution.utm_campaign);
+    if (finalAttribution.utm_content) setClarityTag('utm_content', finalAttribution.utm_content);
+    if (finalAttribution.utm_term) setClarityTag('utm_term', finalAttribution.utm_term);
+    if (finalAttribution.fbclid) setClarityTag('fbclid', finalAttribution.fbclid);
+    if (finalAttribution.gclid) setClarityTag('gclid', finalAttribution.gclid);
 
     // 5. Log to Backend Telemetry (Enrichment Protocol v2.0 - Cold Session)
     fetch('/api/analytics/log', {

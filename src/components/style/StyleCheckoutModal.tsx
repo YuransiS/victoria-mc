@@ -6,6 +6,8 @@ import "react-phone-number-input/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackFBEvent } from "@/components/FacebookPixel";
 import { X, Lock, Check, Sparkles, Flame, ArrowRight, Copy, Send, CheckCircle2, MessageCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { getBwCid, getVisitorUUID } from "@/lib/enrichment";
 
 interface StyleCheckoutModalProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ export function StyleCheckoutModal({
   tariffName = "3-денне навчання: Твій стиль блогу (Безкоштовно)",
   amount = 0,
 }: StyleCheckoutModalProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -147,15 +150,24 @@ export function StyleCheckoutModal({
       full_url: window.location.href,
     };
 
+    const visitorUuid = localStorage.getItem("visitor_id") || localStorage.getItem("visitor_uuid") || getVisitorUUID();
+    const bwCid = getBwCid(visitorUuid);
+    const orderId = `STYLE_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+    const phoneVal = sanitizedPhone || (formData.phone ? formData.phone.replace(/[\s()-]/g, "") : "") || resolvedTelegram || "";
+
     const payload = {
       name: formData.name,
-      phone: sanitizedPhone,
+      phone: sanitizedPhone || formData.phone,
       telegram: resolvedTelegram,
       instagram: formData.instagram,
       amount: amount.toString(),
       currency: "UAH",
+      order_id: orderId,
+      orderReference: orderId,
       targetSheet: "3-денне навчання Стиль (Безкоштовно)",
-      visitor_id: localStorage.getItem("visitor_id") || "",
+      visitor_id: visitorUuid,
+      visitor_uuid: visitorUuid,
+      bw_cid: bwCid,
       ...utmData,
     };
 
@@ -168,17 +180,20 @@ export function StyleCheckoutModal({
       });
 
       localStorage.setItem("lead_name", formData.name);
-      localStorage.setItem("lead_phone", sanitizedPhone);
+      localStorage.setItem("lead_phone", phoneVal);
       localStorage.setItem("lead_social", resolvedTelegram);
       localStorage.setItem("lead_instagram", formData.instagram);
       localStorage.setItem("lead_tariff", tariffName);
       localStorage.setItem("lead_amount", "0");
       localStorage.setItem("lead_currency", "UAH");
+      localStorage.setItem("lead_order_id", orderId);
+      localStorage.setItem("lead_bw_cid", bwCid);
 
       trackFBEvent("Lead", {
         content_name: tariffName,
         value: 0,
         currency: "UAH",
+        order_id: orderId,
         ...utmData,
       });
 
@@ -186,11 +201,15 @@ export function StyleCheckoutModal({
         content_name: tariffName,
         value: 0,
         currency: "UAH",
+        order_id: orderId,
         ...utmData,
       });
 
-      setIsSubmitting(false);
-      setIsSuccess(true);
+    setIsSubmitting(false);
+    // Target Thanks page passing bw_cid, phone, order_id parameters
+    const thanksBase = typeof window !== "undefined" && window.location.pathname.startsWith("/style") ? "/style/thanks" : "/intensive/style/thanks";
+    const targetThanksUrl = `${thanksBase}?bw_cid=${encodeURIComponent(bwCid)}&phone=${encodeURIComponent(phoneVal)}&order_id=${encodeURIComponent(orderId)}`;
+    router.push(targetThanksUrl);
     } catch (err) {
       console.error(err);
       alert("Виникла мережева помилка. Спробуйте ще раз.");

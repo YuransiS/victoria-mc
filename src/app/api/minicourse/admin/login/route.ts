@@ -3,11 +3,11 @@ import { supabase } from '@/app/minicourse/supabase';
 import { MinicourseUser } from '@/app/minicourse/types';
 
 const ADMIN_CREDENTIALS = [
-  { username: 'victoria', role: 'admin', label: 'Адміністратор Owner (Вікторія)', password: 'ndfdfh4#fd' },
-  { username: 'sofifinsight', role: 'admin', label: 'Адміністратор Owner', password: 'ndfdfh4#fd' },
-  { username: 'yuransis', role: 'admin', label: 'Адміністратор Admin', password: 'fdsjhe35Frgf' },
-  { username: 'jeniaproop', role: 'admin', label: 'Адміністратор Admin', password: 'dfaGdxvvg@x3' },
-  { username: 'anya-koorator', role: 'admin', label: 'Адміністратор Anya-Koorator', password: 'fh1`lkfdmcwS5' },
+  { username: 'valeriy_ls', role: 'admin', label: 'Валерій Лисенко', password: 'Valeriy#2026!Lys' },
+  { username: 'sstavytskyi', role: 'admin', label: 'Олександр Ставицький', password: 'Stav#2026!Alex' },
+  { username: 'victoria_mr', role: 'admin', label: 'Вікторія Мерещакова', password: 'Vika#2026!Mesh' },
+  { username: 'coorator', role: 'admin', label: 'Куратор', password: 'Coor#2026!Master' },
+  { username: 'yuransis', role: 'admin', label: 'Адміністратор YuransiS', password: 'Yura$2026!SecMC' },
 ];
 
 export async function POST(req: Request) {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     // Match admin credentials
     const adminMatch = ADMIN_CREDENTIALS.find(admin => {
       const matchUsername = admin.username.toLowerCase() === inputClean;
-      const matchEmail = `${admin.username.toLowerCase()}@finsight.com` === inputClean;
+      const matchEmail = `${admin.username.toLowerCase()}@victoria.mc` === inputClean || `${admin.username.toLowerCase()}@finsight.com` === inputClean;
       return (matchUsername || matchEmail) && admin.password === passwordClean;
     });
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     // Prepare profile
     const adminUsername = adminMatch.username;
-    const adminEmail = `${adminUsername}@finsight.com`;
+    const adminEmail = `${adminUsername}@victoria.mc`;
 
     if (!supabase) {
       // Mock Mode Admin Profile

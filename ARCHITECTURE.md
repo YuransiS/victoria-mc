@@ -21,7 +21,7 @@ This live document outlines the architecture, routing structure, components, dat
 ## 📂 File Map & Routing Structure
 
 ### 🛣️ App Router Routes (`src/app/`)
-*   `layout.tsx` — Root layout initialized with global styles, fonts, and the visitor analytics logger.
+*   `layout.tsx` — Root layout initialized with global styles, fonts, Meta Pixel, Microsoft Clarity, and the visitor analytics logger.
 *   `page.tsx` — Core landing page. Now supports dynamic headline testing via `?offer=1/2/3`, `?v=1/2/3`, or `utm_content` values, defaulting to Variant 1 (completely removing the old "ВІД ХАОСУ ДО СИСТЕМИ" version). Stitches selection into lead analytics.
 *   `price/` — Price selection and package landing page.
 *   `price/thanks/` — Thanks/success confirmation page after checkout.
@@ -35,7 +35,8 @@ This live document outlines the architecture, routing structure, components, dat
 *   `anketa/` — Pre-registration Questionnaire Landing Page for lead capturing. Supports `?v=2` query parameter for A/B testing a different bonus structure (Consultation, Maximum Discount, Warming-up Structure) instead of the default layout. Form requires checking "Я очікую на дзвінок від команди" to submit.
 *   `anketa/thanks/` — [NEW] Pre-registration video thank you landing page with YouTube auto-embed, Telegram pre-registration channel CTA, and direct links to YouTube & Instagram profiles.
 *   `intensive/5-likes/` — [NEW] 4-Lesson Intensive landing page ("5 Лайків") with dark luxury aesthetic, 10-min countdown timer, 125€ bonus package (4 bonuses), "Це про тебе якщо", "Кому не підійде", "Що зміниться", Expert profile, 4-lesson curriculum breakdown, before/after cases & reviews lightbox, format & curation, why price explanation, 100% money-back guarantee, FAQ accordions, and resilient 9€ (EUR) WayForPay checkout integration.
-*   `style/` & `intensive/style/` — [NEW] 3-Day Style Intensive landing page ("Твій блог може виділятися і запам'ятовуватися") based on Framer reference design with mint/sage aesthetics, 3-step roadmap cards (01, 02, 03), 3-day curriculum breakdowns with outcome highlights, "Ти або... або... Обирай перше" choice card, Victoria's speaker profile card, and resilient 9€ WayForPay checkout integration.
+*   `style/` & `intensive/style/` — [NEW] 3-Day Style Intensive landing page ("Твій блог може виділятися і запам'ятовуватися") based on Framer reference design with mint/sage aesthetics, 3-step roadmap cards (01, 02, 03), 3-day curriculum breakdowns with outcome highlights, "Ти або... або... Обирай перше" choice card, Victoria's speaker profile card, and free 100-spot registration.
+*   `style/thanks/` & `intensive/style/thanks/` — [NEW] Dedicated Style Intensive thank you screen with countdown timer and instant automated redirect into Telegram bot (`https://tg.pulse.is/victoriarozbory_bot?start=6a985d45374645c3420409d0&bw_cid=...&phone=...&order_id=...`).
 *   `checkout/` — Dynamic checkout client page.
 *   `admin/` — CRM Dashboard area with Role-Based Access Control (RBAC).
 *   `minicourse/` — [NEW] Mini-Course Student LMS Dashboard. Dynamically displays course checkpoints progress, unlocked/locked module cards based on active lessons configuration, dynamic leaderboard with masked Telegram usernames, and rules agreement modal.
@@ -55,7 +56,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `api/homework/assign/` — [NEW] Upstash QStash job creator scheduling homework reminder 3 hours before the 24-hour deadline.
 *   `api/homework/cancel-reminder/` — [NEW] Upstash QStash reminder cancellation when homework is submitted.
 *   `api/notifications/send/` — [NEW] Webhook receiver triggered by QStash to send Telegram reminders.
-*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Telegram and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching (Google Sheets sync removed for performance). BaseCRM payload `comment` field is dynamically constructed to include all questionnaire answers, explicit UTM parameters (`Source`, `Medium`, `Campaign`, `Content`, `Term`), and prior product/funnel visit history (`Бул(а) на інших продуктах/воронках: Так` with timestamps in Kiev time) if the user previously interacted with other funnels. Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
+*   `api/lead/` — Primary leads registration proxy. Submits leads in parallel to Telegram and BaseCRM (for VSL & Anketa funnels), and registers the customer inside Supabase (`victoria_leads`) with visitor stitching (Google Sheets sync removed for performance). BaseCRM payload `comment` field is dynamically constructed to include all questionnaire answers, explicit UTM parameters (`Source`, `Medium`, `Campaign`, `Content`, `Term`), and prior product/funnel visit history (`Бул(а) на інших продуктах/воронках: Так` with timestamps in Kiev time) if the user previously interacted with other funnels. Automatically maps and transmits `traffic_source_id`: 1094 ('Відповідь на сторіс'), 1088 ('Передані в чаті'), 1092 ('Анкета Бот'), 1091 ('Анкети ефір'), 1093 ('Анкети "розсилка база"'), 1190 ('Ретаргет'), 1089 ('Анкета Блог'), 1090 ('VSL'), 1095 ('АНКЕТА ПЕРЕДЗАПИСУ'). Now omits individual Telegram notifications for VSL Stage 1 leads. Supports questionnaire fields (purpose, difficulties, readiness) from the pre-registration landing. Triggers SendPulse status `'3. Заповнив анкету'` if `sp_contact_id` is supplied.
 *   `api/create-payment/` — Initiate checkout route. Starts Telegram payment alerts and persists the lead details into Supabase (`victoria_leads`). Returns signed WayForPay configuration.
 *   `api/payment-callback/` — [NEW] Webhook target invoked by WayForPay to confirm transaction status. Syncs status updates back to Supabase (`victoria_leads`).
 *   `api/leads/` — Secondary CRM status synchronization proxy. Updates Telegram messages and updates database status when users reach thanks/fail landing pages or manually update states.
@@ -75,6 +76,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `CASES_REGISTRY.md` — Central documentation registry of client cases, copy, and media assets.
 *   `Form.tsx` — Core registration form component.
 *   `Analytics.tsx` — Client-side React tracking component. Generates a secure `visitor_id`, extracts UTM parameters, and logs telemetric sessions on load.
+*   `MicrosoftClarity.tsx` — [NEW] Microsoft Clarity integration component (`next/script` with `strategy="afterInteractive"`). Features SPA route-change virtual pageview tracking, custom event dispatcher (`trackClarityEvent`), session tagging (`setClarityTag`), and user identity stitching (`identifyClarityUser`) coupled with Supabase `visitor_uuid`.
 *   `pricing/BookingModal.tsx` — Premium checkout modal. Triggers payment generation and redirects user to WayForPay. Uses `react-phone-number-input` for exact international numbers with Edge CDN geo-detection.
 *   `practicum/PracticumHeroForm.tsx` — Practicum subscription form.
 *   `blocks/BlockCases.tsx` — Before-and-after student visual cases grid connected to `REAL_CASES`.
@@ -84,7 +86,7 @@ This live document outlines the architecture, routing structure, components, dat
 *   `intensive/IntensiveCasesReviews.tsx` — High-converting Before/After cases and reviews section for 5-Likes Intensive.
 *   `intensive/IntensiveCheckoutModal.tsx` — [NEW] Dedicated 9€ EUR checkout modal with instant validation and WayForPay integration.
 *   `intensive/use10MinTimer.ts` — [NEW] Synchronized persistent 10-minute countdown timer hook.
-*   `style/` — [NEW] Complete 3-Day Style Intensive component suite (`StyleHero`, `StyleInsight`, `StyleRoadmap`, `StyleProgram`, `StyleChoice`, `StyleSpeaker`, `StyleFinalCTA`, `StyleStickyCTA`, `StyleCheckoutModal`, `StyleLandingPage`).
+*   `style/` — [NEW] Complete 3-Day Style Intensive component suite (`StyleHero`, `StyleInsight`, `StyleRoadmap`, `StyleProgram`, `StyleChoice`, `StyleSpeaker`, `StyleFinalCTA`, `StyleStickyCTA`, `StyleCheckoutModal`, `StyleLandingPage`, `StyleThanksPage`).
 
 ### 🧪 QA Regression Tests (`tests/`)
 *   `tests/test_all_landings.js` — Universal E2E test script simulating page views and form submissions across all 6 landing pages.

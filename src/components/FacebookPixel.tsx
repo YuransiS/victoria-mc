@@ -60,11 +60,17 @@ export const FacebookPixel = () => {
   );
 };
 
+import { trackClarityEvent } from "./MicrosoftClarity";
+
 export const trackFBEvent = (
   eventName: string,
   params?: any,
   options?: { eventID?: string; pixelId?: string } | string
 ) => {
+  if (eventName && eventName !== "PageView") {
+    trackClarityEvent(eventName);
+  }
+
   if (typeof window !== "undefined" && (window as any).fbq) {
     const standardEvents = [
       "AddPaymentInfo", "AddToCart", "AddToWishlist", "CompleteRegistration",

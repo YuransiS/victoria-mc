@@ -10,7 +10,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { getDynamicPriceState } from "@/lib/dynamicPrice";
 import { getClientMarketingAttribution, normalizePhone, normalizeTelegram, normalizeInstagram, normalizeAmount } from "@/lib/enrichment";
 
-const TELEGRAM_LINK = "https://telegram.me/vsual_bot?start=6a031ffdc13c0f31290b8596";
+const TELEGRAM_LINK = "https://tg.pulse.is/vsual_bot?start=6a031ffdc13c0f31290b8596";
 
 interface FormProps {
   buttonText?: string;

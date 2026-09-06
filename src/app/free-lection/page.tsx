@@ -13,7 +13,7 @@ interface FormData {
     instagram: string;
 }
 
-const BOT_REDIRECT_URL = 'https://telegram.me/victoriameshcheriakova_bot?start=6a2289635b7cd51e330436df';
+const BOT_REDIRECT_URL = 'https://tg.pulse.is/victoriameshcheriakova_bot?start=6a2289635b7cd51e330436df';
 
 export default function FreeLectionPage() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -150,11 +150,20 @@ export default function FreeLectionPage() {
                 localStorage.setItem('lead_uuid', resData.uuid);
             }
 
-            if (uavslabVal === '160626') {
-                window.location.href = 'https://telegram.me/victoriameshcheriakova_bot?start=6a319bcf0e2107e50808636b';
-            } else {
-                window.location.href = BOT_REDIRECT_URL;
-            }
+            const visitorUuid = localStorage.getItem('visitor_id') || localStorage.getItem('visitor_uuid') || '';
+            const bwCid = visitorUuid ? `bw_${visitorUuid.replace(/-/g, '')}` : '';
+            const cleanPhone = fullPhone.replace(/\D/g, '');
+            const orderId = resData.uuid || '';
+
+            let targetUrl = uavslabVal === '160626'
+                ? 'https://tg.pulse.is/victoriameshcheriakova_bot?start=6a319bcf0e2107e50808636b'
+                : BOT_REDIRECT_URL;
+
+            if (bwCid) targetUrl += `&bw_cid=${encodeURIComponent(bwCid)}`;
+            if (cleanPhone) targetUrl += `&phone=${encodeURIComponent(cleanPhone)}`;
+            if (orderId) targetUrl += `&order_id=${encodeURIComponent(orderId)}`;
+
+            window.location.href = targetUrl;
         } catch (err) {
             console.error(err);
             alert("Помилка відправки. Спробуйте ще раз.");
