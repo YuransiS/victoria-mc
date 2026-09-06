@@ -9,7 +9,8 @@ import { trackFBEvent } from "@/components/FacebookPixel";
 export default function ThanksPage() {
   const router = useRouter();
   const [isMasterclass, setIsMasterclass] = useState(false);
-  const [tgLink, setTgLink] = useState("https://telegram.me/vika_cooperation");
+  const [isStyleIntensive, setIsStyleIntensive] = useState(false);
+  const [tgLink, setTgLink] = useState("https://t.me/vika_cooperation?text=%D0%94%D0%9E%D0%A1%D0%A2%D0%A3%D0%9F");
 
   useEffect(() => {
     const sessionOrderId = sessionStorage.getItem('lastOrderId');
@@ -39,7 +40,10 @@ export default function ThanksPage() {
     if (urlTgMsgId) activeTgMsgId = urlTgMsgId;
 
     const tariff = localStorage.getItem('lead_tariff') || 'Бронювання';
-    if (tariff === "Майстер-клас 28.07") {
+    if (tariff.includes("Стиль") || tariff.includes("3-денне")) {
+      setIsStyleIntensive(true);
+      setTgLink("https://t.me/vika_cooperation?text=%D0%94%D0%9E%D0%A1%D0%A2%D0%A3%D0%9F");
+    } else if (tariff === "Майстер-клас 28.07") {
       setIsMasterclass(true);
       const savedLink = localStorage.getItem('masterclass_tg_link');
       if (savedLink) {
@@ -47,6 +51,8 @@ export default function ThanksPage() {
       } else {
         setTgLink("https://t.me/+sWnkQ4VJeYg3MWVi");
       }
+    } else {
+      setTgLink("https://t.me/vika_cooperation?text=%D0%94%D0%9E%D0%A1%D0%A2%D0%A3%D0%9F");
     }
 
     if (activeOrderId) {
@@ -108,8 +114,13 @@ export default function ThanksPage() {
             ДЯКУЄМО!
           </h1>
           
-          <p className="font-inter text-lg text-white/60 mb-8 leading-relaxed">
-            {isMasterclass ? (
+          <p className="font-inter text-lg text-white/70 mb-8 leading-relaxed">
+            {isStyleIntensive ? (
+              <>
+                Реєстрацію на 3-денне навчання успішно зафіксовано!<br/>
+                Напишіть кодове слово <strong className="text-white font-bold">«ДОСТУП»</strong> в особисті повідомлення на акаунт <strong className="text-white font-bold">@vika_cooperation</strong>, щоб отримати посилання на всі матеріали та уроки.
+              </>
+            ) : isMasterclass ? (
               <>
                 Ваш квиток на майстер-клас успішно оплачено!<br/>
                 Приєднайтеся до закритого Telegram-каналу, де будуть усі матеріали та посилання на трансляцію.
@@ -117,7 +128,7 @@ export default function ThanksPage() {
             ) : (
               <>
                 Ваша бронь успішно зафіксована.<br/>
-                Напишіть нам у Telegram для отримання подальших інструкцій.
+                Напишіть нам у Telegram на акаунт @vika_cooperation для отримання доступу.
               </>
             )}
           </p>
@@ -125,9 +136,15 @@ export default function ThanksPage() {
           <div className="space-y-4">
             <Link 
               href={tgLink} 
-              className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-white text-black py-5 font-manrope font-bold uppercase tracking-widest hover:bg-white/90 transition-all text-center"
             >
-              {isMasterclass ? "ПРИЄДНАТИСЯ ДО TELEGRAM" : "НАПИСАТИ В TELEGRAM"}
+              {isStyleIntensive
+                ? "НАПИСАТИ «ДОСТУП» У TELEGRAM (@vika_cooperation)"
+                : isMasterclass
+                ? "ПРИЄДНАТИСЯ ДО TELEGRAM"
+                : "НАПИСАТИ В TELEGRAM"}
             </Link>
           </div>
         </motion.div>
